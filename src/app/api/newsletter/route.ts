@@ -34,14 +34,14 @@ export async function POST(request: Request) {
       // Postgres unique violation: email already exists.
       if (error.code === "23505") {
         return NextResponse.json(
-          { message: "Du bist bereits im Newsletter eingetragen." },
+          { message: "Du bist bei mir im Newsletter schon dabei." },
           { status: 200 },
         );
       }
       return NextResponse.json({ error: "Speichern fehlgeschlagen." }, { status: 500 });
     }
 
-    return NextResponse.json({ message: "Vielen Dank für das Abonnieren!" }, { status: 200 });
+    return NextResponse.json({ message: "Vielen Dank — ich halte dich auf dem Laufenden." }, { status: 200 });
   } catch {
     return NextResponse.json(
       { error: "Server-Konfiguration für Supabase fehlt." },

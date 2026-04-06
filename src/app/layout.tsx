@@ -10,7 +10,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Mauro Gilardi | SwissPGA",
   description:
-    "Moderne Website von Mauro Gilardi mit News, Turnieren, Partnern und persönlicher Story.",
+    "Ich bin Mauro Gilardi — News, Turniere, Partner und meine persönliche Geschichte.",
 };
 
 export default function RootLayout({

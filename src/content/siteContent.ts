@@ -2,45 +2,37 @@ export const siteContent = {
   brand: {
     short: "MG",
     name: "Mauro Gilardi",
-    role: "SwissPGA | Spitzensport Golf",
+    role: "SwissPGA Golf Professional",
     headline: "Aus der Heimat auf die internationale Tour.",
     intro:
       "Ich bin Mauro Gilardi. Mein Weg ist geprägt von Leidenschaft, harter Arbeit und starken Werten: Heimat, Bodenständigkeit und Familie.",
   },
+  identity: {
+    colorPrimary: "#d71920",
+    colorBlack: "#0a0a0a",
+    colorWhite: "#ffffff",
+    tone: "Clean, modern, premium und nahbar.",
+  },
   values: [
     {
-      title: "Heimat",
-      text: "Meine Wurzeln geben mir Orientierung und Kraft - auf und neben dem Platz.",
+      title: "Strukturiert statt zufällig",
+      text: "Ich baue Prozesse auf und arbeite mit klaren Prioritäten, statt mich vom Zufall steuern zu lassen.",
     },
     {
-      title: "Bodenständigkeit",
-      text: "Leistung entsteht durch tägliche Arbeit, Disziplin und den Blick fürs Wesentliche.",
+      title: "Langfristig statt kurzfristig",
+      text: "Jede Entscheidung zahlt auf nachhaltige Entwicklung ein - sportlich, persönlich und unternehmerisch.",
     },
     {
-      title: "Familie",
-      text: "Ohne mein Umfeld wäre dieser Weg nicht möglich. Erfolg ist immer Teamarbeit.",
+      title: "Authentisch statt inszeniert",
+      text: "Ich teile meinen Weg ehrlich - mit Herausforderungen, Entscheidungen und Learnings aus dem Alltag als Golf Professional.",
     },
   ],
   story: [
-    "Nach einer guten ersten Saison auf der ProGolf Tour und vier gemachten Cuts auf der Challenge Tour setzte ich in meinem zweiten vollen Jahr (Saison 2025) klar auf die ProGolf Tour - mit dem Ziel, mein erstes Turnier zu gewinnen und im Finale um einen Top-5 Platz im Order of Merit zu spielen.",
-    "Das Ziel ist es, regelmässig starke Events zu spielen und dadurch so schnell wie möglich in die Challenge Tour aufzusteigen. Dafür muss ich Ende des Jahres in den Top-5 des ProGolf Tour Order of Merit stehen.",
-  ],
-  tournaments: [
-    {
-      date: "Do., 19. Feb.",
-      name: "PGT - Golf Mad Open 2026",
-      tags: ["pgt", "2026"],
-    },
-    {
-      date: "Mo., 23. Feb.",
-      name: "PGT - Golf Mad Challenge 2026",
-      tags: ["pgt", "2026"],
-    },
-    {
-      date: "Di., 10. März",
-      name: "PGT - Red Sea Ain Sokhna Open 2026",
-      tags: ["pgt", "2026"],
-    },
+    "Ich bin Mauro Gilardi, professioneller Golfspieler seit 2022, mit dem klaren Ziel, mich auf der DP World Tour zu etablieren.",
+    "Mein Weg im Golf war nie nur sportlich geprägt. Schon früh habe ich begonnen, meine Karriere nicht nur als Athlet, sondern als gesamtes Projekt zu verstehen. Mit meinem Hintergrund in der Informatik und meiner beruflichen Erfahrung habe ich gelernt, strukturiert zu denken, Prozesse aufzubauen und langfristig zu planen.",
+    "Heute verbinde ich Leistungssport mit Unternehmertum. Neben meiner Karriere auf der Tour entwickle ich eigene Projekte im Sportbereich - darunter Apps, Plattformen und Initiativen, die Athleten unterstützen und den Zugang zum Sport vereinfachen.",
+    "Gleichzeitig habe ich meine eigene Gönnerstruktur aufgebaut und organisiere jährlich Events, um meine Partner aktiv in meinen Weg einzubinden.",
+    "Ich sehe meine Karriere wie ein Unternehmen - mit klaren Zielen, kontinuierlicher Entwicklung und dem Anspruch, jeden Tag besser zu werden. Dabei ist mir wichtig, bodenständig zu bleiben und meine Erfahrungen zu teilen.",
   ],
   news: [
     {
@@ -64,5 +56,3 @@ export const siteContent = {
     { title: "Partner", text: "Netzwerk aus Vertrauen, Qualität und Langfristigkeit." },
   ],
 };
-
-export type TournamentFilter = "all" | "pgt" | "2026";
