@@ -217,19 +217,15 @@ export function getPgtEventLiveOnDate(now: Date): PgtSeasonEvent | null {
   return null;
 }
 
-const UPCOMING_PGT_EVENTS_LIMIT = 4;
-
-/** Noch nicht beendete Turniere, chronologisch — maximal `limit` (Standard: nächste 4). */
-export function getUpcomingPgtSeasonEvents(now: Date, limit = UPCOMING_PGT_EVENTS_LIMIT): PgtSeasonEvent[] {
+/** Noch nicht beendete Turniere, chronologisch. Mit `limit` wird gekürzt, sonst alle. */
+export function getUpcomingPgtSeasonEvents(now: Date, limit?: number): PgtSeasonEvent[] {
   const t = dayStart(now);
   const upcoming = pgtSeasonEvents2026.filter((ev) => {
     const end = dayStart(new Date(`${ev.end}T12:00:00`));
     return end >= t;
   });
-  return upcoming.slice(0, limit);
+  return typeof limit === "number" ? upcoming.slice(0, limit) : upcoming;
 }
-
-export { UPCOMING_PGT_EVENTS_LIMIT };
 
 export function livescoringLinkForEvent(ev: PgtSeasonEvent): string {
   return ev.livescoringUrl ?? PRO_GOLF_TOUR_LIVESCORING_URL;

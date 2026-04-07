@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isAdminSession } from "@/lib/admin-auth";
 import { readEnv } from "@/lib/env";
-import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 const ALLOWED_BUCKETS = ["blog-images", "sponsor-logos"] as const;
 
@@ -27,21 +27,41 @@ export async function POST(request: Request) {
   if (!(file instanceof File) || file.size === 0) {
     return NextResponse.json({ error: "Datei fehlt." }, { status: 400 });
   }
+  const uploadFile = file;
 
-  if (file.size > 8 * 1024 * 1024) {
+  if (uploadFile.size > 8 * 1024 * 1024) {
     return NextResponse.json({ error: "Max. 8 MB." }, { status: 400 });
   }
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const ext = uploadFile.name.split(".").pop()?.toLowerCase() || "jpg";
   const safeExt = /^[a-z0-9]{2,5}$/.test(ext) ? ext : "jpg";
   const path = `${randomUUID()}.${safeExt}`;
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const supabase = await createSupabaseUserServerClient();
-  const { error } = await supabase.storage.from(bucket).upload(path, buffer, {
-    contentType: file.type || "application/octet-stream",
-    upsert: false,
-  });
+  const buffer = Buffer.from(await uploadFile.arrayBuffer());
+  // Admin route is already session-protected; use service role to avoid Storage RLS policy pitfalls.
+  const supabase = createSupabaseServerClient();
+  async function uploadOnce() {
+    return supabase.storage.from(bucket).upload(path, buffer, {
+      contentType: uploadFile.type || "application/octet-stream",
+      upsert: false,
+    });
+  }
+
+  let { error } = await uploadOnce();
+  const missingBucket =
+    error?.message?.toLowerCase().includes("bucket not found") || error?.message?.toLowerCase().includes("not found");
+
+  if (error && missingBucket) {
+    const { error: createError } = await supabase.storage.createBucket(bucket, {
+      public: true,
+      fileSizeLimit: 8 * 1024 * 1024,
+      allowedMimeTypes: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif", "image/svg+xml"],
+    });
+    if (!createError || createError.message?.toLowerCase().includes("already")) {
+      const retry = await uploadOnce();
+      error = retry.error;
+    }
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message || "Upload fehlgeschlagen." }, { status: 500 });

@@ -3338,11 +3338,15 @@ body {
 }
 
 .admin-login {
-  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(1.25rem, 5vw, 2.5rem) var(--page-gutter);
+  width: min(var(--page-content-max), calc(100% - (var(--page-gutter) * 2)));
+  max-width: var(--page-content-max);
+  margin: 0 auto;
+  box-sizing: border-box;
+  flex: 1 1 auto;
 }
 
 .admin-login-card {
@@ -3483,13 +3487,10 @@ body {
 }
 
 .admin-top {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+  position: relative;
+  z-index: 10;
   border-bottom: 1px solid var(--site-header-edge);
-  background: linear-gradient(180deg, var(--site-header-glass) 0%, var(--site-header-glass-mid) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(1.06);
-  backdrop-filter: blur(14px) saturate(1.06);
+  background: linear-gradient(180deg, rgb(250 249 246 / 86%) 0%, rgb(250 249 246 / 66%) 100%);
 }
 
 .admin-top-inner {
@@ -3516,20 +3517,13 @@ body {
   pointer-events: none;
 }
 
-.admin-brand-lockup {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  text-decoration: none;
-  color: inherit;
-}
-
-.admin-brand-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.05rem;
-  line-height: 1.15;
+.admin-top-kicker {
+  margin: 0;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
 }
 
 .admin-brand-name {
@@ -3538,14 +3532,6 @@ body {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--admin-ink);
-}
-
-.admin-brand-sub {
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--admin-muted);
 }
 
 .admin-brand-badge {
@@ -3966,6 +3952,12 @@ body {
 .admin-link:hover {
   color: var(--admin-primary-hover);
   text-decoration: underline;
+}
+
+.admin-list-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .admin-form {

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin-logout-button";
@@ -16,22 +15,9 @@ export function AdminTabNav() {
   const pathname = usePathname();
 
   return (
-    <header className="admin-top">
+    <section className="admin-top" aria-label="Admin Bereiche">
       <div className="admin-top-inner">
-        <Link href="/admin" className="admin-brand-lockup">
-          <Image
-            src="/brand-assets/logos/Logo_negativ.svg"
-            alt="Mauro Gilardi"
-            width={120}
-            height={28}
-            className="admin-brand-logo"
-          />
-          <span className="admin-brand-text">
-            <span className="admin-brand-name">Mauro Gilardi</span>
-            <span className="admin-brand-sub">maurogilardi.ch</span>
-          </span>
-          <span className="admin-brand-badge">Admin</span>
-        </Link>
+        <p className="admin-top-kicker">Admin</p>
         <nav className="admin-tabs" aria-label="Admin Navigation">
           {tabs.map((tab) => (
             <Link
@@ -45,6 +31,6 @@ export function AdminTabNav() {
         </nav>
         <AdminLogoutButton />
       </div>
-    </header>
+    </section>
   );
 }

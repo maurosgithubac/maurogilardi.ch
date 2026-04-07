@@ -5,7 +5,6 @@ import Image from "next/image";
 import { FormEvent, useMemo, useState } from "react";
 import type { PostRow, SponsorRow } from "@/types/content";
 import { siteContent } from "@/content/siteContent";
-import { blogImageUrl, sponsorLogoUrl } from "@/lib/storage-public-url";
 import { SiteHeader } from "@/components/site-header";
 import { PgtLiveScoringTicker } from "@/components/pgt-live-scoring-ticker";
 import {
@@ -16,14 +15,21 @@ import {
   PRO_GOLF_TOUR_TURNIERE_URL,
 } from "@/content/pgtSeasonEvents";
 
-type PostCard = Pick<PostRow, "id" | "slug" | "title" | "description" | "image_path" | "created_at">;
-type SponsorCard = Pick<SponsorRow, "id" | "name" | "logo_path" | "website_url">;
+type PostCard = Pick<PostRow, "id" | "slug" | "title" | "description" | "created_at"> & { image_url: string | null };
+type SponsorCard = Pick<SponsorRow, "id" | "name" | "website_url"> & { logo_url: string };
 
 type Props = {
   posts: PostCard[];
   sponsors: SponsorCard[];
   upcomingPgtEvents: PgtSeasonEvent[];
 };
+
+const postDateFormatter = new Intl.DateTimeFormat("de-CH", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
   const [newsletterMessage, setNewsletterMessage] = useState("");
@@ -130,7 +136,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           ) : (
             <ul className="blog-grid">
               {posts.map((post) => {
-                const img = blogImageUrl(post.image_path);
+                const img = post.image_url;
                 return (
                   <li key={post.id}>
                     <Link href={`/blog/${post.slug}`} className="blog-card">
@@ -143,11 +149,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                       </div>
                       <div className="blog-card-body">
                         <time dateTime={post.created_at}>
-                          {new Date(post.created_at).toLocaleDateString("de-CH", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {postDateFormatter.format(new Date(post.created_at))}
                         </time>
                         <h3>{post.title}</h3>
                         {post.description ? <p>{post.description}</p> : null}
@@ -165,7 +167,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             <div>
               <h2 id="pgt-events-heading">Saison & Termine</h2>
               <p className="pgt-events-sub">
-                Die nächsten vier Termine — vollständiger Kalender auf der{" "}
+                Die nächsten drei Termine — vollständiger Kalender auf der{" "}
                 <a href={PRO_GOLF_TOUR_TURNIERE_URL} target="_blank" rel="noopener noreferrer">
                   Pro Golf Tour
                 </a>
@@ -183,7 +185,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                 .
               </li>
             ) : (
-              (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 2)).map((ev) => (
+              (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 3)).map((ev) => (
                 <li key={ev.id} className="pgt-events-card">
                   <h3 className="pgt-events-card-title">{ev.name}</h3>
                   <p className="pgt-events-card-meta">
@@ -210,7 +212,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               ))
             )}
           </ul>
-          {upcomingPgtEvents.length > 2 ? (
+          {upcomingPgtEvents.length > 3 ? (
             <div className="pgt-events-toggle-wrap">
               <button
                 type="button"
@@ -281,7 +283,7 @@ function ClientMarquee({
     <div className="blog-marquee-wrap">
       <div className="blog-marquee">
         {sponsors.map((s, index) => {
-          const href = sponsorLogoUrl(s.logo_path);
+          const href = s.logo_url;
           const inner = (
             <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={140} height={56} className="blog-marquee-logo" /> : s.name}</span>
           );
