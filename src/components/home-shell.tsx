@@ -134,31 +134,38 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           {posts.length === 0 ? (
             <p className="blog-empty">Noch keine Beiträge — bald gibt es hier mehr von mir.</p>
           ) : (
-            <ul className="blog-grid">
-              {posts.map((post) => {
-                const img = post.image_url;
-                return (
-                  <li key={post.id}>
-                    <Link href={`/blog/${post.slug}`} className="blog-card">
-                      <div className="blog-card-media">
-                        {img ? (
-                          <Image src={img} alt="" fill className="blog-card-img" sizes="(max-width: 768px) 100vw, 33vw" />
-                        ) : (
-                          <div className="blog-card-placeholder" />
-                        )}
-                      </div>
-                      <div className="blog-card-body">
-                        <time dateTime={post.created_at}>
-                          {postDateFormatter.format(new Date(post.created_at))}
-                        </time>
-                        <h3>{post.title}</h3>
-                        {post.description ? <p>{post.description}</p> : null}
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            <>
+              <ul className="blog-grid blog-grid--one-row">
+                {posts.map((post) => {
+                  const img = post.image_url;
+                  return (
+                    <li key={post.id}>
+                      <Link href={`/blog/${post.slug}`} className="blog-card">
+                        <div className="blog-card-media">
+                          {img ? (
+                            <Image src={img} alt="" fill className="blog-card-img" sizes="(max-width: 768px) 100vw, 33vw" />
+                          ) : (
+                            <div className="blog-card-placeholder" />
+                          )}
+                        </div>
+                        <div className="blog-card-body">
+                          <time dateTime={post.created_at}>{postDateFormatter.format(new Date(post.created_at))}</time>
+                          <h3>{post.title}</h3>
+                          {post.description ? <p>{post.description}</p> : null}
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {posts.length > 1 ? (
+                <div className="pgt-events-toggle-wrap">
+                  <Link href="/blog" className="pgt-events-toggle">
+                    Mehr anzeigen
+                  </Link>
+                </div>
+              ) : null}
+            </>
           )}
         </section>
 

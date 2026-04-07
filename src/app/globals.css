@@ -2416,6 +2416,21 @@ body {
   padding: 0;
 }
 
+.blog-grid--one-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: clamp(1rem, 2.4vw, 1.35rem);
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.35rem;
+}
+
+.blog-grid--one-row > li {
+  flex: 0 0 min(22rem, 84vw);
+  scroll-snap-align: start;
+}
+
 @media (max-width: 1200px) {
   .blog-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
