@@ -5857,3 +5857,60 @@ body {
     object-position: 50% 28%;
   }
 }
+
+/* Final lock: subpage image title sections mirror landing hero 1:1 */
+.about-hero,
+.goenner-hero {
+  min-height: 100svh;
+  min-height: 100dvh;
+  align-items: flex-end;
+}
+
+.subpage-copy.about-hero-copy {
+  max-width: min(36rem, 100%);
+  padding: 6.75rem var(--page-gutter) clamp(2.75rem, 8vh, 4.25rem);
+}
+
+@media (max-width: 760px) {
+  .about-hero,
+  .goenner-hero {
+    min-height: 62svh;
+    min-height: 62dvh;
+    align-items: center;
+  }
+
+  .subpage-copy.about-hero-copy {
+    max-width: min(34rem, 100%);
+    padding: 5.45rem var(--page-gutter) 1.45rem;
+  }
+
+  .about-hero-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+  }
+
+  .about-hero-actions .about-btn {
+    flex: 1 1 0;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero,
+  .goenner-hero {
+    min-height: 58svh;
+    min-height: 58dvh;
+  }
+
+  .subpage-copy.about-hero-copy {
+    padding-top: 4.9rem;
+    padding-bottom: 1rem;
+  }
+
+  .about-hero-actions .about-btn {
+    min-height: 38px;
+  }
+}
