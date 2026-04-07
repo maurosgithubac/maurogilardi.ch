@@ -5059,14 +5059,14 @@ body {
   .subpage-hero,
   .about-hero,
   .goenner-hero {
-    min-height: 56svh;
-    min-height: 56dvh;
+    min-height: 52svh;
+    min-height: 52dvh;
   }
 
   .blog-hero,
   .blog-hero--landing {
-    min-height: 58svh;
-    min-height: 58dvh;
+    min-height: 54svh;
+    min-height: 54dvh;
   }
 
   .blog-post-hero {
@@ -5083,14 +5083,14 @@ body {
   .subpage-hero,
   .about-hero,
   .goenner-hero {
-    min-height: 52svh;
-    min-height: 52dvh;
+    min-height: 48svh;
+    min-height: 48dvh;
   }
 
   .blog-hero,
   .blog-hero--landing {
-    min-height: 54svh;
-    min-height: 54dvh;
+    min-height: 50svh;
+    min-height: 50dvh;
   }
 
   .blog-post-hero {
@@ -5480,8 +5480,10 @@ body {
 @media (max-width: 760px) {
   .blog-hero-cta,
   .about-hero-actions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
     gap: 0.45rem;
     width: 100%;
     margin-top: 0.75rem;
@@ -5489,7 +5491,8 @@ body {
 
   .blog-hero-cta .blog-btn,
   .about-hero-actions .about-btn {
-    width: 100%;
+    width: auto;
+    flex: 1 1 0;
     min-height: 40px;
     padding: 0.55rem 0.85rem;
     justify-content: center;
@@ -5517,5 +5520,10 @@ body {
     min-height: 38px;
     font-size: 0.54rem;
     padding: 0.5rem 0.72rem;
+  }
+
+  .blog-hero-cta,
+  .about-hero-actions {
+    gap: 0.38rem;
   }
 }
