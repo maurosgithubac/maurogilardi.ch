@@ -5792,11 +5792,12 @@ body {
   .goenner-hero {
     min-height: 62svh;
     min-height: 62dvh;
+    align-items: center;
   }
 
   .subpage-copy.about-hero-copy {
     max-width: min(34rem, 100%);
-    padding: 5.45rem var(--page-gutter) 1.45rem;
+    padding: 5rem var(--page-gutter) 1.15rem;
   }
 
   .about-hero-copy h1 {
@@ -5824,7 +5825,7 @@ body {
   }
 
   .about-hero-bg {
-    object-position: 50% 42%;
+    object-position: 50% 30%;
   }
 }
 
@@ -5834,11 +5835,12 @@ body {
   .goenner-hero {
     min-height: 58svh;
     min-height: 58dvh;
+    align-items: center;
   }
 
   .subpage-copy.about-hero-copy {
-    padding-top: 4.9rem;
-    padding-bottom: 1rem;
+    padding-top: 4.6rem;
+    padding-bottom: 0.85rem;
   }
 
   .about-hero-actions {
@@ -5852,6 +5854,6 @@ body {
   }
 
   .about-hero-bg {
-    object-position: 50% 40%;
+    object-position: 50% 28%;
   }
 }
