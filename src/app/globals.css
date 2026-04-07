@@ -5054,6 +5054,51 @@ body {
   white-space: pre-wrap;
 }
 
+/* Final mobile hero overrides (must come late so they win cascade) */
+@media (max-width: 760px) {
+  .subpage-hero,
+  .about-hero,
+  .goenner-hero {
+    min-height: 56svh;
+    min-height: 56dvh;
+  }
+
+  .blog-hero,
+  .blog-hero--landing {
+    min-height: 58svh;
+    min-height: 58dvh;
+  }
+
+  .blog-post-hero {
+    width: calc(100% - 1.4rem);
+    max-width: min(56rem, calc(100% - 1.4rem));
+    margin-top: 0.55rem;
+    aspect-ratio: 16 / 8.5;
+    max-height: 30vh;
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .subpage-hero,
+  .about-hero,
+  .goenner-hero {
+    min-height: 52svh;
+    min-height: 52dvh;
+  }
+
+  .blog-hero,
+  .blog-hero--landing {
+    min-height: 54svh;
+    min-height: 54dvh;
+  }
+
+  .blog-post-hero {
+    aspect-ratio: 16 / 9;
+    max-height: 26vh;
+  }
+}
+
 /* Mobile cleanup: newsletter form compact and stable */
 @media (max-width: 760px) {
   .blog-newsletter-inner {
@@ -5091,5 +5136,386 @@ body {
     font-size: 0.58rem;
     letter-spacing: 0.1em;
     padding: 0.5rem 0.85rem;
+  }
+}
+
+/* Mobile minimalist pass: all pages */
+@media (max-width: 760px) {
+  :root {
+    --page-gutter: 0.85rem;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  .site-header {
+    padding: 0.58rem var(--page-gutter);
+    gap: 0.4rem 0.7rem;
+  }
+
+  .site-header-logo {
+    width: clamp(96px, 28vw, 126px);
+  }
+
+  .site-header-nav {
+    padding: 0.4rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgb(23 21 19 / 13%);
+  }
+
+  .site-header-nav-link {
+    min-height: 2.15rem;
+    font-size: 0.64rem;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.58rem;
+  }
+
+  .blog-home-main,
+  .blog-page-main,
+  .about-story,
+  .about-projects,
+  .pgt-events,
+  .goenner-form-section {
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+  }
+
+  .blog-sponsors {
+    margin-top: -1.2rem;
+    padding: 1.55rem 0 1.25rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: none;
+  }
+
+  .blog-marquee {
+    gap: 1.25rem;
+  }
+
+  .blog-marquee-logo {
+    height: 1.55rem;
+    max-width: 5.4rem;
+  }
+
+  .blog-grid--one-row > li {
+    flex: 0 0 min(17.5rem, 86vw);
+  }
+
+  .blog-card,
+  .pgt-events-card,
+  .about-project-card,
+  .goenner-tier,
+  .goenner-form,
+  .goenner-memberships-head,
+  .goenner-form-section-head,
+  .about-project-kpi,
+  .blog-post-inner,
+  .admin-login-card,
+  .admin-form-card,
+  .admin-list-item,
+  .admin-sponsor-row,
+  .admin-tile {
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .blog-card {
+    border-radius: var(--radius-md);
+  }
+
+  .blog-card-media {
+    aspect-ratio: 16 / 8;
+  }
+
+  .blog-card-body {
+    padding: 0.75rem 0.75rem 0.85rem;
+  }
+
+  .blog-card-body h3 {
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .blog-card-body p {
+    font-size: 0.8rem;
+    line-height: 1.32;
+  }
+
+  .pgt-events {
+    padding-top: 1.8rem;
+    padding-bottom: 1.9rem;
+  }
+
+  .pgt-events-head {
+    margin-bottom: 1rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .pgt-events-head h2 {
+    font-size: 1.16rem;
+  }
+
+  .pgt-events-sub {
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  .pgt-events-card {
+    padding: 0.78rem 0.8rem 0.85rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .pgt-events-card-title {
+    font-size: 0.92rem;
+  }
+
+  .pgt-events-card-meta,
+  .pgt-events-card-links,
+  .pgt-events-footnote {
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .about-hero-copy h1,
+  .goenner-hero .about-hero-copy h1 {
+    font-size: clamp(1.42rem, 7.4vw, 1.95rem);
+    max-width: 14ch;
+  }
+
+  .about-hero-actions {
+    margin-top: 1rem;
+    gap: 0.45rem;
+  }
+
+  .about-btn {
+    padding: 0.58rem 0.92rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.09em;
+  }
+
+  .about-story {
+    padding-top: 1.35rem;
+  }
+
+  .about-story-portrait {
+    width: min(52vw, 180px);
+  }
+
+  .about-story-tags li {
+    padding: 0.22rem 0.46rem;
+    font-size: 0.52rem;
+  }
+
+  .about-projects {
+    padding-bottom: 2.15rem;
+  }
+
+  .about-projects-grid {
+    gap: 0.62rem;
+  }
+
+  .about-project-card {
+    padding: 0.7rem 0.72rem 0.76rem;
+  }
+
+  .about-project-type {
+    font-size: 0.52rem;
+  }
+
+  .about-project-card h3 {
+    font-size: 0.88rem;
+  }
+
+  .about-project-card p {
+    font-size: 0.78rem;
+    line-height: 1.32;
+  }
+
+  .goenner-memberships,
+  .goenner-form-section,
+  .goenner-trust {
+    width: min(100%, calc(100% - 0.9rem));
+  }
+
+  .goenner-tiers {
+    gap: 0.52rem;
+  }
+
+  .goenner-tier {
+    min-width: 88vw;
+    padding: 0.76rem 0.72rem 0.84rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .goenner-tier-title {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .goenner-tier-list {
+    gap: 0.34rem;
+    font-size: 0.8rem;
+    line-height: 1.32;
+  }
+
+  .goenner-tier-cta {
+    margin-top: 0.62rem;
+    font-size: 0.58rem;
+  }
+
+  .goenner-form {
+    padding: 0.72rem;
+    gap: 0.68rem;
+  }
+
+  .goenner-radio-grid {
+    gap: 0.38rem;
+  }
+
+  .goenner-radio-card {
+    padding: 0.48rem 0.5rem;
+  }
+
+  .goenner-radio-title {
+    font-size: 0.66rem;
+  }
+
+  .goenner-radio-price {
+    font-size: 0.74rem;
+  }
+
+  .goenner-label {
+    font-size: 0.76rem;
+  }
+
+  .goenner-label input,
+  .goenner-label textarea {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .goenner-submit {
+    min-height: 40px;
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+  }
+
+  .blog-post-breadcrumb {
+    font-size: 0.58rem;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+  }
+
+  .blog-post-inner {
+    margin-top: 0.62rem;
+    padding: 0.85rem 0.9rem 1.2rem;
+    border-radius: var(--radius-md);
+  }
+
+  .blog-post-inner h1 {
+    margin-top: 0.66rem;
+    font-size: clamp(1.35rem, 6.4vw, 1.85rem);
+  }
+
+  .blog-post-dek {
+    margin-top: 0.52rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .blog-post-body {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.58;
+  }
+
+  .blog-post-back {
+    margin-top: 1.5rem;
+  }
+
+  .admin-body {
+    padding-top: 0.9rem;
+    padding-bottom: 2rem;
+  }
+
+  .admin-page-head {
+    margin-bottom: 0.1rem;
+  }
+
+  .admin-page-kicker {
+    margin-bottom: 0.35rem;
+  }
+
+  .admin-h1 {
+    font-size: clamp(1.2rem, 5.8vw, 1.52rem);
+  }
+
+  .admin-muted,
+  .admin-page-lead {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header-menu-toggle {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .blog-grid--one-row > li {
+    flex-basis: 88vw;
+  }
+
+  .about-hero-actions .about-btn,
+  .goenner-hero .about-hero-actions .about-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .goenner-tier {
+    min-width: 92vw;
+  }
+}
+
+/* Hero title area buttons: mobile specific */
+@media (max-width: 760px) {
+  .blog-hero-cta,
+  .about-hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .blog-hero-cta .blog-btn,
+  .about-hero-actions .about-btn {
+    width: 100%;
+    min-height: 40px;
+    padding: 0.55rem 0.85rem;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    box-shadow: none;
+  }
+
+  .blog-btn-primary,
+  .about-btn-primary {
+    border: 1px solid rgb(215 25 32 / 48%);
+  }
+
+  .blog-btn-ghost,
+  .about-btn-ghost {
+    background: rgb(255 255 255 / 92%);
+    border: 1px solid rgb(23 21 19 / 12%);
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-hero-cta .blog-btn,
+  .about-hero-actions .about-btn {
+    min-height: 38px;
+    font-size: 0.54rem;
+    padding: 0.5rem 0.72rem;
   }
 }
