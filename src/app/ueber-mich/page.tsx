@@ -48,7 +48,9 @@ export default function UeberMichPage() {
             <div className="about-story-layout">
               <div className="about-story-grid">
                 {siteContent.story.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} className={index === 0 ? "about-story-lead" : undefined}>
+                    {paragraph}
+                  </p>
                 ))}
               </div>
               <aside className="about-story-portrait" aria-label="Portrait">
@@ -58,23 +60,49 @@ export default function UeberMichPage() {
                     alt="Portrait von Mauro Gilardi"
                     fill
                     className="about-story-portrait-img"
-                    sizes="(max-width: 640px) 52vw, 220px"
-                    quality={95}
+                    sizes="(max-width: 640px) 70vw, 320px"
+                    quality={100}
                   />
                 </div>
+                <ul className="about-story-tags" aria-label="Schwerpunkte">
+                  <li>DP World Tour Ziel</li>
+                  <li>Leistungssport & IT</li>
+                </ul>
               </aside>
             </div>
           </div>
         </section>
 
-        <section className="about-values" aria-labelledby="about-values-title">
-          <div className="about-values-inner">
-            <h2 id="about-values-title">Was mich trägt</h2>
-            <ul className="about-values-grid">
-              {siteContent.values.map((v) => (
-                <li key={v.title} className="about-value-card">
-                  <h3>{v.title}</h3>
-                  <p>{v.text}</p>
+        <section className="about-projects" aria-labelledby="about-projects-title">
+          <div className="about-projects-inner">
+            <h2 id="about-projects-title">Neben dem Tour-Alltag, den ich aufbaue</h2>
+            <p className="about-projects-intro">{siteContent.projectsShowcase.intro}</p>
+
+            <ul className="about-projects-roles">
+              {siteContent.projectsShowcase.responsibilities.map((role) => (
+                <li key={role}>{role}</li>
+              ))}
+            </ul>
+
+            <ul className="about-projects-grid">
+              {siteContent.projectsShowcase.projects.map((project) => (
+                <li key={project.name} className="about-project-card">
+                  <p className="about-project-type">{project.type}</p>
+                  <h3>
+                    <a href={project.href} target="_blank" rel="noopener noreferrer">
+                      {project.name}
+                    </a>
+                  </h3>
+                  <p>{project.text}</p>
+                </li>
+              ))}
+            </ul>
+
+            <ul className="about-projects-kpis" aria-label="Projektkennzahlen">
+              {siteContent.projectsShowcase.kpis.map((kpi) => (
+                <li key={kpi.label} className="about-project-kpi">
+                  <span className="about-project-kpi-value">{kpi.value}</span>
+                  <span className="about-project-kpi-label">{kpi.label}</span>
                 </li>
               ))}
             </ul>

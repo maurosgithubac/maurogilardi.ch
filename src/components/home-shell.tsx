@@ -28,6 +28,7 @@ type Props = {
 export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAllEvents, setShowAllEvents] = useState(false);
 
   const marqueeSponsors = useMemo(() => {
     if (sponsors.length === 0) return [];
@@ -182,7 +183,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                 .
               </li>
             ) : (
-              upcomingPgtEvents.map((ev) => (
+              (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 2)).map((ev) => (
                 <li key={ev.id} className="pgt-events-card">
                   <h3 className="pgt-events-card-title">{ev.name}</h3>
                   <p className="pgt-events-card-meta">
@@ -209,6 +210,19 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               ))
             )}
           </ul>
+          {upcomingPgtEvents.length > 2 ? (
+            <div className="pgt-events-toggle-wrap">
+              <button
+                type="button"
+                className="pgt-events-toggle"
+                onClick={() => setShowAllEvents((open) => !open)}
+                aria-expanded={showAllEvents}
+                aria-controls="pgt-events-heading"
+              >
+                {showAllEvents ? "Weniger anzeigen" : "Alle anzeigen"}
+              </button>
+            </div>
+          ) : null}
           <p className="pgt-events-footnote">
             Livescoring der Tour:{" "}
             <a href={PRO_GOLF_TOUR_LIVESCORING_URL} target="_blank" rel="noopener noreferrer">

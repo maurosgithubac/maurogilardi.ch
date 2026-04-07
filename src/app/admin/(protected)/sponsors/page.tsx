@@ -93,32 +93,51 @@ export default function AdminSponsorsPage() {
 
   return (
     <div className="admin-card-stack">
-      <h1 className="admin-h1">Partner</h1>
-      <form onSubmit={onAdd} className="admin-form">
-        <label className="admin-field">
-          Name
-          <input value={name} onChange={(event) => setName(event.target.value)} required />
-        </label>
-        <label className="admin-field">
-          Website (optional)
-          <input value={websiteUrl} onChange={(event) => setWebsiteUrl(event.target.value)} placeholder="https://" />
-        </label>
-        <label className="admin-field">
-          Reihenfolge
-          <input
-            type="number"
-            value={sortOrder}
-            onChange={(event) => setSortOrder(Number(event.target.value))}
-          />
-        </label>
-        <label className="admin-field">
-          Logo
-          <input name="logo" type="file" accept="image/*" required />
-        </label>
+      <header className="admin-page-head">
+        <p className="admin-page-kicker">Startseite</p>
+        <h1 className="admin-h1">Partner & Logos</h1>
+        <p className="admin-muted admin-page-lead">
+          Logos erscheinen im Partner-Bereich auf der Website. Die Reihenfolge steuert die Darstellung.
+        </p>
+      </header>
+
+      <div className="admin-inline-kpis">
+        <div className="admin-inline-kpi">
+          <span className="admin-inline-kpi-label">Aktive Partner</span>
+          <strong>{sponsors.length}</strong>
+        </div>
+      </div>
+
+      <form onSubmit={onAdd} className="admin-form admin-form-card">
+        <div className="admin-field-grid">
+          <label className="admin-field">
+            Name
+            <input value={name} onChange={(event) => setName(event.target.value)} required />
+          </label>
+          <label className="admin-field">
+            Website (optional)
+            <input value={websiteUrl} onChange={(event) => setWebsiteUrl(event.target.value)} placeholder="https://" />
+          </label>
+          <label className="admin-field admin-field--compact">
+            Reihenfolge
+            <input
+              type="number"
+              value={sortOrder}
+              onChange={(event) => setSortOrder(Number(event.target.value))}
+            />
+          </label>
+          <label className="admin-field">
+            Logo
+            <input name="logo" type="file" accept="image/*" required />
+            <span className="admin-hint">Optimiert für hellen Hintergrund.</span>
+          </label>
+        </div>
         {error ? <p className="admin-error">{error}</p> : null}
-        <button type="submit" className="admin-submit" disabled={busy}>
-          Partner hinzufügen
-        </button>
+        <div className="admin-form-actions">
+          <button type="submit" className="admin-submit" disabled={busy}>
+            Partner hinzufügen
+          </button>
+        </div>
       </form>
 
       <ul className="admin-sponsor-list">

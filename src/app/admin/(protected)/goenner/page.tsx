@@ -20,8 +20,17 @@ export default async function AdminGoennerPage() {
 
   return (
     <div className="admin-card-stack">
-      <h1 className="admin-h1">Gönner-Anfragen</h1>
-      <p className="admin-muted">Mitgliedschaftsanfragen über dein Gönner-Formular.</p>
+      <header className="admin-page-head">
+        <p className="admin-page-kicker">Gönner</p>
+        <h1 className="admin-h1">Anfragen</h1>
+        <p className="admin-muted admin-page-lead">Mitgliedschaftsanfragen aus dem Gönner-Formular der Website.</p>
+      </header>
+      <div className="admin-inline-kpis">
+        <div className="admin-inline-kpi">
+          <span className="admin-inline-kpi-label">Eingänge</span>
+          <strong>{rows.length}</strong>
+        </div>
+      </div>
       {error ? (
         <p className="admin-muted">
           Tabelle fehlt oder keine Berechtigung. Führe{" "}

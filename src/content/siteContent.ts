@@ -34,6 +34,56 @@ export const siteContent = {
     "Gleichzeitig habe ich meine eigene Gönnerstruktur aufgebaut und organisiere jährlich Events, um meine Partner aktiv in meinen Weg einzubinden.",
     "Ich sehe meine Karriere wie ein Unternehmen - mit klaren Zielen, kontinuierlicher Entwicklung und dem Anspruch, jeden Tag besser zu werden. Dabei ist mir wichtig, bodenständig zu bleiben und meine Erfahrungen zu teilen.",
   ],
+  projectsShowcase: {
+    intro:
+      "Neben dem Tour-Alltag übernehme ich Verantwortung in Verbandsfunktionen und baue digitale Projekte auf. So kann ich sportliches Denken, IT-Know-how und unternehmerische Struktur verbinden.",
+    responsibilities: [
+      "Head of SwissPGA Players Commission (als Teil des SwissPGA Boards) mit Fokus auf Spielerwohl, Plattformaufbau und Austausch unter Playing Professionals",
+    ],
+    projects: [
+      {
+        name: "maurogilardi.ch",
+        href: "https://maurogilardi.ch",
+        type: "Eigene Webseite",
+        text: "Meine persönliche Plattform mit Updates zu Tour, Projekten und Partnern.",
+      },
+      {
+        name: "saameducation.com",
+        href: "https://saameducation.com",
+        type: "Non-Profit",
+        text: "Webseite für die Organisation meiner Schwester zum Aufbau von Infrastruktur in Südafrika.",
+      },
+      {
+        name: "creativegemini.ch",
+        href: "https://creativegemini.ch",
+        type: "Nebenprojekt",
+        text: "Projektseite für personalisierte Geschenke und kreative Kleinserien.",
+      },
+      {
+        name: "claudioblaesi.ch",
+        href: "https://claudioblaesi.ch",
+        type: "Landing Page",
+        text: "Landing Page für Golflektionen eines Pro-Kollegen.",
+      },
+      {
+        name: "CurlingPractice",
+        href: "https://apps.apple.com/us/app/curlingpractice/id6664067780",
+        type: "App (solo gebaut)",
+        text: "Von 0 selbst entwickelt - als Nebenprojekt für meine Freundin und zur Vertiefung meiner AI-gestützten Entwicklung.",
+      },
+      {
+        name: "DrillZone",
+        href: "https://apps.apple.com/us/app/drillzone/id6744123253",
+        type: "App (Co-Creation)",
+        text: "Gemeinsam mit Jeremy aufgebaut und designt, mit meinem Fokus auf Organisation, Struktur und Produktlogik.",
+      },
+    ],
+    kpis: [
+      { label: "Webseiten", value: "4" },
+      { label: "Apps", value: "2" },
+      { label: "Verbandsfunktion", value: "1" },
+    ],
+  },
   news: [
     {
       month: "September 25",

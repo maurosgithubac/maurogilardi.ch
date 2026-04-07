@@ -28,6 +28,7 @@ export function PgtLiveScoringTicker() {
     >
       <span className="pgt-live-scoring-ticker-dot" aria-hidden />
       <span className="pgt-live-scoring-ticker-label">LIVESCORING</span>
+      <span className="pgt-live-scoring-ticker-mobile">Live: {liveEvent.name}</span>
       <span className="pgt-live-scoring-ticker-event">{liveEvent.name}</span>
       <span className="pgt-live-scoring-ticker-cta">Zur Livescoring-Seite →</span>
     </a>

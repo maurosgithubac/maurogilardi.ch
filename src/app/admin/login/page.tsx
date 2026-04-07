@@ -68,7 +68,9 @@ export default function AdminLoginPage() {
           <span className="admin-brand-name">Mauro Gilardi</span>
           <span className="admin-brand-badge">Admin</span>
         </div>
-        <p className="admin-login-dek">Mit Supabase-Account anmelden (nur freigeschaltete Admins).</p>
+        <p className="admin-login-dek">
+          Zugang nur für freigeschaltete Admins. Gleiche Anmeldedaten wie dein Supabase-Benutzer.
+        </p>
         <h1 className="admin-login-title">Anmelden</h1>
         <form onSubmit={onSubmit} className="admin-login-form">
           <label>

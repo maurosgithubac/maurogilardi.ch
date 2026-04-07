@@ -10,8 +10,22 @@ export default async function AdminPostsListPage() {
 
   return (
     <div className="admin-card-stack">
-      <div className="admin-list-head">
+      <header className="admin-page-head">
+        <p className="admin-page-kicker">Blog</p>
         <h1 className="admin-h1">Beiträge</h1>
+        <p className="admin-muted admin-page-lead">Alle Blogbeiträge verwalten, bearbeiten und veröffentlichen.</p>
+      </header>
+      <div className="admin-inline-kpis">
+        <div className="admin-inline-kpi">
+          <span className="admin-inline-kpi-label">Gesamt</span>
+          <strong>{list.length}</strong>
+        </div>
+        <div className="admin-inline-kpi">
+          <span className="admin-inline-kpi-label">Live</span>
+          <strong>{list.filter((post) => post.published).length}</strong>
+        </div>
+      </div>
+      <div className="admin-list-head">
         <Link href="/admin/posts/new" className="admin-btn">
           Neu
         </Link>

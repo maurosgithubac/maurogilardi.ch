@@ -101,38 +101,64 @@ export function AdminPostForm({ initial }: Props) {
   }
 
   return (
-    <form className="admin-form" onSubmit={onSubmit}>
-      <h1 className="admin-h1">{editing ? "Beitrag bearbeiten" : "Neuer Beitrag"}</h1>
-      <label className="admin-field">
-        Titel
-        <input value={title} onChange={(event) => setTitle(event.target.value)} required />
-      </label>
-      <label className="admin-field">
-        Kurzbeschreibung
-        <input value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Eine Zeile für Vorschau & SEO" />
-      </label>
-      <label className="admin-field">
-        Text
-        <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={10} required />
-      </label>
-      <label className="admin-field">
-        Bild
-        <input type="file" accept="image/*" onChange={(event) => onFileChange(event.target.files?.[0] ?? null)} />
-        {uploading ? <span className="admin-hint">Lade hoch…</span> : null}
-      </label>
-      {previewUrl ? (
-        <div className="admin-preview">
-          <Image src={previewUrl} alt="" width={320} height={200} className="admin-preview-img" />
+    <div className="admin-card-stack">
+      <header className="admin-page-head">
+        <p className="admin-page-kicker">Blog</p>
+        <h1 className="admin-h1">{editing ? "Beitrag bearbeiten" : "Neuer Beitrag"}</h1>
+        <p className="admin-muted admin-page-lead">
+          {editing
+            ? "Bearbeite Inhalt, Titelbild und Veröffentlichungsstatus dieses Beitrags."
+            : "Neuen Blog-Artikel anlegen und direkt mit Bild für die Website vorbereiten."}
+        </p>
+      </header>
+
+      <form className="admin-form admin-form-card" onSubmit={onSubmit}>
+        <div className="admin-field-grid">
+          <label className="admin-field admin-field--wide">
+            Titel
+            <input value={title} onChange={(event) => setTitle(event.target.value)} required />
+          </label>
+          <label className="admin-field admin-field--wide">
+            Kurzbeschreibung
+            <input
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Eine Zeile für Vorschau & SEO"
+            />
+          </label>
         </div>
-      ) : null}
-      <label className="admin-check">
-        <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
-        Veröffentlicht
-      </label>
-      {error ? <p className="admin-error">{error}</p> : null}
-      <button type="submit" className="admin-submit" disabled={saving}>
-        {saving ? "…" : "Speichern"}
-      </button>
-    </form>
+
+        <label className="admin-field">
+          Text
+          <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={12} required />
+        </label>
+
+        <div className="admin-media-block">
+          <label className="admin-field">
+            Titelbild
+            <input type="file" accept="image/*" onChange={(event) => onFileChange(event.target.files?.[0] ?? null)} />
+            {uploading ? <span className="admin-hint">Lade Bild hoch…</span> : <span className="admin-hint">JPG/PNG empfohlen.</span>}
+          </label>
+          {previewUrl ? (
+            <div className="admin-preview">
+              <Image src={previewUrl} alt="" width={320} height={200} className="admin-preview-img" />
+            </div>
+          ) : null}
+        </div>
+
+        <label className="admin-check">
+          <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
+          Veröffentlicht
+        </label>
+
+        {error ? <p className="admin-error">{error}</p> : null}
+
+        <div className="admin-form-actions">
+          <button type="submit" className="admin-submit" disabled={saving}>
+            {saving ? "Speichert..." : editing ? "Änderungen speichern" : "Beitrag erstellen"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

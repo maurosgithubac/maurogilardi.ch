@@ -26,7 +26,10 @@ export function AdminTabNav() {
             height={28}
             className="admin-brand-logo"
           />
-          <span className="admin-brand-name">Mauro Gilardi</span>
+          <span className="admin-brand-text">
+            <span className="admin-brand-name">Mauro Gilardi</span>
+            <span className="admin-brand-sub">maurogilardi.ch</span>
+          </span>
           <span className="admin-brand-badge">Admin</span>
         </Link>
         <nav className="admin-tabs" aria-label="Admin Navigation">

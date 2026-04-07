@@ -100,6 +100,13 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
             Newsletter
           </a>
         )}
+        <Link
+          href="/goenner#goenner-form-title"
+          className="site-header-nav-link site-header-nav-link--cta"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Gönner Formular
+        </Link>
       </nav>
       {mobileMenuOpen ? <button type="button" className="site-header-nav-backdrop" aria-hidden onClick={() => setMobileMenuOpen(false)} /> : null}
     </header>

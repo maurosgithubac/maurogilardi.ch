@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import {
   goennerMembershipTiers,
@@ -59,103 +61,136 @@ export function GoennerPageClient() {
     <div className="goenner-page site-page">
       <SiteHeader variant="document" />
 
-      <section className="goenner-intro">
-        <p className="goenner-eyebrow">Unterstützung</p>
-        <h1 className="goenner-h1">Gönner</h1>
-        <p className="goenner-lead">
-          Wähle deine Mitgliedschaft und sende mir eine Anfrage. Ich melde mich mit den nächsten Schritten.
-        </p>
-        <p className="goenner-lead">
-          Interesse an einer Zusammenarbeit? Ich freue mich über den Austausch mit Partnern, die den Weg im
-          Leistungssport aktiv mitgestalten möchten - sei es durch gemeinsame Projekte, Events oder langfristige
-          Partnerschaften.
-        </p>
-      </section>
-
-      <div className="goenner-tiers">
-        {goennerMembershipTiers.map((tier) => (
-          <article
-            key={tier.id}
-            className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}`}
-          >
-            {tier.id === "eagle" ? (
-              <p className="goenner-tier-badge">
-                <span>Empfohlen</span>
-              </p>
-            ) : null}
-            <h2 className="goenner-tier-title">{tier.title}</h2>
-            <ul className="goenner-tier-list">
-              {tier.benefits.map((b) => (
-                <li key={b.text} className={b.bold ? "goenner-tier-li goenner-tier-li--bold" : "goenner-tier-li"}>
-                  <span className="goenner-tier-arrow" aria-hidden>
-                    →
-                  </span>
-                  {b.text}
-                </li>
-              ))}
-            </ul>
-            <p className="goenner-tier-cta">
-              Beitreten für {tier.priceChf}.- / Jahr
+      <main className="subpage-shell subpage-shell--flush">
+        <section className="subpage-hero about-hero goenner-hero">
+          <Image
+            src="/brand-assets/images/mauro&friends-9.jpg"
+            alt="Mauro Gilardi auf dem Golfplatz"
+            fill
+            className="stage-bg about-hero-bg"
+            priority
+          />
+          <div className="stage-overlay about-hero-overlay" />
+          <div className="subpage-copy about-hero-copy">
+            <p className="label about-hero-label">Unterstützung</p>
+            <h1>Gönner werden.</h1>
+            <p className="about-hero-lead">
+              Interesse an einer Zusammenarbeit? Ich freue mich über den Austausch mit Partnern, die den Weg im
+              Leistungssport aktiv mitgestalten möchten - sei es durch gemeinsame Projekte, Events oder langfristige
+              Partnerschaften.
             </p>
-          </article>
-        ))}
-      </div>
-
-      <section className="goenner-form-section" aria-labelledby="goenner-form-title">
-        <div className="goenner-form-section-head">
-          <p className="goenner-form-kicker">Kontakt</p>
-          <h2 id="goenner-form-title" className="goenner-form-heading">
-            Mitgliedschaft anfragen
-          </h2>
-          <p className="goenner-form-lead">Ich bestätige deine Anfrage per E-Mail.</p>
-        </div>
-        <form className="goenner-form" onSubmit={onSubmit}>
-          <fieldset className="goenner-fieldset">
-            <legend className="goenner-legend">Mitgliedschaft</legend>
-            <div className="goenner-radio-grid">
-              {goennerMembershipTiers.map((tier) => (
-                <label key={tier.id} className="goenner-radio-card">
-                  <input
-                    type="radio"
-                    name="membership_pick"
-                    value={tier.id}
-                    checked={membershipId === tier.id}
-                    onChange={() => setMembershipId(tier.id)}
-                  />
-                  <span className="goenner-radio-card-body">
-                    <span className="goenner-radio-title">{tier.title}</span>
-                    <span className="goenner-radio-price">{tier.priceChf}.- / Jahr</span>
-                  </span>
-                </label>
-              ))}
+            <div className="about-hero-actions">
+              <a href="#goenner-form-title" className="about-btn about-btn-primary">
+                Mitgliedschaft anfragen
+              </a>
+              <Link href="/ueber-mich" className="about-btn about-btn-ghost">
+                Über mich
+              </Link>
             </div>
-          </fieldset>
+          </div>
+        </section>
 
-          <label className="goenner-label">
-            Name
-            <input name="name" type="text" required autoComplete="name" maxLength={200} />
-          </label>
-          <label className="goenner-label">
-            E-Mail
-            <input name="email" type="email" required autoComplete="email" />
-          </label>
-          <label className="goenner-label">
-            Telefon <span className="goenner-optional">(optional)</span>
-            <input name="phone" type="tel" autoComplete="tel" maxLength={80} />
-          </label>
-          <label className="goenner-label">
-            Nachricht <span className="goenner-optional">(optional)</span>
-            <textarea name="message" rows={4} maxLength={4000} />
-          </label>
+        <section className="goenner-memberships" aria-labelledby="goenner-memberships-title">
+          <header className="goenner-memberships-head">
+            <p className="goenner-memberships-kicker">Mitgliedschaften</p>
+            <h2 id="goenner-memberships-title">Wähle das Modell, das zu dir passt</h2>
+          </header>
+          <div className="goenner-tiers">
+            {goennerMembershipTiers.map((tier) => (
+              <article
+                key={tier.id}
+                className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}`}
+              >
+                {tier.id === "eagle" ? (
+                  <p className="goenner-tier-badge">
+                    <span>Empfohlen</span>
+                  </p>
+                ) : null}
+                <h2 className="goenner-tier-title">{tier.title}</h2>
+                <ul className="goenner-tier-list">
+                  {tier.benefits.map((b) => (
+                    <li key={b.text} className={b.bold ? "goenner-tier-li goenner-tier-li--bold" : "goenner-tier-li"}>
+                      <span className="goenner-tier-arrow" aria-hidden>
+                        →
+                      </span>
+                      {b.text}
+                    </li>
+                  ))}
+                </ul>
+                <p className="goenner-tier-cta">
+                  Beitreten für {tier.priceChf}.- / Jahr
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
 
-          <p className="goenner-footnote">* Details und Termine stimme ich persönlich mit dir ab.</p>
+        <section className="goenner-trust" aria-label="Zusätzliche Informationen">
+          <ul className="goenner-trust-list">
+            <li>Direkter Kontakt ohne Umwege</li>
+            <li>Persönliche Abstimmung von Details und Terminen</li>
+            <li>Transparente Kommunikation und langfristige Zusammenarbeit</li>
+          </ul>
+        </section>
 
-          <button type="submit" className="goenner-submit" disabled={isSubmitting}>
-            {isSubmitting ? "Wird gesendet…" : "Anfrage senden"}
-          </button>
-          {status ? <p className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") ? " goenner-status--warn" : ""}`}>{status}</p> : null}
-        </form>
-      </section>
+        <section className="goenner-form-section" aria-labelledby="goenner-form-title">
+          <div className="goenner-form-section-head">
+            <p className="goenner-form-kicker">Kontakt</p>
+            <h2 id="goenner-form-title" className="goenner-form-heading">
+              Mitgliedschaft anfragen
+            </h2>
+            <p className="goenner-form-lead">Ich bestätige deine Anfrage per E-Mail.</p>
+          </div>
+          <form className="goenner-form" onSubmit={onSubmit}>
+            <fieldset className="goenner-fieldset">
+              <legend className="goenner-legend">Mitgliedschaft</legend>
+              <div className="goenner-radio-grid">
+                {goennerMembershipTiers.map((tier) => (
+                  <label key={tier.id} className="goenner-radio-card">
+                    <input
+                      type="radio"
+                      name="membership_pick"
+                      value={tier.id}
+                      checked={membershipId === tier.id}
+                      onChange={() => setMembershipId(tier.id)}
+                    />
+                    <span className="goenner-radio-card-body">
+                      <span className="goenner-radio-title">{tier.title}</span>
+                      <span className="goenner-radio-price">{tier.priceChf}.- / Jahr</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="goenner-form-grid">
+              <label className="goenner-label">
+                Name
+                <input name="name" type="text" required autoComplete="name" maxLength={200} />
+              </label>
+              <label className="goenner-label">
+                E-Mail
+                <input name="email" type="email" required autoComplete="email" />
+              </label>
+            </div>
+            <label className="goenner-label">
+              Telefon <span className="goenner-optional">(optional)</span>
+              <input name="phone" type="tel" autoComplete="tel" maxLength={80} />
+            </label>
+            <label className="goenner-label">
+              Nachricht <span className="goenner-optional">(optional)</span>
+              <textarea name="message" rows={4} maxLength={4000} />
+            </label>
+
+            <p className="goenner-footnote">* Details und Termine stimme ich persönlich mit dir ab.</p>
+
+            <button type="submit" className="goenner-submit" disabled={isSubmitting}>
+              {isSubmitting ? "Wird gesendet…" : "Anfrage senden"}
+            </button>
+            {status ? <p className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") ? " goenner-status--warn" : ""}`}>{status}</p> : null}
+          </form>
+        </section>
+      </main>
 
       <SiteFooter />
     </div>
