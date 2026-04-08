@@ -21,6 +21,9 @@ export default function RootLayout({
   return (
     <html lang="de-CH">
       <body className={`${geistSans.variable} antialiased`}>
+        <a href="/#newsletter" className="global-newsletter-tab">
+          Newsletter abonnieren
+        </a>
         {children}
       </body>
     </html>

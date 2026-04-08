@@ -19,7 +19,7 @@ export default function UeberMichPage() {
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero">
           <Image
-            src="/brand-assets/images/195.png"
+            src="/brand-assets/images/1L9A9440.JPG"
             alt="Mauro Gilardi im Turnier"
             fill
             className="stage-bg about-hero-bg"
@@ -55,22 +55,6 @@ export default function UeberMichPage() {
                   </p>
                 ))}
               </div>
-              <aside className="about-story-portrait" aria-label="Portrait">
-                <div className="about-story-portrait-frame">
-                  <Image
-                    src="/brand-assets/images/1L9A8795.JPG"
-                    alt="Portrait von Mauro Gilardi"
-                    fill
-                    className="about-story-portrait-img"
-                    sizes="(max-width: 640px) 70vw, 320px"
-                    quality={100}
-                  />
-                </div>
-                <ul className="about-story-tags" aria-label="Schwerpunkte">
-                  <li>DP World Tour Ziel</li>
-                  <li>Leistungssport & IT</li>
-                </ul>
-              </aside>
             </div>
           </div>
         </section>

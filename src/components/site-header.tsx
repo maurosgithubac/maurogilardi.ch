@@ -12,6 +12,7 @@ const NAV: {
 }[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   { href: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") },
+  { href: "/erfolge", label: "Erfolge", match: (p) => p.startsWith("/erfolge") },
   { href: "/goenner", label: "Gönner", match: (p) => p.startsWith("/goenner") },
   { href: "/ueber-mich", label: "Über mich", match: (p) => p.startsWith("/ueber-mich") },
 ];
@@ -91,15 +92,6 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
             </Link>
           );
         })}
-        {pathname === "/" ? (
-          <a href="#newsletter" className="site-header-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            Newsletter
-          </a>
-        ) : (
-          <a href="/#newsletter" className="site-header-nav-link" onClick={() => setMobileMenuOpen(false)}>
-            Newsletter
-          </a>
-        )}
         <Link
           href="/goenner#goenner-form-title"
           className="site-header-nav-link site-header-nav-link--cta"

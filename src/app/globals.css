@@ -340,6 +340,43 @@ body {
   color: var(--text);
 }
 
+.global-newsletter-tab {
+  position: fixed;
+  top: 0;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: max-content;
+  max-width: calc(100vw - 1rem);
+  min-height: 1.8rem;
+  padding: 0.28rem 0.66rem 0.32rem;
+  border-radius: 0 0 12px 12px;
+  border: 1px solid rgb(23 21 19 / 14%);
+  border-top: 0;
+  background: linear-gradient(180deg, rgb(113 113 113 / 92%) 0%, rgb(90 90 90 / 92%) 100%);
+  color: #f7f7f7;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 14%);
+  transition: filter 0.2s ease;
+}
+
+.global-newsletter-tab:hover {
+  color: #fff;
+  filter: brightness(1.02);
+}
+
 .pro-shell {
   width: min(1220px, calc(100% - 2.4rem));
   margin: 0 auto;
@@ -5456,6 +5493,15 @@ body {
 }
 
 @media (max-width: 480px) {
+  .global-newsletter-tab {
+    top: 0;
+    max-width: calc(100vw - 0.75rem);
+    min-height: 1.7rem;
+    padding: 0.22rem 0.52rem 0.28rem;
+    font-size: 0.48rem;
+    letter-spacing: 0.07em;
+  }
+
   .site-header-menu-toggle {
     width: 2.2rem;
     height: 2.2rem;
@@ -6247,6 +6293,235 @@ body {
   .subpage-shell--flush .subpage-hero {
     min-height: 62svh !important;
     min-height: 62dvh !important;
+  }
+}
+
+/* Erfolge page: same corporate shell with modern vertical timeline */
+.erfolge-page .subpage-shell--flush {
+  background: var(--site-page-bg);
+}
+
+.erfolge-hero .about-hero-bg {
+  object-position: 50% 20%;
+}
+
+.erfolge-timeline-section {
+  width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
+  margin: 0 auto;
+  padding: clamp(2.25rem, 5vw, 4rem) 0 clamp(2rem, 4.5vw, 3.75rem);
+}
+
+.erfolge-timeline-head {
+  margin-bottom: 0.95rem;
+}
+
+.erfolge-timeline-kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.erfolge-timeline-head h2 {
+  margin: 0.32rem 0 0;
+  font-size: clamp(1.45rem, 3.5vw, 2.2rem);
+  letter-spacing: -0.02em;
+}
+
+.erfolge-timeline-lead {
+  margin: 0.48rem 0 0;
+  color: var(--site-muted);
+  font-size: 0.92rem;
+}
+
+.erfolge-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0;
+  position: relative;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.erfolge-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgb(23 21 19 / 14%) 0%, rgb(23 21 19 / 26%) 30%, rgb(23 21 19 / 12%) 100%);
+}
+
+.erfolge-timeline-progress {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.erfolge-timeline-progress-dot {
+  position: sticky;
+  top: clamp(5.5rem, 14vh, 7.25rem);
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow:
+    0 0 0 4px rgb(215 25 32 / 20%),
+    0 6px 18px rgb(215 25 32 / 35%);
+}
+
+.erfolge-timeline-item {
+  position: relative;
+  width: calc(50% - 1.45rem);
+}
+
+.erfolge-timeline-item:nth-child(odd) {
+  justify-self: start;
+  transform: translateY(0);
+}
+
+.erfolge-timeline-item:nth-child(even) {
+  justify-self: end;
+  transform: translateY(1.05rem);
+}
+
+.erfolge-timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgb(215 25 32 / 15%);
+}
+
+.erfolge-timeline-item:nth-child(odd)::before {
+  right: -1.73rem;
+}
+
+.erfolge-timeline-item:nth-child(even)::before {
+  left: -1.73rem;
+}
+
+.erfolge-timeline-card {
+  padding: 1rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid rgb(23 21 19 / 10%);
+  background: linear-gradient(150deg, #fff 0%, rgb(250 249 246) 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+.erfolge-timeline-year {
+  margin: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.erfolge-timeline-card h3 {
+  margin: 0.42rem 0 0;
+  font-size: 1.02rem;
+  line-height: 1.3;
+}
+
+.erfolge-timeline-card p {
+  margin: 0.42rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.48;
+  color: rgb(23 21 19 / 66%);
+}
+
+/* Mobile hamburger menu: larger and easier to navigate */
+@media (max-width: 760px) {
+  .site-header-nav {
+    padding: 1.2rem var(--page-gutter) 1.15rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .site-header-nav-link {
+    min-height: 44px !important;
+    font-size: 0.74rem !important;
+    letter-spacing: 0.07em !important;
+    padding: 0.56rem 0.84rem !important;
+  }
+
+  .site-header-nav-link--cta {
+    margin-top: 0.3rem;
+  }
+
+  .site-header-menu-toggle {
+    width: 42px;
+    height: 42px;
+  }
+
+  .erfolge-timeline-section {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .erfolge-timeline::before {
+    left: 0.45rem;
+    transform: none;
+  }
+
+  .erfolge-timeline-progress {
+    left: 0.45rem;
+    transform: none;
+  }
+
+  .erfolge-timeline-progress-dot {
+    top: clamp(4.9rem, 10vh, 6rem);
+    margin-left: -6px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .erfolge-timeline-item,
+  .erfolge-timeline-item:nth-child(odd),
+  .erfolge-timeline-item:nth-child(even) {
+    width: 100%;
+    justify-self: stretch;
+    transform: none;
+  }
+
+  .erfolge-timeline-item {
+    padding-left: 1.6rem;
+  }
+
+  .erfolge-timeline-item::before,
+  .erfolge-timeline-item:nth-child(odd)::before,
+  .erfolge-timeline-item:nth-child(even)::before {
+    left: 0.1rem;
+    right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header-nav-link {
+    min-height: 42px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .erfolge-timeline-card {
+    padding: 0.8rem 0.76rem;
+  }
+
+  .erfolge-timeline-progress-dot {
+    top: 5rem;
   }
 }
 
