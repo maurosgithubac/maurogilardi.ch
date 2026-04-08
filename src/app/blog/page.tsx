@@ -39,7 +39,9 @@ export default async function BlogPage() {
 
   return (
     <div className="blog-page site-page">
-      <SiteHeader variant="document" />
+      <div className="site-header-fixed-stack">
+        <SiteHeader variant="overlay" inOverlayStack />
+      </div>
       <main className="subpage-shell subpage-shell--flush blog-index-shell">
         <section className="subpage-hero about-hero blog-index-hero-unified">
           <Image

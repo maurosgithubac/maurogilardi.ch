@@ -6147,6 +6147,109 @@ body {
   }
 }
 
+/* Final readability + edge-to-edge hero lock */
+.stage-overlay,
+.band-overlay {
+  background:
+    linear-gradient(110deg, rgb(255 255 255 / 62%) 12%, rgb(255 255 255 / 24%) 56%, rgb(255 255 255 / 2%) 100%),
+    linear-gradient(180deg, rgb(0 0 0 / 18%) 0%, rgb(0 0 0 / 12%) 55%, rgb(0 0 0 / 10%) 100%);
+}
+
+.blog-hero-veil {
+  background:
+    linear-gradient(100deg, rgb(250 249 246 / 91%) 0%, rgb(250 249 246 / 68%) 22%, rgb(250 249 246 / 24%) 44%, rgb(250 249 246 / 0%) 62%),
+    linear-gradient(180deg, rgb(0 0 0 / 24%) 0%, rgb(0 0 0 / 14%) 22%, rgb(0 0 0 / 8%) 66%, rgb(244 243 240 / 72%) 100%);
+}
+
+.about-hero-overlay {
+  background:
+    linear-gradient(100deg, rgb(250 249 246 / 92%) 0%, rgb(250 249 246 / 72%) 24%, rgb(250 249 246 / 26%) 46%, rgb(250 249 246 / 0%) 64%),
+    linear-gradient(180deg, rgb(0 0 0 / 22%) 0%, rgb(0 0 0 / 12%) 24%, rgb(0 0 0 / 6%) 68%, rgb(244 243 240 / 70%) 100%);
+}
+
+@media (max-width: 760px) {
+  .subpage-shell--flush .subpage-hero,
+  .blog-hero,
+  .blog-hero--landing {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
+  .blog-home-main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Slightly taller heroes to avoid visual clipping */
+  .blog-hero--landing,
+  .blog-index-hero-unified,
+  .blog-hero {
+    min-height: 68svh;
+    min-height: 68dvh;
+  }
+
+  .about-hero,
+  .goenner-hero,
+  .subpage-shell--flush .subpage-hero {
+    min-height: 62svh;
+    min-height: 62dvh;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-hero--landing,
+  .blog-index-hero-unified,
+  .blog-hero {
+    min-height: 64svh;
+    min-height: 64dvh;
+  }
+
+  .about-hero,
+  .goenner-hero,
+  .subpage-shell--flush .subpage-hero {
+    min-height: 58svh;
+    min-height: 58dvh;
+  }
+}
+
+/* Final mobile height lock (wins cascade) */
+@media (max-width: 760px) {
+  .blog-hero--landing {
+    min-height: 72svh !important;
+    min-height: 72dvh !important;
+  }
+
+  .blog-index-hero-unified,
+  .blog-hero,
+  .about-hero,
+  .goenner-hero,
+  .subpage-shell--flush .subpage-hero {
+    min-height: 66svh !important;
+    min-height: 66dvh !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-hero--landing {
+    min-height: 68svh !important;
+    min-height: 68dvh !important;
+  }
+
+  .blog-index-hero-unified,
+  .blog-hero,
+  .about-hero,
+  .goenner-hero,
+  .subpage-shell--flush .subpage-hero {
+    min-height: 62svh !important;
+    min-height: 62dvh !important;
+  }
+}
+
 /* Blog index: use same shell layout as goenner/about */
 .blog-page .subpage-shell--flush {
   background: var(--site-page-bg);

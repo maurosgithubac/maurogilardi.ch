@@ -59,7 +59,9 @@ export function GoennerPageClient() {
 
   return (
     <div className="goenner-page site-page">
-      <SiteHeader variant="document" />
+      <div className="site-header-fixed-stack">
+        <SiteHeader variant="overlay" inOverlayStack />
+      </div>
 
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero goenner-hero">

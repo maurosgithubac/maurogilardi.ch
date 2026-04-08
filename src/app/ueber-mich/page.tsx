@@ -12,7 +12,9 @@ export const metadata = {
 export default function UeberMichPage() {
   return (
     <div className="site-page about-page">
-      <SiteHeader variant="document" />
+      <div className="site-header-fixed-stack">
+        <SiteHeader variant="overlay" inOverlayStack />
+      </div>
 
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero">
