@@ -40,51 +40,71 @@ export default async function BlogPage() {
   return (
     <div className="blog-page site-page">
       <SiteHeader variant="document" />
-      <main className="blog-page-main blog-index">
-        <header className="blog-index-hero">
-          <p className="blog-index-kicker">Blog</p>
-          <h1 className="blog-page-h1">Updates vom Platz</h1>
-          <p className="blog-page-dek">Meine Karriere, Turniere und Gedanken — kompakt erzählt.</p>
-        </header>
-        {posts.length === 0 ? (
-          <div className="blog-index-empty">
-            <p className="blog-page-empty">Noch keine Beiträge.</p>
+      <main className="subpage-shell subpage-shell--flush blog-index-shell">
+        <section className="subpage-hero about-hero blog-index-hero-unified">
+          <Image
+            src="/brand-assets/images/195.png"
+            alt="Mauro Gilardi im Turnier"
+            fill
+            className="stage-bg about-hero-bg"
+            priority
+          />
+          <div className="stage-overlay about-hero-overlay" />
+          <div className="subpage-copy about-hero-copy">
+            <p className="label about-hero-label">Blog</p>
+            <h1 className="blog-page-h1">Updates vom Platz</h1>
+            <p className="about-hero-lead">Meine Karriere, Turniere und Gedanken - kompakt erzählt.</p>
+            <div className="about-hero-actions">
+              <Link href="/" className="about-btn about-btn-primary">
+                Home
+              </Link>
+              <a href="/#newsletter" className="about-btn about-btn-ghost">
+                Newsletter
+              </a>
+            </div>
           </div>
-        ) : (
-          <ul className="blog-feed">
-            {posts.map((post) => {
-              const img = blogImageUrl(post.image_path);
-              return (
-                <li key={post.id}>
-                  <Link href={`/blog/${post.slug}`} className="blog-feed-card">
-                    <div className="blog-feed-card-media">
-                      {img ? (
-                        <Image src={img} alt="" fill className="blog-feed-card-img" sizes="(max-width: 720px) 100vw, 280px" />
-                      ) : (
-                        <div className="blog-feed-card-placeholder" />
-                      )}
-                    </div>
-                    <div className="blog-feed-card-body">
-                      <time dateTime={post.created_at}>
-                        {new Date(post.created_at).toLocaleDateString("de-CH", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </time>
-                      <h2>{post.title}</h2>
-                      {post.description ? <p>{post.description}</p> : null}
-                      <span className="blog-feed-card-more">
-                        Weiterlesen
-                        <span aria-hidden>→</span>
-                      </span>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        </section>
+        <section className="blog-index-content" aria-label="Blogbeiträge">
+          {posts.length === 0 ? (
+            <div className="blog-index-empty">
+              <p className="blog-page-empty">Noch keine Beiträge.</p>
+            </div>
+          ) : (
+            <ul className="blog-feed">
+              {posts.map((post) => {
+                const img = blogImageUrl(post.image_path);
+                return (
+                  <li key={post.id}>
+                    <Link href={`/blog/${post.slug}`} className="blog-feed-card">
+                      <div className="blog-feed-card-media">
+                        {img ? (
+                          <Image src={img} alt="" fill className="blog-feed-card-img" sizes="(max-width: 720px) 100vw, 280px" />
+                        ) : (
+                          <div className="blog-feed-card-placeholder" />
+                        )}
+                      </div>
+                      <div className="blog-feed-card-body">
+                        <time dateTime={post.created_at}>
+                          {new Date(post.created_at).toLocaleDateString("de-CH", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </time>
+                        <h2>{post.title}</h2>
+                        {post.description ? <p>{post.description}</p> : null}
+                        <span className="blog-feed-card-more">
+                          Weiterlesen
+                          <span aria-hidden>→</span>
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       </main>
       <SiteFooter />
     </div>

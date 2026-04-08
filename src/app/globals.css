@@ -1987,7 +1987,7 @@ body {
 
 .blog-hero--landing .blog-hero-bg-img {
   object-fit: cover;
-  object-position: 58% 22%;
+  object-position: 58% 14%;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -2063,7 +2063,7 @@ body {
 
 @media (max-width: 640px) {
   .blog-hero--landing .blog-hero-bg-img {
-    object-position: 50% 18%;
+    object-position: 50% 14%;
   }
 
   .blog-hero-veil {
@@ -5634,7 +5634,7 @@ body {
   }
 
   .blog-hero--landing .blog-hero-bg-img {
-    object-position: 50% 34%;
+    object-position: 50% 20%;
   }
 }
 
@@ -5657,7 +5657,7 @@ body {
   }
 
   .blog-hero--landing .blog-hero-bg-img {
-    object-position: 50% 32%;
+    object-position: 50% 18%;
   }
 }
 
@@ -5874,8 +5874,8 @@ body {
 @media (max-width: 760px) {
   .about-hero,
   .goenner-hero {
-    min-height: 62svh;
-    min-height: 62dvh;
+    min-height: 59svh;
+    min-height: 59dvh;
     align-items: center;
   }
 
@@ -5901,8 +5901,8 @@ body {
 @media (max-width: 480px) {
   .about-hero,
   .goenner-hero {
-    min-height: 58svh;
-    min-height: 58dvh;
+    min-height: 55svh;
+    min-height: 55dvh;
   }
 
   .subpage-copy.about-hero-copy {
@@ -5912,5 +5912,274 @@ body {
 
   .about-hero-actions .about-btn {
     min-height: 38px;
+  }
+}
+
+/* Corporate pass: unify public page structure and spacing */
+.blog-index .blog-feed,
+.about-story-inner,
+.about-projects-inner,
+.goenner-memberships,
+.goenner-trust,
+.goenner-form-section,
+.blog-post-article,
+.blog-post-breadcrumb {
+  width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blog-index .blog-feed,
+.about-story,
+.about-projects,
+.goenner-memberships,
+.goenner-trust,
+.goenner-form-section,
+.blog-post-article {
+  padding-top: clamp(2.25rem, 5vw, 4rem);
+  padding-bottom: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+.blog-index-hero-unified {
+  min-height: 100svh;
+  min-height: 100dvh;
+}
+
+.blog-index .blog-feed {
+  margin-top: 1rem;
+}
+
+@media (max-width: 760px) {
+  .blog-index-hero-unified {
+    min-height: 65svh;
+    min-height: 65dvh;
+    align-items: center;
+  }
+
+  .blog-index .blog-feed,
+  .about-story,
+  .about-projects,
+  .goenner-memberships,
+  .goenner-trust,
+  .goenner-form-section,
+  .blog-post-article {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-index-hero-unified {
+    min-height: 61svh;
+    min-height: 61dvh;
+  }
+}
+
+/* Mobile refinement pass: dense, clear, consistent across public pages */
+@media (max-width: 760px) {
+  .blog-home-main,
+  .blog-page-main,
+  .subpage-shell {
+    row-gap: 0;
+  }
+
+  .blog-latest,
+  .pgt-events,
+  .blog-newsletter,
+  .about-story,
+  .about-projects,
+  .goenner-memberships,
+  .goenner-form-section {
+    padding-top: 1.35rem;
+    padding-bottom: 1.35rem;
+  }
+
+  .blog-latest-head,
+  .pgt-events-head,
+  .goenner-memberships-head,
+  .goenner-form-section-head {
+    margin-bottom: 0.85rem;
+  }
+
+  .blog-grid--one-row,
+  .goenner-tiers,
+  .pgt-events-list,
+  .blog-feed {
+    gap: 0.7rem;
+  }
+
+  .blog-card,
+  .blog-feed-card,
+  .pgt-events-card,
+  .goenner-tier,
+  .about-project-card,
+  .about-project-kpi {
+    border-radius: 12px;
+  }
+
+  .blog-card-body,
+  .blog-feed-card-body,
+  .goenner-form,
+  .goenner-tier,
+  .about-project-card {
+    padding: 0.72rem;
+  }
+
+  .blog-hero-title,
+  .blog-page-h1,
+  .about-hero h1 {
+    line-height: 1.06;
+  }
+
+  .blog-hero-sub,
+  .blog-hero-lead,
+  .about-hero-lead,
+  .blog-page-dek {
+    margin-top: 0.5rem;
+    line-height: 1.42;
+  }
+
+  .blog-btn,
+  .about-btn,
+  .goenner-submit,
+  .pgt-events-toggle,
+  .blog-latest-cta {
+    min-height: 38px;
+    padding: 0.45rem 0.78rem;
+    border-radius: 999px;
+  }
+
+  .site-header-nav {
+    padding: 1.05rem var(--page-gutter) 0.95rem;
+    gap: 0.32rem;
+  }
+
+  .site-header-nav-link {
+    min-height: 36px;
+    padding-top: 0.38rem;
+    padding-bottom: 0.38rem;
+  }
+
+  .goenner-label input,
+  .goenner-label textarea,
+  .blog-newsletter-form input {
+    min-height: 40px;
+    padding: 0.58rem 0.7rem;
+  }
+
+  .site-footer,
+  .site-footer--on-dark {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .site-footer-inner {
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-latest,
+  .pgt-events,
+  .blog-newsletter,
+  .about-story,
+  .about-projects,
+  .goenner-memberships,
+  .goenner-form-section {
+    padding-top: 1.05rem;
+    padding-bottom: 1.05rem;
+  }
+
+  .blog-card-body,
+  .blog-feed-card-body,
+  .goenner-form,
+  .goenner-tier,
+  .about-project-card {
+    padding: 0.64rem;
+  }
+
+  .blog-btn,
+  .about-btn,
+  .goenner-submit,
+  .pgt-events-toggle,
+  .blog-latest-cta {
+    min-height: 36px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .blog-newsletter-form {
+    gap: 0.45rem;
+  }
+
+  .site-header-menu-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Final lock: about + goenner hero CTAs stay side-by-side on mobile */
+@media (max-width: 640px) {
+  .goenner-hero .about-hero-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    grid-template-columns: none;
+    width: 100%;
+    gap: 0.45rem;
+  }
+
+  .goenner-hero .about-hero-actions .about-btn {
+    width: auto;
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
+/* Final lock (desktop): all public title sections equal height */
+@media (min-width: 761px) {
+  .blog-hero--landing,
+  .blog-index-hero-unified,
+  .about-hero,
+  .goenner-hero,
+  .subpage-shell--flush .subpage-hero {
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+}
+
+/* Blog index: use same shell layout as goenner/about */
+.blog-page .subpage-shell--flush {
+  background: var(--site-page-bg);
+}
+
+.blog-index-shell {
+  width: 100%;
+  padding: 0;
+}
+
+.blog-index-content {
+  width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: clamp(2.25rem, 5vw, 4rem);
+  padding-bottom: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+.blog-index-shell .blog-index-empty {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 760px) {
+  .blog-index-content {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-index-content {
+    padding-top: 1.05rem;
+    padding-bottom: 1.05rem;
   }
 }
