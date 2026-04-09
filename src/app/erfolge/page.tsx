@@ -1,5 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  ErfolgeTimeline,
+  type ErfolgeTimelineEntry,
+  type ErfolgeTimelinePhase,
+} from "@/components/erfolge-timeline";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -8,31 +13,129 @@ export const metadata = {
   description: "Meilensteine und Entwicklung von Mauro Gilardi im modernen Zeitstrahl.",
 };
 
-const timelineEntries: { year: string; title: string; text: string }[] = [
+const phaseLabel: Record<ErfolgeTimelinePhase, string> = {
+  Foundation: "Foundation",
+  Development: "Development",
+  Professional: "Professional",
+};
+
+const timelineEntries: ErfolgeTimelineEntry[] = [
+  {
+    year: "1999",
+    title: "Geburt & sportliche Prägung",
+    phase: "Foundation",
+    details: [
+      "Geburt und frühe Bewegungsförderung durch Familie.",
+      "Tennis als frühe koordinative Grundlage.",
+      "Hauptsportarten: Unihockey und Eishockey.",
+    ],
+  },
+  {
+    year: "2005",
+    title: "Einstieg in den Golfsport",
+    phase: "Foundation",
+    details: [
+      "Beginn mit Golf und erste Turniererfahrung.",
+      "Starts auf U14-Level.",
+      "Golf entwickelt sich schrittweise zum Hauptfokus.",
+    ],
+  },
+  {
+    year: "2012",
+    title: "Erste internationale Erfahrung",
+    phase: "Development",
+    details: [
+      "Erste internationale Turniererfahrung in Holland.",
+      "Klare Entscheidung für Golf als Primärsport.",
+      "Reduktion anderer Sportarten zugunsten gezielter Entwicklung.",
+    ],
+  },
+  {
+    year: "2016 / 2018",
+    title: "Datenbasierter Trainingsansatz",
+    phase: "Development",
+    details: [
+      "Einstieg in 3D-Schwunganalyse, unter anderem mit Dr. Rob Neal.",
+      "Systematische Performance-Arbeit mit messbaren Parametern.",
+    ],
+  },
+  {
+    year: "2017",
+    title: "Sieg Engadin International Amateur Championship",
+    phase: "Development",
+    details: ["Turniersieg auf Amateur-Spitzenniveau.", "Eintritt ins World Amateur Golf Ranking (WAGR)."],
+  },
+  {
+    year: "2020",
+    title: "Team-Erfolg auf europäischer Bühne",
+    phase: "Development",
+    details: [
+      "Bronzemedaille bei der Team-Europameisterschaft.",
+      "Wichtiger Beitrag zum Schweizer Teamerfolg.",
+      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster grosser internationaler Titel.",
+    ],
+  },
+  {
+    year: "2021",
+    title: "Nationale Spitzenförderung",
+    phase: "Development",
+    details: [
+      "Erneute Teilnahme an der Team-Europameisterschaft.",
+      "Teil der ersten Spitzensport-RS in Magglingen.",
+    ],
+  },
   {
     year: "2022",
-    title: "Start als Playing Professional",
-    text: "Offizieller Start auf der Pro Golf Tour mit klarem Fokus auf Konstanz und Turnierroutine.",
+    title: "Übergang zum Professional Golfer",
+    phase: "Development",
+    details: ["Wechsel vom Amateur- ins Profigolf."],
   },
   {
     year: "2023",
-    title: "Wettkampfstruktur aufgebaut",
-    text: "Training, Turnierplanung und Performance-Tracking als stabile Basis für die Saisonentwicklung etabliert.",
+    title: "Einstieg ins Pro-Level",
+    phase: "Professional",
+    details: [
+      "Erste Saison als Playing Professional.",
+      "Teilzeitstelle bei Würth ITensis parallel zum Tourbetrieb.",
+      "Starts auf Pro Golf Tour und Challenge Tour.",
+      "Erster geschaffter Cut auf der Challenge Tour.",
+    ],
   },
   {
     year: "2024",
-    title: "Plattform & Partnernetzwerk",
-    text: "Eigene Marke ausgebaut, Partnerstruktur erweitert und die Kommunikation professionell aufgestellt.",
+    title: "Etablierung im Tour-Alltag",
+    phase: "Professional",
+    details: [
+      "Erste volle Saison auf der Pro Golf Tour.",
+      "8 Starts auf der Challenge Tour mit 4 geschafften Cuts.",
+      "50. Rang im Pro Golf Tour Ranking bei rund zwei Dritteln der Turniere.",
+      "Deutliche Leistungssteigerung.",
+      "August 2024: Kündigung des Jobs und 100% Fokus auf Golf.",
+    ],
   },
   {
     year: "2025",
-    title: "Leadership & Projekte",
-    text: "Mehr Verantwortung neben der Tour übernommen, inklusive Verbandsarbeit und digitaler Sportprojekte.",
+    title: "Breakthrough Season",
+    phase: "Professional",
+    details: [
+      "Erste Saison als Vollzeit-Profi.",
+      "1. Sieg auf der Pro Golf Tour.",
+      "Sieben Top-15-Resultate auf der Pro Golf Tour.",
+      "Swiss Golf Open Champion.",
+      "17. Rang bei einem Challenge-Tour-Event (Swiss Challenge).",
+      "13. Rang im Jahresranking der Pro Golf Tour.",
+    ],
   },
   {
     year: "2026",
-    title: "Nächster Performance-Schritt",
-    text: "Volle Ausrichtung auf die nächsten Tour-Ziele mit Fokus auf Resultate, Sichtbarkeit und langfristigen Aufbau.",
+    title: "Next Level",
+    phase: "Professional",
+    details: [
+      "2. Rang bei einem Pro Golf Tour Event.",
+      "Start CAS Elite Sports Management.",
+      "Board Member SwissPGA.",
+      "Head of Playing Professional Commission.",
+    ],
   },
 ];
 
@@ -75,23 +178,18 @@ export default function ErfolgePage() {
             <p className="erfolge-timeline-kicker">Zeitstrahl</p>
             <h2 id="erfolge-timeline-title">Meilensteine</h2>
             <p className="erfolge-timeline-lead">Vertikaler Zeitstrahl mit klaren Etappen meines bisherigen Wegs.</p>
+            <ul className="erfolge-phase-legend" aria-label="Phasen">
+              <li>Foundation</li>
+              <li>Development</li>
+              <li>Professional</li>
+            </ul>
           </div>
 
           <div className="erfolge-timeline-progress" aria-hidden>
             <span className="erfolge-timeline-progress-dot" />
           </div>
 
-          <ol className="erfolge-timeline" aria-label="Werdegang als Zeitstrahl">
-            {timelineEntries.map((entry) => (
-              <li key={entry.year} className="erfolge-timeline-item">
-                <article className="erfolge-timeline-card">
-                  <p className="erfolge-timeline-year">{entry.year}</p>
-                  <h3>{entry.title}</h3>
-                  <p>{entry.text}</p>
-                </article>
-              </li>
-            ))}
-          </ol>
+          <ErfolgeTimeline entries={timelineEntries} phaseLabel={phaseLabel} />
         </section>
       </main>
 

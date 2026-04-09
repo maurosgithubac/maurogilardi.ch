@@ -9,6 +9,7 @@ import {
 } from "@/content/goennerMemberships";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SwipeStripHint } from "@/components/swipe-strip-hint";
 
 export function GoennerPageClient() {
   const [membershipId, setMembershipId] = useState<MembershipId | "">("");
@@ -97,33 +98,38 @@ export function GoennerPageClient() {
             <p className="goenner-memberships-kicker">Mitgliedschaften</p>
             <h2 id="goenner-memberships-title">Wähle das Modell, das zu dir passt</h2>
           </header>
-          <div className="goenner-tiers">
-            {goennerMembershipTiers.map((tier) => (
-              <article
-                key={tier.id}
-                className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}`}
-              >
-                {tier.id === "eagle" ? (
-                  <p className="goenner-tier-badge">
-                    <span>Empfohlen</span>
-                  </p>
-                ) : null}
-                <h2 className="goenner-tier-title">{tier.title}</h2>
-                <ul className="goenner-tier-list">
-                  {tier.benefits.map((b) => (
-                    <li key={b.text} className={b.bold ? "goenner-tier-li goenner-tier-li--bold" : "goenner-tier-li"}>
-                      <span className="goenner-tier-arrow" aria-hidden>
-                        →
-                      </span>
-                      {b.text}
-                    </li>
-                  ))}
-                </ul>
-                <p className="goenner-tier-cta">
-                  Beitreten für {tier.priceChf}.- / Jahr
-                </p>
-              </article>
-            ))}
+          <div
+            className="swipe-strip-wrap swipe-strip-wrap--goenner"
+            role="region"
+            aria-label="Mitgliedschaftsstufen, seitlich wischbar"
+          >
+            <div className="goenner-tiers">
+              {goennerMembershipTiers.map((tier) => (
+                <article
+                  key={tier.id}
+                  className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}`}
+                >
+                  {tier.id === "eagle" ? (
+                    <p className="goenner-tier-badge">
+                      <span>Empfohlen</span>
+                    </p>
+                  ) : null}
+                  <h2 className="goenner-tier-title">{tier.title}</h2>
+                  <ul className="goenner-tier-list">
+                    {tier.benefits.map((b) => (
+                      <li key={b.text} className={b.bold ? "goenner-tier-li goenner-tier-li--bold" : "goenner-tier-li"}>
+                        <span className="goenner-tier-arrow" aria-hidden>
+                          →
+                        </span>
+                        {b.text}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="goenner-tier-cta">Beitreten für {tier.priceChf}.- / Jahr</p>
+                </article>
+              ))}
+            </div>
+            {goennerMembershipTiers.length > 1 ? <SwipeStripHint /> : null}
           </div>
         </section>
 
