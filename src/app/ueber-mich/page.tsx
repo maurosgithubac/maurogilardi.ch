@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
+import { AboutSubnav } from "@/components/about-subnav";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -43,6 +44,8 @@ export default function UeberMichPage() {
             </div>
           </div>
         </section>
+
+        <AboutSubnav />
 
         <section className="about-story" aria-labelledby="about-story-title">
           <div className="about-story-inner">
