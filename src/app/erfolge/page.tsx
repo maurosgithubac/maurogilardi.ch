@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Erfolge | Mauro Gilardi",
-  description: "Meilensteine und Entwicklung von Mauro Gilardi im modernen Zeitstrahl.",
+  description: "Mein Werdegang im Golf — Jahr für Jahr, aus meiner Sicht.",
 };
 
 const phaseLabel: Record<ErfolgeTimelinePhase, string> = {
@@ -72,7 +72,7 @@ const timelineEntries: ErfolgeTimelineEntry[] = [
     details: [
       "Bronzemedaille bei der Team-Europameisterschaft.",
       "Wichtiger Beitrag zum Schweizer Teamerfolg.",
-      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster grosser internationaler Titel.",
+      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster großer internationaler Titel.",
     ],
   },
   {
@@ -158,9 +158,9 @@ export default function ErfolgePage() {
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Erfolge</p>
-            <h1>Mein bisheriger Weg.</h1>
+            <h1>So bin ich bis hierhin gekommen.</h1>
             <p className="about-hero-lead">
-              Entwicklung im Leistungssport, als Unternehmer und in der täglichen Arbeit auf dem Weg zur Spitze.
+              Von den ersten Schlägen bis zur Tour — hier siehst du die Stationen, die für mich zählen.
             </p>
             <div className="about-hero-actions">
               <Link href="/blog" className="about-btn about-btn-primary">
@@ -177,7 +177,7 @@ export default function ErfolgePage() {
           <div className="erfolge-timeline-head">
             <p className="erfolge-timeline-kicker">Zeitstrahl</p>
             <h2 id="erfolge-timeline-title">Meilensteine</h2>
-            <p className="erfolge-timeline-lead">Vertikaler Zeitstrahl mit klaren Etappen meines bisherigen Wegs.</p>
+            <p className="erfolge-timeline-lead">Scroll weiter — jede Karte ist ein Kapitel aus meiner Geschichte.</p>
             <ul className="erfolge-phase-legend" aria-label="Phasen">
               <li>Foundation</li>
               <li>Development</li>

@@ -3,9 +3,9 @@ export const siteContent = {
     short: "MG",
     name: "Mauro Gilardi",
     role: "SwissPGA Golf Professional",
-    headline: "Aus der Heimat auf die internationale Tour.",
+    headline: "Von der Heimat auf die Tour.",
     intro:
-      "Ich bin Mauro Gilardi. Mein Weg ist geprägt von Leidenschaft, harter Arbeit und starken Werten: Heimat, Bodenständigkeit und Familie.",
+      "Ich bin Mauro, SwissPGA Pro. Heimat, Bodenständigkeit und Familie sind mein Fundament — hier auf der Seite teile ich, was ich unterwegs erlebe.",
   },
   identity: {
     colorPrimary: "#d71920",
@@ -16,11 +16,11 @@ export const siteContent = {
   values: [
     {
       title: "Strukturiert statt zufällig",
-      text: "Ich baue Prozesse auf und arbeite mit klaren Prioritäten, statt mich vom Zufall steuern zu lassen.",
+      text: "Ich arbeite mit klaren Prioritäten — damit du siehst, dass Profisport mehr ist als nur Talent.",
     },
     {
       title: "Langfristig statt kurzfristig",
-      text: "Jede Entscheidung zahlt auf nachhaltige Entwicklung ein - sportlich, persönlich und unternehmerisch.",
+      text: "Ich entscheide für mich lieber nachhaltig — auf dem Platz, persönlich und in meinen Projekten.",
     },
     {
       title: "Authentisch statt inszeniert",
@@ -36,7 +36,7 @@ export const siteContent = {
   ],
   projectsShowcase: {
     intro:
-      "Neben dem Tour-Alltag übernehme ich Verantwortung in Verbandsfunktionen und baue digitale Projekte auf. So kann ich sportliches Denken, IT-Know-how und unternehmerische Struktur verbinden.",
+      "Neben der Tour engagiere ich mich im Verband und baue digitale Projekte — Sport, IT und Struktur greifen bei mir ineinander.",
     responsibilities: [
       "Head of SwissPGA Players Commission (als Teil des SwissPGA Boards) mit Fokus auf Spielerwohl, Plattformaufbau und Austausch unter Playing Professionals",
     ],
@@ -99,10 +99,10 @@ export const siteContent = {
     },
   ],
   partnerGroups: [
-    { title: "Sponsoren", text: "Marken, die den Weg aktiv mittragen." },
-    { title: "Arbeitgeber", text: "Menschen und Unternehmen, die Leistung ermöglichen." },
-    { title: "Ausrüster / Ambassador", text: "Produkte, auf die ich mich verlassen kann." },
-    { title: "Supporter", text: "Menschen im Hintergrund mit grosser Wirkung." },
-    { title: "Partner", text: "Netzwerk aus Vertrauen, Qualität und Langfristigkeit." },
+    { title: "Sponsoren", text: "Marken, die mich auf der Tour sichtbar mittragen." },
+    { title: "Arbeitgeber", text: "Leute und Firmen, ohne die mein Sport nicht möglich wäre." },
+    { title: "Ausrüster / Ambassador", text: "Equipment, dem ich unter Druck vertraue." },
+    { title: "Supporter", text: "Menschen im Hintergrund — für mich mit großer Wirkung." },
+    { title: "Partner", text: "Mein Netzwerk aus Vertrauen, Qualität und langfristigem Blick." },
   ],
 };

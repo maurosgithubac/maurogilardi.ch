@@ -1,90 +1,95 @@
+import Image from "next/image";
 import Link from "next/link";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
-import {
-  equipmentGroups,
-  equipmentPageIntro,
-  equipmentPartnerCallouts,
-} from "@/content/equipment";
+import { equipmentBag, equipmentTheGolfersMalans } from "@/content/equipment";
 
 export const metadata = {
-  title: "Equipment | Mauro Gilardi",
-  description: "Was im Bag ist: Schläger, Schäfte und Partner Titleist & TheGolfers.",
+  title: "Mein Bag | Mauro Gilardi",
+  description: "Mein Bag: Schläger von Driver bis Putter — und wo ich mich beraten lasse.",
 };
 
 export default function UeberMichEquipmentPage() {
-  const { titleist, theGolfers } = equipmentPartnerCallouts;
-
   return (
     <AboutSubpageShell
       label="Über mich"
-      title="Equipment"
-      lead="Setup aus dem Fitting — Schläger und Schäfte, die zu meinem Schwung und den Tour-Bedingungen passen."
-      heroSrc="/brand-assets/images/1L9A9440.JPG"
-      heroAlt="Mauro Gilardi im Turnier"
+      title="Mein Bag"
+      lead="Was ich im Spiel dabei habe — und bei wem ich fitten gehe."
+      heroSrc="/brand-assets/images/mauro&friends-8.jpg"
+      heroAlt="Mauro Gilardi mit Team"
+      heroBgClassName="about-hero-bg--focus-top"
     >
       <section className="about-equipment-page" aria-label="Equipment im Bag">
-        <div className="about-equipment-page-inner">
-          <p className="about-equipment-intro">{equipmentPageIntro}</p>
-
-          <div className="about-equipment-partners">
-            <article className="about-equipment-partner-card">
-              <h2 className="about-equipment-partner-name">{titleist.name}</h2>
-              <p className="about-equipment-partner-text">{titleist.tagline}</p>
-              <a
-                href={titleist.href}
-                className="about-btn about-btn-primary"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {titleist.cta}
-              </a>
-            </article>
-            <article className="about-equipment-partner-card about-equipment-partner-card--accent">
-              <h2 className="about-equipment-partner-name">{theGolfers.name}</h2>
-              <p className="about-equipment-partner-text">{theGolfers.tagline}</p>
-              <a
-                href={theGolfers.href}
-                className="about-btn about-btn-ghost"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {theGolfers.cta}
-              </a>
-            </article>
+        <div className="about-equipment-page-inner about-equipment-page-inner--stream">
+          <div className="about-equipment-slider-block">
+            <div className="about-equipment-slider-head">
+              <h2 className="about-equipment-slider-title">Im Bag</h2>
+              <p className="about-equipment-slider-dek">
+                Von Driver bis Putter — einfach seitlich weiterwischen oder scrollen.
+              </p>
+            </div>
+            <ul className="about-equipment-bag-slider" aria-label="Schläger im Bag, horizontal scrollbar">
+              {equipmentBag.map((item) => (
+                <li key={item.id} className="about-equipment-bag-slide">
+                  <div className="about-equipment-bag-slide-card">
+                    <div className="about-equipment-bag-photo about-equipment-bag-photo--slide">
+                      {item.imageSrc ? (
+                        <Image
+                          src={item.imageSrc}
+                          alt={item.slot}
+                          fill
+                          className="about-equipment-bag-img"
+                          sizes="(max-width: 680px) 72vw, (max-width: 1100px) 32vw, 320px"
+                        />
+                      ) : (
+                        <span className="about-equipment-bag-placeholder">Foto folgt</span>
+                      )}
+                    </div>
+                    <div className="about-equipment-bag-copy about-equipment-bag-copy--slide">
+                      <span className="about-equipment-bag-slot">{item.slot}</span>
+                      <p className="about-equipment-bag-head">{item.head}</p>
+                      {item.shaft ? <p className="about-equipment-bag-shaft">{item.shaft}</p> : null}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {equipmentGroups.map((group, i) => (
-            <section key={group.title} className="about-equipment-group" aria-labelledby={`eq-g-${i}`}>
-              <h2 id={`eq-g-${i}`} className="about-equipment-group-title">
-                {group.title}
-              </h2>
-              {group.intro ? <p className="about-equipment-group-intro">{group.intro}</p> : null}
-              <ul className="about-equipment-club-list">
-                {group.clubs.map((club) => (
-                  <li key={club.name} className="about-equipment-club-card">
-                    <h3 className="about-equipment-club-name">{club.name}</h3>
-                    {club.model ? (
-                      <p className="about-equipment-club-row">
-                        <span className="about-equipment-club-label">Modell</span>
-                        <span>{club.model}</span>
-                      </p>
-                    ) : null}
-                    {club.shaft ? (
-                      <p className="about-equipment-club-row">
-                        <span className="about-equipment-club-label">Schaft</span>
-                        <span>{club.shaft}</span>
-                      </p>
-                    ) : null}
-                    {club.notes ? <p className="about-equipment-club-notes">{club.notes}</p> : null}
-                  </li>
+          <div className="about-equipment-fitter-block">
+            <div className="about-equipment-fitter-layout">
+              <div className="about-equipment-fitter-copy">
+                <p className="about-equipment-fitter-kicker">{equipmentTheGolfersMalans.kicker}</p>
+                {equipmentTheGolfersMalans.paragraphs.map((p, i) => (
+                  <p key={`equipment-fitter-${i}`} className="about-equipment-fitter-body">
+                    {p}
+                  </p>
                 ))}
-              </ul>
-            </section>
-          ))}
+                <a
+                  href={equipmentTheGolfersMalans.websiteHref}
+                  className="about-equipment-fitter-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {equipmentTheGolfersMalans.websiteLabel}
+                </a>
+              </div>
+              <div className="about-equipment-fitter-media">
+                <div className="about-equipment-fitter-frame">
+                  <Image
+                    src={equipmentTheGolfersMalans.imageSrc}
+                    alt={equipmentTheGolfersMalans.imageAlt}
+                    fill
+                    className="about-equipment-fitter-img"
+                    sizes="(max-width: 767px) 100vw, 42vw"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
           <p className="about-equipment-footnote">
-            Specs können sich mit Saison und Testing leicht ändern — Stand wie veröffentlicht.{" "}
-            <Link href="/ueber-mich/sponsoren">Zu den Partnern</Link>
+            Stand wie hier — nach Saison und Testing kann sich was ändern.{" "}
+            <Link href="/ueber-mich/sponsoren">Zu meinen Partnern</Link>
           </p>
         </div>
       </section>

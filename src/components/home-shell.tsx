@@ -97,11 +97,11 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               <span className="blog-eyebrow-pill">{siteContent.brand.role}</span>
             </p>
             <h1 className="blog-hero-title">{siteContent.brand.name}</h1>
-            <p className="blog-hero-sub">Meine Karriere, Turniere, Gedanken vom Platz.</p>
+            <p className="blog-hero-sub">Willkommen — hier folgst du mir auf der Tour.</p>
             <p className="blog-hero-lead">{siteContent.brand.intro}</p>
             <div className="blog-hero-cta">
               <Link href="/blog" className="blog-btn blog-btn-primary">
-                Zum Blog
+                Zu meinen Posts
               </Link>
               <a href="#newsletter" className="blog-btn blog-btn-ghost">
                 Newsletter
@@ -113,7 +113,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         {marqueeSponsors.length > 0 && (
           <section className="blog-sponsors" aria-label="Partner">
             <p className="blog-sponsors-label">
-              <span>Partner</span>
+              <span>Meine Partner</span>
             </p>
             <ClientMarquee sponsors={marqueeSponsors} />
           </section>
@@ -122,8 +122,8 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         <section className="blog-latest">
           <div className="blog-latest-head">
             <div className="blog-latest-head-text">
-              <h2>Neueste Updates</h2>
-              <p className="blog-latest-sub">Aus meinem Blog — kurz und auf den Punkt.</p>
+              <h2>Neueste Posts</h2>
+              <p className="blog-latest-sub">Das schreib ich gerade — vom Platz und aus der Vorbereitung.</p>
             </div>
             <Link href="/blog" className="blog-latest-cta">
               Alle anzeigen
@@ -179,24 +179,24 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         <section className="pgt-events" aria-labelledby="pgt-events-heading">
           <div className="pgt-events-head">
             <div>
-              <h2 id="pgt-events-heading">Saison & Termine</h2>
+              <h2 id="pgt-events-heading">Meine nächsten Termine</h2>
               <p className="pgt-events-sub">
-                Die nächsten drei Termine — vollständiger Kalender auf der{" "}
+                Wo ich als Nächstes starte — kompletter Kalender bei der{" "}
                 <a href={PRO_GOLF_TOUR_TURNIERE_URL} target="_blank" rel="noopener noreferrer">
                   Pro Golf Tour
                 </a>
-                . Änderungen vorbehalten.
+                . Kann sich noch ändern.
               </p>
             </div>
           </div>
           <ul className="pgt-events-list">
             {upcomingPgtEvents.length === 0 ? (
               <li className="pgt-events-empty">
-                Aktuell sind keine kommenden Turniere in der Liste — später in der Saison oder im{" "}
+                Gerade steht nichts in meiner Liste — schau bei der{" "}
                 <a href={PRO_GOLF_TOUR_TURNIERE_URL} target="_blank" rel="noopener noreferrer">
-                  offiziellen Kalender
-                </a>
-                .
+                  Pro Golf Tour
+                </a>{" "}
+                nach, falls du alle Termine sehen willst.
               </li>
             ) : (
               (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 3)).map((ev) => (
@@ -240,23 +240,23 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             </div>
           ) : null}
           <p className="pgt-events-footnote">
-            Livescoring der Tour:{" "}
+            Live dabei?{" "}
             <a href={PRO_GOLF_TOUR_LIVESCORING_URL} target="_blank" rel="noopener noreferrer">
               progolftour.de/livescoring
             </a>
-            . Termine bitte bei Abweichungen immer auf der{" "}
+            . Wenn sich ein Termin verschiebt, gilt für mich die{" "}
             <a href={PRO_GOLF_TOUR_TURNIERE_URL} target="_blank" rel="noopener noreferrer">
-              offiziellen Turnierseite
-            </a>{" "}
-            prüfen.
+              offizielle Ausschreibung
+            </a>
+            .
           </p>
         </section>
 
         <section id="newsletter" className="blog-newsletter">
           <div className="blog-newsletter-inner">
-            <p className="blog-newsletter-kicker">Bleib dran</p>
+            <p className="blog-newsletter-kicker">Für dich</p>
             <h2>Newsletter</h2>
-            <p className="blog-newsletter-dek">E-Mail für Updates zu meinen Posts und meiner Karriere.</p>
+            <p className="blog-newsletter-dek">Trag dich ein — ich schicke dir ab und zu Updates von der Tour.</p>
             <form onSubmit={handleNewsletterSubmit} className="blog-newsletter-form">
               <label htmlFor="email" className="sr-only">
                 E-Mail
@@ -301,12 +301,21 @@ function ClientMarquee({
           const inner = (
             <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={140} height={56} className="blog-marquee-logo" /> : s.name}</span>
           );
-          return s.website_url ? (
-            <a key={`${s.id}-${index}`} href={s.website_url} target="_blank" rel="noopener noreferrer">
+          const url = s.website_url;
+          if (!url) {
+            return <span key={`${s.id}-${index}`}>{inner}</span>;
+          }
+          if (url.startsWith("/")) {
+            return (
+              <Link key={`${s.id}-${index}`} href={url}>
+                {inner}
+              </Link>
+            );
+          }
+          return (
+            <a key={`${s.id}-${index}`} href={url} target="_blank" rel="noopener noreferrer">
               {inner}
             </a>
-          ) : (
-            <span key={`${s.id}-${index}`}>{inner}</span>
           );
         })}
       </div>

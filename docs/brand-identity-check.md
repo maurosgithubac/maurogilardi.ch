@@ -2,17 +2,17 @@
 
 ## Ergebnis
 
-Die Marke ist klar aufgestellt: Leistung, Bodenstaendigkeit, Heimat und Familie.
+Die Marke ist klar aufgestellt: Leistung, Bodenständigkeit, Heimat und Familie.
 Das neue Designsystem setzt diese Werte mit einer cleanen, modernen und reduzierten Bildsprache um.
 
 ## Design Richtung
 
-- Primaerfarbe: `#d71920` (Signature Red)
-- Basis: Schwarz/Weiss fuer einen modernen Premium-Look
-- Typografie: gross, klar, reduziert, mit viel Weissraum
-- UI-Elemente: eckige Buttons/Karten statt runde Formen (fashion-artig und zeitgemaess)
+- Primärfarbe: `#d71920` (Signature Red)
+- Basis: Schwarz/Weiß für einen modernen Premium-Look
+- Typografie: groß, klar, reduziert, mit viel Weißraum
+- UI-Elemente: eckige Buttons/Karten statt runde Formen (fashion-artig und zeitgemäß)
 
-## Empfehlung fuer Assets
+## Empfehlung für Assets
 
 - Hero-Bilder mit viel Ruhe, wenig visuellem Rauschen
 - Hochwertige Portraits + Action-Shots auf dem Platz
@@ -22,4 +22,4 @@ Das neue Designsystem setzt diese Werte mit einer cleanen, modernen und reduzier
 ## Inspiration
 
 Die Reduktion und Klarheit orientieren sich an einer modernen Schweizer Bild- und Markenlogik:
-[Graubuenden](https://www.graubuenden.ch)
+[Graubünden](https://www.graubuenden.ch)

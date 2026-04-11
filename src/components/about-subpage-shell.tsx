@@ -12,9 +12,11 @@ type Props = {
   heroSrc: string;
   heroAlt: string;
   children: ReactNode;
+  /** Zusätzliche Klasse fürs Hero-Bild (z. B. Fokus oben bei `about-hero-bg--focus-top`). */
+  heroBgClassName?: string;
 };
 
-export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, children }: Props) {
+export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, children, heroBgClassName }: Props) {
   return (
     <div className="site-page about-page">
       <div className="site-header-fixed-stack">
@@ -22,8 +24,15 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
       </div>
 
       <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero blog-index-hero-unified">
-          <Image src={heroSrc} alt={heroAlt} fill className="stage-bg about-hero-bg" priority />
+        {/* Gleicher Aufbau wie /ueber-mich (subpage-hero + about-hero, gleiche Höhen-Locks) */}
+        <section className="subpage-hero about-hero">
+          <Image
+            src={heroSrc}
+            alt={heroAlt}
+            fill
+            className={["stage-bg", "about-hero-bg", heroBgClassName].filter(Boolean).join(" ")}
+            priority
+          />
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">{label}</p>

@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: Props) {
   try {
     const supabase = createSupabaseServerClient();
     const { data } = await supabase.from("posts").select("title, description").eq("slug", slug).eq("published", true).maybeSingle();
-    if (!data) return { title: "Beitrag | Mauro Gilardi" };
+    if (!data) return { title: "Post | Mauro Gilardi" };
     return {
       title: `${data.title} | Mauro Gilardi`,
       description: data.description ?? undefined,
     };
   } catch {
-    return { title: "Beitrag | Mauro Gilardi" };
+    return { title: "Post | Mauro Gilardi" };
   }
 }
 
@@ -57,8 +57,8 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <article className="blog-post site-page">
       <SiteHeader variant="document" />
-      <nav className="blog-post-breadcrumb" aria-label="Brotkrumen">
-        <Link href="/blog">Blog</Link>
+      <nav className="blog-post-breadcrumb" aria-label="Navigation">
+        <Link href="/blog">Zum Blog</Link>
         <span aria-hidden className="blog-post-breadcrumb-sep">
           /
         </span>
@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: Props) {
         {post.description ? <p className="blog-post-dek">{post.description}</p> : null}
         <div className="blog-post-body">{post.body}</div>
         <Link href="/blog" className="blog-post-back">
-          ← Alle Beiträge
+          ← Zurück zum Blog
         </Link>
       </div>
       <SiteFooter />

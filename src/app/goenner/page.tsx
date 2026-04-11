@@ -3,7 +3,7 @@ import { GoennerPageClient } from "@/components/goenner-page-client";
 
 export const metadata: Metadata = {
   title: "Gönner | Mauro Gilardi",
-  description: "Gönner-Mitgliedschaften bei mir: Birdie, Eagle und Albatros — direkt an mich anfragen.",
+  description: "Unterstütze mich auf der Tour — drei Mitgliedschaften, alles direkt bei mir anfragen.",
 };
 
 export default function GoennerPage() {

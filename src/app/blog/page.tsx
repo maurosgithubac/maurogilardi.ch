@@ -9,7 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Blog | Mauro Gilardi",
-  description: "Updates aus meiner Golf-Karriere.",
+  description: "Meine Texte von der Tour — Training, Turniere und was mich bewegt.",
 };
 
 export default async function BlogPage() {
@@ -54,8 +54,8 @@ export default async function BlogPage() {
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Blog</p>
-            <h1 className="blog-page-h1">Updates vom Platz</h1>
-            <p className="about-hero-lead">Meine Karriere, Turniere und Gedanken - kompakt erzählt.</p>
+            <h1 className="blog-page-h1">Mein Blog</h1>
+            <p className="about-hero-lead">Alles, was ich hier veröffentliche — damit du weißt, was bei mir läuft.</p>
             <div className="about-hero-actions">
               <Link href="/" className="about-btn about-btn-primary">
                 Home
@@ -69,7 +69,7 @@ export default async function BlogPage() {
         <section className="blog-index-content" aria-label="Blogbeiträge">
           {posts.length === 0 ? (
             <div className="blog-index-empty">
-              <p className="blog-page-empty">Noch keine Beiträge.</p>
+              <p className="blog-page-empty">Noch keine Posts — sobald etwas da ist, findest du es hier.</p>
             </div>
           ) : (
             <ul className="blog-feed">
@@ -96,7 +96,7 @@ export default async function BlogPage() {
                         <h2>{post.title}</h2>
                         {post.description ? <p>{post.description}</p> : null}
                         <span className="blog-feed-card-more">
-                          Weiterlesen
+                          Post öffnen
                           <span aria-hidden>→</span>
                         </span>
                       </div>

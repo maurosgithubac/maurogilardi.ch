@@ -1,99 +1,107 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
-import { sponsorLogoUrl } from "@/lib/storage-public-url";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
-import type { SponsorRow } from "@/types/content";
+import { siteSponsorTiers } from "@/content/sponsorsSite";
 
 export const metadata = {
-  title: "Sponsoren & Partner | Mauro Gilardi",
-  description: "Partner und Sponsoren, die meinen Weg im Profigolf unterstützen.",
+  title: "Partner | Mauro Gilardi",
+  description:
+    "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Partner schnell.",
 };
 
-export const revalidate = 3600;
-
-export default async function UeberMichSponsorenPage() {
-  type SponsorCard = Pick<SponsorRow, "id" | "name" | "logo_path" | "website_url">;
-  let sponsors: SponsorCard[] = [];
-
-  try {
-    const supabase = createSupabaseServerClient();
-    const { data } = await supabase
-      .from("sponsors")
-      .select("id, name, logo_path, website_url")
-      .eq("active", true)
-      .order("sort_order", { ascending: true });
-    sponsors = data ?? [];
-  } catch {
-    /* Supabase nicht konfiguriert */
+function SponsorCardShell({
+  href,
+  className,
+  ariaLabel,
+  children,
+}: {
+  href: string | null;
+  className: string;
+  ariaLabel: string;
+  children: ReactNode;
+}) {
+  if (!href) {
+    return (
+      <div className={`${className} about-sponsors-page-card--static`} aria-label={ariaLabel}>
+        {children}
+      </div>
+    );
   }
+  if (href.startsWith("/")) {
+    return (
+      <Link href={href} className={className} aria-label={ariaLabel}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} className={className} aria-label={ariaLabel} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
 
+export default function UeberMichSponsorenPage() {
   return (
     <AboutSubpageShell
       label="Über mich"
-      title="Sponsoren & Partner"
-      lead="Ohne die richtigen Partner gäbe es keinen professionellen Auftritt auf und neben dem Platz — vielen Dank für das Vertrauen."
+      title="Meine Partner"
+      lead="Hier siehst du, wer hinter mir steht — Danke an alle, die den Weg mitgehen."
       heroSrc="/brand-assets/images/1L9A9440.JPG"
       heroAlt="Mauro Gilardi im Turnier"
     >
-      <section className="about-sponsors-page" aria-label="Partnerlogos">
+      <section className="about-sponsors-page" aria-label="Sponsoren und Partner">
         <div className="about-sponsors-page-inner">
-          {sponsors.length === 0 ? (
-            <div className="about-sponsors-empty">
-              <p>
-                Die Partnerliste wird aktuell gepflegt. Auf der Startseite siehst du laufend aktuelle Logos — oder
-                schreib mir für eine Zusammenarbeit.
-              </p>
-              <div className="about-sponsors-empty-actions">
-                <Link href="/" className="about-btn about-btn-primary">
-                  Zur Startseite
-                </Link>
-                <Link href="/goenner" className="about-btn about-btn-ghost">
-                  Gönner werden
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <ul className="about-sponsors-page-grid">
-              {sponsors.map((s) => {
-                const logo = sponsorLogoUrl(s.logo_path);
-                const inner = (
-                  <>
-                    <div className="about-sponsors-page-logo">
-                      {logo ? (
-                        <Image src={logo} alt="" width={200} height={80} className="about-sponsors-page-logo-img" />
-                      ) : (
-                        <span className="about-sponsors-page-fallback">{s.name}</span>
-                      )}
-                    </div>
-                    <span className="about-sponsors-page-name">{s.name}</span>
-                  </>
-                );
-                return (
-                  <li key={s.id}>
-                    {s.website_url ? (
-                      <a
-                        href={s.website_url}
+          <div className="about-sponsors-page-main">
+            <p className="about-sponsors-page-kicker">Netzwerk</p>
+            <h2 className="about-sponsors-page-section-title">Partner im Überblick</h2>
+            <p className="about-sponsors-page-lead">
+              Drei Stufen. Klick öffnet die Website — MG Gönnervereinigung bringt dich zu meiner Gönner-Seite.
+            </p>
+
+            {siteSponsorTiers.map((block) => (
+              <section
+                key={block.tier}
+                className="about-sponsors-tier"
+                aria-labelledby={`sponsor-tier-${block.tier}-title`}
+              >
+                <h3 id={`sponsor-tier-${block.tier}-title`} className="about-sponsors-tier-title">
+                  {block.title}
+                </h3>
+                <p className="about-sponsors-tier-dek">{block.description}</p>
+                <ul className="about-sponsors-page-grid">
+                  {block.sponsors.map((s) => (
+                    <li key={s.id}>
+                      <SponsorCardShell
+                        href={s.href}
                         className="about-sponsors-page-card"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        ariaLabel={s.displayName}
                       >
-                        {inner}
-                      </a>
-                    ) : (
-                      <div className="about-sponsors-page-card about-sponsors-page-card--static">{inner}</div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+                        <div className="about-sponsors-page-card-media">
+                          <Image
+                            src={s.imageSrc}
+                            alt=""
+                            fill
+                            sizes="(max-width: 520px) 90vw, (max-width: 880px) 40vw, 300px"
+                            className="about-sponsors-page-card-img"
+                          />
+                          <span className="about-sponsors-page-card-overlay" aria-hidden="true">
+                            <span className="about-sponsors-page-card-title">{s.displayName}</span>
+                          </span>
+                        </div>
+                      </SponsorCardShell>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
 
           <aside className="about-sponsors-aside">
             <h2 className="about-sponsors-aside-title">Partnerschaft</h2>
             <p className="about-sponsors-aside-text">
-              Interesse an sichtbarer Zusammenarbeit, Events oder langfristiger Unterstützung? Ich freue mich auf ein
-              Gespräch — unverbindlich und klar in den Erwartungen.
+              Interesse an Zusammenarbeit? Melde dich — unverbindlich.
             </p>
             <Link href="/goenner" className="about-btn about-btn-primary">
               Gönner &amp; Mitgliedschaften

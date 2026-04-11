@@ -35,7 +35,7 @@ async function main() {
       description:
         "Warum ich 2026 bei Eisen und Wedges auf Titleist setze, welche Tests dahinterstehen und wie mich The Golfer's Malans im Alltag begleitet.",
       body:
-        "Im neuen Jahr vertraue ich noch stärker auf meinen Ausruester The Golfer's Malans. Nach intensiven Tests verschiedener Marken habe ich fuer mein Spiel das Setup gefunden, das sich am besten anfuehlt und unter Druck am konstantesten performt.\n\nDer Fokus liegt auf gleichem Outcome wie im letzten Jahr, kombiniert mit besserem Landing Angle auf die Gruens. Genau hier liefern mir die Titleist T100 Eisen die passenden Werte bei Spin und Ballflug, ohne mein Schlaggefuehl komplett zu veraendern.\n\nBei den Hoelzern bleibe ich weiterhin bei Callaway, weil das Gesamtbild fuer mich stimmt. Mit dem ProV1 als Ball und dem direkten Austausch vor Ort in Malans habe ich fuer 2026 ein Setup, das Leistung und Vertrauen zusammenbringt.",
+        "Im neuen Jahr vertraue ich noch stärker auf meinen Ausrüster The Golfer's Malans. Nach intensiven Tests verschiedener Marken habe ich für mein Spiel das Setup gefunden, das sich am besten anfühlt und unter Druck am konstantesten performt.\n\nDer Fokus liegt auf gleichem Outcome wie im letzten Jahr, kombiniert mit besserem Landing Angle auf die Grüns. Genau hier liefern mir die Titleist T100 Eisen die passenden Werte bei Spin und Ballflug, ohne mein Schlaggefühl komplett zu verändern.\n\nBei den Hölzern bleibe ich weiterhin bei Callaway, weil das Gesamtbild für mich stimmt. Mit dem ProV1 als Ball und dem direkten Austausch vor Ort in Malans habe ich für 2026 ein Setup, das Leistung und Vertrauen zusammenbringt.",
       image_path: "/brand-assets/images/mauro&friends-9.jpg",
       created_at: "2026-01-08T09:00:00.000Z",
       published: true,
@@ -45,7 +45,7 @@ async function main() {
       title: "Newsletter Januar 2026: Swiss Golf Camp in Al Ain",
       description: "14 Tage Intensivtraining in den UAE: Technik, Routinen und Performance unter realen Platzbedingungen.",
       body:
-        "Das Swiss Golf Camp in Al Ain ist fuer mich jedes Jahr ein wichtiger Baustein vor dem Saisonstart. Mit Coaches, Spezialisten im Kurzspiel und Putting sowie dem National Team entstehen taeglich wertvolle Inputs fuer mein Spiel.\n\nIn Woche eins lag der Schwerpunkt auf meinem eigenen Schwunggefuehl und darauf, wieder in stabile Routinen zu kommen. Morgens und abends habe ich zusaetzlich Performance-Training eingebaut, um trotz hoher Belastung fokussiert und spielnah zu bleiben.\n\nIn Woche zwei ging es staerker Richtung Wettkampfmodus: mehr Locherunden, verschiedene Spielsituationen und klares Entscheidungsverhalten auf dem Platz. Genau diese Kombination aus Struktur und Praxis hat mir geholfen, wieder mit Selbstvertrauen unter Druck zu performen.",
+        "Das Swiss Golf Camp in Al Ain ist für mich jedes Jahr ein wichtiger Baustein vor dem Saisonstart. Mit Coaches, Spezialisten im Kurzspiel und Putting sowie dem National Team entstehen täglich wertvolle Inputs für mein Spiel.\n\nIn Woche eins lag der Schwerpunkt auf meinem eigenen Schwunggefühl und darauf, wieder in stabile Routinen zu kommen. Morgens und abends habe ich zusätzlich Performance-Training eingebaut, um trotz hoher Belastung fokussiert und spielnah zu bleiben.\n\nIn Woche zwei ging es stärker Richtung Wettkampfmodus: mehr Locherunden, verschiedene Spielsituationen und klares Entscheidungsverhalten auf dem Platz. Genau diese Kombination aus Struktur und Praxis hat mir geholfen, wieder mit Selbstvertrauen unter Druck zu performen.",
       image_path: "/brand-assets/images/1L9A8795.JPG",
       created_at: "2026-01-20T10:00:00.000Z",
       published: true,
@@ -54,9 +54,9 @@ async function main() {
       slug: "newsletter-januar-2026-trainingslearnings-und-ausblick",
       title: "Newsletter Januar 2026: Learnings und Ausblick",
       description:
-        "Was ich aus dem Januar-Block mitnehme und wie ich die Erkenntnisse in Turnierwahl, Planung und Saisonvorbereitung ueberfuehre.",
+        "Was ich aus dem Januar-Block mitnehme und wie ich die Erkenntnisse in Turnierwahl, Planung und Saisonvorbereitung überführe.",
       body:
-        "Nach dem intensiven Januar-Block war fuer mich klar: Die Richtung stimmt. Ich fuehle mich auf dem Platz wieder wohl, kann auch bei unsicherem Schwunggefuehl solide performen und weiss, welche Routinen im Turniermodus funktionieren.\n\nGleichzeitig braucht es nach 14 Tagen mit taeglich vielen Trainingsstunden bewusste Regeneration. Physische und mentale Pausen sind entscheidend, um Erkenntnisse sauber einzuordnen und Prioritaeten fuer die naechsten Wochen zu setzen.\n\nMit diesem Fundament gehe ich in die weitere Saisonvorbereitung: strukturierter Plan, passende Turnierauswahl und ein klarer Fokus auf Umsetzung. Genau so will ich 2026 Schritt fuer Schritt auf das naechste Level bringen.",
+        "Nach dem intensiven Januar-Block war für mich klar: Die Richtung stimmt. Ich fühle mich auf dem Platz wieder wohl, kann auch bei unsicherem Schwunggefühl solide performen und weiß, welche Routinen im Turniermodus funktionieren.\n\nGleichzeitig braucht es nach 14 Tagen mit täglich vielen Trainingsstunden bewusste Regeneration. Physische und mentale Pausen sind entscheidend, um Erkenntnisse sauber einzuordnen und Prioritäten für die nächsten Wochen zu setzen.\n\nMit diesem Fundament gehe ich in die weitere Saisonvorbereitung: strukturierter Plan, passende Turnierauswahl und ein klarer Fokus auf Umsetzung. Genau so will ich 2026 Schritt für Schritt auf das nächste Level bringen.",
       image_path: "/brand-assets/images/1L9A8968.JPG",
       created_at: "2026-02-02T11:00:00.000Z",
       published: true,

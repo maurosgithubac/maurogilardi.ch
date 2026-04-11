@@ -10,7 +10,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Mauro Gilardi | SwissPGA",
   description:
-    "Ich bin Mauro Gilardi — News, Turniere, Partner und meine persönliche Geschichte.",
+    "Ich bin Mauro — hier findest du meinen Blog, meine Termine und Partner. Kurz und von der Tour.",
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="de-CH">
       <body className={`${geistSans.variable} antialiased`}>
         <a href="/#newsletter" className="global-newsletter-tab">
-          Newsletter abonnieren
+          Newsletter
         </a>
         {children}
       </body>

@@ -76,11 +76,10 @@ export function GoennerPageClient() {
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Unterstützung</p>
-            <h1>Gönner werden.</h1>
+            <h1>Werde Teil meines Teams.</h1>
             <p className="about-hero-lead">
-              Interesse an einer Zusammenarbeit? Ich freue mich über den Austausch mit Partnern, die den Weg im
-              Leistungssport aktiv mitgestalten möchten - sei es durch gemeinsame Projekte, Events oder langfristige
-              Partnerschaften.
+              Wenn du mich auf der Tour begleiten willst, gibt’s drei klare Modelle — unten siehst du, was drinsteht.
+              Ich freue mich auf deine Anfrage.
             </p>
             <div className="about-hero-actions">
               <a href="#goenner-form-title" className="about-btn about-btn-primary">
@@ -135,9 +134,9 @@ export function GoennerPageClient() {
 
         <section className="goenner-trust" aria-label="Zusätzliche Informationen">
           <ul className="goenner-trust-list">
-            <li>Direkter Kontakt ohne Umwege</li>
-            <li>Persönliche Abstimmung von Details und Terminen</li>
-            <li>Transparente Kommunikation und langfristige Zusammenarbeit</li>
+            <li>Du schreibst mir direkt — ohne Umwege.</li>
+            <li>Details und Termine klären wir persönlich.</li>
+            <li>Ich halte dich ehrlich auf dem Laufenden.</li>
           </ul>
         </section>
 

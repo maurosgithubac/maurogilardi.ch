@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Über mich | Mauro Gilardi",
-  description: "Über mich: Performance trifft Persönlichkeit — ich bin Mauro Gilardi, SwissPGA.",
+  description: "Wer ich bin, wie ich denke — und was ich neben dem Spiel noch mache.",
 };
 
 export default function UeberMichPage() {
@@ -49,7 +49,7 @@ export default function UeberMichPage() {
 
         <section className="about-story" aria-labelledby="about-story-title">
           <div className="about-story-inner">
-            <h2 id="about-story-title">Mein Weg</h2>
+            <h2 id="about-story-title">Mein Weg — in Kurzform</h2>
             <div className="about-story-layout">
               <div className="about-story-grid">
                 {siteContent.story.map((paragraph, index) => (
@@ -64,7 +64,7 @@ export default function UeberMichPage() {
 
         <section className="about-projects" aria-labelledby="about-projects-title">
           <div className="about-projects-inner">
-            <h2 id="about-projects-title">Neben dem Tour-Alltag, den ich aufbaue</h2>
+            <h2 id="about-projects-title">Was ich neben der Tour noch mache</h2>
             <p className="about-projects-intro">{siteContent.projectsShowcase.intro}</p>
 
             <ul className="about-projects-roles">
