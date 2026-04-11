@@ -83,7 +83,7 @@ export default function UeberMichSponsorenPage() {
                             src={s.imageSrc}
                             alt=""
                             fill
-                            sizes="(max-width: 520px) 90vw, (max-width: 880px) 40vw, 300px"
+                            sizes="(max-width: 380px) 90vw, (max-width: 719px) 45vw, 28vw"
                             className="about-sponsors-page-card-img"
                           />
                           <span className="about-sponsors-page-card-overlay" aria-hidden="true">

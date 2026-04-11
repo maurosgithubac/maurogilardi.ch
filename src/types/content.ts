@@ -25,6 +25,9 @@ export type GoennerInquiryRow = {
   name: string;
   email: string;
   phone: string | null;
+  street: string | null;
+  postal_code: string | null;
+  city: string | null;
   message: string | null;
   created_at: string;
 };

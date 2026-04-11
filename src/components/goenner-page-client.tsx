@@ -27,6 +27,9 @@ export function GoennerPageClient() {
     const name = String(fd.get("name") || "").trim();
     const email = String(fd.get("email") || "").trim();
     const phone = String(fd.get("phone") || "").trim();
+    const street = String(fd.get("street") || "").trim();
+    const postal_code = String(fd.get("postal_code") || "").trim();
+    const city = String(fd.get("city") || "").trim();
     const message = String(fd.get("message") || "").trim();
 
     setIsSubmitting(true);
@@ -40,6 +43,9 @@ export function GoennerPageClient() {
           name,
           email,
           phone: phone || null,
+          street,
+          postal_code,
+          city,
           message: message || null,
         }),
       });
@@ -184,6 +190,32 @@ export function GoennerPageClient() {
               Telefon <span className="goenner-optional">(optional)</span>
               <input name="phone" type="tel" autoComplete="tel" maxLength={80} />
             </label>
+
+            <fieldset className="goenner-fieldset goenner-fieldset--block">
+              <legend className="goenner-legend">Adresse</legend>
+              <p className="goenner-fieldset-hint">Damit ich dir Post und Infos direkt schicken kann.</p>
+              <div className="goenner-form-grid">
+                <label className="goenner-label goenner-label--span-2">
+                  Strasse & Hausnummer
+                  <input
+                    name="street"
+                    type="text"
+                    required
+                    autoComplete="street-address"
+                    maxLength={300}
+                    placeholder="z. B. Musterweg 12"
+                  />
+                </label>
+                <label className="goenner-label">
+                  PLZ
+                  <input name="postal_code" type="text" required autoComplete="postal-code" maxLength={16} inputMode="numeric" />
+                </label>
+                <label className="goenner-label">
+                  Ort
+                  <input name="city" type="text" required autoComplete="address-level2" maxLength={120} />
+                </label>
+              </div>
+            </fieldset>
             <label className="goenner-label">
               Nachricht <span className="goenner-optional">(optional)</span>
               <textarea name="message" rows={4} maxLength={4000} />

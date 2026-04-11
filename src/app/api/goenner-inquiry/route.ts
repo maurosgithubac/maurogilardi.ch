@@ -13,6 +13,9 @@ type Body = {
   name?: string;
   email?: string;
   phone?: string | null;
+  street?: string;
+  postal_code?: string;
+  city?: string;
   message?: string | null;
 };
 
@@ -40,6 +43,18 @@ export async function POST(request: Request) {
   }
 
   const phone = body.phone != null ? String(body.phone).trim().slice(0, 80) : null;
+  const street = String(body.street || "").trim();
+  if (street.length < 3 || street.length > 300) {
+    return NextResponse.json({ error: "Bitte gib Strasse und Hausnummer an." }, { status: 400 });
+  }
+  const postal_code = String(body.postal_code || "").trim();
+  if (postal_code.length < 3 || postal_code.length > 16) {
+    return NextResponse.json({ error: "Bitte gib eine gültige PLZ ein." }, { status: 400 });
+  }
+  const city = String(body.city || "").trim();
+  if (city.length < 2 || city.length > 120) {
+    return NextResponse.json({ error: "Bitte gib den Ort an." }, { status: 400 });
+  }
   const message = body.message != null ? String(body.message).trim().slice(0, 4000) : null;
 
   try {
@@ -49,6 +64,9 @@ export async function POST(request: Request) {
       name,
       email,
       phone: phone || null,
+      street,
+      postal_code,
+      city,
       message: message || null,
     });
 

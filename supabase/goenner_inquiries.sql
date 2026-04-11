@@ -8,6 +8,9 @@ create table if not exists public.goenner_inquiries (
   name text not null,
   email text not null,
   phone text,
+  street text,
+  postal_code text,
+  city text,
   message text,
   created_at timestamptz not null default now()
 );
