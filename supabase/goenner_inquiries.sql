@@ -12,7 +12,10 @@ create table if not exists public.goenner_inquiries (
   postal_code text,
   city text,
   message text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  status text not null default 'open' check (status in ('open', 'completed')),
+  completed_at timestamptz,
+  amount_chf numeric(10, 2)
 );
 
 create index if not exists goenner_inquiries_created_at_idx on public.goenner_inquiries (created_at desc);
@@ -23,5 +26,15 @@ drop policy if exists "Admins read goenner inquiries" on public.goenner_inquirie
 create policy "Admins read goenner inquiries"
   on public.goenner_inquiries for select
   using (
+    exists (select 1 from public.admin_users u where u.user_id = auth.uid())
+  );
+
+drop policy if exists "Admins update goenner inquiries" on public.goenner_inquiries;
+create policy "Admins update goenner inquiries"
+  on public.goenner_inquiries for update
+  using (
+    exists (select 1 from public.admin_users u where u.user_id = auth.uid())
+  )
+  with check (
     exists (select 1 from public.admin_users u where u.user_id = auth.uid())
   );

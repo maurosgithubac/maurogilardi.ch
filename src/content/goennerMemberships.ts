@@ -52,3 +52,9 @@ export function membershipLabel(id: MembershipId): string {
   const t = goennerMembershipTiers.find((x) => x.id === id);
   return t ? `${t.title} (${t.priceChf}.- / Jahr)` : id;
 }
+
+/** Listenpreis der gewählten Stufe (CHF / Jahr) — z. B. als Vorschlag beim Erfassen des Betrags. */
+export function membershipPriceChf(id: MembershipId | string): number {
+  const t = goennerMembershipTiers.find((x) => x.id === id);
+  return t?.priceChf ?? 0;
+}

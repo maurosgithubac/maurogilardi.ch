@@ -139,6 +139,9 @@ const timelineEntries: ErfolgeTimelineEntry[] = [
   },
 ];
 
+/** Neueste Station zuerst, beim Scrollen zurück in die Vergangenheit */
+const timelineEntriesDisplay = [...timelineEntries].reverse();
+
 export default function ErfolgePage() {
   return (
     <div className="site-page erfolge-page">
@@ -147,7 +150,7 @@ export default function ErfolgePage() {
       </div>
 
       <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero erfolge-hero">
+        <section className="subpage-hero about-hero erfolge-hero blog-index-hero-unified">
           <Image
             src="/brand-assets/images/pgtwinbig.jpg"
             alt="Mauro Gilardi bei einem Turnier"
@@ -177,7 +180,9 @@ export default function ErfolgePage() {
           <div className="erfolge-timeline-head">
             <p className="erfolge-timeline-kicker">Zeitstrahl</p>
             <h2 id="erfolge-timeline-title">Meilensteine</h2>
-            <p className="erfolge-timeline-lead">Scroll weiter — jede Karte ist ein Kapitel aus meiner Geschichte.</p>
+            <p className="erfolge-timeline-lead">
+              Oben steht, was am aktuellsten ist — weiter unten geht’s zurück zu den Anfängen.
+            </p>
             <ul className="erfolge-phase-legend" aria-label="Phasen">
               <li>Foundation</li>
               <li>Development</li>
@@ -189,7 +194,7 @@ export default function ErfolgePage() {
             <span className="erfolge-timeline-progress-dot" />
           </div>
 
-          <ErfolgeTimeline entries={timelineEntries} phaseLabel={phaseLabel} />
+          <ErfolgeTimeline entries={timelineEntriesDisplay} phaseLabel={phaseLabel} />
         </section>
       </main>
 

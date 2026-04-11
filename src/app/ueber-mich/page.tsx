@@ -18,7 +18,7 @@ export default function UeberMichPage() {
       </div>
 
       <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero">
+        <section className="subpage-hero about-hero blog-index-hero-unified">
           <Image
             src="/brand-assets/images/1L9A9440.JPG"
             alt="Mauro Gilardi im Turnier"

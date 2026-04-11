@@ -79,31 +79,27 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         <PgtLiveScoringTicker />
       </div>
 
-      <main className="blog-home-main">
-        <section className="blog-hero blog-hero--landing">
-          <div className="blog-hero-bg" aria-hidden="true">
-            <Image
-              src="/brand-assets/images/1L9A8795.JPG"
-              alt="Mauro Gilardi auf dem Golfplatz"
-              fill
-              priority
-              className="blog-hero-bg-img"
-              sizes="100vw"
-            />
-          </div>
-          <div className="blog-hero-veil" aria-hidden="true" />
-          <div className="blog-hero-inner">
-            <p className="blog-eyebrow">
-              <span className="blog-eyebrow-pill">{siteContent.brand.role}</span>
-            </p>
-            <h1 className="blog-hero-title">{siteContent.brand.name}</h1>
-            <p className="blog-hero-sub">Willkommen — hier folgst du mir auf der Tour.</p>
-            <p className="blog-hero-lead">{siteContent.brand.intro}</p>
-            <div className="blog-hero-cta">
-              <Link href="/blog" className="blog-btn blog-btn-primary">
+      <main className="blog-home-main subpage-shell subpage-shell--flush blog-index-shell">
+        <section className="subpage-hero about-hero blog-index-hero-unified home-landing-hero" aria-label="Start">
+          <Image
+            src="/brand-assets/images/1L9A8795.JPG"
+            alt="Mauro Gilardi auf dem Golfplatz"
+            fill
+            priority
+            className="stage-bg about-hero-bg"
+            sizes="100vw"
+          />
+          <div className="stage-overlay about-hero-overlay" aria-hidden="true" />
+          <div className="subpage-copy about-hero-copy">
+            <p className="label about-hero-label">{siteContent.brand.role}</p>
+            <h1>{siteContent.brand.name}</h1>
+            <p className="about-hero-lead about-hero-lead--welcome">Willkommen — hier folgst du mir auf der Tour.</p>
+            <p className="about-hero-lead">{siteContent.brand.intro}</p>
+            <div className="about-hero-actions">
+              <Link href="/blog" className="about-btn about-btn-primary">
                 Zu meinen Posts
               </Link>
-              <a href="#newsletter" className="blog-btn blog-btn-ghost">
+              <a href="#newsletter" className="about-btn about-btn-ghost">
                 Newsletter
               </a>
             </div>
@@ -299,7 +295,7 @@ function ClientMarquee({
         {sponsors.map((s, index) => {
           const href = s.logo_url;
           const inner = (
-            <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={140} height={56} className="blog-marquee-logo" /> : s.name}</span>
+            <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={168} height={64} className="blog-marquee-logo" /> : s.name}</span>
           );
           const url = s.website_url;
           if (!url) {

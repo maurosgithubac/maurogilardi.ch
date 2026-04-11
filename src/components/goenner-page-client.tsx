@@ -71,7 +71,7 @@ export function GoennerPageClient() {
       </div>
 
       <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero goenner-hero">
+        <section className="subpage-hero about-hero goenner-hero blog-index-hero-unified">
           <Image
             src="/brand-assets/images/mauro&friends-9.jpg"
             alt="Mauro Gilardi auf dem Golfplatz"

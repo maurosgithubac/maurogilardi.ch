@@ -30,4 +30,8 @@ export type GoennerInquiryRow = {
   city: string | null;
   message: string | null;
   created_at: string;
+  /** Nach Migration supabase/goenner_inquiries_status_amount.sql */
+  status?: "open" | "completed";
+  completed_at?: string | null;
+  amount_chf?: number | null;
 };

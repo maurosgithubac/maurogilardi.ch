@@ -101,15 +101,15 @@ export const equipmentPartnerCallouts = {
   },
 } as const;
 
-/** Logo wie auf der Sponsoren-Seite: public/brand-assets/images/Sponsors/1_TheGolfers.png */
+/** Bild: Team / Malans-Bereich auf der Equipment-Seite */
 export const equipmentTheGolfersMalans = {
   kicker: "The Golfer's Malans",
   paragraphs: [
     "Mit The Golfer's Malans in Malans kläre ich Schläger, Schäfte und Material — mit ehrlicher Beratung und dem Raum, Setups zu testen, bevor sie bei mir ins Bag kommen.",
     "So bleibt mein Equipment stimmig für Daten, Schwung und das Gefühl, das ich unter Druck brauche. Suchst du ein Fitting? Da bist du bei ihnen gut aufgehoben.",
   ],
-  imageSrc: "/brand-assets/images/Sponsors/1_TheGolfers.png",
-  imageAlt: "The Golfer's Malans — Shop und Fitting in Malans",
+  imageSrc: "/brand-assets/images/mauro&friends-8.jpg",
+  imageAlt: "Mauro Gilardi mit Team — Fitting und Beratung bei The Golfer's Malans",
   websiteHref: equipmentPartnerCallouts.theGolfers.href,
   websiteLabel: "TheGolfers.ch",
 } as const;

@@ -25,7 +25,7 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
 
       <main className="subpage-shell subpage-shell--flush">
         {/* Gleicher Aufbau wie /ueber-mich (subpage-hero + about-hero, gleiche Höhen-Locks) */}
-        <section className="subpage-hero about-hero">
+        <section className="subpage-hero about-hero blog-index-hero-unified">
           <Image
             src={heroSrc}
             alt={heroAlt}

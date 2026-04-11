@@ -54,7 +54,7 @@ export default async function BlogPage() {
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Blog</p>
-            <h1 className="blog-page-h1">Mein Blog</h1>
+            <h1>Mein Blog</h1>
             <p className="about-hero-lead">Alles, was ich hier veröffentliche — damit du weißt, was bei mir läuft.</p>
             <div className="about-hero-actions">
               <Link href="/" className="about-btn about-btn-primary">
