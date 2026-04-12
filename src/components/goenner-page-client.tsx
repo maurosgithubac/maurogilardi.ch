@@ -4,7 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import {
+  GOENNER_SPONSORING_MIN_CHF,
   goennerMembershipTiers,
+  tierCardCta,
+  tierPriceLine,
   type MembershipId,
 } from "@/content/goennerMemberships";
 import { SiteHeader } from "@/components/site-header";
@@ -19,7 +22,7 @@ export function GoennerPageClient() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!membershipId) {
-      setStatus("Bitte wähle eine Mitgliedschaft.");
+      setStatus("Bitte wähle eine Option (Mitgliedschaft oder Sponsoring).");
       return;
     }
     const form = event.currentTarget;
@@ -84,12 +87,13 @@ export function GoennerPageClient() {
             <p className="label about-hero-label">Unterstützung</p>
             <h1>Werde Teil meines Teams.</h1>
             <p className="about-hero-lead">
-              Wenn du mich auf der Tour begleiten willst, gibt’s drei klare Modelle — unten siehst du, was drinsteht.
-              Ich freue mich auf deine Anfrage.
+              Mitgliedschaft als Birdie, Eagle oder Albatros — oder Sponsoring mit{" "}
+              <strong>Mindestbetrag ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr. Unten
+              siehst du, was jeweils dabei ist. Ich freue mich auf deine Anfrage.
             </p>
             <div className="about-hero-actions">
               <a href="#goenner-form-title" className="about-btn about-btn-primary">
-                Mitgliedschaft anfragen
+                Anfrage senden
               </a>
               <Link href="/ueber-mich" className="about-btn about-btn-ghost">
                 Über mich
@@ -100,23 +104,35 @@ export function GoennerPageClient() {
 
         <section className="goenner-memberships" aria-labelledby="goenner-memberships-title">
           <header className="goenner-memberships-head">
-            <p className="goenner-memberships-kicker">Mitgliedschaften</p>
-            <h2 id="goenner-memberships-title">Wähle das Modell, das zu dir passt</h2>
+            <p className="goenner-memberships-kicker">Mitgliedschaft &amp; Sponsoring</p>
+            <h2 id="goenner-memberships-title">Das passende Modell für deine Unterstützung</h2>
+            <p className="goenner-memberships-dek">
+              Sponsoring: Mindestbetrag{" "}
+              <strong>≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr — Paket und Leistungen
+              stimmen wir individuell ab.
+            </p>
           </header>
           <div
             className="swipe-strip-wrap swipe-strip-wrap--goenner"
             role="region"
-            aria-label="Mitgliedschaftsstufen, seitlich wischbar"
+            aria-label="Mitgliedschaft und Sponsoring, seitlich wischbar"
           >
             <div className="goenner-tiers">
               {goennerMembershipTiers.map((tier) => (
                 <article
                   key={tier.id}
-                  className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}`}
+                  className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}${tier.id === "sponsoring" ? " goenner-tier--sponsoring" : ""}`}
                 >
                   {tier.id === "eagle" ? (
                     <p className="goenner-tier-badge">
                       <span>Empfohlen</span>
+                    </p>
+                  ) : null}
+                  {tier.id === "sponsoring" ? (
+                    <p className="goenner-tier-badge goenner-tier-badge--sponsoring-min">
+                      <span>
+                        ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF / Jahr
+                      </span>
                     </p>
                   ) : null}
                   <h2 className="goenner-tier-title">{tier.title}</h2>
@@ -130,7 +146,7 @@ export function GoennerPageClient() {
                       </li>
                     ))}
                   </ul>
-                  <p className="goenner-tier-cta">Beitreten für {tier.priceChf}.- / Jahr</p>
+                  <p className="goenner-tier-cta">{tierCardCta(tier)}</p>
                 </article>
               ))}
             </div>
@@ -150,13 +166,13 @@ export function GoennerPageClient() {
           <div className="goenner-form-section-head">
             <p className="goenner-form-kicker">Kontakt</p>
             <h2 id="goenner-form-title" className="goenner-form-heading">
-              Mitgliedschaft anfragen
+              Mitgliedschaft oder Sponsoring anfragen
             </h2>
             <p className="goenner-form-lead">Ich bestätige deine Anfrage per E-Mail.</p>
           </div>
           <form className="goenner-form" onSubmit={onSubmit}>
             <fieldset className="goenner-fieldset">
-              <legend className="goenner-legend">Mitgliedschaft</legend>
+              <legend className="goenner-legend">Mitgliedschaft oder Sponsoring</legend>
               <div className="goenner-radio-grid">
                 {goennerMembershipTiers.map((tier) => (
                   <label key={tier.id} className="goenner-radio-card">
@@ -169,11 +185,18 @@ export function GoennerPageClient() {
                     />
                     <span className="goenner-radio-card-body">
                       <span className="goenner-radio-title">{tier.title}</span>
-                      <span className="goenner-radio-price">{tier.priceChf}.- / Jahr</span>
+                      <span className="goenner-radio-price">{tierPriceLine(tier)}</span>
                     </span>
                   </label>
                 ))}
               </div>
+              {membershipId === "sponsoring" ? (
+                <p className="goenner-fieldset-hint goenner-sponsoring-min-hint" role="note">
+                  <strong>Sponsoring:</strong> Pakete gelten ab einem Mindestbetrag von{" "}
+                  <strong>≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr (Details
+                  individuell).
+                </p>
+              ) : null}
             </fieldset>
 
             <div className="goenner-form-grid">

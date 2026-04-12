@@ -2818,6 +2818,10 @@ body {
   color: rgb(250 249 246 / 90%);
 }
 
+.blog-newsletter .form-message--error {
+  color: rgb(255 180 160 / 95%);
+}
+
 .blog-page-main {
   flex: 1 1 auto;
   max-width: min(var(--page-content-max), 100%);
@@ -5766,6 +5770,14 @@ body {
   line-height: 1.2;
 }
 
+.goenner-memberships-dek {
+  margin: 0.55rem 0 0;
+  max-width: 40rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #444;
+}
+
 .goenner-tiers {
   width: 100%;
   margin: 0;
@@ -5821,6 +5833,11 @@ body {
   background: linear-gradient(165deg, #fffefd 0%, rgb(255 252 252) 45%, #ffffff 100%);
 }
 
+/* Platz fürs Mindestbetrag-Badge (≥ CHF) oben rechts */
+.goenner-tier--sponsoring {
+  padding-top: 1.55rem;
+}
+
 .goenner-tier-badge {
   position: absolute;
   top: 0;
@@ -5841,6 +5858,14 @@ body {
   background: var(--primary);
   border-radius: var(--radius-full);
   box-shadow: 0 4px 14px rgb(215 25 32 / 35%);
+}
+
+.goenner-tier-badge--sponsoring-min span {
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 0.58rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .goenner-tier-title {
@@ -6011,6 +6036,18 @@ body {
   font-weight: 500;
   color: #555;
   line-height: 1.38;
+}
+
+.goenner-sponsoring-min-hint {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  line-height: 1.45;
+  border-radius: var(--radius-md, 10px);
+  background: rgb(215 25 32 / 7%);
+  border: 1px solid rgb(215 25 32 / 22%);
 }
 
 .goenner-fieldset--block {

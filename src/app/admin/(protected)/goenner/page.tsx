@@ -17,8 +17,8 @@ export default async function AdminGoennerPage() {
         <p className="admin-page-kicker">Gönner</p>
         <h1 className="admin-h1">Anfragen</h1>
         <p className="admin-muted admin-page-lead">
-          Offene Anfragen abarbeiten, als erledigt markieren und den Rechnungs- oder Mitgliedschaftsbetrag erfassen —
-          erledigte Einträge bleiben im Archiv mit Summe oben.
+          Offene Anfragen abarbeiten (Mitgliedschaft oder Sponsoring ab 2&apos;000 CHF), als erledigt markieren und den
+          Betrag erfassen — erledigte Einträge bleiben im Archiv mit Summe oben.
         </p>
       </header>
 
@@ -27,7 +27,8 @@ export default async function AdminGoennerPage() {
           Tabelle fehlt, Spalten fehlen oder keine Berechtigung. In Supabase nacheinander ausführen:{" "}
           <code className="admin-code">supabase/goenner_inquiries.sql</code>, bei bestehender Tabelle{" "}
           <code className="admin-code">supabase/goenner_inquiries_add_address.sql</code> und für Status/Beträge{" "}
-          <code className="admin-code">supabase/goenner_inquiries_status_amount.sql</code>.
+          <code className="admin-code">supabase/goenner_inquiries_status_amount.sql</code>, für Sponsoring-Option{" "}
+          <code className="admin-code">supabase/goenner_inquiries_membership_sponsoring.sql</code>.
         </p>
       ) : null}
 

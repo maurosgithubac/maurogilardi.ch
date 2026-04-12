@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GOENNER_SPONSORING_MIN_CHF } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
@@ -33,6 +34,28 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       return NextResponse.json({ error: "Bitte einen gültigen Betrag in CHF angeben." }, { status: 400 });
     }
     const amount = Math.round(n * 100) / 100;
+
+    const { data: existing, error: loadError } = await supabase
+      .from("goenner_inquiries")
+      .select("membership_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (loadError) {
+      return NextResponse.json({ error: loadError.message }, { status: 500 });
+    }
+    if (!existing) {
+      return NextResponse.json({ error: "Nicht gefunden." }, { status: 404 });
+    }
+    if (existing.membership_id === "sponsoring" && amount < GOENNER_SPONSORING_MIN_CHF) {
+      return NextResponse.json(
+        {
+          error: `Sponsoring: Betrag muss ≥ ${GOENNER_SPONSORING_MIN_CHF} CHF sein.`,
+        },
+        { status: 400 },
+      );
+    }
+
     const { data, error } = await supabase
       .from("goenner_inquiries")
       .update({

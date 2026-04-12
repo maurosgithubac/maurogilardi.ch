@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { MembershipId } from "@/content/goennerMemberships";
 
-const ALLOWED: MembershipId[] = ["birdie", "eagle", "albatros"];
+const ALLOWED: MembershipId[] = ["birdie", "eagle", "albatros", "sponsoring"];
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -29,7 +29,10 @@ export async function POST(request: Request) {
 
   const membership_id = String(body.membership_id || "").trim() as MembershipId;
   if (!ALLOWED.includes(membership_id)) {
-    return NextResponse.json({ error: "Bitte wähle eine Mitgliedschaft." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Bitte wähle eine Option (Mitgliedschaft oder Sponsoring)." },
+      { status: 400 },
+    );
   }
 
   const name = String(body.name || "").trim();

@@ -2,15 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { membershipLabel, membershipPriceChf, type MembershipId } from "@/content/goennerMemberships";
+import {
+  GOENNER_SPONSORING_MIN_CHF,
+  inquiryTierLabel,
+  membershipPriceChf,
+} from "@/content/goennerMemberships";
 import type { GoennerInquiryRow } from "@/types/content";
-
-function labelFor(id: string): string {
-  if (id === "birdie" || id === "eagle" || id === "albatros") {
-    return membershipLabel(id as MembershipId);
-  }
-  return id;
-}
 
 function formatPostalAddress(row: GoennerInquiryRow): string | null {
   const street = row.street?.trim();
@@ -85,7 +82,7 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
           <header className="admin-goenner-card-head">
             <div className="admin-goenner-card-title">
               <strong>{row.name}</strong>
-              <span className="admin-goenner-tier">{labelFor(row.membership_id)}</span>
+              <span className="admin-goenner-tier">{inquiryTierLabel(row.membership_id)}</span>
             </div>
             <div className="admin-goenner-card-meta">
               {variant === "completed" && row.completed_at ? (
@@ -157,6 +154,12 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                       setFormError("Bitte einen gültigen Betrag eingeben.");
                       return;
                     }
+                    if (row.membership_id === "sponsoring" && n < GOENNER_SPONSORING_MIN_CHF) {
+                      setFormError(
+                        `Sponsoring: Betrag muss ≥ ${GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF sein.`,
+                      );
+                      return;
+                    }
                     void patch(row.id, { status: "completed", amount_chf: n });
                   }}
                 >
@@ -172,7 +175,9 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                     />
                   </label>
                   <p id={`goenner-hint-${row.id}`} className="admin-goenner-form-hint">
-                    Vorschlag = Listenpreis der Stufe; anpassen falls abweichend.
+                    {row.membership_id === "sponsoring"
+                      ? `Sponsoring: erfasster Betrag ≥ ${GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF (Mindestbetrag); bei höherem Paket anpassen.`
+                      : "Vorschlag = Listenpreis der Stufe; anpassen falls abweichend."}
                   </p>
                   <div className="admin-goenner-form-buttons">
                     <button type="submit" className="admin-btn" disabled={busy}>

@@ -4,7 +4,7 @@
 
 create table if not exists public.goenner_inquiries (
   id uuid primary key default gen_random_uuid(),
-  membership_id text not null check (membership_id in ('birdie', 'eagle', 'albatros')),
+  membership_id text not null check (membership_id in ('birdie', 'eagle', 'albatros', 'sponsoring')),
   name text not null,
   email text not null,
   phone text,

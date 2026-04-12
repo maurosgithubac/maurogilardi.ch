@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import type { PostRow, SponsorRow } from "@/types/content";
+import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
+import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
@@ -33,59 +35,23 @@ const postDateFormatter = new Intl.DateTimeFormat("de-CH", {
 });
 
 export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
-  const [newsletterMessage, setNewsletterMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const newsletterFormRef = useRef<HTMLFormElement>(null);
+  const [newsletterState, newsletterFormAction, newsletterPending] = useActionState(
+    newsletterSubscribeAction,
+    initialNewsletterFormState,
+  );
 
   const marqueeSponsors = useMemo(() => {
     if (sponsors.length === 0) return [];
     return [...sponsors, ...sponsors];
   }, [sponsors]);
 
-  async function handleNewsletterSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const email = String(formData.get("email") || "").trim();
-    if (!email.includes("@")) {
-      setNewsletterMessage("Bitte gib eine gültige E-Mail ein.");
-      return;
+  useEffect(() => {
+    if (newsletterState.message && !newsletterState.error && newsletterFormRef.current) {
+      newsletterFormRef.current.reset();
     }
-    setIsSubmitting(true);
-    setNewsletterMessage("");
-    try {
-      // Absolute URL + /api/subscribe: avoids broken relative requests in some previews and ad blockers blocking "newsletter" in the path.
-      const subscribeUrl = new URL("/api/subscribe", window.location.origin).href;
-      const response = await fetch(subscribeUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const raw = await response.text();
-      let data: { message?: string; error?: string } = {};
-      if (raw.trim()) {
-        try {
-          data = JSON.parse(raw) as { message?: string; error?: string };
-        } catch {
-          setNewsletterMessage(
-            "Die Antwort vom Server war ungültig. Bitte prüfe, ob die Seite neu deployed ist, und versuch es erneut.",
-          );
-          return;
-        }
-      }
-      if (!response.ok) {
-        setNewsletterMessage(data.error || "Etwas ist schiefgelaufen.");
-        return;
-      }
-      setNewsletterMessage(data.message || "Danke — ich halte dich auf dem Laufenden.");
-      event.currentTarget.reset();
-    } catch {
-      setNewsletterMessage(
-        "Keine Verbindung zum Server. Tipp: Seite unter http://localhost:3000 öffnen (nicht die Vorschau im Editor), Adblock für localhost testweise aus, «npm run dev» laufen lassen.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  }, [newsletterState.message, newsletterState.error]);
 
   return (
     <div className="blog-home">
@@ -268,16 +234,20 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             <p className="blog-newsletter-kicker">Für dich</p>
             <h2>Newsletter</h2>
             <p className="blog-newsletter-dek">Trag dich ein — ich schicke dir ab und zu Updates von der Tour.</p>
-            <form onSubmit={handleNewsletterSubmit} className="blog-newsletter-form">
+            <form ref={newsletterFormRef} action={newsletterFormAction} className="blog-newsletter-form">
               <label htmlFor="email" className="sr-only">
                 E-Mail
               </label>
               <input id="email" name="email" type="email" placeholder="deine@email.ch" required autoComplete="email" />
-              <button type="submit" className="blog-btn blog-btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "…" : "Anmelden"}
+              <button type="submit" className="blog-btn blog-btn-primary" disabled={newsletterPending}>
+                {newsletterPending ? "…" : "Anmelden"}
               </button>
             </form>
-            <p className="form-message">{newsletterMessage}</p>
+            {(newsletterState.message || newsletterState.error) && (
+              <p className={`form-message${newsletterState.error ? " form-message--error" : ""}`}>
+                {newsletterState.message || newsletterState.error}
+              </p>
+            )}
           </div>
         </section>
       </main>
