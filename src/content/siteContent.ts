@@ -102,7 +102,7 @@ export const siteContent = {
     { title: "Sponsoren", text: "Marken, die mich auf der Tour sichtbar mittragen." },
     { title: "Arbeitgeber", text: "Leute und Firmen, ohne die mein Sport nicht möglich wäre." },
     { title: "Ausrüster / Ambassador", text: "Equipment, dem ich unter Druck vertraue." },
-    { title: "Supporter", text: "Menschen im Hintergrund — für mich mit großer Wirkung." },
+    { title: "Supporter", text: "Menschen im Hintergrund — für mich mit grosser Wirkung." },
     { title: "Partner", text: "Mein Netzwerk aus Vertrauen, Qualität und langfristigem Blick." },
   ],
 };

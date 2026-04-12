@@ -14,7 +14,7 @@ export default async function AdminGoennerPage() {
   return (
     <div className="admin-card-stack">
       <header className="admin-page-head">
-        <p className="admin-page-kicker">Gönner</p>
+        <p className="admin-page-kicker">Sponsoring</p>
         <h1 className="admin-h1">Anfragen</h1>
         <p className="admin-muted admin-page-lead">
           Offene Anfragen abarbeiten (Mitgliedschaft oder Sponsoring ab 2&apos;000 CHF), als erledigt markieren und den

@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: Props) {
   try {
     const supabase = createSupabaseServerClient();
     const { data } = await supabase.from("posts").select("title, description").eq("slug", slug).eq("published", true).maybeSingle();
-    if (!data) return { title: "Post | Mauro Gilardi" };
+    if (!data) return { title: "Beitrag | Mauro Gilardi" };
     return {
       title: `${data.title} | Mauro Gilardi`,
       description: data.description ?? undefined,
     };
   } catch {
-    return { title: "Post | Mauro Gilardi" };
+    return { title: "Beitrag | Mauro Gilardi" };
   }
 }
 

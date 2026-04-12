@@ -7,8 +7,8 @@ export default function AdminHomePage() {
         <p className="admin-page-kicker">Backend</p>
         <h1 className="admin-h1">Inhalte verwalten</h1>
         <p className="admin-muted admin-page-lead">
-          Hier pflegst du alles, was auf maurogilardi.ch sichtbar ist: Blog-Updates, Partner-Logos auf der Startseite
-          und eingehende Gönner-Anfragen aus dem Formular.
+          Hier pflegst du alles, was auf maurogilardi.ch sichtbar ist: Blog-Updates, Sponsor-Logos auf der Startseite
+          und eingehende Sponsoring-Anfragen aus dem Formular.
         </p>
       </header>
       <div className="admin-tiles">
@@ -22,10 +22,10 @@ export default function AdminHomePage() {
         </Link>
         <Link href="/admin/sponsors" className="admin-tile">
           <span className="admin-tile-label">Startseite</span>
-          <span className="admin-tile-title">Partner & Logos</span>
+          <span className="admin-tile-title">Sponsoren &amp; Logos</span>
         </Link>
         <Link href="/admin/goenner" className="admin-tile">
-          <span className="admin-tile-label">Gönner</span>
+          <span className="admin-tile-label">Sponsoring</span>
           <span className="admin-tile-title">Anfragen</span>
         </Link>
       </div>
@@ -36,8 +36,8 @@ export default function AdminHomePage() {
         <Link href="/blog" className="admin-quick-link">
           Blog
         </Link>
-        <Link href="/goenner" className="admin-quick-link">
-          Gönner
+        <Link href="/sponsoring" className="admin-quick-link">
+          Sponsoring
         </Link>
         <Link href="/ueber-mich" className="admin-quick-link">
           Über mich

@@ -78,7 +78,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             <p className="about-hero-lead">{siteContent.brand.intro}</p>
             <div className="about-hero-actions">
               <Link href="/blog" className="about-btn about-btn-primary">
-                Zu meinen Posts
+                Zu meinen Beiträgen
               </Link>
               <a href="#newsletter" className="about-btn about-btn-ghost">
                 Newsletter
@@ -88,9 +88,9 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         </section>
 
         {marqueeSponsors.length > 0 && (
-          <section className="blog-sponsors" aria-label="Partner">
+          <section className="blog-sponsors" aria-label="Sponsoren">
             <p className="blog-sponsors-label">
-              <span>Meine Partner</span>
+              <span>Meine Sponsoren</span>
             </p>
             <ClientMarquee sponsors={marqueeSponsors} />
           </section>
@@ -99,7 +99,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         <section className="blog-latest">
           <div className="blog-latest-head">
             <div className="blog-latest-head-text">
-              <h2>Neueste Posts</h2>
+              <h2>Beiträge</h2>
               <p className="blog-latest-sub">Das schreib ich gerade — vom Platz und aus der Vorbereitung.</p>
             </div>
             <Link href="/blog" className="blog-latest-cta">
@@ -116,7 +116,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               <div className="swipe-strip-wrap swipe-strip-wrap--blog">
                 <ul
                   className="blog-grid blog-grid--one-row"
-                  aria-label="Neueste Blogbeiträge, seitlich wischbar"
+                  aria-label="Neueste Beiträge, seitlich wischbar"
                 >
                   {posts.map((post) => {
                     const img = post.image_url;
@@ -153,7 +153,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           )}
         </section>
 
-        <section className="pgt-events" aria-labelledby="pgt-events-heading">
+        <section id="pgt-events" className="pgt-events" aria-labelledby="pgt-events-heading">
           <div className="pgt-events-head">
             <div>
               <h2 id="pgt-events-heading">Meine nächsten Termine</h2>
@@ -259,7 +259,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           </p>
           <p className="site-footer-links">
             <Link href="/blog">Blog</Link>
-            <Link href="/goenner">Gönner</Link>
+            <Link href="/sponsoring">Sponsoring</Link>
             <Link href="/ueber-mich">Über mich</Link>
             <a href="#newsletter">Newsletter</a>
           </p>

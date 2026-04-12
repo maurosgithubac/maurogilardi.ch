@@ -55,7 +55,7 @@ export default async function BlogPage() {
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Blog</p>
             <h1>Mein Blog</h1>
-            <p className="about-hero-lead">Alles, was ich hier veröffentliche — damit du weißt, was bei mir läuft.</p>
+            <p className="about-hero-lead">Alles, was ich hier veröffentliche — damit du weisst, was bei mir läuft.</p>
             <div className="about-hero-actions">
               <Link href="/" className="about-btn about-btn-primary">
                 Home
@@ -69,7 +69,7 @@ export default async function BlogPage() {
         <section className="blog-index-content" aria-label="Blogbeiträge">
           {posts.length === 0 ? (
             <div className="blog-index-empty">
-              <p className="blog-page-empty">Noch keine Posts — sobald etwas da ist, findest du es hier.</p>
+              <p className="blog-page-empty">Noch keine Beiträge — sobald etwas da ist, findest du es hier.</p>
             </div>
           ) : (
             <ul className="blog-feed">
@@ -96,7 +96,7 @@ export default async function BlogPage() {
                         <h2>{post.title}</h2>
                         {post.description ? <p>{post.description}</p> : null}
                         <span className="blog-feed-card-more">
-                          Post öffnen
+                          Beitrag öffnen
                           <span aria-hidden>→</span>
                         </span>
                       </div>

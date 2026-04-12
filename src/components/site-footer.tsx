@@ -12,7 +12,7 @@ export function SiteFooter() {
         <p className="site-footer-links">
           <Link href="/">Home</Link>
           <Link href="/blog">Blog</Link>
-          <Link href="/goenner">Gönner</Link>
+          <Link href="/sponsoring">Sponsoring</Link>
           <Link href="/ueber-mich">Über mich</Link>
         </p>
       </div>

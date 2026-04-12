@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { goennervereinigungMemberNames } from "@/content/goennervereinigungMembers";
 import {
   GOENNER_SPONSORING_MIN_CHF,
   goennerMembershipTiers,
@@ -84,7 +85,7 @@ export function GoennerPageClient() {
           />
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">Unterstützung</p>
+            <p className="label about-hero-label">Sponsoring</p>
             <h1>Werde Teil meines Teams.</h1>
             <p className="about-hero-lead">
               Mitgliedschaft als Birdie, Eagle oder Albatros — oder Sponsoring mit{" "}
@@ -92,7 +93,7 @@ export function GoennerPageClient() {
               siehst du, was jeweils dabei ist. Ich freue mich auf deine Anfrage.
             </p>
             <div className="about-hero-actions">
-              <a href="#goenner-form-title" className="about-btn about-btn-primary">
+              <a href="#sponsoring-form-title" className="about-btn about-btn-primary">
                 Anfrage senden
               </a>
               <Link href="/ueber-mich" className="about-btn about-btn-ghost">
@@ -162,10 +163,10 @@ export function GoennerPageClient() {
           </ul>
         </section>
 
-        <section className="goenner-form-section" aria-labelledby="goenner-form-title">
+        <section className="goenner-form-section" aria-labelledby="sponsoring-form-title">
           <div className="goenner-form-section-head">
             <p className="goenner-form-kicker">Kontakt</p>
-            <h2 id="goenner-form-title" className="goenner-form-heading">
+            <h2 id="sponsoring-form-title" className="goenner-form-heading">
               Mitgliedschaft oder Sponsoring anfragen
             </h2>
             <p className="goenner-form-lead">Ich bestätige deine Anfrage per E-Mail.</p>
@@ -251,6 +252,39 @@ export function GoennerPageClient() {
             </button>
             {status ? <p className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") ? " goenner-status--warn" : ""}`}>{status}</p> : null}
           </form>
+        </section>
+
+        <section
+          className="goenner-supporters-section"
+          aria-labelledby="goenner-supporters-title"
+        >
+          <header className="goenner-supporters-head">
+            <p className="goenner-supporters-kicker">MG Gönnervereinigung</p>
+            <h2 id="goenner-supporters-title" className="goenner-supporters-heading">
+              Unterstützerinnen und Unterstützer
+            </h2>
+            <p className="goenner-supporters-lead">
+              Ein grosses Merci an alle, die mich auf diesem Weg begleiten.
+            </p>
+          </header>
+          {goennervereinigungMemberNames.length > 0 ? (
+            <ul className="goenner-supporters-chips">
+              {[...goennervereinigungMemberNames]
+                .map((n) => n.trim())
+                .filter(Boolean)
+                .sort((a, b) => a.localeCompare(b, "de-CH", { sensitivity: "base" }))
+                .map((name, index) => (
+                  <li key={`${index}-${name}`} className="goenner-supporters-item">
+                    <span className="goenner-supporters-chip">{name}</span>
+                  </li>
+                ))}
+            </ul>
+          ) : (
+            <p className="goenner-supporters-placeholder">
+              Hier erscheinen in Kürze die Namen aller, die mich über die MG Gönnervereinigung
+              unterstützen.
+            </p>
+          )}
         </section>
       </main>
 

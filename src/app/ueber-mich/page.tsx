@@ -38,8 +38,8 @@ export default function UeberMichPage() {
               <Link href="/blog" className="about-btn about-btn-primary">
                 Zum Blog
               </Link>
-              <Link href="/goenner" className="about-btn about-btn-ghost">
-                Gönner werden
+              <Link href="/sponsoring" className="about-btn about-btn-ghost">
+                Sponsoring
               </Link>
             </div>
           </div>

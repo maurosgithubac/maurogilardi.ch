@@ -10,7 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Erfolge | Mauro Gilardi",
-  description: "Mein Werdegang im Golf — Jahr für Jahr, aus meiner Sicht.",
+  description: "Erfolge und Meilensteine — mein Werdegang im Golf, Jahr für Jahr, aus meiner Sicht.",
 };
 
 const phaseLabel: Record<ErfolgeTimelinePhase, string> = {
@@ -72,7 +72,7 @@ const timelineEntries: ErfolgeTimelineEntry[] = [
     details: [
       "Bronzemedaille bei der Team-Europameisterschaft.",
       "Wichtiger Beitrag zum Schweizer Teamerfolg.",
-      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster großer internationaler Titel.",
+      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster grosser internationaler Titel.",
     ],
   },
   {
@@ -169,8 +169,8 @@ export default function ErfolgePage() {
               <Link href="/blog" className="about-btn about-btn-primary">
                 Zum Blog
               </Link>
-              <Link href="/goenner" className="about-btn about-btn-ghost">
-                Gönner werden
+              <Link href="/sponsoring" className="about-btn about-btn-ghost">
+                Sponsoring
               </Link>
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function ErfolgePage() {
         <section className="erfolge-timeline-section" aria-labelledby="erfolge-timeline-title">
           <div className="erfolge-timeline-head">
             <p className="erfolge-timeline-kicker">Zeitstrahl</p>
-            <h2 id="erfolge-timeline-title">Meilensteine</h2>
+            <h2 id="erfolge-timeline-title">Erfolge und Meilensteine</h2>
             <p className="erfolge-timeline-lead">
               Oben steht, was am aktuellsten ist — weiter unten geht’s zurück zu den Anfängen.
             </p>

@@ -8,7 +8,7 @@ const tabs: { href: string; label: string; match: (path: string) => boolean }[] 
   { href: "/admin", label: "Übersicht", match: (path) => path === "/admin" },
   { href: "/admin/posts", label: "Beiträge", match: (path) => path.startsWith("/admin/posts") },
   { href: "/admin/sponsors", label: "Partner", match: (path) => path.startsWith("/admin/sponsors") },
-  { href: "/admin/goenner", label: "Gönner", match: (path) => path.startsWith("/admin/goenner") },
+  { href: "/admin/goenner", label: "Sponsoring", match: (path) => path.startsWith("/admin/goenner") },
 ];
 
 export function AdminTabNav() {

@@ -8,9 +8,9 @@ Das neue Designsystem setzt diese Werte mit einer cleanen, modernen und reduzier
 ## Design Richtung
 
 - Primärfarbe: `#d71920` (Signature Red)
-- Basis: Schwarz/Weiß für einen modernen Premium-Look
-- Typografie: groß, klar, reduziert, mit viel Weißraum
-- UI-Elemente: eckige Buttons/Karten statt runde Formen (fashion-artig und zeitgemäß)
+- Basis: Schwarz/Weiss für einen modernen Premium-Look
+- Typografie: gross, klar, reduziert, mit viel Weissraum
+- UI-Elemente: eckige Buttons/Karten statt runde Formen (fashion-artig und zeitgemäss)
 
 ## Empfehlung für Assets
 

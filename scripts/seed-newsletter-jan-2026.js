@@ -56,7 +56,7 @@ async function main() {
       description:
         "Was ich aus dem Januar-Block mitnehme und wie ich die Erkenntnisse in Turnierwahl, Planung und Saisonvorbereitung überführe.",
       body:
-        "Nach dem intensiven Januar-Block war für mich klar: Die Richtung stimmt. Ich fühle mich auf dem Platz wieder wohl, kann auch bei unsicherem Schwunggefühl solide performen und weiß, welche Routinen im Turniermodus funktionieren.\n\nGleichzeitig braucht es nach 14 Tagen mit täglich vielen Trainingsstunden bewusste Regeneration. Physische und mentale Pausen sind entscheidend, um Erkenntnisse sauber einzuordnen und Prioritäten für die nächsten Wochen zu setzen.\n\nMit diesem Fundament gehe ich in die weitere Saisonvorbereitung: strukturierter Plan, passende Turnierauswahl und ein klarer Fokus auf Umsetzung. Genau so will ich 2026 Schritt für Schritt auf das nächste Level bringen.",
+        "Nach dem intensiven Januar-Block war für mich klar: Die Richtung stimmt. Ich fühle mich auf dem Platz wieder wohl, kann auch bei unsicherem Schwunggefühl solide performen und weiss, welche Routinen im Turniermodus funktionieren.\n\nGleichzeitig braucht es nach 14 Tagen mit täglich vielen Trainingsstunden bewusste Regeneration. Physische und mentale Pausen sind entscheidend, um Erkenntnisse sauber einzuordnen und Prioritäten für die nächsten Wochen zu setzen.\n\nMit diesem Fundament gehe ich in die weitere Saisonvorbereitung: strukturierter Plan, passende Turnierauswahl und ein klarer Fokus auf Umsetzung. Genau so will ich 2026 Schritt für Schritt auf das nächste Level bringen.",
       image_path: "/brand-assets/images/1L9A8968.JPG",
       created_at: "2026-02-02T11:00:00.000Z",
       published: true,

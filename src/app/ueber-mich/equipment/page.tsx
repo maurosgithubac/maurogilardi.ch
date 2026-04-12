@@ -89,7 +89,7 @@ export default function UeberMichEquipmentPage() {
 
           <p className="about-equipment-footnote">
             Stand wie hier — nach Saison und Testing kann sich was ändern.{" "}
-            <Link href="/ueber-mich/sponsoren">Zu meinen Partnern</Link>
+            <Link href="/ueber-mich/sponsoren">Zu meinen Sponsoren</Link>
           </p>
         </div>
       </section>

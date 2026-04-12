@@ -5,9 +5,9 @@ import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { siteSponsorTiers } from "@/content/sponsorsSite";
 
 export const metadata = {
-  title: "Partner | Mauro Gilardi",
+  title: "Sponsoren | Mauro Gilardi",
   description:
-    "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Partner schnell.",
+    "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Sponsoren schnell.",
 };
 
 function SponsorCardShell({
@@ -46,18 +46,18 @@ export default function UeberMichSponsorenPage() {
   return (
     <AboutSubpageShell
       label="Über mich"
-      title="Meine Partner"
-      lead="Hier siehst du, wer hinter mir steht — Danke an alle, die den Weg mitgehen."
+      title="Meine Sponsoren"
+      lead="Hier siehst du, wer mich unterstützt — Danke an alle, die den Weg mitgehen."
       heroSrc="/brand-assets/images/1L9A9440.JPG"
       heroAlt="Mauro Gilardi im Turnier"
     >
-      <section className="about-sponsors-page" aria-label="Sponsoren und Partner">
+      <section className="about-sponsors-page" aria-label="Sponsoren">
         <div className="about-sponsors-page-inner">
           <div className="about-sponsors-page-main">
             <p className="about-sponsors-page-kicker">Netzwerk</p>
-            <h2 className="about-sponsors-page-section-title">Partner im Überblick</h2>
+            <h2 className="about-sponsors-page-section-title">Sponsoren im Überblick</h2>
             <p className="about-sponsors-page-lead">
-              Drei Stufen. Klick öffnet die Website — MG Gönnervereinigung bringt dich zu meiner Gönner-Seite.
+              Drei Stufen. Klick öffnet die Website — MG Gönnervereinigung führt zur Sponsoring-Seite.
             </p>
 
             {siteSponsorTiers.map((block) => (
@@ -99,12 +99,12 @@ export default function UeberMichSponsorenPage() {
           </div>
 
           <aside className="about-sponsors-aside">
-            <h2 className="about-sponsors-aside-title">Partnerschaft</h2>
+            <h2 className="about-sponsors-aside-title">Sponsoring</h2>
             <p className="about-sponsors-aside-text">
-              Interesse an Zusammenarbeit? Melde dich — unverbindlich.
+              Interesse an Unterstützung oder Sponsoring? Melde dich — unverbindlich.
             </p>
-            <Link href="/goenner" className="about-btn about-btn-primary">
-              Gönner &amp; Mitgliedschaften
+            <Link href="/sponsoring" className="about-btn about-btn-primary">
+              Sponsoring &amp; Mitgliedschaften
             </Link>
           </aside>
         </div>

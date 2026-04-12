@@ -18,13 +18,14 @@ const NAV: NavItem[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   { href: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") },
   { href: "/erfolge", label: "Erfolge", match: (p) => p.startsWith("/erfolge") },
-  { href: "/goenner", label: "Gönner", match: (p) => p.startsWith("/goenner") },
+  { href: "/sponsoring", label: "Sponsoring", match: (p) => p.startsWith("/sponsoring") },
   {
     href: "/ueber-mich",
     label: "Über mich",
     match: (p) => p.startsWith("/ueber-mich"),
     sublinks: [
-      { href: "/ueber-mich/sponsoren", label: "Partner" },
+      { href: "/ueber-mich/sponsoren", label: "Sponsoren" },
+      { href: "/ueber-mich/gallerie", label: "Galerie" },
       { href: "/ueber-mich/media", label: "Medien" },
       { href: "/ueber-mich/equipment", label: "Mein Bag" },
     ],
@@ -91,7 +92,7 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
       <button
         type="button"
         className={`site-header-menu-toggle${mobileMenuOpen ? " is-open" : ""}`}
-        aria-label={mobileMenuOpen ? "Navigation schließen" : "Navigation öffnen"}
+        aria-label={mobileMenuOpen ? "Navigation schliessen" : "Navigation öffnen"}
         aria-expanded={mobileMenuOpen}
         aria-controls="site-header-nav"
         onClick={() => setMobileMenuOpen((open) => !open)}
@@ -177,11 +178,11 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
           );
         })}
         <Link
-          href="/goenner#goenner-form-title"
+          href="/sponsoring#sponsoring-form-title"
           className="site-header-nav-link site-header-nav-link--cta"
           onClick={() => setMobileMenuOpen(false)}
         >
-          Gönner Formular
+          Sponsoring anfragen
         </Link>
       </nav>
       {mobileMenuOpen ? <button type="button" className="site-header-nav-backdrop" aria-hidden onClick={() => setMobileMenuOpen(false)} /> : null}

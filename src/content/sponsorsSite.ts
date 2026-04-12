@@ -1,6 +1,6 @@
 /**
- * Statische Partner & Sponsoren (Logos unter public/brand-assets/images/Sponsors/).
- * Präfix im Dateinamen: 1_ Hauptsponsoren, 2_ Partner & Ausrüster, 3_ weitere Unterstützer.
+ * Statische Sponsoren-Logos (public/brand-assets/images/Sponsors/).
+ * Präfix im Dateinamen: 1_ Hauptsponsoren, 2_ Ausrüster & Marken, 3_ weitere Sponsoren.
  */
 
 export type SiteSponsor = {
@@ -9,7 +9,7 @@ export type SiteSponsor = {
   imageSrc: string;
   /** Anzeige- und Alt-Text */
   displayName: string;
-  /** `null` = keine Verlinkung; mit `/` = interne Route (z. B. Gönner) */
+  /** `null` = keine Verlinkung; mit `/` = interne Route (z. B. Sponsoring) */
   href: string | null;
 };
 
@@ -40,7 +40,7 @@ const tier1: SiteSponsor[] = [
     id: "goennervereinigung",
     imageSrc: SPONSOR_IMG("1_Gönnerverenigung.png"),
     displayName: "MG Gönnervereinigung",
-    href: "/goenner",
+    href: "/sponsoring",
   },
   {
     id: "spispo",
@@ -62,7 +62,7 @@ const tier1: SiteSponsor[] = [
   },
 ];
 
-/** Ebene 2 — Partner & Ausrüster */
+/** Ebene 2 — Ausrüster & Marken */
 const tier2: SiteSponsor[] = [
   {
     id: "jlindeberg",
@@ -78,7 +78,7 @@ const tier2: SiteSponsor[] = [
   },
 ];
 
-/** Ebene 3 — Weitere Unterstützer & Partnerschaften */
+/** Ebene 3 — Weitere Sponsoren */
 const tier3: SiteSponsor[] = [
   {
     id: "gcde",
@@ -115,13 +115,13 @@ export const siteSponsorTiers: SiteSponsorTier[] = [
   },
   {
     tier: 2,
-    title: "Partner & Ausrüster",
+    title: "Ausrüster & Marken",
     description: "Marken und Services rund ums Spiel.",
     sponsors: tier2,
   },
   {
     tier: 3,
-    title: "Weitere Partner",
+    title: "Weitere Sponsoren",
     description: "Vereine, Stiftungen und weitere Unterstützung.",
     sponsors: tier3,
   },
@@ -131,7 +131,7 @@ export function allSiteSponsorsFlat(): SiteSponsor[] {
   return siteSponsorTiers.flatMap((t) => t.sponsors);
 }
 
-/** Startseiten-Marquee: sichtbare Partner aus Ebene 1 und 2 */
+/** Startseiten-Marquee: sichtbare Logos aus Ebene 1 und 2 */
 export function homeMarqueeSponsorCards(): {
   id: string;
   name: string;
