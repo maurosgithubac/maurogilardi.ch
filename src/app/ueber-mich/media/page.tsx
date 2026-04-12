@@ -25,13 +25,13 @@ export default function UeberMichMediaPage() {
             <p className="about-media-page-kicker">Presse & Portale</p>
             <h2 className="about-media-page-title">Berichte, Profile, Turnierseiten</h2>
             <p className="about-media-page-lead">
-              Verifizierbare Links zu{" "}
+              Verifizierbare Links — von aktuellen Tour-News bis ins{" "}
+              <strong>Amateurlager</strong> (z. B. Team-EM 2020, Q-School 2022, Spitzensport-RS). Quellen:{" "}
               <strong>Swiss Golf</strong>, <strong>Golf.ch</strong>, <strong>Golf.de</strong>,{" "}
               <strong>Südostschweiz</strong>, <strong>Pro Golf Tour</strong>,{" "}
-              <strong>Swiss PGA</strong>, <strong>Friends of Swiss Golf Talents</strong> und weiteren
-              Quellen. Die <strong>Challenge Tour</strong> bzw. <strong>HotelPlanner Tour</strong> werden
-              vor allem über Swiss Golf und Golf.ch begleitet; die Tour-Websites fokussieren auf
-              Startlisten und Scoring.
+              <strong>Swiss PGA</strong>, <strong>Friends of Swiss Golf Talents</strong>,{" "}
+              <strong>EGA</strong>, <strong>OWGR</strong> und mehr. Challenge / HotelPlanner werden
+              vor allem über Swiss Golf und Golf.ch dokumentiert.
             </p>
           </header>
 
