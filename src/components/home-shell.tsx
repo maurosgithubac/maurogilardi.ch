@@ -53,12 +53,25 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
     setIsSubmitting(true);
     setNewsletterMessage("");
     try {
-      const response = await fetch("/api/newsletter", {
+      // Absolute URL + /api/subscribe: avoids broken relative requests in some previews and ad blockers blocking "newsletter" in the path.
+      const subscribeUrl = new URL("/api/subscribe", window.location.origin).href;
+      const response = await fetch(subscribeUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = (await response.json()) as { message?: string; error?: string };
+      const raw = await response.text();
+      let data: { message?: string; error?: string } = {};
+      if (raw.trim()) {
+        try {
+          data = JSON.parse(raw) as { message?: string; error?: string };
+        } catch {
+          setNewsletterMessage(
+            "Die Antwort vom Server war ungültig. Bitte prüfe, ob die Seite neu deployed ist, und versuch es erneut.",
+          );
+          return;
+        }
+      }
       if (!response.ok) {
         setNewsletterMessage(data.error || "Etwas ist schiefgelaufen.");
         return;
@@ -66,7 +79,9 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
       setNewsletterMessage(data.message || "Danke — ich halte dich auf dem Laufenden.");
       event.currentTarget.reset();
     } catch {
-      setNewsletterMessage("Verbindung fehlgeschlagen.");
+      setNewsletterMessage(
+        "Keine Verbindung zum Server. Tipp: Seite unter http://localhost:3000 öffnen (nicht die Vorschau im Editor), Adblock für localhost testweise aus, «npm run dev» laufen lassen.",
+      );
     } finally {
       setIsSubmitting(false);
     }
