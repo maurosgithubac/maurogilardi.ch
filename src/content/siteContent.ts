@@ -38,7 +38,7 @@ export const siteContent = {
     intro:
       "Neben der Tour engagiere ich mich im Verband und baue digitale Projekte — Sport, IT und Struktur greifen bei mir ineinander.",
     responsibilities: [
-      "Head of SwissPGA Players Commission (als Teil des SwissPGA Boards) mit Fokus auf Spielerwohl, Plattformaufbau und Austausch unter Playing Professionals",
+      "Head of SwissPGA Players Commission mit Fokus auf Spielerwohl, Plattformaufbau und Austausch unter Playing Professionals",
     ],
     projects: [
       {
