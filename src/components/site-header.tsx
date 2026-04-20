@@ -182,7 +182,7 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
           className="site-header-nav-link site-header-nav-link--cta"
           onClick={() => setMobileMenuOpen(false)}
         >
-          Sponsoring anfragen
+          Gönner werden
         </Link>
       </nav>
       {mobileMenuOpen ? <button type="button" className="site-header-nav-backdrop" aria-hidden onClick={() => setMobileMenuOpen(false)} /> : null}
