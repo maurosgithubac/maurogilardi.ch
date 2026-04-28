@@ -40,23 +40,24 @@ async function sendGoennerInquiryEmails(payload: {
 }) {
   const resend = createResendClient();
   const from = readEnv("RESEND_FROM_EMAIL");
+  const templateIdOrAlias = process.env.RESEND_GOENNER_TEMPLATE_ID?.trim() || "welcome";
   const label = membershipLabel(payload.membership_id);
+  const address = `${payload.street}, ${payload.postal_code} ${payload.city}`;
 
   await resend.emails.send({
     from,
     to: [payload.email],
-    subject: "Vielen Dank fuer deine Anfrage",
-    text: [
-      `Hoi ${payload.name}`,
-      "",
-      "Vielen Dank fuer deine Anfrage fuer meine Goennervereinigung / Sponsoring.",
-      "Ich habe deine Nachricht erhalten und melde mich so bald wie moeglich bei dir.",
-      "",
-      `Ausgewaehlte Option: ${label}`,
-      "",
-      "Sportliche Gruesse",
-      "Mauro Gilardi",
-    ].join("\n"),
+    template: {
+      id: templateIdOrAlias,
+      variables: {
+        NAME: payload.name,
+        EMAIL_ADDRESS: payload.email,
+        MEMBERSHIP_OPTION: label,
+        PHONE: payload.phone || "",
+        ADDRESS: address,
+        MESSAGE: payload.message || "",
+      },
+    },
   });
 }
 
