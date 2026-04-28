@@ -41,8 +41,28 @@ async function sendGoennerInquiryEmails(payload: {
   const resend = createResendClient();
   const from = readEnv("RESEND_FROM_EMAIL");
   const templateIdOrAlias = process.env.RESEND_GOENNER_TEMPLATE_ID?.trim() || "welcome";
+  const adminNotify = process.env.GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL?.trim() || "mauro.gilardi@hotmail.com";
   const label = membershipLabel(payload.membership_id);
   const address = `${payload.street}, ${payload.postal_code} ${payload.city}`;
+
+  await resend.emails.send({
+    from,
+    to: [adminNotify],
+    subject: `Neue Goenner/Sponsoring-Anfrage: ${payload.name}`,
+    text: [
+      "Neue Anfrage ueber das Goenner-/Sponsoring-Formular:",
+      "",
+      `Mitgliedschaft / Option: ${label}`,
+      `Name: ${payload.name}`,
+      `E-Mail: ${payload.email}`,
+      `Telefon: ${payload.phone || "-"}`,
+      `Strasse: ${payload.street}`,
+      `PLZ: ${payload.postal_code}`,
+      `Ort: ${payload.city}`,
+      `Adresse komplett: ${address}`,
+      `Nachricht: ${payload.message || "-"}`,
+    ].join("\n"),
+  });
 
   await resend.emails.send({
     from,
