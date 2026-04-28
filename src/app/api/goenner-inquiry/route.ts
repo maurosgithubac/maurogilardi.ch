@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { MembershipId } from "@/content/goennerMemberships";
+import { createResendClient } from "@/lib/resend";
+import { readEnv } from "@/lib/env";
 
 const ALLOWED: MembershipId[] = ["birdie", "eagle", "albatros", "sponsoring"];
 
@@ -18,6 +20,45 @@ type Body = {
   city?: string;
   message?: string | null;
 };
+
+function membershipLabel(membershipId: MembershipId): string {
+  if (membershipId === "birdie") return "Birdie";
+  if (membershipId === "eagle") return "Eagle";
+  if (membershipId === "albatros") return "Albatros";
+  return "Sponsoring";
+}
+
+async function sendGoennerInquiryEmails(payload: {
+  membership_id: MembershipId;
+  name: string;
+  email: string;
+  phone: string | null;
+  street: string;
+  postal_code: string;
+  city: string;
+  message: string | null;
+}) {
+  const resend = createResendClient();
+  const from = readEnv("RESEND_FROM_EMAIL");
+  const label = membershipLabel(payload.membership_id);
+
+  await resend.emails.send({
+    from,
+    to: [payload.email],
+    subject: "Vielen Dank fuer deine Anfrage",
+    text: [
+      `Hoi ${payload.name}`,
+      "",
+      "Vielen Dank fuer deine Anfrage fuer meine Goennervereinigung / Sponsoring.",
+      "Ich habe deine Nachricht erhalten und melde mich so bald wie moeglich bei dir.",
+      "",
+      `Ausgewaehlte Option: ${label}`,
+      "",
+      "Sportliche Gruesse",
+      "Mauro Gilardi",
+    ].join("\n"),
+  });
+}
 
 export async function POST(request: Request) {
   let body: Body;
@@ -75,6 +116,24 @@ export async function POST(request: Request) {
 
     if (error) {
       return NextResponse.json({ error: "Speichern fehlgeschlagen." }, { status: 500 });
+    }
+
+    try {
+      await sendGoennerInquiryEmails({
+        membership_id,
+        name,
+        email,
+        phone: phone || null,
+        street,
+        postal_code,
+        city,
+        message: message || null,
+      });
+    } catch {
+      return NextResponse.json(
+        { error: "Anfrage gespeichert, aber E-Mail-Versand fehlgeschlagen." },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json(

@@ -6,14 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "resend:domain:create": "node scripts/resend-domain-setup.js create",
+    "resend:domain:get": "node scripts/resend-domain-setup.js get",
+    "resend:domain:verify": "node scripts/resend-domain-setup.js verify"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.97.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "resend": "^6.12.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
