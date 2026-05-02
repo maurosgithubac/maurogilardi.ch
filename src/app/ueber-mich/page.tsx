@@ -2,17 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
 import { AboutSubnav } from "@/components/about-subnav";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { uebermichMetadata, uebermichSchema } from "@/lib/seo/page-metadata";
 
-export const metadata = {
-  title: "Über mich | Mauro Gilardi",
-  description: "Wer ich bin, wie ich denke — und was ich neben dem Spiel noch mache.",
-};
+export const metadata = uebermichMetadata;
 
 export default function UeberMichPage() {
   return (
-    <div className="site-page about-page">
+    <>
+      <SeoPageJsonLd schema={uebermichSchema} />
+      <div className="site-page about-page">
       <div className="site-header-fixed-stack">
         <SiteHeader variant="overlay" inOverlayStack />
       </div>
@@ -101,5 +102,6 @@ export default function UeberMichPage() {
 
       <SiteFooter />
     </div>
+    </>
   );
 }

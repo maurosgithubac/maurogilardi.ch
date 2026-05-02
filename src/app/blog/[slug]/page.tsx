@@ -1,35 +1,81 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { findDemoPostBySlug } from "@/content/demoPosts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const demoPost = findDemoPostBySlug(slug);
-  if (demoPost) {
-    return {
-      title: `${demoPost.title} | Mauro Gilardi`,
-      description: demoPost.description,
-    };
+  let post: Pick<PostRow, "title" | "description" | "created_at" | "image_path"> | null = demoPost
+    ? {
+        title: demoPost.title,
+        description: demoPost.description,
+        created_at: demoPost.created_at,
+        image_path: demoPost.image_path,
+      }
+    : null;
+
+  if (!post) {
+    try {
+      const supabase = createSupabaseServerClient();
+      const { data } = await supabase
+        .from("posts")
+        .select("title, description, created_at, image_path")
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+      post = data as typeof post;
+    } catch {
+      /* ignore */
+    }
   }
-  try {
-    const supabase = createSupabaseServerClient();
-    const { data } = await supabase.from("posts").select("title, description").eq("slug", slug).eq("published", true).maybeSingle();
-    if (!data) return { title: "Beitrag | Mauro Gilardi" };
-    return {
-      title: `${data.title} | Mauro Gilardi`,
-      description: data.description ?? undefined,
-    };
-  } catch {
-    return { title: "Beitrag | Mauro Gilardi" };
-  }
+
+  if (!post) return { title: "Beitrag | Mauro Gilardi" };
+
+  const title = `${post.title} | Mauro Gilardi`;
+  const desc =
+    post.description?.trim() ||
+    `${post.title} – Tour-Update von Mauro Gilardi, Schweizer Golf Professional auf der Pro Golf Tour.`;
+  const canonical = `https://www.maurogilardi.ch/blog/${slug}`;
+  const img = blogImageUrl(post.image_path);
+
+  return {
+    title,
+    description: desc,
+    keywords: [
+      post.title,
+      "Mauro Gilardi",
+      "Schweizer Golf Professional",
+      "Pro Golf Tour",
+      "SwissPGA",
+      "Golf Schweiz",
+    ],
+    alternates: { canonical },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: desc,
+      url: canonical,
+      publishedTime: post.created_at,
+      authors: ["https://www.maurogilardi.ch/#mauro-gilardi"],
+      images: img ? [{ url: img, alt: `${post.title} – Mauro Gilardi` }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: desc,
+      images: img ? [img] : undefined,
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -54,8 +100,25 @@ export default async function BlogPostPage({ params }: Props) {
 
   const img = blogImageUrl(post.image_path);
 
+  const blogPostingSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description || undefined,
+    datePublished: post.created_at,
+    dateModified: post.created_at,
+    url: `https://www.maurogilardi.ch/blog/${post.slug}`,
+    ...(img ? { image: img } : {}),
+    author: { "@id": "https://www.maurogilardi.ch/#mauro-gilardi" },
+    publisher: { "@id": "https://www.maurogilardi.ch/#mauro-gilardi" },
+    inLanguage: "de-CH",
+    about: { "@type": "Sport", name: "Golf" },
+    keywords: "Schweizer Golf Professional, Golf Schweiz, SwissPGA, Pro Golf Tour",
+  };
+
   return (
     <article className="blog-post site-page">
+      <SeoPageJsonLd schema={blogPostingSchema} />
       <SiteHeader variant="document" />
       <nav className="blog-post-breadcrumb" aria-label="Navigation">
         <Link href="/blog">Zum Blog</Link>

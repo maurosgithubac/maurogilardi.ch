@@ -3,14 +3,13 @@ import Image from "next/image";
 import { demoPosts } from "@/content/demoPosts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
+import { blogIndexMetadata, blogIndexSchema } from "@/lib/seo/page-metadata";
 import type { PostRow } from "@/types/content";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-export const metadata = {
-  title: "Blog | Mauro Gilardi",
-  description: "Meine Texte von der Tour — Training, Turniere und was mich bewegt.",
-};
+export const metadata = blogIndexMetadata;
 
 export default async function BlogPage() {
   let posts: Pick<PostRow, "id" | "slug" | "title" | "description" | "image_path" | "created_at">[] = [];
@@ -38,7 +37,9 @@ export default async function BlogPage() {
   }
 
   return (
-    <div className="blog-page site-page">
+    <>
+      <SeoPageJsonLd schema={blogIndexSchema} />
+      <div className="blog-page site-page">
       <div className="site-header-fixed-stack">
         <SiteHeader variant="overlay" inOverlayStack />
       </div>
@@ -110,5 +111,6 @@ export default async function BlogPage() {
       </main>
       <SiteFooter />
     </div>
+    </>
   );
 }

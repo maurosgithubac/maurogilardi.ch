@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
+import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,11 +9,7 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Mauro Gilardi | SwissPGA",
-  description:
-    "Ich bin Mauro — hier findest du meinen Blog, meine Termine und Sponsoren. Kurz und von der Tour.",
-};
+export const metadata: Metadata = siteRootMetadata;
 
 export default function RootLayout({
   children,
@@ -21,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="de-CH">
       <body className={`${geistSans.variable} antialiased`}>
+        <SeoRootJsonLd />
         <div className="global-top-tabs" role="navigation" aria-label="Schnellzugriff">
           <a href="/#newsletter" className="global-newsletter-tab">
             Newsletter

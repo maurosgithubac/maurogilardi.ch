@@ -1,0 +1,10 @@
+# robots.txt – maurogilardi.ch
+
+User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+Sitemap: https://www.maurogilardi.ch/sitemap.xml

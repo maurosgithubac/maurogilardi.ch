@@ -5,13 +5,12 @@ import {
   type ErfolgeTimelineEntry,
   type ErfolgeTimelinePhase,
 } from "@/components/erfolge-timeline";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { erfolgeMetadata, erfolgeSchema } from "@/lib/seo/page-metadata";
 
-export const metadata = {
-  title: "Erfolge | Mauro Gilardi",
-  description: "Erfolge und Meilensteine — mein Werdegang im Golf, Jahr für Jahr, aus meiner Sicht.",
-};
+export const metadata = erfolgeMetadata;
 
 const phaseLabel: Record<ErfolgeTimelinePhase, string> = {
   Foundation: "Foundation",
@@ -144,7 +143,9 @@ const timelineEntriesDisplay = [...timelineEntries].reverse();
 
 export default function ErfolgePage() {
   return (
-    <div className="site-page erfolge-page">
+    <>
+      <SeoPageJsonLd schema={erfolgeSchema} />
+      <div className="site-page erfolge-page">
       <div className="site-header-fixed-stack">
         <SiteHeader variant="overlay" inOverlayStack />
       </div>
@@ -200,5 +201,6 @@ export default function ErfolgePage() {
 
       <SiteFooter />
     </div>
+    </>
   );
 }
