@@ -105,6 +105,13 @@ export const siteRootMetadata: Metadata = {
       }
     : {}),
 
+  /** Tab-Favicon: positives Logo — das negative Header-Logo ist auf hellem Browser-Chrome kaum sichtbar */
+  icons: {
+    icon: [{ url: "/brand-assets/logos/logo.png", type: "image/png" }],
+    shortcut: "/brand-assets/logos/logo.png",
+    apple: "/brand-assets/logos/logo.png",
+  },
+
   appleWebApp: {
     capable: true,
     title: "Mauro Gilardi Golf",
