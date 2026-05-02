@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 
 const LINKS = [
   { href: "/ueber-mich", label: "Überblick" },
-  { href: "/ueber-mich/faq", label: "FAQ" },
   { href: "/ueber-mich/sponsoren", label: "Sponsoren" },
   { href: "/ueber-mich/gallerie", label: "Galerie" },
   { href: "/ueber-mich/media", label: "Medien" },
   { href: "/ueber-mich/equipment", label: "Mein Bag" },
+  { href: "/ueber-mich/faq", label: "FAQ" },
 ] as const;
 
 export function AboutSubnav() {

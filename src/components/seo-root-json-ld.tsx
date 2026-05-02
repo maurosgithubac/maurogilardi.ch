@@ -1,5 +1,7 @@
 /** Root Structured Data — Person + WebSite (kein Layout-UI) */
 
+import { personSameAs } from "@/content/socialProfiles";
+
 const SITE = "https://www.maurogilardi.ch";
 
 export function SeoRootJsonLd() {
@@ -64,7 +66,7 @@ export function SeoRootJsonLd() {
       "Bündner Golf",
       "Golf Professional Ausbildung",
     ],
-    sameAs: ["https://www.progolftour.de", "https://www.swissgolf.ch"],
+    sameAs: personSameAs,
   };
 
   const websiteSchema = {

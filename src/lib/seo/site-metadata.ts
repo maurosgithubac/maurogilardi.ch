@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { socialProfiles } from "@/content/socialProfiles";
 import { readEnvOptional } from "@/lib/env";
 
 const siteUrl = "https://www.maurogilardi.ch";
 
-/** Root metadata — Open Graph, Twitter, Keywords, ohne bestehendes Layout-Verhalten zu verändern */
+/** Root metadata — Open Graph; Summary-Card-Feldern für externe Link-Vorschau (kein eigenes Twitter/X-Konto) */
 export const siteRootMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
 
@@ -73,7 +74,7 @@ export const siteRootMetadata: Metadata = {
     firstName: "Mauro",
     lastName: "Gilardi",
     gender: "male",
-    username: "maurogilardi",
+    username: socialProfiles.instagram.handle,
   },
 
   twitter: {
@@ -82,7 +83,6 @@ export const siteRootMetadata: Metadata = {
     description:
       "SwissPGA Pro aus Graubünden, aktiv auf der Pro Golf Tour in Europa. Swiss Golf Team Mitglied.",
     images: ["/brand-assets/images/1L9A8795.JPG"],
-    creator: "@maurogilardi",
   },
 
   robots: {
@@ -105,11 +105,11 @@ export const siteRootMetadata: Metadata = {
       }
     : {}),
 
-  /** Tab-Favicon: positives Logo — das negative Header-Logo ist auf hellem Browser-Chrome kaum sichtbar */
+  /** Favicon / Icons: durch `scripts/generate-favicon.mjs` (+ prebuild) aus dem Master-Logo gebaut — siehe `/favicon.ico`, `/icon.png`, `/apple-icon.png` */
   icons: {
-    icon: [{ url: "/brand-assets/logos/logo.png", type: "image/png" }],
-    shortcut: "/brand-assets/logos/logo.png",
-    apple: "/brand-assets/logos/logo.png",
+    icon: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
 
   appleWebApp: {

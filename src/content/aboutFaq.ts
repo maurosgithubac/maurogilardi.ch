@@ -2,87 +2,139 @@ export const UEBER_MICH_FAQ_CANONICAL = "https://www.maurogilardi.ch/ueber-mich/
 
 export type AboutFaqItem = {
   question: string;
-  /** Absätze für die Seite — für JSON-LD werden sie zu einem Fließtext verbunden */
   paragraphs: string[];
 };
 
-export const aboutFaqItems: AboutFaqItem[] = [
+export type AboutFaqSection = {
+  id: string;
+  title: string;
+  lead?: string;
+  items: AboutFaqItem[];
+};
+
+/** Texte angelehnt an `siteContent.ts` und die Über-mich-Themen dieser Website — bewusst kurz gefasst. */
+export const aboutFaqSections: AboutFaqSection[] = [
   {
-    question: "Auf welchen Touren spielst du?",
-    paragraphs: [
-      "Ich bin als Schweizer Golf Professional vor allem auf der **Pro Golf Tour (PGT)** unterwegs — das ist ein fester Teil meines Wettkampfkalenders.",
-      "Ergänzend kann es je nach Spielplan und Qualifikation auch Starts auf der **Challenge Tour** (Nachwuchsebene der DP World Tour) sowie auf der **HotelPlanner Tour** geben.",
-      "Die konkreten Turniere und Daten findest du jeweils auf meiner Homepage unter den kommenden Terminen und im Blog — dort dokumentiere ich, wo ich aktuell spiele.",
+    id: "ueber-mich",
+    title: "Über Mauro Gilardi",
+    lead: "Persönliche Einordnung — inhaltlich konsistent zur Über-mich-Seite.",
+    items: [
+      {
+        question: "Wer bin ich?",
+        paragraphs: [
+          "Ich bin **Mauro Gilardi**, **SwissPGA Golf Professional**. Wie auf der Startseite: Ich bin Mauro — **Heimat, Bodenständigkeit und Familie sind mein Fundament**; hier auf der Seite **teile ich, was ich unterwegs erlebe**.",
+          "Ausführlicher Hintergrund, Projekte und Überzeugungen stehen unter [**Über mich**](/ueber-mich). Aktuelle Tourphasen ergänze ich im [**Blog**](/blog).",
+        ],
+      },
+      {
+        question: "Seit wann bist du Profi?",
+        paragraphs: [
+          "Im Über-mich-Text beschreibe ich den Start so: Ich bin Mauro Gilardi und **professioneller Golfspieler seit 2022**. Mein klares Fernziel formulieren wir dort als **DP World Tour** als Etappe der Karriereplanung.",
+          "Historische Stationen sind bei [**Erfolge**](/erfolge) zusammengefasst.",
+        ],
+      },
+      {
+        question: "Worauf legst du inhaltlich Wert?",
+        paragraphs: [
+          "**Strukturiert statt zufällig** — klare Prioritäten, damit sichtbar wird, dass Profisport mehr als nur Talent ist.",
+          "**Langfristig statt kurzfristig** — Entscheidungen, die für mich persönlich tragfähiger sind.",
+          "**Authentisch statt inszeniert** — ich teile den Weg mit echten Herausforderungen und Alltag als Golf Professional.",
+        ],
+      },
+      {
+        question: "Was machst du neben dem Spiel auf der Tour?",
+        paragraphs: [
+          "Die Website bündelt drei Linien: Ich verbinde **Leistungssport mit Unternehmertum** und arbeite an **digitalen Projekten** (Apps, Webseiten), die Sportler unterstützen oder Prozesse klären können.",
+          "Im Verband bin ich als **Head der SwissPGA Players Commission** aktiv — Fokus auf **Spielerwohl, Plattform-Aufbau und Austausch** zwischen Playing Professionals.",
+          "Zusätzlich habe ich eine **Gönnerstruktur** mit Events aufgebaut — wer mitmachen möchte, geht über [**Sponsoring & Gönner**](/sponsoring). Konkrete Projektbeispiele sind auf der Über-mich-Seite verlinkt.",
+        ],
+      },
     ],
   },
   {
-    question: "Was ist die Pro Golf Tour?",
-    paragraphs: [
-      "Die **Pro Golf Tour** (PGT) ist eine europäische Entwicklungstour für Professionals. Sie bietet wettbewerbsnahe Rundenturniere unter Bedingungen, die oft an die höheren Touren angelehnt sind — ideal, um Ranking, Routine und Wettkampfmentalität weiterzuentwickeln.",
-      "Infos, Kalender und Ergebnisse: [progolftour.de](https://www.progolftour.de).",
+    id: "touren-golf",
+    title: "Touren & Golf",
+    lead: "Spielformate und wo du offizielle Daten nachliest.",
+    items: [
+      {
+        question: "Auf welchen Touren spielst du?",
+        paragraphs: [
+          "Mein Schwerpunkt liegt auf der **Pro Golf Tour (PGT)**. Je nach Spielplan und Qualifikation können **Challenge-Tour**-Starts dazukommen.",
+          "Konkrete Termine und Rückblicke findest du auf der **Startseite** (anstehende Termine) sowie im [**Blog**](/blog).",
+        ],
+      },
+      {
+        question: "Was ist die Pro Golf Tour?",
+        paragraphs: [
+          "Die **Pro Golf Tour** ist eine europäische Profi-Entwicklungstour mit Rundenturnieren und übersichtlichem Kalender.",
+          "Offizielle Infos unter [progolftour.de](https://www.progolftour.de).",
+        ],
+      },
+      {
+        question: "Was ist die Challenge Tour?",
+        paragraphs: [
+          "Die **Challenge Tour** ist Teil des European-Tour-Ökosystems und bildet für viele Professionals die **Brückenstufe** Richtung **DP World Tour**.",
+          "Infos unter [europeantour.com/challenge-tour/](https://www.europeantour.com/challenge-tour/).",
+        ],
+      },
+      {
+        question: "Was ist Golf in Kürze?",
+        paragraphs: [
+          "Ziel ist, den Ball mit möglichst **wenigen Schlägen** vom Abschlag ins Loch zu spielen — klassisch **18 Loch** pro Runde, mit Par als Referenz.",
+          "Auf Profebene dominiert oft **Strokeplay** (Zählen der Schläge über mehrere Runden).",
+        ],
+      },
+      {
+        question: "Wo findest du Rankings und Resultate?",
+        paragraphs: [
+          "**Pro Golf Tour**: Kalender und Order of Merit auf [progolftour.de](https://www.progolftour.de).",
+          "**Challenge Tour / DP World Tour**: Daten bei der [European Tour](https://www.europeantour.com/).",
+          "**Weltranking**: [Official World Golf Ranking](https://www.owgr.com/).",
+          "Persönlich aufbereitet: Zeitstrahl unter [**Erfolge**](/erfolge), aktuelle Gedanken im [**Blog**](/blog).",
+        ],
+      },
     ],
   },
   {
-    question: "Was ist die Challenge Tour?",
-    paragraphs: [
-      "Die **Challenge Tour** gilt als wichtiges Sprungbrecht zur **DP World Tour**. Sie richtet sich an Spielerinnen und Spieler, die bereits auf sehr hohem Niveau turniererfahren sind und dort über Ergebnisse und Punkte ihre nächsten Schritte im Profisport anstreben.",
-      "Überblicke und Daten findest du auf der offiziellen Tour-Website unter [European Tour Challenge Tour](https://www.europeantour.com/challenge-tour/).",
-    ],
-  },
-  {
-    question: "Was ist die HotelPlanner Tour?",
-    paragraphs: [
-      "Die **HotelPlanner Tour** ist ein Turnierkalender auf Entwicklungsebene, der mit professionellen Challenger- oder Regional-Formats vergleichbar ist und mir zusätzliche Wettkampfpraxis im Jahresablauf ermöglichen kann.",
-      "Ob und wann ich dort starte, hängt von Einladungen, Vergabe der Startplätze und meinem Turnierprogramm ab — Aktuelles beschreibe ich im Blog oder auf den Ergebnis-Services der jeweiligen Tour.",
-    ],
-  },
-  {
-    question: "Was ist die SwissPGA?",
-    paragraphs: [
-      "Die **SwissPGA** (*Swiss Professional Golfers‘ Association*) ist der Verband der Golf-Lehrkräfte und Golf-Professionals in der Schweiz. Sie fördert Ausbildung, Qualitätsstandards und den beruflichen Austausch zwischen Playing Professionals und Club-Professionals.",
-      "Mehr dazu unter [swisspga.ch](https://www.swisspga.ch/).",
-    ],
-  },
-  {
-    question: "Was ist Swiss Golf?",
-    paragraphs: [
-      "**Swiss Golf** ist der Dachverband für den Schweizer Golfsport. Der Verband kümmert sich unter anderem um Breitensport, Leistungssport, Regeln sowie das **Swiss Golf Team**, dem auch ich angehöre.",
-      "Weitere Informationen auf [swissgolf.ch](https://www.swissgolf.ch).",
-    ],
-  },
-  {
-    question: "Was ist Golf – ganz kurz erklärt?",
-    paragraphs: [
-      "Golf ist eine Sportart, bei der es darum geht, einen Ball mit möglichst wenigen Schlügen vom Abschlag ins Loch zu bringen — meist über 18 Löcher ( eine Runde) auf Platz mit Hindernissen wie Bunkern und Gewässern.",
-      "Professioneller Wettkampf findet häufig als **Strokeplay** statt (Zählweise Schläge pro Runde über mehrere Spieltage), teilweise auch in anderen Formaten wie **Matchplay**.",
-    ],
-  },
-  {
-    question: "Was ist die MG Gönnervereinigung?",
-    paragraphs: [
-      "Die **MG Gönnervereinigung** bündelt Menschen und Partner, die meine Laufbahn als Playing Professional aktiv unterstützen — etwa durch Mitgliedschaften unterscheidlicher Stufen oder durch Sponsoring ab einem jährlichen Mindestbetrag.",
-      "Wer Mitglied oder Sponsor werden möchte, kann sich direkt auf der Seite [**Sponsoring & Gönner**](/sponsoring) melden.",
-    ],
-  },
-  {
-    question: "Wo findest du aktuelle Rankings und meine Turnierergebnisse?",
-    paragraphs: [
-      "**Pro Golf Tour:** Auf der Website der Tour findest du Order of Merit, Kalender und Resultate unter [progolftour.de](https://www.progolftour.de).",
-      "**Challenge Tour & DP World Tour:** Ranking und Daten liegen bei der European Tour unter [europeantour.com](https://www.europeantour.com).",
-      "**World Ranking:** Für den Überblick im Weltranking dient das offizielle **Official World Golf Ranking** unter [OWGR](https://www.owgr.com/).",
-      "Auf dieser Website zusätzlich einen persönlichen Einblick unter [**Erfolge**](/erfolge) und aktuelle Texte unter [**Blog**](/blog).",
-    ],
-  },
-  {
-    question: "Wo erfährst du mehr über Mauro Gilardi?",
-    paragraphs: [
-      "Einen Überblick über meinen Weg, meine Arbeit neben der Tour und meine Überzeugungen gibt es auf [**Über mich**](/ueber-mich).",
-      "Ausführlicher ist die Zeitleiste unter [**Erfolge**](/erfolge); für sehr aktuelle Gedanken und Turnierphasen empfehle ich den [**Blog**](/blog).",
+    id: "verbaende-support",
+    title: "Schweizer Golf & Unterstützung",
+    lead: "Verbände und wie du Sponsor oder Gönner wirst.",
+    items: [
+      {
+        question: "Was ist Swiss Golf?",
+        paragraphs: [
+          "**Swiss Golf** ist der Dachverband des Golfsports in der Schweiz — Breitensport, Leistungssport und das **Swiss Golf Team**, dem ich angehöre.",
+          "[swissgolf.ch](https://www.swissgolf.ch)",
+        ],
+      },
+      {
+        question: "Was ist die SwissPGA?",
+        paragraphs: [
+          "Die **Swiss PGA** ist der Berufsverband der Golf-Professionals und Lehrkräfte — Ausbildung, Qualität und Austausch im Berufsfeld Golf.",
+          "[swisspga.ch](https://www.swisspga.ch)",
+        ],
+      },
+      {
+        question: "Was ist die MG Gönnervereinigung?",
+        paragraphs: [
+          "Die **MG Gönnervereinigung** fasst Mitglieder und Partner zusammen, die meinen Weg als Playing Professional unterstützen — mit strukturierten Stufen und jährlicher Beteiligung wie auf der Sponsoring-Seite beschrieben.",
+          "So geht eine Anfrage: [**Sponsoring & Gönner**](/sponsoring).",
+        ],
+      },
+      {
+        question: "Wo geht die Reise weiter für mehr Tiefe?",
+        paragraphs: [
+          "Langform Überblick: [**Über mich**](/ueber-mich)",
+          "Chronologie: [**Erfolge**](/erfolge)",
+          "Aktuelle Texte aus dem Touralltag: [**Blog**](/blog)",
+        ],
+      },
     ],
   },
 ];
 
-/** Einfacher Markdown-Light: nur **bold** → <strong>; Links [text](url) → <a>; Rest als Text nach Split gefährlich — wir escapen & nutzen kleine Replacements */
+export const aboutFaqItemsFlat = aboutFaqSections.flatMap((s) => s.items);
+
 export function parseFaqParagraphToHtml(paragraph: string): string {
   let s = paragraph
     .replace(/&/g, "&amp;")
@@ -94,11 +146,10 @@ export function parseFaqParagraphToHtml(paragraph: string): string {
   return s;
 }
 
-export function plainTextFromParagraph(htmlLike: string): string {
-  return htmlLike.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+export function plainTextFromParagraph(markdownLike: string): string {
+  return markdownLike.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
 }
 
-/** Schema.org FAQPage für JSON-LD */
 export function getAboutFaqPageJsonLd(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
@@ -108,7 +159,7 @@ export function getAboutFaqPageJsonLd(): Record<string, unknown> {
     inLanguage: "de-CH",
     isPartOf: { "@id": "https://www.maurogilardi.ch/#website" },
     about: { "@id": "https://www.maurogilardi.ch/#mauro-gilardi" },
-    mainEntity: aboutFaqItems.map(({ question, paragraphs }) => ({
+    mainEntity: aboutFaqItemsFlat.map(({ question, paragraphs }) => ({
       "@type": "Question",
       name: question,
       acceptedAnswer: {

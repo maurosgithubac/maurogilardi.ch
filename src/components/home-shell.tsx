@@ -7,6 +7,7 @@ import type { PostRow, SponsorRow } from "@/types/content";
 import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
+import { socialProfiles } from "@/content/socialProfiles";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 import { PgtLiveScoringTicker } from "@/components/pgt-live-scoring-ticker";
@@ -262,6 +263,12 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             <Link href="/sponsoring">Sponsoring</Link>
             <Link href="/ueber-mich">Über mich</Link>
             <a href="#newsletter">Newsletter</a>
+            <a href={socialProfiles.instagram.url} target="_blank" rel="noopener noreferrer">
+              {socialProfiles.instagram.label}
+            </a>
+            <a href={socialProfiles.linkedin.url} target="_blank" rel="noopener noreferrer">
+              {socialProfiles.linkedin.label}
+            </a>
           </p>
         </div>
       </footer>

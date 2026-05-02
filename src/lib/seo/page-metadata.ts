@@ -177,12 +177,12 @@ export const sponsoringSchema = {
 export const uebermichFaqMetadata: Metadata = {
   title: "FAQ – Mauro Gilardi, Pro Golf Tour, SwissPGA & Swiss Golf",
   description:
-    "Antworten auf häufige Fragen zu Mauro Gilardi: Pro Golf Tour, Challenge Tour, HotelPlanner Tour, SwissPGA, Swiss Golf, Ranking, MG Gönnervereinigung und Golf erklärt.",
+    "Antworten auf häufige Fragen zu Mauro Gilardi: Pro Golf Tour, Challenge Tour, SwissPGA, Swiss Golf, Ranking, MG Gönnervereinigung und Golf erklärt.",
   keywords: [
     "Mauro Gilardi FAQ",
     "Pro Golf Tour erklärt",
     "Challenge Tour Golf",
-    "HotelPlanner Tour",
+    "Schweizer Golf Professional FAQ",
     "SwissPGA",
     "Swiss Golf",
     "Schweizer Golf Professional",
