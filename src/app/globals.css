@@ -3380,6 +3380,131 @@ body {
   box-shadow: 0 2px 10px rgb(215 25 32 / 12%);
 }
 
+/* Über mich — FAQ */
+.about-faq-page {
+  padding: 0 var(--page-gutter) clamp(2.25rem, 5.5vw, 3.25rem);
+  background: var(--site-page-bg);
+}
+
+.about-faq-page-inner {
+  width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.about-faq-page-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--site-ink);
+}
+
+.about-faq-page-intro {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.93rem;
+  line-height: 1.58;
+  color: rgb(23 21 19 / 74%);
+}
+
+.about-faq-page-intro a {
+  color: var(--primary);
+  font-weight: 600;
+  text-underline-offset: 0.14em;
+}
+
+.about-faq-page-intro a:hover {
+  text-decoration: underline;
+}
+
+.about-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.about-faq-details {
+  border-radius: 14px;
+  border: 1px solid rgb(23 21 19 / 9%);
+  background: rgb(255 255 255 / 95%);
+  box-shadow: 0 6px 22px rgb(23 21 19 / 5%);
+}
+
+.about-faq-details[open] {
+  border-color: rgb(215 25 32 / 28%);
+  box-shadow:
+    0 0 0 1px rgb(215 25 32 / 6%),
+    0 8px 26px rgb(23 21 19 / 6%);
+}
+
+.about-faq-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 1rem 2.85rem 1rem 1.15rem;
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: -0.015em;
+  color: var(--site-ink);
+  position: relative;
+}
+
+.about-faq-summary::-webkit-details-marker {
+  display: none;
+}
+
+.about-faq-summary::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid rgb(23 21 19 / 45%);
+  transition: transform 0.2s ease;
+}
+
+.about-faq-details[open] .about-faq-summary::after {
+  transform: translateY(-50%) rotate(-180deg);
+}
+
+.about-faq-body {
+  padding: 0 1.15rem 1rem;
+  margin-top: -0.35rem;
+  border-top: 1px solid rgb(23 21 19 / 6%);
+}
+
+.about-faq-p {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.58;
+  color: rgb(23 21 19 / 78%);
+}
+
+.about-faq-p:last-child {
+  margin-bottom: 0;
+}
+
+.about-faq-p strong {
+  color: rgb(23 21 19 / 94%);
+}
+
+.about-faq-p a {
+  color: var(--primary);
+  font-weight: 600;
+  text-underline-offset: 0.14em;
+}
+
+.about-faq-p a:hover {
+  text-decoration: underline;
+}
+
 /* Über mich — Sponsoren-Seite */
 .about-sponsors-page {
   padding: clamp(1.5rem, 4vw, 2.75rem) var(--page-gutter) clamp(2rem, 5vw, 3.25rem);

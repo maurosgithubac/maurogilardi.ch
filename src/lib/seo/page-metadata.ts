@@ -173,3 +173,38 @@ export const sponsoringSchema = {
     "@id": "https://www.maurogilardi.ch/#mauro-gilardi",
   },
 };
+
+export const uebermichFaqMetadata: Metadata = {
+  title: "FAQ – Mauro Gilardi, Pro Golf Tour, SwissPGA & Swiss Golf",
+  description:
+    "Antworten auf häufige Fragen zu Mauro Gilardi: Pro Golf Tour, Challenge Tour, HotelPlanner Tour, SwissPGA, Swiss Golf, Ranking, MG Gönnervereinigung und Golf erklärt.",
+  keywords: [
+    "Mauro Gilardi FAQ",
+    "Pro Golf Tour erklärt",
+    "Challenge Tour Golf",
+    "HotelPlanner Tour",
+    "SwissPGA",
+    "Swiss Golf",
+    "Schweizer Golf Professional",
+    "Gönnervereinigung MG",
+    "Golf Schweiz Ranking",
+    "Weltranking Golf OWGR",
+  ],
+  alternates: {
+    canonical: "https://www.maurogilardi.ch/ueber-mich/faq",
+  },
+  openGraph: {
+    title: "FAQ – Mauro Gilardi, Touren & Swiss Golf",
+    description:
+      "Touren, SwissPGA, Swiss Golf, Gönnervereinigung und wo du Rankings sowie Ergebnisse findest — kompakt beantwortet.",
+    url: "https://www.maurogilardi.ch/ueber-mich/faq",
+    images: [
+      {
+        url: "/brand-assets/images/1L9A8795.JPG",
+        width: 1200,
+        height: 630,
+        alt: "Mauro Gilardi – Schweizer Golf Professional",
+      },
+    ],
+  },
+};

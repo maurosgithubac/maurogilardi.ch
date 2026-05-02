@@ -24,6 +24,7 @@ const NAV: NavItem[] = [
     label: "Über mich",
     match: (p) => p.startsWith("/ueber-mich"),
     sublinks: [
+      { href: "/ueber-mich/faq", label: "FAQ" },
       { href: "/ueber-mich/sponsoren", label: "Sponsoren" },
       { href: "/ueber-mich/gallerie", label: "Galerie" },
       { href: "/ueber-mich/media", label: "Medien" },
