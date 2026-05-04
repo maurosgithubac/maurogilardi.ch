@@ -11,7 +11,8 @@
     "lint": "eslint",
     "resend:domain:create": "node scripts/resend-domain-setup.js create",
     "resend:domain:get": "node scripts/resend-domain-setup.js get",
-    "resend:domain:verify": "node scripts/resend-domain-setup.js verify"
+    "resend:domain:verify": "node scripts/resend-domain-setup.js verify",
+    "posts:publish-podium-pgt": "node --env-file=.env.local scripts/publish-zweites-podium-pgt.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
