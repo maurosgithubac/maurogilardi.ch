@@ -8348,6 +8348,23 @@ body {
   filter: saturate(1.02) contrast(1.02);
 }
 
+/* Startseite: längeres H1 — kompaktere Typo, mehr Breite als generisches `14ch` */
+.home-landing-hero .about-hero-copy h1 {
+  max-width: min(100%, 32rem);
+  font-size: clamp(1.38rem, 2.95vw + 0.72rem, 2.05rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.026em;
+}
+
+@media (max-width: 760px) {
+  .home-landing-hero .about-hero-copy h1 {
+    font-size: clamp(1.2rem, 4.85vw + 0.42rem, 1.74rem);
+    line-height: 1.13;
+    max-width: 100%;
+  }
+}
+
 .about-hero-copy .about-hero-lead--welcome {
   margin-top: 0.75rem;
   font-size: 1.02rem;
