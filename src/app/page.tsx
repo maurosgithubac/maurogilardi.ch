@@ -1,13 +1,18 @@
 import { HomeShell } from "@/components/home-shell";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { demoPosts } from "@/content/demoPosts";
 import { getUpcomingPgtSeasonEvents } from "@/content/pgtSeasonEvents";
 import { homeMarqueeSponsorCards } from "@/content/sponsorsSite";
 import { blogImageUrl } from "@/lib/storage-public-url";
+import { HOME_PAGE_DESCRIPTION, homePageMetadata } from "@/lib/seo/page-metadata";
+import { homeWebPageJsonLd } from "@/lib/seo/webpage-jsonld";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { PostRow } from "@/types/content";
 
 /** Homepage inkl. „nächste 4 Termine“ — öfter neu gegen PGT-Kalender */
 export const revalidate = 3600;
+
+export const metadata = homePageMetadata;
 
 export default async function Home() {
   type PostCard = Pick<PostRow, "id" | "slug" | "title" | "description" | "image_path" | "created_at">;
@@ -53,5 +58,10 @@ export default async function Home() {
 
   const upcomingPgtEvents = getUpcomingPgtSeasonEvents(new Date());
 
-  return <HomeShell posts={homePosts} sponsors={homeSponsors} upcomingPgtEvents={upcomingPgtEvents} />;
+  return (
+    <>
+      <SeoPageJsonLd schema={homeWebPageJsonLd(HOME_PAGE_DESCRIPTION)} />
+      <HomeShell posts={homePosts} sponsors={homeSponsors} upcomingPgtEvents={upcomingPgtEvents} />
+    </>
+  );
 }

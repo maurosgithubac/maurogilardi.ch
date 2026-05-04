@@ -1,18 +1,31 @@
 import { MediaPressExplorer } from "@/components/media-press-explorer";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { enrichAndSortPressItems, pressOutlets } from "@/content/media-press";
+import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+
+const PAGE_PATH = "/ueber-mich/media";
+
+const MEDIA_DESCRIPTION =
+  "Berichte, Interviews und Artikel über Mauro Gilardi — Swiss Golf, Golf.ch, Pro Golf Tour, Regionalmedien und mehr.";
 
 export const metadata = {
   title: "In den Medien | Mauro Gilardi",
-  description:
-    "Berichte, Interviews und Artikel über Mauro Gilardi — Swiss Golf, Golf.ch, Pro Golf Tour, Regionalmedien und mehr.",
+  description: MEDIA_DESCRIPTION,
 };
 
 export default function UeberMichMediaPage() {
   const items = enrichAndSortPressItems();
 
   return (
-    <AboutSubpageShell
+    <>
+      <SeoPageJsonLd
+        schema={[
+          webPageJsonLd({ path: PAGE_PATH, name: "In den Medien – Presse", description: MEDIA_DESCRIPTION }),
+          ueberMichChildBreadcrumbJsonLd("Medien", PAGE_PATH),
+        ]}
+      />
+      <AboutSubpageShell
       label="Über mich"
       title="In den Medien"
       lead="Presse, Portale und Tour-Seiten — durchsuchbar nach Quelle. Ich ergänze die Liste, sobald neue Berichte erscheinen."
@@ -39,5 +52,6 @@ export default function UeberMichMediaPage() {
         </div>
       </section>
     </AboutSubpageShell>
+    </>
   );
 }

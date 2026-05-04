@@ -2,12 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { siteSponsorTiers } from "@/content/sponsorsSite";
+import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+
+const PAGE_PATH = "/ueber-mich/sponsoren";
+
+const SPONSOREN_DESCRIPTION =
+  "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Sponsoren schnell.";
 
 export const metadata = {
   title: "Sponsoren | Mauro Gilardi",
-  description:
-    "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Sponsoren schnell.",
+  description: SPONSOREN_DESCRIPTION,
 };
 
 function SponsorCardShell({
@@ -44,7 +50,14 @@ function SponsorCardShell({
 
 export default function UeberMichSponsorenPage() {
   return (
-    <AboutSubpageShell
+    <>
+      <SeoPageJsonLd
+        schema={[
+          webPageJsonLd({ path: PAGE_PATH, name: "Meine Sponsoren", description: SPONSOREN_DESCRIPTION }),
+          ueberMichChildBreadcrumbJsonLd("Sponsoren", PAGE_PATH),
+        ]}
+      />
+      <AboutSubpageShell
       label="Über mich"
       title="Meine Sponsoren"
       lead="Hier siehst du, wer mich unterstützt — Danke an alle, die den Weg mitgehen."
@@ -110,5 +123,6 @@ export default function UeberMichSponsorenPage() {
         </div>
       </section>
     </AboutSubpageShell>
+    </>
   );
 }

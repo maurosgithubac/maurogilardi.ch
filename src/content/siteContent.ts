@@ -2,6 +2,8 @@ export const siteContent = {
   brand: {
     short: "MG",
     name: "Mauro Gilardi",
+    /** Prominente H1 auf der Startseite — Golf & Schweiz für Suchmaschinen, ohne Slogan zu ersetzen. */
+    homepageH1: "Mauro Gilardi – Schweizer Golf Professional, Swiss Golf Team",
     role: "SwissPGA Golf Professional",
     headline: "Von der Heimat auf die Tour.",
     intro:

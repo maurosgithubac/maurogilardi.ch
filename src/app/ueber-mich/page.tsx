@@ -30,8 +30,9 @@ export default function UeberMichPage() {
           <div className="stage-overlay about-hero-overlay" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">Über mich</p>
-            <h1>Karriere wie ein Unternehmen.</h1>
+            <h1>Mauro Gilardi – Schweizer Golf Professional aus Graubünden</h1>
             <p className="about-hero-lead">
+              <strong>Karriere wie ein Unternehmen.</strong>{" "}
               Leistungssport, Unternehmertum und klare Strukturen verbinden sich zu einem Weg mit einem Ziel:
               langfristiger Erfolg im Golf - und darüber hinaus.
             </p>

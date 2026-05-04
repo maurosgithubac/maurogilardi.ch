@@ -1,23 +1,37 @@
 import Image from "next/image";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import {
   aboutGalleryAltFromFilename,
   aboutGalleryImageSrc,
   listAboutGalleryFilenames,
 } from "@/lib/about-gallery-images";
+import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
 
 export const dynamic = "force-dynamic";
 
+const PAGE_PATH = "/ueber-mich/gallerie";
+
+const GALLERY_DESCRIPTION =
+  "Impressionen von der Tour, Training und Events — Bilder aus meinem Alltag als Profigolfer.";
+
 export const metadata = {
   title: "Galerie | Mauro Gilardi",
-  description: "Impressionen von der Tour, Training und Events — Bilder aus meinem Alltag als Profigolfer.",
+  description: GALLERY_DESCRIPTION,
 };
 
 export default async function UeberMichGalleriePage() {
   const files = await listAboutGalleryFilenames();
 
   return (
-    <AboutSubpageShell
+    <>
+      <SeoPageJsonLd
+        schema={[
+          webPageJsonLd({ path: PAGE_PATH, name: "Galerie – Impressionen", description: GALLERY_DESCRIPTION }),
+          ueberMichChildBreadcrumbJsonLd("Galerie", PAGE_PATH),
+        ]}
+      />
+      <AboutSubpageShell
       label="Über mich"
       title="Galerie"
       lead="Einblicke in Turniere, Training und Momente neben dem Platz — die Sammlung wächst mit der Saison."
@@ -69,5 +83,6 @@ export default async function UeberMichGalleriePage() {
         </div>
       </section>
     </AboutSubpageShell>
+    </>
   );
 }

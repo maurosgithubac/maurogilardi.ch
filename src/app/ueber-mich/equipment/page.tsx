@@ -1,16 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { equipmentBag, equipmentTheGolfersMalans } from "@/content/equipment";
+import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+
+const PAGE_PATH = "/ueber-mich/equipment";
+
+const EQUIPMENT_DESCRIPTION = "Mein Bag: Schläger von Driver bis Putter — und wo ich mich beraten lasse.";
 
 export const metadata = {
   title: "Mein Bag | Mauro Gilardi",
-  description: "Mein Bag: Schläger von Driver bis Putter — und wo ich mich beraten lasse.",
+  description: EQUIPMENT_DESCRIPTION,
 };
 
 export default function UeberMichEquipmentPage() {
   return (
-    <AboutSubpageShell
+    <>
+      <SeoPageJsonLd
+        schema={[
+          webPageJsonLd({ path: PAGE_PATH, name: "Mein Bag – Equipment", description: EQUIPMENT_DESCRIPTION }),
+          ueberMichChildBreadcrumbJsonLd("Mein Bag", PAGE_PATH),
+        ]}
+      />
+      <AboutSubpageShell
       label="Über mich"
       title="Mein Bag"
       lead="Was ich im Spiel dabei habe — und bei wem ich fitten gehe."
@@ -94,5 +107,6 @@ export default function UeberMichEquipmentPage() {
         </div>
       </section>
     </AboutSubpageShell>
+    </>
   );
 }

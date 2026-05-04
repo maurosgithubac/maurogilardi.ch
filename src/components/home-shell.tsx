@@ -74,7 +74,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           <div className="stage-overlay about-hero-overlay" aria-hidden="true" />
           <div className="subpage-copy about-hero-copy">
             <p className="label about-hero-label">{siteContent.brand.role}</p>
-            <h1>{siteContent.brand.name}</h1>
+            <h1>{siteContent.brand.homepageH1}</h1>
             <p className="about-hero-lead about-hero-lead--welcome">Willkommen — hier folgst du mir auf der Tour.</p>
             <p className="about-hero-lead">{siteContent.brand.intro}</p>
             <div className="about-hero-actions">

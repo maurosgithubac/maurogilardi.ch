@@ -2,6 +2,57 @@ import type { Metadata } from "next";
 
 /** Individuelle Metadata + JSON-LD-Objekte pro Hauptseite */
 
+const siteBase = "https://www.maurogilardi.ch";
+
+/** Startseite: expliziter Title (ohne Template-Suffix) + Description — höchster SEO-Hebel. */
+export const HOME_PAGE_DESCRIPTION =
+  "Offizielle Website von Mauro Gilardi, SwissPGA Golf Professional aus Graubünden, Schweiz. Pro Golf Tour, Mitglied im Swiss Golf Team — Blog von der Tour, Erfolge, Sponsoring und Termine.";
+
+export const homePageMetadata: Metadata = {
+  title: {
+    absolute:
+      "Mauro Gilardi – Schweizer Golf Professional Graubünden | SwissPGA, Pro Golf Tour & Swiss Golf Team",
+  },
+  description: HOME_PAGE_DESCRIPTION,
+  alternates: {
+    canonical: siteBase + "/",
+  },
+  keywords: [
+    "Mauro Gilardi",
+    "Schweizer Golf Professional",
+    "SwissPGA Pro",
+    "Golf Profi Schweiz",
+    "Swiss Golf Team",
+    "Pro Golf Tour",
+    "Golf Graubünden",
+    "Schweizer Golf",
+    "Schweizer Golfer",
+    "Tour Professional Golf Schweiz",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "de_CH",
+    url: siteBase,
+    siteName: "Mauro Gilardi – Schweizer Golf Professional",
+    title: "Mauro Gilardi – Schweizer Golf-Profi Schweiz | SwissPGA & Pro Golf Tour",
+    description: HOME_PAGE_DESCRIPTION,
+    images: [
+      {
+        url: "/brand-assets/images/1L9A8795.JPG",
+        width: 1200,
+        height: 630,
+        alt: "Mauro Gilardi – Schweizer Golf Professional auf dem Golfplatz",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mauro Gilardi – Schweizer Golf Professional Graubünden | SwissPGA & Pro Golf Tour",
+    description: HOME_PAGE_DESCRIPTION,
+    images: ["/brand-assets/images/1L9A8795.JPG"],
+  },
+};
+
 export const uebermichMetadata: Metadata = {
   title: "Über mich – Mauro Gilardi, Schweizer Golf Professional aus Graubünden",
   description:

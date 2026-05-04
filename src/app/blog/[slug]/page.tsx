@@ -131,7 +131,7 @@ export default async function BlogPostPage({ params }: Props) {
       </nav>
       {img ? (
         <div className="blog-post-hero">
-          <Image src={img} alt="" fill className="blog-post-hero-img" priority sizes="100vw" />
+          <Image src={img} alt={`${post.title} – Beitragsbild`} fill className="blog-post-hero-img" priority sizes="100vw" />
           <div className="blog-post-hero-scrim" />
         </div>
       ) : null}
