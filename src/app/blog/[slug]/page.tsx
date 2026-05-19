@@ -9,6 +9,7 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { BlogPostBody } from "@/components/blog-post-body";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -145,7 +146,7 @@ export default async function BlogPostPage({ params }: Props) {
         </time>
         <h1>{post.title}</h1>
         {post.description ? <p className="blog-post-dek">{post.description}</p> : null}
-        <div className="blog-post-body">{post.body}</div>
+        <BlogPostBody body={post.body} />
         <Link href="/blog" className="blog-post-back">
           ← Zurück zum Blog
         </Link>

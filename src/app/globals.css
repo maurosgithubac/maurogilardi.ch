@@ -3175,7 +3175,38 @@ body {
   font-size: 1.05rem;
   line-height: 1.78;
   color: #2e2c29;
+}
+
+.blog-post-body-block {
+  display: block;
   white-space: pre-wrap;
+}
+
+.blog-post-inline-figure {
+  margin: 1.85rem 0;
+}
+
+.blog-post-inline-figure-aspect {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgb(23 21 19 / 8%);
+  box-shadow: 0 14px 36px rgb(23 21 19 / 8%);
+}
+
+.blog-post-inline-figure-img {
+  object-fit: cover;
+  object-position: center center;
+}
+
+.blog-post-inline-figure-caption {
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgb(23 21 19 / 52%);
+  text-align: center;
 }
 
 .blog-post-back {
