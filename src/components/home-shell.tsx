@@ -7,6 +7,7 @@ import type { PostRow, SponsorRow } from "@/types/content";
 import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
+import { SiteFooterCredit } from "@/components/site-footer";
 import { socialProfiles } from "@/content/socialProfiles";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
@@ -270,6 +271,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               {socialProfiles.linkedin.label}
             </a>
           </p>
+          <SiteFooterCredit />
         </div>
       </footer>
     </div>

@@ -2,6 +2,22 @@ import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
 import { socialProfiles } from "@/content/socialProfiles";
 
+export function SiteFooterCredit() {
+  return (
+    <p className="site-footer-credit">
+      Webseite umgesetzt von{" "}
+      <a
+        href="https://sibatusig.ch"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="site-footer-credit-brand"
+      >
+        sibatusig.ch
+      </a>
+    </p>
+  );
+}
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
@@ -22,6 +38,7 @@ export function SiteFooter() {
             {socialProfiles.linkedin.label}
           </a>
         </p>
+        <SiteFooterCredit />
       </div>
     </footer>
   );

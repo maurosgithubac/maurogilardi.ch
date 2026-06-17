@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import localFont from "next/font/local";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
@@ -7,6 +8,13 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+const sifonn = localFont({
+  src: "./fonts/Sifonn.woff",
+  variable: "--font-sifonn",
+  display: "swap",
+  weight: "700",
 });
 
 export const metadata: Metadata = siteRootMetadata;
@@ -18,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de-CH">
-      <body className={`${geistSans.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${sifonn.variable} antialiased`}>
         <SeoRootJsonLd />
         <div className="global-top-tabs" role="navigation" aria-label="Schnellzugriff">
           <a href="/#newsletter" className="global-newsletter-tab">
