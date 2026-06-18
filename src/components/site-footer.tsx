@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
 import { socialProfiles } from "@/content/socialProfiles";
+import { SiteFooterLegalLinks } from "@/components/site-footer-legal-links";
 
 export function SiteFooterCredit() {
   return (
@@ -40,6 +41,7 @@ export function SiteFooter() {
           <a href={socialProfiles.linkedin.url} target="_blank" rel="noopener noreferrer">
             {socialProfiles.linkedin.label}
           </a>
+          <SiteFooterLegalLinks />
         </p>
         <SiteFooterCredit />
       </div>

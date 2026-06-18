@@ -21,18 +21,16 @@ export const seoImageAlts = {
   golfTeam: "Mauro Gilardi, Swiss PGA Professional mit Team",
 } as const;
 
+/** Offizielles Markenlogo — eine Quelle für Header, Admin, Schema & SEO */
 export const brandLogo = {
-  path: "/brand-assets/logos/Logo_negativ.svg",
-  alt: "Mauro Gilardi",
+  path: "/brand-assets/logos/mauro-gilardi-golf-logo.svg",
+  alt: "Mauro Gilardi – Swiss PGA Professional Golf Logo",
   width: 180,
   height: 44,
 } as const;
 
-/** SEO-freundlicher Dateiname (gleiches Asset wie brandLogo) */
-export const seoLogo = {
-  path: "/brand-assets/logos/Logo_negativ.svg",
-  alt: "Mauro Gilardi Golf Logo",
-} as const;
+/** @deprecated Alias — bitte überall `brandLogo` verwenden */
+export const seoLogo = brandLogo;
 
 export const entityKeywords = [
   "Mauro Gilardi",

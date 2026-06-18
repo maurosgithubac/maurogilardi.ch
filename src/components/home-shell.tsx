@@ -8,6 +8,7 @@ import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
 import { SiteFooterCredit } from "@/components/site-footer";
+import { SiteFooterLegalLinks } from "@/components/site-footer-legal-links";
 import { socialProfiles } from "@/content/socialProfiles";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
@@ -274,6 +275,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             <a href={socialProfiles.linkedin.url} target="_blank" rel="noopener noreferrer">
               {socialProfiles.linkedin.label}
             </a>
+            <SiteFooterLegalLinks />
           </p>
           <SiteFooterCredit />
         </div>

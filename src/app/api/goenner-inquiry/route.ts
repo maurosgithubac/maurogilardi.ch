@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { MembershipId } from "@/content/goennerMemberships";
+import { siteContent } from "@/content/siteContent";
 import { createResendClient } from "@/lib/resend";
 import { readEnv } from "@/lib/env";
 
@@ -41,7 +42,7 @@ async function sendGoennerInquiryEmails(payload: {
   const resend = createResendClient();
   const from = readEnv("RESEND_FROM_EMAIL");
   const templateIdOrAlias = process.env.RESEND_GOENNER_TEMPLATE_ID?.trim() || "welcome";
-  const adminNotify = process.env.GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL?.trim() || "mauro.gilardi@hotmail.com";
+  const adminNotify = process.env.GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL?.trim() || siteContent.contact.email;
   const label = membershipLabel(payload.membership_id);
   const address = `${payload.street}, ${payload.postal_code} ${payload.city}`;
 

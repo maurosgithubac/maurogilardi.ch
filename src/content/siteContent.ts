@@ -9,6 +9,9 @@ export const siteContent = {
     intro:
       "Ich bin Mauro, SwissPGA Pro. Heimat, Bodenständigkeit und Familie sind mein Fundament — hier auf der Seite teile ich, was ich unterwegs erlebe.",
   },
+  contact: {
+    email: "mauro.gilardi@hotmail.com",
+  },
   identity: {
     colorPrimary: "#d71920",
     colorBlack: "#0a0a0a",

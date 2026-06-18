@@ -1,7 +1,8 @@
 /** Person-, Athlete- und Entity-JSON-LD für Mauro Gilardi */
 
 import { personSameAs } from "@/content/socialProfiles";
-import { SITE_URL, seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { siteContent } from "@/content/siteContent";
+import { SITE_URL, brandLogo, seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const PERSON_ID = `${SITE_URL}/#mauro-gilardi`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
@@ -20,10 +21,16 @@ export function buildPersonJsonLd() {
     description:
       "Mauro Gilardi ist ein Schweizer Golfprofi, Swiss PGA Professional, Playing Professional und Mitglied des Swiss Golf Teams. Aktiv auf der Pro Golf Tour in Europa als Tour Professional und Schweizer Spitzensportler.",
     url: SITE_URL,
+    email: siteContent.contact.email,
     image: {
       "@type": "ImageObject",
       url: `${SITE_URL}${seoImages.heroPrimary}`,
       description: seoImageAlts.heroPrimary,
+    },
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}${brandLogo.path}`,
+      description: brandLogo.alt,
     },
     nationality: {
       "@type": "Country",
@@ -140,6 +147,11 @@ export function buildWebsiteJsonLd() {
     author: { "@id": PERSON_ID },
     about: { "@id": PERSON_ID },
     publisher: { "@id": PERSON_ID },
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}${brandLogo.path}`,
+      description: brandLogo.alt,
+    },
   };
 }
 

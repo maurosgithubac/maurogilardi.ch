@@ -31,6 +31,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/erfolge`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${base}/sponsoring`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/impressum`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/datenschutz`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.4 },
   ];
 
   const blogEntries: MetadataRoute.Sitemap = posts.map((p) => ({

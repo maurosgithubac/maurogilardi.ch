@@ -367,3 +367,37 @@ export const uebermichEquipmentMetadata: Metadata = {
     images: seoTwitterImages(seoImages.golfTeam),
   },
 };
+
+export const impressumMetadata: Metadata = {
+  title: {
+    absolute: "Impressum | Mauro Gilardi – Swiss PGA Professional",
+  },
+  description:
+    "Impressum und Kontakt zu maurogilardi.ch — Verantwortliche Stelle, Haftung und Hosting-Angaben von Mauro Gilardi, Swiss PGA Professional.",
+  alternates: {
+    canonical: `${SITE_URL}/impressum`,
+  },
+  openGraph: {
+    title: "Impressum | Mauro Gilardi",
+    description: "Impressum und Kontakt zu maurogilardi.ch",
+    url: `${SITE_URL}/impressum`,
+  },
+  robots: { index: true, follow: true },
+};
+
+export const datenschutzMetadata: Metadata = {
+  title: {
+    absolute: "Datenschutz | Mauro Gilardi – maurogilardi.ch",
+  },
+  description:
+    "Datenschutzerklärung für maurogilardi.ch: Newsletter, Kontaktformulare, Cookies und deine Rechte gemäss DSG/DSGVO.",
+  alternates: {
+    canonical: `${SITE_URL}/datenschutz`,
+  },
+  openGraph: {
+    title: "Datenschutz | Mauro Gilardi",
+    description: "Datenschutzerklärung und Cookie-Hinweise für maurogilardi.ch",
+    url: `${SITE_URL}/datenschutz`,
+  },
+  robots: { index: true, follow: true },
+};

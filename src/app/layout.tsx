@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import localFont from "next/font/local";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
@@ -46,6 +47,7 @@ export default function RootLayout({
           </a>
         </div>
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   );
