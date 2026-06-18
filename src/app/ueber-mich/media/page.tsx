@@ -2,6 +2,8 @@ import { MediaPressExplorer } from "@/components/media-press-explorer";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { enrichAndSortPressItems, pressOutlets } from "@/content/media-press";
+import { uebermichMediaMetadata } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
 
 const PAGE_PATH = "/ueber-mich/media";
@@ -9,10 +11,7 @@ const PAGE_PATH = "/ueber-mich/media";
 const MEDIA_DESCRIPTION =
   "Berichte, Interviews und Artikel über Mauro Gilardi — Swiss Golf, Golf.ch, Pro Golf Tour, Regionalmedien und mehr.";
 
-export const metadata = {
-  title: "In den Medien | Mauro Gilardi",
-  description: MEDIA_DESCRIPTION,
-};
+export const metadata = uebermichMediaMetadata;
 
 export default function UeberMichMediaPage() {
   const items = enrichAndSortPressItems();
@@ -29,8 +28,8 @@ export default function UeberMichMediaPage() {
       label="Über mich"
       title="In den Medien"
       lead="Presse, Portale und Tour-Seiten — durchsuchbar nach Quelle. Ich ergänze die Liste, sobald neue Berichte erscheinen."
-      heroSrc="/brand-assets/images/195.png"
-      heroAlt="Mauro Gilardi im Turnier"
+      heroSrc={seoImages.tournamentAction}
+      heroAlt={seoImageAlts.tournamentAction}
     >
       <section className="about-media-page" aria-label="Medienberichte und externe Artikel">
         <div className="about-media-page-inner">

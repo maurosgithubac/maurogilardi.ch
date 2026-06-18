@@ -6,6 +6,7 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { uebermichMetadata, uebermichSchema } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = uebermichMetadata;
 
@@ -21,8 +22,8 @@ export default function UeberMichPage() {
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero blog-index-hero-unified">
           <Image
-            src="/brand-assets/images/1L9A9440.JPG"
-            alt="Mauro Gilardi im Turnier"
+            src={seoImages.portraitTournament}
+            alt={seoImageAlts.portraitTournament}
             fill
             className="stage-bg about-hero-bg"
             priority

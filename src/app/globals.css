@@ -337,6 +337,8 @@ a {
   --panel-soft: #f1f1f1;
   --text: #111111;
   --muted: #5e5e5e;
+  /* Desktop-Lesbarkeit: skaliert rem-basierte Typo proportional (nur ab 1024px) */
+  --desktop-read-scale: 1;
 }
 
 body {
@@ -1711,6 +1713,16 @@ body {
 }
 
 .site-footer-credit-brand:hover {
+  color: var(--site-ink);
+}
+
+.site-footer-brand-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.site-footer-brand-link:hover {
   color: var(--site-ink);
 }
 
@@ -8924,4 +8936,68 @@ body {
 
 .goenner-page .goenner-form-section {
   padding-bottom: clamp(1.1rem, 2.8vw, 1.75rem);
+}
+
+/* Desktop: etwas grössere Schrift für bessere Lesbarkeit (alle Jahrgänge) */
+@media (min-width: 1024px) {
+  :root {
+    --desktop-read-scale: 1.1;
+  }
+
+  html {
+    font-size: calc(100% * var(--desktop-read-scale));
+  }
+
+  body {
+    line-height: 1.58;
+  }
+
+  .about-hero-copy h1 {
+    font-size: clamp(2.35rem, 5.5vw, 4.35rem);
+  }
+
+  .about-hero-lead,
+  .about-hero-lead--welcome {
+    font-size: 1.12rem;
+    line-height: 1.62;
+  }
+
+  .blog-post-body {
+    font-size: 1.12rem;
+    line-height: 1.82;
+  }
+
+  .blog-post-dek {
+    font-size: 1.14rem;
+  }
+
+  .blog-card-body h3 {
+    font-size: 1.14rem;
+  }
+
+  .blog-card-body p,
+  .blog-feed-card-body p {
+    font-size: 0.98rem;
+    line-height: 1.58;
+  }
+
+  .site-header-nav-link,
+  .site-header-nav-dropdown-item {
+    font-size: 0.8rem;
+  }
+
+  .about-btn {
+    font-size: 0.68rem;
+  }
+
+  .pgt-events-card-title {
+    font-size: 1.02rem;
+  }
+
+  .pgt-events-card-meta,
+  .pgt-events-card-links,
+  .pgt-events-sub,
+  .pgt-events-footnote {
+    font-size: 0.92rem;
+  }
 }

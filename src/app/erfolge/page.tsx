@@ -9,6 +9,7 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { erfolgeMetadata, erfolgeSchema } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = erfolgeMetadata;
 
@@ -153,8 +154,8 @@ export default function ErfolgePage() {
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero erfolge-hero blog-index-hero-unified">
           <Image
-            src="/brand-assets/images/pgtwinbig.jpg"
-            alt="Mauro Gilardi bei einem Turnier"
+            src={seoImages.progolfTour}
+            alt={seoImageAlts.progolfTour}
             fill
             className="stage-bg about-hero-bg"
             priority

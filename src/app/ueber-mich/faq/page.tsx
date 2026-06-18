@@ -7,6 +7,7 @@ import {
   parseFaqParagraphToHtml,
 } from "@/content/aboutFaq";
 import { uebermichFaqMetadata } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = uebermichFaqMetadata;
 
@@ -16,8 +17,8 @@ export default function UeberMichFaqPage() {
       label="Über mich"
       title="FAQ"
       lead="Antworten zu mir selbst, zu den Touren, Swiss Golf, Swiss PGA und wo du Zahlen sowie Termine nachliest."
-      heroSrc="/brand-assets/images/1L9A8795.JPG"
-      heroAlt="Mauro Gilardi bei der Pro Golf Tour"
+      heroSrc={seoImages.heroPrimary}
+      heroAlt={seoImageAlts.heroPrimary}
       heroBgClassName="about-hero-bg--focus-top"
     >
       <SeoPageJsonLd schema={[getAboutFaqPageJsonLd(), getUeberMichFaqBreadcrumbJsonLd()]} />

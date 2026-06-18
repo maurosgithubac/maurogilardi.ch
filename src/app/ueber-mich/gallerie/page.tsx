@@ -6,6 +6,8 @@ import {
   aboutGalleryImageSrc,
   listAboutGalleryFilenames,
 } from "@/lib/about-gallery-images";
+import { uebermichGallerieMetadata } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
 
 export const dynamic = "force-dynamic";
@@ -15,10 +17,7 @@ const PAGE_PATH = "/ueber-mich/gallerie";
 const GALLERY_DESCRIPTION =
   "Impressionen von der Tour, Training und Events — Bilder aus meinem Alltag als Profigolfer.";
 
-export const metadata = {
-  title: "Galerie | Mauro Gilardi",
-  description: GALLERY_DESCRIPTION,
-};
+export const metadata = uebermichGallerieMetadata;
 
 export default async function UeberMichGalleriePage() {
   const files = await listAboutGalleryFilenames();
@@ -35,8 +34,8 @@ export default async function UeberMichGalleriePage() {
       label="Über mich"
       title="Galerie"
       lead="Einblicke in Turniere, Training und Momente neben dem Platz — die Sammlung wächst mit der Saison."
-      heroSrc="/brand-assets/images/mauro&friends-9.jpg"
-      heroAlt="Mauro Gilardi auf dem Golfplatz"
+      heroSrc={seoImages.golfEvent}
+      heroAlt={seoImageAlts.golfEvent}
     >
       <section className="about-gallery-page" aria-labelledby="about-gallery-title">
         <div className="about-gallery-inner">

@@ -18,4 +18,5 @@ export const personSameAs: string[] = [
   socialProfiles.linkedin.url,
   "https://www.progolftour.de",
   "https://www.swissgolf.ch",
+  "https://www.swisspga.ch",
 ];

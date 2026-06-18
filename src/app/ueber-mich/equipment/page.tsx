@@ -3,16 +3,15 @@ import Link from "next/link";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { equipmentBag, equipmentTheGolfersMalans } from "@/content/equipment";
+import { uebermichEquipmentMetadata } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
 
 const PAGE_PATH = "/ueber-mich/equipment";
 
 const EQUIPMENT_DESCRIPTION = "Mein Bag: Schläger von Driver bis Putter — und wo ich mich beraten lasse.";
 
-export const metadata = {
-  title: "Mein Bag | Mauro Gilardi",
-  description: EQUIPMENT_DESCRIPTION,
-};
+export const metadata = uebermichEquipmentMetadata;
 
 export default function UeberMichEquipmentPage() {
   return (
@@ -27,8 +26,8 @@ export default function UeberMichEquipmentPage() {
       label="Über mich"
       title="Mein Bag"
       lead="Was ich im Spiel dabei habe — und bei wem ich fitten gehe."
-      heroSrc="/brand-assets/images/mauro&friends-8.jpg"
-      heroAlt="Mauro Gilardi mit Team"
+      heroSrc={seoImages.golfTeam}
+      heroAlt={seoImageAlts.golfTeam}
       heroBgClassName="about-hero-bg--focus-top"
     >
       <section className="about-equipment-page" aria-label="Equipment im Bag">
@@ -48,7 +47,7 @@ export default function UeberMichEquipmentPage() {
                       {item.imageSrc ? (
                         <Image
                           src={item.imageSrc}
-                          alt={item.slot}
+                          alt={`Mauro Gilardi Golf Equipment – ${item.slot}`}
                           fill
                           className="about-equipment-bag-img"
                           sizes="(max-width: 680px) 72vw, (max-width: 1100px) 32vw, 320px"

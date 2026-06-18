@@ -11,6 +11,7 @@ import {
   tierPriceLine,
   type MembershipId,
 } from "@/content/goennerMemberships";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
@@ -77,8 +78,8 @@ export function GoennerPageClient() {
       <main className="subpage-shell subpage-shell--flush">
         <section className="subpage-hero about-hero goenner-hero blog-index-hero-unified">
           <Image
-            src="/brand-assets/images/mauro&friends-9.jpg"
-            alt="Mauro Gilardi auf dem Golfplatz"
+            src={seoImages.golfEvent}
+            alt={seoImageAlts.golfEvent}
             fill
             className="stage-bg about-hero-bg"
             priority

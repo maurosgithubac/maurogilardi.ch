@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { siteSponsorTiers } from "@/content/sponsorsSite";
+import { uebermichSponsorenMetadata } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
 
 const PAGE_PATH = "/ueber-mich/sponsoren";
@@ -11,10 +13,7 @@ const PAGE_PATH = "/ueber-mich/sponsoren";
 const SPONSOREN_DESCRIPTION =
   "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Sponsoren schnell.";
 
-export const metadata = {
-  title: "Sponsoren | Mauro Gilardi",
-  description: SPONSOREN_DESCRIPTION,
-};
+export const metadata = uebermichSponsorenMetadata;
 
 function SponsorCardShell({
   href,
@@ -61,8 +60,8 @@ export default function UeberMichSponsorenPage() {
       label="Über mich"
       title="Meine Sponsoren"
       lead="Hier siehst du, wer mich unterstützt — Danke an alle, die den Weg mitgehen."
-      heroSrc="/brand-assets/images/1L9A9440.JPG"
-      heroAlt="Mauro Gilardi im Turnier"
+      heroSrc={seoImages.portraitTournament}
+      heroAlt={seoImageAlts.portraitTournament}
     >
       <section className="about-sponsors-page" aria-label="Sponsoren">
         <div className="about-sponsors-page-inner">
@@ -94,7 +93,7 @@ export default function UeberMichSponsorenPage() {
                         <div className="about-sponsors-page-card-media">
                           <Image
                             src={s.imageSrc}
-                            alt=""
+                            alt={`${s.displayName} – Sponsor von Mauro Gilardi`}
                             fill
                             sizes="(max-width: 380px) 90vw, (max-width: 719px) 45vw, 28vw"
                             className="about-sponsors-page-card-img"

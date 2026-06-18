@@ -9,6 +9,7 @@ import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
 import { SiteFooterCredit } from "@/components/site-footer";
 import { socialProfiles } from "@/content/socialProfiles";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 import { PgtLiveScoringTicker } from "@/components/pgt-live-scoring-ticker";
@@ -65,8 +66,8 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
       <main className="blog-home-main subpage-shell subpage-shell--flush blog-index-shell">
         <section className="subpage-hero about-hero blog-index-hero-unified home-landing-hero" aria-label="Start">
           <Image
-            src="/brand-assets/images/1L9A8795.JPG"
-            alt="Mauro Gilardi auf dem Golfplatz"
+            src={seoImages.heroPrimary}
+            alt={seoImageAlts.heroPrimary}
             fill
             priority
             className="stage-bg about-hero-bg"
@@ -127,7 +128,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                         <Link href={`/blog/${post.slug}`} className="blog-card">
                           <div className="blog-card-media">
                             {img ? (
-                              <Image src={img} alt="" fill className="blog-card-img" sizes="(max-width: 768px) 100vw, 33vw" />
+                              <Image src={img} alt={`${post.title} – Mauro Gilardi`} fill className="blog-card-img" sizes="(max-width: 768px) 100vw, 33vw" />
                             ) : (
                               <div className="blog-card-placeholder" />
                             )}
@@ -257,7 +258,10 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
       <footer className="site-footer site-footer--on-dark">
         <div className="site-footer-inner">
           <p>
-            © {new Date().getFullYear()} {siteContent.brand.name}
+            © {new Date().getFullYear()}{" "}
+            <Link href="/ueber-mich" className="site-footer-brand-link">
+              {siteContent.brand.name}
+            </Link>
           </p>
           <p className="site-footer-links">
             <Link href="/blog">Blog</Link>

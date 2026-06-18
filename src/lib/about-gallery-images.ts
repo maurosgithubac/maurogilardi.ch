@@ -25,5 +25,6 @@ export function aboutGalleryImageSrc(filename: string): string {
 
 export function aboutGalleryAltFromFilename(filename: string): string {
   const base = filename.replace(/\.[^.]+$/i, "").replace(/[-_]+/g, " ").trim();
-  return base.length > 0 ? base : "Galeriebild";
+  if (!base.length) return "Mauro Gilardi – Galeriebild";
+  return `Mauro Gilardi – ${base}`;
 }

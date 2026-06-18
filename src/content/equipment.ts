@@ -108,7 +108,7 @@ export const equipmentTheGolfersMalans = {
     "Mit The Golfer's Malans in Malans kläre ich Schläger, Schäfte und Material — mit ehrlicher Beratung und dem Raum, Setups zu testen, bevor sie bei mir ins Bag kommen.",
     "So bleibt mein Equipment stimmig für Daten, Schwung und das Gefühl, das ich unter Druck brauche. Suchst du ein Fitting? Da bist du bei ihnen gut aufgehoben.",
   ],
-  imageSrc: "/brand-assets/images/mauro&friends-8.jpg",
+  imageSrc: "/brand-assets/images/mauro-gilardi-golf-team-switzerland.jpg",
   imageAlt: "Mauro Gilardi mit Team — Fitting und Beratung bei The Golfer's Malans",
   websiteHref: equipmentPartnerCallouts.theGolfers.href,
   websiteLabel: "TheGolfers.ch",

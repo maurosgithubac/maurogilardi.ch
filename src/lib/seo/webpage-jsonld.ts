@@ -31,7 +31,7 @@ export function homeWebPageJsonLd(description: string): Record<string, unknown> 
     "@type": "WebPage",
     "@id": `${SITE_ROOT}/#webpage`,
     url: SITE_ROOT,
-    name: "Mauro Gilardi – Schweizer Golf Professional | SwissPGA & Pro Golf Tour",
+    name: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
     description,
     inLanguage: "de-CH",
     isPartOf: { "@id": `${SITE_ROOT}/#website` },

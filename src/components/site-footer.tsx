@@ -24,7 +24,10 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer-inner">
         <p>
-          © {year} {siteContent.brand.name}
+          © {year}{" "}
+          <Link href="/ueber-mich" className="site-footer-brand-link">
+            {siteContent.brand.name}
+          </Link>
         </p>
         <p className="site-footer-links">
           <Link href="/">Home</Link>

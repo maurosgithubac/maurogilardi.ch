@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { brandLogo } from "@/lib/seo/constants";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -60,8 +61,8 @@ export default function AdminLoginPage() {
         <div className="admin-login-card">
           <Link href="/" className="admin-login-logo-link">
             <Image
-              src="/brand-assets/logos/Logo_negativ.svg"
-              alt="Mauro Gilardi"
+              src={brandLogo.path}
+              alt={brandLogo.alt}
               width={160}
               height={38}
               className="admin-brand-logo"

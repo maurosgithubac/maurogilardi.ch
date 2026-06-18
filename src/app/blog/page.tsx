@@ -4,6 +4,7 @@ import { demoPosts } from "@/content/demoPosts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { blogIndexMetadata, blogIndexSchema } from "@/lib/seo/page-metadata";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import type { PostRow } from "@/types/content";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
@@ -46,8 +47,8 @@ export default async function BlogPage() {
       <main className="subpage-shell subpage-shell--flush blog-index-shell">
         <section className="subpage-hero about-hero blog-index-hero-unified">
           <Image
-            src="/brand-assets/images/195.png"
-            alt="Mauro Gilardi im Turnier"
+            src={seoImages.tournamentAction}
+            alt={seoImageAlts.tournamentAction}
             fill
             className="stage-bg about-hero-bg"
             priority
@@ -81,7 +82,7 @@ export default async function BlogPage() {
                     <Link href={`/blog/${post.slug}`} className="blog-feed-card">
                       <div className="blog-feed-card-media">
                         {img ? (
-                          <Image src={img} alt="" fill className="blog-feed-card-img" sizes="(max-width: 720px) 100vw, 280px" />
+                          <Image src={img} alt={`${post.title} – Mauro Gilardi`} fill className="blog-feed-card-img" sizes="(max-width: 720px) 100vw, 280px" />
                         ) : (
                           <div className="blog-feed-card-placeholder" />
                         )}

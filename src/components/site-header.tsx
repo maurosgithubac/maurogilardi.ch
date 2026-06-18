@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { brandLogo } from "@/lib/seo/constants";
 
 type NavSublink = { href: string; label: string };
 
@@ -81,10 +82,10 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
       <Link href="/" className="site-header-brand">
         <span className="site-header-brand-mark">
           <Image
-            src="/brand-assets/logos/Logo_negativ.svg"
-            alt="Mauro Gilardi"
-            width={180}
-            height={44}
+            src={brandLogo.path}
+            alt={brandLogo.alt}
+            width={brandLogo.width}
+            height={brandLogo.height}
             className="site-header-logo"
             priority={variant === "overlay"}
           />

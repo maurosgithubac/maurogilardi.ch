@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) return { title: "Beitrag | Mauro Gilardi" };
 
-  const title = `${post.title} | Mauro Gilardi`;
+  const title = { absolute: `${post.title} | Mauro Gilardi` };
   const desc =
     post.description?.trim() ||
     `${post.title} – Tour-Update von Mauro Gilardi, Schweizer Golf Professional auf der Pro Golf Tour.`;
