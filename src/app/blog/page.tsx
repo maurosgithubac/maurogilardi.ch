@@ -6,6 +6,7 @@ import { blogImageUrl } from "@/lib/storage-public-url";
 import { blogIndexMetadata, blogIndexSchema } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import type { PostRow } from "@/types/content";
+import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -54,19 +55,21 @@ export default async function BlogPage() {
             priority
           />
           <div className="stage-overlay about-hero-overlay" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">Blog</p>
-            <h1>Mein Blog</h1>
-            <p className="about-hero-lead">Alles, was ich hier veröffentliche — damit du weisst, was bei mir läuft.</p>
-            <div className="about-hero-actions">
-              <Link href="/" className="about-btn about-btn-primary">
-                Home
-              </Link>
-              <a href="/#newsletter" className="about-btn about-btn-ghost">
-                Newsletter
-              </a>
-            </div>
-          </div>
+          <AboutHeroMotionCopy
+            label="Blog"
+            title="Mein Blog"
+            lead="Alles, was ich hier veröffentliche — damit du weisst, was bei mir läuft."
+            actions={
+              <>
+                <Link href="/" className="about-btn about-btn-primary">
+                  Home
+                </Link>
+                <a href="/#newsletter" className="about-btn about-btn-ghost">
+                  Newsletter
+                </a>
+              </>
+            }
+          />
         </section>
         <section className="blog-index-content" aria-label="Blogbeiträge">
           {posts.length === 0 ? (

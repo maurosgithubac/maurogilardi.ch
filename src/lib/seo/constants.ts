@@ -35,6 +35,8 @@ export const seoLogo = brandLogo;
 export const entityKeywords = [
   "Mauro Gilardi",
   "Mauro Gilardi Golf",
+  "Gilardi Golf",
+  "GilardiGolf",
   "Schweizer Golfprofi",
   "Swiss PGA Professional",
   "Professional Golfer",
@@ -46,6 +48,8 @@ export const entityKeywords = [
   "Golf Event Schweiz",
   "Pro Golf Tour",
   "Golf Professional Graubünden",
+  "Golf Graubünden",
+  "Golf Schweiz",
   "Golf Coach Graubünden",
 ] as const;
 

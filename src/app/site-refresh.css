@@ -1,0 +1,284 @@
+/**
+ * Taste-skill + Impeccable polish layer.
+ * Motion craft, scroll reveals (CSS fallback), brand styling preserved.
+ */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --press-duration: 140ms;
+  --ui-duration: 220ms;
+}
+
+/* ——— CSS scroll reveals (server pages + fallback) ——— */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .about-story,
+    .about-projects,
+    .blog-index-content,
+    .erfolge-timeline-section,
+    .about-faq-page,
+    .about-gallery-page,
+    .about-equipment-page,
+    .about-sponsors-page,
+    .about-media-page,
+    .legal-document-section,
+    .goenner-supporters-section {
+      animation: section-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
+    }
+
+    .about-project-card,
+    .legal-document-section {
+      animation: section-enter-subtle linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 28%;
+    }
+  }
+}
+
+@keyframes section-enter {
+  from {
+    opacity: 0.88;
+    transform: translateY(28px);
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes section-enter-subtle {
+  from {
+    opacity: 0.92;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ——— Header glass ——— */
+.site-header {
+  transition:
+    background var(--ui-duration) var(--ease-out-strong),
+    border-color var(--ui-duration) var(--ease-out-strong),
+    box-shadow var(--ui-duration) var(--ease-out-strong);
+}
+
+.site-header--overlay {
+  -webkit-backdrop-filter: blur(22px) saturate(1.18);
+  backdrop-filter: blur(22px) saturate(1.18);
+}
+
+.site-header--overlay-solid {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 70%) inset,
+    0 12px 40px rgb(23 21 19 / 7%);
+}
+
+@media (min-width: 681px) {
+  .site-header-nav-dropdown-panel {
+    transform-origin: top center;
+    transition:
+      opacity 180ms var(--ease-out-strong),
+      visibility 180ms var(--ease-out-strong),
+      transform 180ms var(--ease-out-strong);
+  }
+
+  .site-header-nav-dropdown:hover .site-header-nav-dropdown-panel,
+  .site-header-nav-dropdown:focus-within .site-header-nav-dropdown-panel {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.site-header-nav-link {
+  transition:
+    background var(--ui-duration) ease,
+    color var(--ui-duration) ease,
+    border-color var(--ui-duration) ease,
+    box-shadow var(--ui-duration) var(--ease-out-strong),
+    transform var(--press-duration) var(--ease-out-strong);
+}
+
+.site-header-nav-link:active {
+  transform: scale(0.97);
+}
+
+/* ——— Buttons: snappy press, keep lift & glow ——— */
+.about-btn,
+.blog-btn,
+.blog-latest-cta,
+.pgt-events-toggle,
+.cookie-consent-btn {
+  transition:
+    transform var(--press-duration) var(--ease-out-strong),
+    box-shadow var(--ui-duration) var(--ease-out-strong),
+    background var(--ui-duration) ease,
+    border-color var(--ui-duration) ease,
+    color var(--ui-duration) ease;
+}
+
+.about-btn-primary:hover,
+.blog-btn-primary:hover,
+.blog-latest-cta:hover {
+  transform: translateY(-2px);
+}
+
+.about-btn:active,
+.blog-btn:active,
+.blog-latest-cta:active,
+.pgt-events-toggle:active,
+.cookie-consent-btn:active {
+  transform: scale(0.97);
+}
+
+.about-btn-primary:active,
+.blog-btn-primary:active,
+.blog-latest-cta:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 16px rgb(215 25 32 / 22%);
+}
+
+/* ——— Cards: refined lift, no flat hover ——— */
+.blog-card,
+.pgt-events-card {
+  transition:
+    transform var(--ui-duration) var(--ease-out-strong),
+    box-shadow var(--ui-duration) var(--ease-out-strong),
+    border-color var(--ui-duration) ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+}
+
+.blog-card-img {
+  transition: transform 0.4s var(--ease-out-strong);
+}
+
+.blog-card:hover .blog-card-img {
+  transform: scale(1.035);
+}
+
+/* ——— Hero typography (Impeccable: tracking floor -0.04em) ——— */
+.about-hero-copy h1 {
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.about-hero-lead,
+.blog-latest-sub,
+.pgt-events-sub {
+  text-wrap: pretty;
+}
+
+/* ——— Cards: border OR shadow, not both heavy (Impeccable) ——— */
+.blog-card {
+  box-shadow: none;
+}
+
+.blog-card:hover {
+  box-shadow: 0 8px 28px rgb(23 21 19 / 8%);
+}
+
+.pgt-events-card {
+  box-shadow: none;
+}
+
+.pgt-events-card:hover {
+  box-shadow: 0 6px 20px rgb(23 21 19 / 6%);
+}
+
+/* ——— Section rhythm ——— */
+.blog-latest,
+.pgt-events,
+.blog-newsletter,
+.about-story,
+.about-projects,
+.goenner-memberships,
+.goenner-form-section {
+  scroll-margin-top: 5rem;
+}
+
+/* ——— Hero: crisper type ——— */
+.blog-newsletter-inner {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 10%) inset,
+    0 0 0 1px rgb(255 255 255 / 6%),
+    0 24px 64px rgb(23 21 19 / 28%);
+}
+
+.blog-newsletter-form input {
+  transition:
+    border-color var(--ui-duration) ease,
+    box-shadow var(--ui-duration) var(--ease-out-strong);
+}
+
+.blog-newsletter-form input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(215 25 32 / 20%);
+}
+
+/* ——— Forms ——— */
+.goenner-label input,
+.goenner-label textarea {
+  transition:
+    border-color var(--ui-duration) ease,
+    box-shadow var(--ui-duration) var(--ease-out-strong);
+}
+
+.goenner-label input:focus-visible,
+.goenner-label textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(215 25 32 / 14%);
+}
+
+/* ——— Cookie banner ——— */
+.cookie-consent-inner {
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  backdrop-filter: blur(16px) saturate(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-story,
+  .about-projects,
+  .blog-index-content,
+  .erfolge-timeline-section,
+  .about-faq-page,
+  .about-gallery-page,
+  .about-equipment-page,
+  .about-sponsors-page,
+  .about-media-page,
+  .legal-document-section,
+  .goenner-supporters-section,
+  .about-project-card {
+    animation: none !important;
+  }
+
+  .about-btn,
+  .blog-btn,
+  .blog-latest-cta,
+  .site-header-nav-link,
+  .blog-card,
+  .blog-card-img,
+  .pgt-events-card {
+    transition: none !important;
+  }
+
+  .about-btn:active,
+  .blog-btn:active,
+  .blog-latest-cta:active,
+  .site-header-nav-link:active,
+  .blog-card:hover,
+  .blog-card:hover .blog-card-img {
+    transform: none;
+  }
+}

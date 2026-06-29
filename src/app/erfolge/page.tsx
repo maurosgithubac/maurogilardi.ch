@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
 import {
   ErfolgeTimeline,
   type ErfolgeTimelineEntry,
@@ -161,21 +162,21 @@ export default function ErfolgePage() {
             priority
           />
           <div className="stage-overlay about-hero-overlay" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">Erfolge</p>
-            <h1>So bin ich bis hierhin gekommen.</h1>
-            <p className="about-hero-lead">
-              Von den ersten Schlägen bis zur Tour — hier siehst du die Stationen, die für mich zählen.
-            </p>
-            <div className="about-hero-actions">
-              <Link href="/blog" className="about-btn about-btn-primary">
-                Zum Blog
-              </Link>
-              <Link href="/sponsoring" className="about-btn about-btn-ghost">
-                Sponsoring
-              </Link>
-            </div>
-          </div>
+          <AboutHeroMotionCopy
+            label="Erfolge"
+            title="So bin ich bis hierhin gekommen."
+            lead="Von den ersten Schlägen bis zur Tour — hier siehst du die Stationen, die für mich zählen."
+            actions={
+              <>
+                <Link href="/blog" className="about-btn about-btn-primary">
+                  Zum Blog
+                </Link>
+                <Link href="/sponsoring" className="about-btn about-btn-ghost">
+                  Sponsoring
+                </Link>
+              </>
+            }
+          />
         </section>
 
         <section className="erfolge-timeline-section" aria-labelledby="erfolge-timeline-title">

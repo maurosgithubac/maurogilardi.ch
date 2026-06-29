@@ -15,6 +15,12 @@ import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 import { PgtLiveScoringTicker } from "@/components/pgt-live-scoring-ticker";
 import {
+  HeroCopyReveal,
+  HeroRevealItem,
+  RevealItem,
+  SectionReveal,
+} from "@/components/motion/scroll-reveal";
+import {
   formatPgtEventDateRange,
   livescoringLinkForEvent,
   type PgtSeasonEvent,
@@ -75,32 +81,42 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             sizes="100vw"
           />
           <div className="stage-overlay about-hero-overlay" aria-hidden="true" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">{siteContent.brand.role}</p>
-            <h1>{siteContent.brand.homepageH1}</h1>
-            <p className="about-hero-lead about-hero-lead--welcome">Willkommen — hier folgst du mir auf der Tour.</p>
-            <p className="about-hero-lead">{siteContent.brand.intro}</p>
-            <div className="about-hero-actions">
-              <Link href="/blog" className="about-btn about-btn-primary">
-                Zu meinen Beiträgen
-              </Link>
-              <a href="#newsletter" className="about-btn about-btn-ghost">
-                Newsletter
-              </a>
-            </div>
-          </div>
+          <HeroCopyReveal className="subpage-copy about-hero-copy">
+            <HeroRevealItem>
+              <p className="label about-hero-label">{siteContent.brand.role}</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <h1>{siteContent.brand.homepageH1}</h1>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <p className="about-hero-lead about-hero-lead--welcome">Willkommen — hier folgst du mir auf der Tour.</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <p className="about-hero-lead">{siteContent.brand.intro}</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <div className="about-hero-actions">
+                <Link href="/blog" className="about-btn about-btn-primary">
+                  Zu meinen Beiträgen
+                </Link>
+                <a href="#newsletter" className="about-btn about-btn-ghost">
+                  Newsletter
+                </a>
+              </div>
+            </HeroRevealItem>
+          </HeroCopyReveal>
         </section>
 
         {marqueeSponsors.length > 0 && (
-          <section className="blog-sponsors" aria-label="Sponsoren">
+          <SectionReveal className="blog-sponsors" aria-label="Sponsoren">
             <p className="blog-sponsors-label">
               <span>Meine Sponsoren</span>
             </p>
             <ClientMarquee sponsors={marqueeSponsors} />
-          </section>
+          </SectionReveal>
         )}
 
-        <section className="blog-latest">
+        <SectionReveal className="blog-latest">
           <div className="blog-latest-head">
             <div className="blog-latest-head-text">
               <h2>Beiträge</h2>
@@ -122,10 +138,10 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                   className="blog-grid blog-grid--one-row"
                   aria-label="Neueste Beiträge, seitlich wischbar"
                 >
-                  {posts.map((post) => {
+                  {posts.map((post, postIndex) => {
                     const img = post.image_url;
                     return (
-                      <li key={post.id}>
+                      <RevealItem key={post.id} index={postIndex}>
                         <Link href={`/blog/${post.slug}`} className="blog-card">
                           <div className="blog-card-media">
                             {img ? (
@@ -140,7 +156,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                             {post.description ? <p>{post.description}</p> : null}
                           </div>
                         </Link>
-                      </li>
+                      </RevealItem>
                     );
                   })}
                 </ul>
@@ -155,9 +171,9 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               ) : null}
             </>
           )}
-        </section>
+        </SectionReveal>
 
-        <section id="pgt-events" className="pgt-events" aria-labelledby="pgt-events-heading">
+        <SectionReveal id="pgt-events" className="pgt-events" aria-labelledby="pgt-events-heading">
           <div className="pgt-events-head">
             <div>
               <h2 id="pgt-events-heading">Meine nächsten Termine</h2>
@@ -180,8 +196,8 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                 nach, falls du alle Termine sehen willst.
               </li>
             ) : (
-              (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 3)).map((ev) => (
-                <li key={ev.id} className="pgt-events-card">
+              (showAllEvents ? upcomingPgtEvents : upcomingPgtEvents.slice(0, 3)).map((ev, eventIndex) => (
+                <RevealItem key={ev.id} className="pgt-events-card" index={eventIndex}>
                   <h3 className="pgt-events-card-title">{ev.name}</h3>
                   <p className="pgt-events-card-meta">
                     <time dateTime={ev.start}>{formatPgtEventDateRange(ev)}</time>
@@ -203,7 +219,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                       </>
                     ) : null}
                   </p>
-                </li>
+                </RevealItem>
               ))
             )}
           </ul>
@@ -231,9 +247,9 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
             </a>
             .
           </p>
-        </section>
+        </SectionReveal>
 
-        <section id="newsletter" className="blog-newsletter">
+        <SectionReveal id="newsletter" className="blog-newsletter">
           <div className="blog-newsletter-inner">
             <p className="blog-newsletter-kicker">Für dich</p>
             <h2>Newsletter</h2>
@@ -253,7 +269,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               </p>
             )}
           </div>
-        </section>
+        </SectionReveal>
       </main>
 
       <footer className="site-footer site-footer--on-dark">

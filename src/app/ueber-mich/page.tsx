@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
+import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
 import { AboutSubnav } from "@/components/about-subnav";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
@@ -29,23 +30,27 @@ export default function UeberMichPage() {
             priority
           />
           <div className="stage-overlay about-hero-overlay" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">Über mich</p>
-            <h1>Mauro Gilardi – Schweizer Golf Professional aus Graubünden</h1>
-            <p className="about-hero-lead">
-              <strong>Karriere wie ein Unternehmen.</strong>{" "}
-              Leistungssport, Unternehmertum und klare Strukturen verbinden sich zu einem Weg mit einem Ziel:
-              langfristiger Erfolg im Golf - und darüber hinaus.
-            </p>
-            <div className="about-hero-actions">
-              <Link href="/blog" className="about-btn about-btn-primary">
-                Zum Blog
-              </Link>
-              <Link href="/sponsoring" className="about-btn about-btn-ghost">
-                Sponsoring
-              </Link>
-            </div>
-          </div>
+          <AboutHeroMotionCopy
+            label="Über mich"
+            title="Mauro Gilardi – Schweizer Golf Professional aus Graubünden"
+            lead={
+              <>
+                <strong>Karriere wie ein Unternehmen.</strong>{" "}
+                Leistungssport, Unternehmertum und klare Strukturen verbinden sich zu einem Weg mit einem Ziel:
+                langfristiger Erfolg im Golf - und darüber hinaus.
+              </>
+            }
+            actions={
+              <>
+                <Link href="/blog" className="about-btn about-btn-primary">
+                  Zum Blog
+                </Link>
+                <Link href="/sponsoring" className="about-btn about-btn-ghost">
+                  Sponsoring
+                </Link>
+              </>
+            }
+          />
         </section>
 
         <AboutSubnav />

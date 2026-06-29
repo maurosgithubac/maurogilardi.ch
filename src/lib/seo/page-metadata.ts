@@ -6,15 +6,16 @@ import {
   seoOgImages,
   seoTwitterImages,
 } from "@/lib/seo/constants";
+import { seoPageTitles, seoSiteName } from "@/lib/seo/titles";
 
 /** Individuelle Metadata + JSON-LD-Objekte pro Hauptseite */
 
 export const HOME_PAGE_DESCRIPTION =
-  "Swiss PGA Professional Mauro Gilardi. Schweizer Golfprofi, Spitzensportler, Playing Professional, Golf Coach, Referent und Gastgeber exklusiver Golf Experiences.";
+  "Gilardi Golf – Mauro Gilardi, Swiss PGA Professional und Schweizer Golfprofi aus Graubünden. Playing Professional, Golf Coach und Tour-Spieler auf der Pro Golf Tour.";
 
 export const homePageMetadata: Metadata = {
   title: {
-    absolute: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    absolute: seoPageTitles.home,
   },
   description: HOME_PAGE_DESCRIPTION,
   alternates: {
@@ -22,6 +23,7 @@ export const homePageMetadata: Metadata = {
   },
   keywords: [
     "Mauro Gilardi",
+    "Gilardi Golf",
     "Mauro Gilardi Golf",
     "Swiss PGA Professional",
     "Schweizer Golfprofi",
@@ -35,14 +37,14 @@ export const homePageMetadata: Metadata = {
     type: "website",
     locale: "de_CH",
     url: SITE_URL,
-    siteName: "Mauro Gilardi | Swiss PGA Professional",
-    title: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    siteName: seoSiteName,
+    title: seoPageTitles.home,
     description: HOME_PAGE_DESCRIPTION,
     images: seoOgImages(seoImages.heroPrimary, seoImageAlts.heroPrimary),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    title: seoPageTitles.home,
     description: HOME_PAGE_DESCRIPTION,
     images: seoTwitterImages(seoImages.heroPrimary),
   },
@@ -50,7 +52,7 @@ export const homePageMetadata: Metadata = {
 
 export const uebermichMetadata: Metadata = {
   title: {
-    absolute: "Mauro Gilardi | Schweizer Golfprofi & Spitzensportler",
+    absolute: seoPageTitles.ueberMich,
   },
   description:
     "Mauro Gilardi – Swiss PGA Professional und Schweizer Spitzensportler aus Graubünden. Playing Professional auf der Pro Golf Tour, Mitglied im Swiss Golf Team.",
@@ -61,14 +63,16 @@ export const uebermichMetadata: Metadata = {
     "Swiss PGA Professional",
     "Playing Professional",
     "Swiss Golf Team",
+    "Gilardi Golf",
+    "Golf Graubünden",
+    "Golf Schweiz",
     "Golf Professional Graubünden",
-    "Pro Golf Tour Spieler",
   ],
   alternates: {
     canonical: `${SITE_URL}/ueber-mich`,
   },
   openGraph: {
-    title: "Mauro Gilardi | Schweizer Golfprofi & Spitzensportler",
+    title: seoPageTitles.ueberMich,
     description:
       "Swiss PGA Professional, Playing Professional und Swiss Golf Team Spieler aus Graubünden – Karriere, Projekte und Werdegang.",
     url: `${SITE_URL}/ueber-mich`,
@@ -76,7 +80,7 @@ export const uebermichMetadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mauro Gilardi | Schweizer Golfprofi & Spitzensportler",
+    title: seoPageTitles.ueberMich,
     description:
       "Swiss PGA Professional, Playing Professional und Swiss Golf Team Spieler aus Graubünden.",
     images: seoTwitterImages(seoImages.portraitTournament),
@@ -103,12 +107,12 @@ export const uebermichSchema = {
 
 export const blogIndexMetadata: Metadata = {
   title: {
-    absolute: "Blog | Mauro Gilardi – Tour-Updates & Turnierberichte",
+    absolute: seoPageTitles.blog,
   },
   description:
     "Tour-Updates vom Schweizer Golfprofi Mauro Gilardi. Turnierberichte, Training und Einblicke als Playing Professional auf der Pro Golf Tour – direkt von der Tour.",
   keywords: [
-    "Mauro Gilardi Blog",
+    "Gilardi Golf Blog",
     "Golf Blog Schweiz",
     "Pro Golf Tour Berichte",
     "Schweizer Golfprofi Blog",
@@ -120,7 +124,7 @@ export const blogIndexMetadata: Metadata = {
     canonical: `${SITE_URL}/blog`,
   },
   openGraph: {
-    title: "Blog | Mauro Gilardi – Tour-Updates & Turnierberichte",
+    title: seoPageTitles.blog,
     description:
       "Turnierberichte und Einblicke vom Schweizer Golfprofi Mauro Gilardi auf der Pro Golf Tour.",
     url: `${SITE_URL}/blog`,
@@ -128,7 +132,7 @@ export const blogIndexMetadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Blog | Mauro Gilardi – Tour-Updates & Turnierberichte",
+    title: seoPageTitles.blog,
     description: "Turnierberichte vom Schweizer Golfprofi Mauro Gilardi auf der Pro Golf Tour.",
     images: seoTwitterImages(seoImages.tournamentAction),
   },
@@ -138,7 +142,7 @@ export const blogIndexSchema = {
   "@context": "https://schema.org",
   "@type": "Blog",
   "@id": `${SITE_URL}/blog`,
-  name: "Mauro Gilardi – Golf Pro Blog",
+  name: "Gilardi Golf Blog – Mauro Gilardi Pro Golf Tour",
   description:
     "Tour-Updates, Turnierberichte und Training-Einblicke vom Schweizer Golf Professional Mauro Gilardi",
   url: `${SITE_URL}/blog`,
@@ -154,7 +158,7 @@ export const blogIndexSchema = {
 
 export const erfolgeMetadata: Metadata = {
   title: {
-    absolute: "Erfolge | Mauro Gilardi – Pro Golf Tour & Karriere",
+    absolute: seoPageTitles.erfolge,
   },
   description:
     "Turnierergebnisse und Karriere-Meilensteine von Mauro Gilardi. Schweizer Golfprofi, Swiss PGA Professional und Playing Professional auf der Pro Golf Tour.",
@@ -170,7 +174,7 @@ export const erfolgeMetadata: Metadata = {
     canonical: `${SITE_URL}/erfolge`,
   },
   openGraph: {
-    title: "Erfolge | Mauro Gilardi – Pro Golf Tour & Karriere",
+    title: seoPageTitles.erfolge,
     description:
       "Karriere und Turnierergebnisse von Mauro Gilardi – Swiss PGA Professional und Playing Professional.",
     url: `${SITE_URL}/erfolge`,
@@ -178,7 +182,7 @@ export const erfolgeMetadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Erfolge | Mauro Gilardi – Pro Golf Tour & Karriere",
+    title: seoPageTitles.erfolge,
     description: "Turnierergebnisse und Karriere von Mauro Gilardi, Swiss PGA Professional.",
     images: seoTwitterImages(seoImages.progolfTour),
   },
@@ -206,12 +210,12 @@ export const erfolgeSchema = {
 
 export const sponsoringMetadataSeo: Metadata = {
   title: {
-    absolute: "Partner & Sponsoring | Mauro Gilardi Golf",
+    absolute: seoPageTitles.sponsoring,
   },
   description:
     "Partner und Sponsoring für Mauro Gilardi, Swiss PGA Professional und Schweizer Spitzensportler. Sichtbarkeit auf internationaler Bühne mit einem Playing Professional.",
   keywords: [
-    "Mauro Gilardi Sponsoring",
+    "Gilardi Golf Sponsoring",
     "Partner Golf Schweiz",
     "Golf Sponsoring Schweiz",
     "Swiss PGA Sponsoring",
@@ -223,7 +227,7 @@ export const sponsoringMetadataSeo: Metadata = {
     canonical: `${SITE_URL}/sponsoring`,
   },
   openGraph: {
-    title: "Partner & Sponsoring | Mauro Gilardi Golf",
+    title: seoPageTitles.sponsoring,
     description:
       "Unterstütze Mauro Gilardi – Swiss PGA Professional, Playing Professional und Swiss Golf Team Spieler.",
     url: `${SITE_URL}/sponsoring`,
@@ -231,7 +235,7 @@ export const sponsoringMetadataSeo: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Partner & Sponsoring | Mauro Gilardi Golf",
+    title: seoPageTitles.sponsoring,
     description: "Sponsoring und Partnerschaften mit Mauro Gilardi, Swiss PGA Professional.",
     images: seoTwitterImages(seoImages.golfEvent),
   },
@@ -251,7 +255,7 @@ export const sponsoringSchema = {
 
 export const uebermichFaqMetadata: Metadata = {
   title: {
-    absolute: "FAQ | Mauro Gilardi – Swiss PGA & Pro Golf Tour",
+    absolute: seoPageTitles.faq,
   },
   description:
     "FAQ zu Mauro Gilardi: Pro Golf Tour, Swiss PGA, Swiss Golf Team, Playing Professional, Rankings und Gönnervereinigung – kompakt beantwortet.",
@@ -267,14 +271,14 @@ export const uebermichFaqMetadata: Metadata = {
     canonical: `${SITE_URL}/ueber-mich/faq`,
   },
   openGraph: {
-    title: "FAQ | Mauro Gilardi – Swiss PGA & Pro Golf Tour",
+    title: seoPageTitles.faq,
     description: "Antworten zu Touren, Swiss PGA, Swiss Golf und Rankings von Mauro Gilardi.",
     url: `${SITE_URL}/ueber-mich/faq`,
     images: seoOgImages(seoImages.heroPrimary, seoImageAlts.heroPrimary),
   },
   twitter: {
     card: "summary_large_image",
-    title: "FAQ | Mauro Gilardi – Swiss PGA & Pro Golf Tour",
+    title: seoPageTitles.faq,
     description: "FAQ zu Pro Golf Tour, Swiss PGA und Swiss Golf Team.",
     images: seoTwitterImages(seoImages.heroPrimary),
   },
@@ -282,7 +286,7 @@ export const uebermichFaqMetadata: Metadata = {
 
 export const uebermichSponsorenMetadata: Metadata = {
   title: {
-    absolute: "Sponsoren | Mauro Gilardi – Swiss PGA Professional",
+    absolute: seoPageTitles.sponsoren,
   },
   description:
     "Sponsoren und Partner von Mauro Gilardi, Swiss PGA Professional und Schweizer Golfprofi. Netzwerk aus Unternehmen und Gönnern, die den Weg unterstützen.",
@@ -290,21 +294,21 @@ export const uebermichSponsorenMetadata: Metadata = {
     canonical: `${SITE_URL}/ueber-mich/sponsoren`,
   },
   openGraph: {
-    title: "Sponsoren | Mauro Gilardi – Swiss PGA Professional",
+    title: seoPageTitles.sponsoren,
     description: "Partner und Sponsoren von Mauro Gilardi, Swiss PGA Professional.",
     url: `${SITE_URL}/ueber-mich/sponsoren`,
     images: seoOgImages(seoImages.portraitTournament, seoImageAlts.portraitTournament),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sponsoren | Mauro Gilardi – Swiss PGA Professional",
+    title: seoPageTitles.sponsoren,
     images: seoTwitterImages(seoImages.portraitTournament),
   },
 };
 
 export const uebermichGallerieMetadata: Metadata = {
   title: {
-    absolute: "Galerie | Mauro Gilardi – Golfprofi Schweiz",
+    absolute: seoPageTitles.gallerie,
   },
   description:
     "Galerie von Mauro Gilardi, Swiss PGA Professional. Impressionen von der Pro Golf Tour, Training und Golf Events in der Schweiz.",
@@ -312,21 +316,21 @@ export const uebermichGallerieMetadata: Metadata = {
     canonical: `${SITE_URL}/ueber-mich/gallerie`,
   },
   openGraph: {
-    title: "Galerie | Mauro Gilardi – Golfprofi Schweiz",
+    title: seoPageTitles.gallerie,
     description: "Bilder von Tour, Training und Events – Mauro Gilardi, Schweizer Golfprofi.",
     url: `${SITE_URL}/ueber-mich/gallerie`,
     images: seoOgImages(seoImages.golfEvent, seoImageAlts.golfEvent),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Galerie | Mauro Gilardi – Golfprofi Schweiz",
+    title: seoPageTitles.gallerie,
     images: seoTwitterImages(seoImages.golfEvent),
   },
 };
 
 export const uebermichMediaMetadata: Metadata = {
   title: {
-    absolute: "Medien | Mauro Gilardi – Presse & Interviews",
+    absolute: seoPageTitles.media,
   },
   description:
     "Mauro Gilardi in den Medien: Presseberichte, Interviews und Auftritte des Swiss PGA Professionals und Schweizer Spitzensportlers.",
@@ -334,21 +338,21 @@ export const uebermichMediaMetadata: Metadata = {
     canonical: `${SITE_URL}/ueber-mich/media`,
   },
   openGraph: {
-    title: "Medien | Mauro Gilardi – Presse & Interviews",
+    title: seoPageTitles.media,
     description: "Presse und Medien über Mauro Gilardi, Swiss PGA Professional.",
     url: `${SITE_URL}/ueber-mich/media`,
     images: seoOgImages(seoImages.tournamentAction, seoImageAlts.tournamentAction),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Medien | Mauro Gilardi – Presse & Interviews",
+    title: seoPageTitles.media,
     images: seoTwitterImages(seoImages.tournamentAction),
   },
 };
 
 export const uebermichEquipmentMetadata: Metadata = {
   title: {
-    absolute: "Mein Bag | Mauro Gilardi – Equipment Swiss PGA Pro",
+    absolute: seoPageTitles.equipment,
   },
   description:
     "Equipment und Schläger im Bag von Mauro Gilardi, Swiss PGA Professional und Playing Professional. Driver, Eisen, Wedges und Putter auf der Pro Golf Tour.",
@@ -356,21 +360,21 @@ export const uebermichEquipmentMetadata: Metadata = {
     canonical: `${SITE_URL}/ueber-mich/equipment`,
   },
   openGraph: {
-    title: "Mein Bag | Mauro Gilardi – Equipment Swiss PGA Pro",
+    title: seoPageTitles.equipment,
     description: "Schläger und Equipment von Mauro Gilardi, Swiss PGA Professional.",
     url: `${SITE_URL}/ueber-mich/equipment`,
     images: seoOgImages(seoImages.golfTeam, seoImageAlts.golfTeam),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mein Bag | Mauro Gilardi – Equipment Swiss PGA Pro",
+    title: seoPageTitles.equipment,
     images: seoTwitterImages(seoImages.golfTeam),
   },
 };
 
 export const impressumMetadata: Metadata = {
   title: {
-    absolute: "Impressum | Mauro Gilardi – Swiss PGA Professional",
+    absolute: seoPageTitles.impressum,
   },
   description:
     "Impressum und Kontakt zu maurogilardi.ch — Verantwortliche Stelle, Haftung und Hosting-Angaben von Mauro Gilardi, Swiss PGA Professional.",
@@ -378,7 +382,7 @@ export const impressumMetadata: Metadata = {
     canonical: `${SITE_URL}/impressum`,
   },
   openGraph: {
-    title: "Impressum | Mauro Gilardi",
+    title: seoPageTitles.impressum,
     description: "Impressum und Kontakt zu maurogilardi.ch",
     url: `${SITE_URL}/impressum`,
   },
@@ -387,7 +391,7 @@ export const impressumMetadata: Metadata = {
 
 export const datenschutzMetadata: Metadata = {
   title: {
-    absolute: "Datenschutz | Mauro Gilardi – maurogilardi.ch",
+    absolute: seoPageTitles.datenschutz,
   },
   description:
     "Datenschutzerklärung für maurogilardi.ch: Newsletter, Kontaktformulare, Cookies und deine Rechte gemäss DSG/DSGVO.",
@@ -395,7 +399,7 @@ export const datenschutzMetadata: Metadata = {
     canonical: `${SITE_URL}/datenschutz`,
   },
   openGraph: {
-    title: "Datenschutz | Mauro Gilardi",
+    title: seoPageTitles.datenschutz,
     description: "Datenschutzerklärung und Cookie-Hinweise für maurogilardi.ch",
     url: `${SITE_URL}/datenschutz`,
   },

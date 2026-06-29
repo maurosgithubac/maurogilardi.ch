@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AboutSubnav } from "@/components/about-subnav";
+import { HeroCopyReveal, HeroRevealItem } from "@/components/motion/scroll-reveal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
@@ -34,19 +35,27 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
             priority
           />
           <div className="stage-overlay about-hero-overlay" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">{label}</p>
-            <h1>{title}</h1>
-            <p className="about-hero-lead">{lead}</p>
-            <div className="about-hero-actions">
-              <Link href="/ueber-mich" className="about-btn about-btn-ghost">
-                Über mich
-              </Link>
-              <Link href="/" className="about-btn about-btn-primary">
-                Home
-              </Link>
-            </div>
-          </div>
+          <HeroCopyReveal className="subpage-copy about-hero-copy">
+            <HeroRevealItem>
+              <p className="label about-hero-label">{label}</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <h1>{title}</h1>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <p className="about-hero-lead">{lead}</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <div className="about-hero-actions">
+                <Link href="/ueber-mich" className="about-btn about-btn-ghost">
+                  Über mich
+                </Link>
+                <Link href="/" className="about-btn about-btn-primary">
+                  Home
+                </Link>
+              </div>
+            </HeroRevealItem>
+          </HeroCopyReveal>
         </section>
 
         <AboutSubnav />

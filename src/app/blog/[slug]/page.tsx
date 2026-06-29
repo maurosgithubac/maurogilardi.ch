@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { SITE_URL } from "@/lib/seo/constants";
+import { buildSeoTitle } from "@/lib/seo/build-seo-title";
+import { seoPageTitles } from "@/lib/seo/titles";
 import { findDemoPostBySlug } from "@/content/demoPosts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
@@ -40,13 +43,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  if (!post) return { title: "Beitrag | Mauro Gilardi" };
+  if (!post) return { title: { absolute: seoPageTitles.blogFallback } };
 
-  const title = { absolute: `${post.title} | Mauro Gilardi` };
+  const seoTitle = buildSeoTitle(post.title);
+  const title = { absolute: seoTitle };
   const desc =
     post.description?.trim() ||
-    `${post.title} – Tour-Update von Mauro Gilardi, Schweizer Golf Professional auf der Pro Golf Tour.`;
-  const canonical = `https://www.maurogilardi.ch/blog/${slug}`;
+    `${post.title} – Tour-Update von Mauro Gilardi (Gilardi Golf), Schweizer Golf Professional auf der Pro Golf Tour.`;
+  const canonical = `${SITE_URL}/blog/${slug}`;
   const img = blogImageUrl(post.image_path);
 
   return {
@@ -58,21 +62,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       "Schweizer Golf Professional",
       "Pro Golf Tour",
       "SwissPGA",
-      "Golf Schweiz",
+      "Gilardi Golf",
+      "Golf Graubünden",
     ],
     alternates: { canonical },
     openGraph: {
       type: "article",
-      title: post.title,
+      title: seoTitle,
       description: desc,
       url: canonical,
       publishedTime: post.created_at,
-      authors: ["https://www.maurogilardi.ch/#mauro-gilardi"],
-      images: img ? [{ url: img, alt: `${post.title} – Mauro Gilardi` }] : undefined,
+      authors: [`${SITE_URL}/#mauro-gilardi`],
+      images: img ? [{ url: img, alt: `${post.title} – Mauro Gilardi Gilardi Golf` }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: seoTitle,
       description: desc,
       images: img ? [img] : undefined,
     },

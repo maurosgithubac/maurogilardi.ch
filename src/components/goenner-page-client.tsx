@@ -14,6 +14,7 @@ import {
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { HeroCopyReveal, HeroRevealItem, SectionReveal } from "@/components/motion/scroll-reveal";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 
 export function GoennerPageClient() {
@@ -85,26 +86,34 @@ export function GoennerPageClient() {
             priority
           />
           <div className="stage-overlay about-hero-overlay" />
-          <div className="subpage-copy about-hero-copy">
-            <p className="label about-hero-label">Sponsoring</p>
-            <h1>Werde Teil meines Teams.</h1>
-            <p className="about-hero-lead">
-              Mitgliedschaft als Birdie, Eagle oder Albatros — oder Sponsoring mit{" "}
-              <strong>Mindestbetrag ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr. Unten
-              siehst du, was jeweils dabei ist. Ich freue mich auf deine Anfrage.
-            </p>
-            <div className="about-hero-actions">
-              <a href="#sponsoring-form-title" className="about-btn about-btn-primary">
-                Anfrage senden
-              </a>
-              <Link href="/ueber-mich" className="about-btn about-btn-ghost">
-                Über mich
-              </Link>
-            </div>
-          </div>
+          <HeroCopyReveal className="subpage-copy about-hero-copy">
+            <HeroRevealItem>
+              <p className="label about-hero-label">Sponsoring</p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <h1>Werde Teil meines Teams.</h1>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <p className="about-hero-lead">
+                Mitgliedschaft als Birdie, Eagle oder Albatros — oder Sponsoring mit{" "}
+                <strong>Mindestbetrag ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr. Unten
+                siehst du, was jeweils dabei ist. Ich freue mich auf deine Anfrage.
+              </p>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <div className="about-hero-actions">
+                <a href="#sponsoring-form-title" className="about-btn about-btn-primary">
+                  Anfrage senden
+                </a>
+                <Link href="/ueber-mich" className="about-btn about-btn-ghost">
+                  Über mich
+                </Link>
+              </div>
+            </HeroRevealItem>
+          </HeroCopyReveal>
         </section>
 
-        <section className="goenner-memberships" aria-labelledby="goenner-memberships-title">
+        <SectionReveal className="goenner-memberships" aria-labelledby="goenner-memberships-title">
           <header className="goenner-memberships-head">
             <p className="goenner-memberships-kicker">Mitgliedschaft &amp; Sponsoring</p>
             <h2 id="goenner-memberships-title">Das passende Modell für deine Unterstützung</h2>
@@ -154,17 +163,17 @@ export function GoennerPageClient() {
             </div>
             {goennerMembershipTiers.length > 1 ? <SwipeStripHint /> : null}
           </div>
-        </section>
+        </SectionReveal>
 
-        <section className="goenner-trust" aria-label="Zusätzliche Informationen">
+        <SectionReveal className="goenner-trust" aria-label="Zusätzliche Informationen">
           <ul className="goenner-trust-list">
             <li>Du schreibst mir direkt — ohne Umwege.</li>
             <li>Details und Termine klären wir persönlich.</li>
             <li>Ich halte dich ehrlich auf dem Laufenden.</li>
           </ul>
-        </section>
+        </SectionReveal>
 
-        <section className="goenner-form-section" aria-labelledby="sponsoring-form-title">
+        <SectionReveal className="goenner-form-section" aria-labelledby="sponsoring-form-title">
           <div className="goenner-form-section-head">
             <p className="goenner-form-kicker">Kontakt</p>
             <h2 id="sponsoring-form-title" className="goenner-form-heading">
@@ -253,9 +262,9 @@ export function GoennerPageClient() {
             </button>
             {status ? <p className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") ? " goenner-status--warn" : ""}`}>{status}</p> : null}
           </form>
-        </section>
+        </SectionReveal>
 
-        <section
+        <SectionReveal
           className="goenner-supporters-section"
           aria-labelledby="goenner-supporters-title"
         >
@@ -286,7 +295,7 @@ export function GoennerPageClient() {
               unterstützen.
             </p>
           )}
-        </section>
+        </SectionReveal>
       </main>
 
       <SiteFooter />

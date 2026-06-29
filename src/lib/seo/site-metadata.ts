@@ -9,16 +9,17 @@ import {
   seoOgImages,
   seoTwitterImages,
 } from "@/lib/seo/constants";
+import { seoPageTitles, seoSiteName } from "@/lib/seo/titles";
 
 const defaultDescription =
-  "Swiss PGA Professional Mauro Gilardi: Schweizer Golfprofi, Spitzensportler, Playing Professional, Golf Coach, Referent und Gastgeber exklusiver Golf Experiences in der Schweiz.";
+  "Gilardi Golf – Mauro Gilardi, Swiss PGA Professional und Schweizer Golfprofi aus Graubünden. Playing Professional auf der Pro Golf Tour, Golf Coach und Golf Events in der Schweiz.";
 
 /** Root metadata — Open Graph; Summary-Card-Feldern für externe Link-Vorschau (kein eigenes Twitter/X-Konto) */
 export const siteRootMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    default: seoPageTitles.home,
     template: "%s",
   },
 
@@ -41,8 +42,8 @@ export const siteRootMetadata: Metadata = {
     type: "profile",
     locale: "de_CH",
     url: SITE_URL,
-    siteName: "Mauro Gilardi | Swiss PGA Professional",
-    title: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    siteName: seoSiteName,
+    title: seoPageTitles.home,
     description: defaultDescription,
     images: seoOgImages(seoImages.heroPrimary, seoImageAlts.heroPrimary),
     firstName: "Mauro",
@@ -53,7 +54,7 @@ export const siteRootMetadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    title: seoPageTitles.home,
     description: defaultDescription,
     images: seoTwitterImages(seoImages.heroPrimary),
   },
@@ -86,7 +87,7 @@ export const siteRootMetadata: Metadata = {
 
   appleWebApp: {
     capable: true,
-    title: "Mauro Gilardi Golf",
+    title: "Gilardi Golf | Mauro Gilardi",
     statusBarStyle: "default",
   },
 

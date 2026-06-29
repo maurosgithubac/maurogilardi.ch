@@ -5,6 +5,7 @@ import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
+import "./site-refresh.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

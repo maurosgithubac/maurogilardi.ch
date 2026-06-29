@@ -14,9 +14,11 @@ export function buildPersonJsonLd() {
     "@id": PERSON_ID,
     name: "Mauro Gilardi",
     alternateName: [
+      "Gilardi Golf",
       "Mauro Gilardi Golf",
       "Mauro Gilardi Swiss PGA",
       "Mauro Gilardi Professional Golfer",
+      "Schweizer Golfprofi Graubünden",
     ],
     description:
       "Mauro Gilardi ist ein Schweizer Golfprofi, Swiss PGA Professional, Playing Professional und Mitglied des Swiss Golf Teams. Aktiv auf der Pro Golf Tour in Europa als Tour Professional und Schweizer Spitzensportler.",
@@ -140,7 +142,7 @@ export function buildWebsiteJsonLd() {
     "@type": "WebSite",
     "@id": WEBSITE_ID,
     url: SITE_URL,
-    name: "Mauro Gilardi | Swiss PGA Professional & Golfprofi",
+    name: "Gilardi Golf | Mauro Gilardi Swiss PGA Professional",
     description:
       "Offizielle Website von Mauro Gilardi, Swiss PGA Professional. Schweizer Golfprofi, Playing Professional, Golf Coach, Referent und Gastgeber von Golf Experiences.",
     inLanguage: "de-CH",
