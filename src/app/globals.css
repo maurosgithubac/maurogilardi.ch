@@ -1157,6 +1157,10 @@ body {
 .blog-post-date,
 .blog-post-dek,
 .blog-post-body,
+.blog-post-subheading,
+.blog-post-paragraph,
+.engagement-quiz-question,
+.engagement-quiz-kicker,
 .pgt-events-head h2,
 .pgt-events-sub,
 .pgt-events-card-title,
@@ -2081,8 +2085,11 @@ body {
 
   .goenner-intro,
   .goenner-tiers,
-  .goenner-form-section {
-    width: min(100%, calc(100% - 1.5rem));
+  .goenner-memberships,
+  .goenner-trust,
+  .goenner-form-section,
+  .goenner-supporters-section {
+    width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
   }
 
   .goenner-intro {
@@ -2129,14 +2136,11 @@ body {
     padding-right: 0.9rem;
   }
 
-  .blog-post-breadcrumb {
-    padding-left: 0.9rem;
-    padding-right: 0.9rem;
+  .blog-post {
+    --blog-post-inset: 0.7rem;
   }
 
   .blog-post-hero {
-    width: calc(100% - 1.4rem);
-    max-width: min(56rem, calc(100% - 1.4rem));
     margin-top: 0.55rem;
     aspect-ratio: 16 / 8.5;
     max-height: 30vh;
@@ -3097,9 +3101,24 @@ body {
 }
 
 .blog-post {
+  --blog-post-content-max: 56rem;
+  --blog-post-inset: 1rem;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+}
+
+.blog-post-layout {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--blog-post-content-max), calc(100% - var(--blog-post-inset) * 2));
+  margin-inline: auto;
+}
+
+.blog-post-inner.blog-post-article {
+  padding-top: clamp(1.35rem, 3vw, 1.85rem);
+  padding-bottom: clamp(1.75rem, 4vw, 2.35rem);
 }
 
 .blog-post-breadcrumb {
@@ -3107,9 +3126,8 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.5rem;
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 0.85rem clamp(1rem, 3vw, 1.5rem) 0;
+  width: 100%;
+  padding: 0.85rem 0 0;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -3148,9 +3166,8 @@ body {
 
 .blog-post-hero {
   position: relative;
-  width: calc(100% - 2rem);
-  max-width: min(56rem, calc(100% - 2rem));
-  margin: 0.75rem auto 0;
+  width: 100%;
+  margin: 0.75rem 0 0;
   aspect-ratio: 16 / 7;
   max-height: min(52vh, 420px);
   background: #e8e6e2;
@@ -3171,11 +3188,9 @@ body {
 }
 
 .blog-post-inner {
-  flex: 1 1 auto;
-  max-width: 40rem;
-  margin: 0.95rem auto 0;
   width: 100%;
-  padding: 1.25rem clamp(1rem, 3vw, 1.5rem) 2rem;
+  margin: 0.95rem 0 0;
+  padding: clamp(1.35rem, 3vw, 1.85rem) clamp(1.15rem, 3vw, 2rem) clamp(1.75rem, 4vw, 2.35rem);
   box-sizing: border-box;
   border: 1px solid rgb(23 21 19 / 8%);
   border-radius: var(--radius-lg);
@@ -3220,9 +3235,30 @@ body {
   color: #2e2c29;
 }
 
-.blog-post-body-block {
-  display: block;
-  white-space: pre-wrap;
+.blog-post-subheading {
+  margin: 2.35rem 0 0.65rem;
+  font-size: clamp(1.2rem, 2.8vw, 1.45rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--site-ink);
+}
+
+.blog-post-subheading:first-child {
+  margin-top: 0;
+}
+
+.blog-post-paragraph {
+  margin: 0 0 1.05rem;
+}
+
+.blog-post-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.blog-post-body-strong {
+  font-weight: 600;
+  color: var(--site-ink);
 }
 
 .blog-post-inline-figure {
@@ -6848,7 +6884,7 @@ body {
   }
 
   .goenner-tier {
-    min-width: min(86vw, 20rem);
+    min-width: min(calc(100vw - var(--page-gutter) * 2 - 1.5rem), 20rem);
     scroll-snap-align: start;
     padding: 1rem 0.92rem 1.1rem;
     border-radius: var(--radius-md);
@@ -6938,27 +6974,10 @@ body {
   }
 
   .goenner-memberships,
+  .goenner-trust,
   .goenner-form-section,
   .goenner-supporters-section {
-    width: min(100%, calc(100% - 1rem));
-  }
-}
-
-@media (max-width: 520px) {
-  .goenner-memberships-head h2,
-  .goenner-form-heading {
-    font-size: 1rem;
-    line-height: 1.2;
-  }
-
-  .goenner-tiers {
-    gap: 0.6rem;
-    padding: 0.6rem 0 0.85rem;
-  }
-
-  .goenner-tier {
-    min-width: 90vw;
-    padding: 0.86rem 0.8rem 0.95rem;
+    width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
   }
 
   .goenner-tier-title {
@@ -7256,8 +7275,6 @@ body {
   }
 
   .blog-post-hero {
-    width: calc(100% - 1.4rem);
-    max-width: min(56rem, calc(100% - 1.4rem));
     margin-top: 0.55rem;
     aspect-ratio: 16 / 8.5;
     max-height: 30vh;
@@ -7581,13 +7598,11 @@ body {
 
   .blog-post-breadcrumb {
     font-size: 0.58rem;
-    padding-left: var(--page-gutter);
-    padding-right: var(--page-gutter);
   }
 
   .blog-post-inner {
     margin-top: 0.62rem;
-    padding: 0.85rem 0.9rem 1.2rem;
+    padding: 0.85rem 0.95rem 1.2rem;
     border-radius: var(--radius-md);
   }
 
@@ -7606,6 +7621,16 @@ body {
     margin-top: 1rem;
     font-size: 0.9rem;
     line-height: 1.58;
+  }
+
+  .blog-post-subheading {
+    margin-top: 1.65rem;
+    margin-bottom: 0.45rem;
+    font-size: clamp(1.05rem, 4.8vw, 1.22rem);
+  }
+
+  .blog-post-paragraph {
+    margin-bottom: 0.85rem;
   }
 
   .blog-post-back {
@@ -8098,9 +8123,14 @@ body {
 .goenner-memberships,
 .goenner-trust,
 .goenner-form-section,
-.blog-post-article,
-.blog-post-breadcrumb {
+.goenner-supporters-section {
   width: min(var(--page-content-max), calc(100% - var(--page-gutter) * 2));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blog-post .blog-post-layout {
+  width: min(var(--blog-post-content-max), calc(100% - var(--blog-post-inset) * 2));
   margin-left: auto;
   margin-right: auto;
 }
@@ -8111,7 +8141,7 @@ body {
 .goenner-memberships,
 .goenner-trust,
 .goenner-form-section,
-.blog-post-article {
+.goenner-supporters-section {
   padding-top: clamp(2.25rem, 5vw, 4rem);
   padding-bottom: clamp(2rem, 4.5vw, 3.75rem);
 }
@@ -8138,7 +8168,7 @@ body {
   .goenner-memberships,
   .goenner-trust,
   .goenner-form-section,
-  .blog-post-article {
+  .goenner-supporters-section {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
   }
@@ -8165,7 +8195,9 @@ body {
   .about-story,
   .about-projects,
   .goenner-memberships,
-  .goenner-form-section {
+  .goenner-trust,
+  .goenner-form-section,
+  .goenner-supporters-section {
     padding-top: 1.35rem;
     padding-bottom: 1.35rem;
   }
@@ -8259,7 +8291,9 @@ body {
   .about-story,
   .about-projects,
   .goenner-memberships,
-  .goenner-form-section {
+  .goenner-trust,
+  .goenner-form-section,
+  .goenner-supporters-section {
     padding-top: 1.05rem;
     padding-bottom: 1.05rem;
   }
@@ -9134,5 +9168,292 @@ body {
 
   .cookie-consent-btn {
     width: 100%;
+  }
+}
+
+/* Engagement-Quiz Popup */
+.engagement-quiz-root {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: max(1rem, env(safe-area-inset-top)) var(--page-gutter) max(1rem, env(safe-area-inset-bottom));
+}
+
+.engagement-quiz-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(23 21 19 / 42%);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.engagement-quiz-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(32rem, 100%);
+  max-height: min(88vh, 42rem);
+  overflow: auto;
+  padding: clamp(1.1rem, 3vw, 1.45rem);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgb(23 21 19 / 10%);
+  background: linear-gradient(155deg, #ffffff 0%, rgb(252 251 249) 100%);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+}
+
+.engagement-quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.engagement-quiz-kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--site-muted);
+}
+
+.engagement-quiz-close {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgb(23 21 19 / 10%);
+  border-radius: var(--radius-full);
+  background: #fff;
+  color: var(--site-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
+}
+
+.engagement-quiz-close:hover {
+  background: rgb(23 21 19 / 4%);
+  border-color: rgb(23 21 19 / 16%);
+}
+
+.engagement-quiz-question {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.8vw, 1.22rem);
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--site-ink);
+}
+
+.engagement-quiz-options {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.engagement-quiz-option {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgb(23 21 19 / 12%);
+  border-radius: var(--radius-md);
+  padding: 0.78rem 0.95rem;
+  background: #fff;
+  color: var(--site-ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out),
+    transform 0.14s var(--ease-out);
+}
+
+.engagement-quiz-option:hover {
+  border-color: rgb(23 21 19 / 22%);
+  background: rgb(23 21 19 / 3%);
+}
+
+.engagement-quiz-option:active {
+  transform: scale(0.99);
+}
+
+.engagement-quiz-result {
+  margin-top: 1rem;
+}
+
+.engagement-quiz-feedback-block {
+  border-radius: var(--radius-md);
+  border: 1px solid rgb(23 21 19 / 10%);
+  background: rgb(23 21 19 / 4%);
+  overflow: hidden;
+}
+
+.engagement-quiz-feedback-block--wrong {
+  border-color: rgb(180 95 40 / 22%);
+  background: rgb(180 95 40 / 6%);
+}
+
+.engagement-quiz-correct {
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid rgb(23 21 19 / 8%);
+  background: rgb(255 255 255 / 72%);
+}
+
+.engagement-quiz-feedback-block--wrong .engagement-quiz-correct {
+  border-bottom-color: rgb(180 95 40 / 16%);
+}
+
+.engagement-quiz-correct-label {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-muted);
+}
+
+.engagement-quiz-correct-value {
+  margin: 0.28rem 0 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--site-ink);
+}
+
+.engagement-quiz-feedback {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgb(23 21 19 / 78%);
+}
+
+.engagement-quiz-feedback-block .engagement-quiz-feedback {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.engagement-quiz-feedback--correct {
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgb(34 120 70 / 22%);
+  background: rgb(34 120 70 / 8%);
+  color: rgb(18 66 38);
+}
+
+.engagement-quiz-continue {
+  appearance: none;
+  margin-top: 0.85rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  padding: 0.58rem 1.15rem;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--primary);
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.engagement-quiz-continue:hover {
+  opacity: 0.92;
+}
+
+.engagement-quiz-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(23 21 19 / 8%);
+}
+
+.engagement-quiz-newsletter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--radius-md);
+  color: var(--site-muted);
+  text-decoration: none;
+  transition:
+    color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out);
+}
+
+.engagement-quiz-newsletter:hover {
+  color: var(--site-ink);
+  background: rgb(23 21 19 / 4%);
+}
+
+.engagement-quiz-newsletter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.engagement-quiz-goenner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.95rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgb(23 21 19 / 12%);
+  background: #fff;
+  color: var(--site-ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    border-color 0.2s var(--ease-out),
+    background 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
+}
+
+.engagement-quiz-goenner:hover {
+  border-color: var(--primary);
+  background: rgb(215 25 32 / 6%);
+  color: var(--primary);
+}
+
+@media (max-width: 680px) {
+  .engagement-quiz-dialog {
+    padding: 1rem 0.95rem 1.1rem;
+  }
+
+  .engagement-quiz-option {
+    font-size: 0.88rem;
+    padding: 0.72rem 0.85rem;
+  }
+
+  .engagement-quiz-footer {
+    flex-wrap: wrap;
+  }
+
+  .engagement-quiz-goenner {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }

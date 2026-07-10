@@ -8,7 +8,12 @@ export type DemoPost = {
   created_at: string;
 };
 
+import { europa20Post } from "@/content/europa-2-0-post";
+import { zurueckInEuropaPost } from "@/content/zurueck-in-europa-post";
+
 export const demoPosts: DemoPost[] = [
+  europa20Post,
+  zurueckInEuropaPost,
   {
     id: "demo-may-2026-marokko-swing",
     slug: "marokko-swing",

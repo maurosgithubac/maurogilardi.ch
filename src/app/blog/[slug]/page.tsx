@@ -126,35 +126,44 @@ export default async function BlogPostPage({ params }: Props) {
     <article className="blog-post site-page">
       <SeoPageJsonLd schema={blogPostingSchema} />
       <SiteHeader variant="document" />
-      <nav className="blog-post-breadcrumb" aria-label="Navigation">
-        <Link href="/blog">Zum Blog</Link>
-        <span aria-hidden className="blog-post-breadcrumb-sep">
-          /
-        </span>
-        <span className="blog-post-breadcrumb-current" title={post.title}>
-          {post.title}
-        </span>
-      </nav>
-      {img ? (
-        <div className="blog-post-hero">
-          <Image src={img} alt={`${post.title} – Beitragsbild`} fill className="blog-post-hero-img" priority sizes="100vw" />
-          <div className="blog-post-hero-scrim" />
+      <div className="blog-post-layout">
+        <nav className="blog-post-breadcrumb" aria-label="Navigation">
+          <Link href="/blog">Zum Blog</Link>
+          <span aria-hidden className="blog-post-breadcrumb-sep">
+            /
+          </span>
+          <span className="blog-post-breadcrumb-current" title={post.title}>
+            {post.title}
+          </span>
+        </nav>
+        {img ? (
+          <div className="blog-post-hero">
+            <Image
+              src={img}
+              alt={`${post.title} – Beitragsbild`}
+              fill
+              className="blog-post-hero-img"
+              priority
+              sizes="(max-width: 904px) calc(100vw - 2rem), 56rem"
+            />
+            <div className="blog-post-hero-scrim" />
+          </div>
+        ) : null}
+        <div className="blog-post-inner blog-post-article">
+          <time className="blog-post-date" dateTime={post.created_at}>
+            {new Date(post.created_at).toLocaleDateString("de-CH", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </time>
+          <h1>{post.title}</h1>
+          {post.description ? <p className="blog-post-dek">{post.description}</p> : null}
+          <BlogPostBody body={post.body} />
+          <Link href="/blog" className="blog-post-back">
+            ← Zurück zum Blog
+          </Link>
         </div>
-      ) : null}
-      <div className="blog-post-inner blog-post-article">
-        <time className="blog-post-date" dateTime={post.created_at}>
-          {new Date(post.created_at).toLocaleDateString("de-CH", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </time>
-        <h1>{post.title}</h1>
-        {post.description ? <p className="blog-post-dek">{post.description}</p> : null}
-        <BlogPostBody body={post.body} />
-        <Link href="/blog" className="blog-post-back">
-          ← Zurück zum Blog
-        </Link>
       </div>
       <SiteFooter />
     </article>

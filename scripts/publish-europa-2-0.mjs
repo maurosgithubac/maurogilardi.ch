@@ -1,0 +1,81 @@
+/**
+ * Veröffentlicht «europa-2-0» in Supabase (UPSERT slug).
+ * node --env-file=.env.local scripts/publish-europa-2-0.mjs
+ */
+import { createClient } from "@supabase/supabase-js";
+
+const slug = "europa-2-0";
+
+const row = {
+  slug,
+  title: "Europa 2.0",
+  description:
+    "Köln Open, Neuhof Open und Gradi Golf: Cut verpasst, Rang 8, Hole-in-One auf Par 4 und Siebter in Polen — sechs Turnierwochen in Europa.",
+  body: `Köln Open
+
+Nach einer guten Woche in Owingen geht es direkt weiter mit dem Auto nach Köln, wo zur Abwechslung mal auf einem richtig schönen und schwierigen Platz ein Pro Golf Tour Event stattfindet, wo früher bereits die European Tour war. Ich spiele wieder im ProAm mit und kann mir ein gutes Bild vom Platz machen. Ich freue mich, denn die Konditionen sind gut und ich fühle mich gut.
+
+Ich starte solide in die Runde, aber es ist ein langer Tag, viele kleine Fehler und ich bin auf Dauerspannung – auf keinem Loch gibt es mal ein einfaches Birdie, wo man etwas runterfahren kann, und das macht mir mental etwas zu schaffen. Ich halte mich solide und kann mit einer Par-Runde gut dabei bleiben.
+
+In der zweiten Runde dasselbe: Auch hier kämpfe ich mich nochmals auf Par zurück nach einem nicht so guten Start. Leider werde ich dann aber etwas ungeduldig und mache zwei wirklich grosse Fehler, die ich bisher immer vermeiden konnte, lasse mich schneller ablenken und bekomme den Fokus auf meinen Job nicht mehr hin. Zusätzlich gehe ich auf dem letzten Loch etwas unnötiges Risiko ein, was aber nach hinten losgeht, und mit zwei Doppelbogeys auf den letzten drei Löchern verpasse ich den Cut klar und bin etwas in einem Loch. Gedanken wie «komm, lass mich den Putt extra vorbeischieben, damit ich nach Hause kann und einen Erholungstag mehr habe» schleichen sich in meinen Kopf – das war gar kein gutes Zeichen und ich musste zuerst mal verarbeiten, woran es lag, und auch erkennen, dass dieses Turnier nun evtl. eines zu viel am Stück war oder das Mindset nicht das richtige war.
+
+Zwei Tage Schläger weg, etwas erholen, mit dem Mental Coach die Gedanken sortieren und einordnen, und schon reise ich weiter ans nächste Turnier nach Frankfurt.
+
+Neuhof Open
+
+In Neuhof angekommen, sehe ich schnell, dass es hier auch sehr warm war – alles ausgetrocknet ausser die Greens, und das Eisen 4 rollt statt 10 m fast 40 m auf dem Fairway. Die geplante Strategie muss dadurch etwas angepasst werden: weniger Eisen vom Tee, dafür gezielter, denn bei so viel Roll kann der Ball auf dem Fairway in alle Richtungen springen.
+
+Ich kann mich gut mit den Konditionen anfreunden und starte solide ins Turnier. Die Motivation ist gar nicht hoch, auch aufgrund der schlechten letzten Woche. Ich muss früh zwei Bogeys in Kauf nehmen aufgrund von zwei Wasserbällen und struggle etwas mental und spielerisch. Ich fokussiere mich auf meinen Job, und mein einziges Ziel war und bleibt für das Turnier, einfach meine Routinen und Prozesse sauber zu behalten und weniger Wert auf das Golfspiel zu legen. Das hilft mir, und ich kann eine solide Par-Runde nach Hause bringen, einige Birdies machen und trotz eines schlechten Tages wieder einen soliden Score schreiben.
+
+In die zweite Runde starte ich sehr langweilig – ich spiele 11 Löcher nur Pars, loche praktisch keine Putts, aber spiele wieder, wie ich spielen will. Auch auf den zweiten neun ein recht langweiliges Spiel, aber ich kann mit zwei Birdies mit 1 unter Par die Runde beenden, bin 25. und weiss, ich habe noch Potenzial.
+
+Die dritte Runde startet dann super: Ich bin nach 9 Löchern 4 unter Par, fühle mich wohl und kann mir weiter gute Chancen erarbeiten. Auch heute muss ich einen – total den vierten – Wasserball in Kauf nehmen, was mich ärgert, aber aufgrund meines angepassten Mindsets gut handeln konnte.
+
+Durch diese super Schlussrunde beende ich das Turnier auf dem 8. Schlussrang, 2 Schläge hinter dem Sieger, und das mit 4 Strafschlägen diese Woche. Natürlich geärgert, aber auch positiv gestimmt, dass es trotzdem mit einer geringen Motivation und dummen Fehlern fast gereicht hätte.
+
+Gradi Golf
+
+Als Abschluss dieser 6 Turnierwochen am Stück geht es mit dem Auto nach Polen. Den Platz kenne ich gut, deshalb reise ich etwas kurzfristiger an, um zu Hause noch etwas Energie tanken zu können.
+
+Die erste Runde starte ich nicht so optimal, bin auf einem eher einfachen Platz 1 über Par und merke, wie das Köln-Mindset durchdrückt. Auch hier setze ich den Fokus auf meinen Job, im Wissen, dass ich mir gleich zwei Wochen Pause verdient habe nach diesem Turnier.
+
+Ich kämpfe mich super zurück und kann eine 4 unter Par-Runde schreiben, dadurch viel positive Energie tanken. In die zweite Runde starte ich phänomenal: Auf den ersten 5 Löchern mache ich 4 Birdies. Dann kommt das 15. Loch, ein Dogleg Par 4, 305 m über ein Wasser mit Büschen rechts vom Green. Zwei Varianten gibt es: aggressiv aufs Green mit einer Slice-Kurve oder ein sicherer Schlag mit dem Eisen 5, wovon man 70 Meter an die Fahne hat.
+
+Ich spiele seit Jahren immer den Driver, und auch heute – ich spiele den Driver mit einem super hohen Slice um die Ecke. Mein Gefühl: Oh, oh, der könnte 5 m rechts vom Green sein, wo es viele Bäume hat, die den Ball bremsen könnten.
+
+Auf einmal sehe und höre ich ein Gejohle und Gejauchze vom Flight vor uns und meinem Spielpartner, der den sicheren Schlag gemacht und sich schon vorgelaufen hat.
+
+Ich weiss: DER IST DRIN – Hole in One von 300 m auf einem Par 4, mein allererstes Hole in One an einem Turnier. Ich bin baff und habe ein Grinsen für den Rest der Runde – heute macht Golf wieder mal so richtig Spass. Und als wäre das nicht genug, loche ich 9 Löcher später von 35 Metern zum Eagle ein und verstehe die Welt nicht mehr.
+
+Die Runde kann ich mit 9 unter Par beenden und mich auf den vierten Zwischenrang spielen.
+
+Die dritte Runde ist ein wilder Ritt: viel Wind, ich loche keine Putts und am Ende muss ich zweimal einen Strafschlag in Kauf nehmen, einige Bogeys hinnehmen und kann mich nicht mehr ganz zurückkämpfen. Am Schluss reicht es leider wieder «nur» für einen soliden siebten Rang. Ich kann meine Position im Order of Merit behalten, was sehr wichtig ist, und bin immer noch dran an den Spielern vor mir. Der Sieg wird schon noch kommen 😊
+
+Zufrieden mit dem Ergebnis, aber etwas sehr genervt, dass ich wieder in einer solch guten Position nicht mein bestes Golf abliefern konnte, fahre ich nach Hause und freue mich auf die kommenden zwei Wochen mit Selina, Familie, Freunden und mal etwas weniger Golf für eine Woche.
+
+Ich danke euch für euren stetigen Support und freue mich, den einen oder anderen in den kommenden Wochen mal auf dem Golfplatz wiederzusehen.
+
+Euer Mauro`,
+  image_path: "/brand-assets/images/blog/europa-2-0-pgt-2026.png",
+  published: true,
+  created_at: "2026-07-10T08:00:00.000Z",
+};
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!url || !key) {
+  console.error("Fehlendes NEXT_PUBLIC_SUPABASE_URL oder SUPABASE_SERVICE_ROLE_KEY (z.B. aus .env.local).");
+  process.exit(1);
+}
+
+const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+
+const { error } = await sb.from("posts").upsert(row, { onConflict: "slug" });
+
+if (error) {
+  console.error("Supabase Upsert failed:", error.message);
+  process.exit(1);
+}
+
+console.log(`OK — Post live: https://www.maurogilardi.ch/blog/${slug}`);

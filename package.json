@@ -13,7 +13,9 @@
     "resend:domain:get": "node scripts/resend-domain-setup.js get",
     "resend:domain:verify": "node scripts/resend-domain-setup.js verify",
     "posts:publish-podium-pgt": "node --env-file=.env.local scripts/publish-zweites-podium-pgt.mjs",
-    "posts:publish-marokko-swing": "node --env-file=.env.local scripts/publish-marokko-swing.mjs"
+    "posts:publish-marokko-swing": "node --env-file=.env.local scripts/publish-marokko-swing.mjs",
+    "posts:publish-zurueck-in-europa": "node --env-file=.env.local scripts/publish-zurueck-in-europa.mjs",
+    "posts:publish-europa-2-0": "node --env-file=.env.local scripts/publish-europa-2-0.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",
