@@ -359,11 +359,13 @@ body {
   pointer-events: none;
 }
 
-.global-top-tabs > a {
+.global-top-tabs > a,
+.global-top-tabs > button {
   pointer-events: auto;
 }
 
 .global-newsletter-tab {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -387,6 +389,7 @@ body {
   text-overflow: ellipsis;
   box-shadow: 0 8px 18px rgb(0 0 0 / 14%);
   transition: filter 0.2s ease;
+  cursor: pointer;
 }
 
 .global-newsletter-tab:hover {
