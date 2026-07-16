@@ -14,6 +14,7 @@ import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 import { PgtLiveScoringTicker } from "@/components/pgt-live-scoring-ticker";
+import { TwintPaylinkButton } from "@/components/twint-paylink-button";
 import {
   HeroCopyReveal,
   HeroRevealItem,
@@ -103,6 +104,9 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                   Newsletter
                 </a>
               </div>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <TwintPaylinkButton />
             </HeroRevealItem>
           </HeroCopyReveal>
         </section>

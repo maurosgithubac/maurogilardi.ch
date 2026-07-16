@@ -16,6 +16,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroCopyReveal, HeroRevealItem, SectionReveal } from "@/components/motion/scroll-reveal";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
+import { TwintPaylinkButton } from "@/components/twint-paylink-button";
 
 export function GoennerPageClient() {
   const [membershipId, setMembershipId] = useState<MembershipId | "">("");
@@ -109,6 +110,9 @@ export function GoennerPageClient() {
                   Über mich
                 </Link>
               </div>
+            </HeroRevealItem>
+            <HeroRevealItem>
+              <TwintPaylinkButton />
             </HeroRevealItem>
           </HeroCopyReveal>
         </section>

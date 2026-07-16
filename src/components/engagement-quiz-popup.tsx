@@ -196,7 +196,7 @@ export function EngagementQuizPopup() {
             </svg>
             <span className="engagement-quiz-newsletter-label">Newsletter</span>
           </Link>
-          <Link href="/sponsoring" className="engagement-quiz-goenner" onClick={handleFooterNavigate}>
+          <Link href="/sponsoring#goenner-memberships-title" className="engagement-quiz-goenner" onClick={handleFooterNavigate}>
             Gönner werden
           </Link>
         </div>

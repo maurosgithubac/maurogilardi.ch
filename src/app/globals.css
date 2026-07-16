@@ -423,6 +423,10 @@ body {
   flex-shrink: 0;
 }
 
+.global-twint-text-tab {
+  max-width: min(42vw, 7rem);
+}
+
 .pro-shell {
   width: min(1220px, calc(100% - 2.4rem));
   margin: 0 auto;
@@ -7686,6 +7690,10 @@ body {
     height: 16px;
   }
 
+  .global-twint-text-tab {
+    max-width: min(32vw, 6rem);
+  }
+
   .site-header-menu-toggle {
     width: 2.2rem;
     height: 2.2rem;
@@ -9455,5 +9463,55 @@ body {
   .engagement-quiz-goenner {
     flex: 1 1 auto;
     justify-content: center;
+  }
+}
+
+/* Hero TWINT CTA */
+.hero-twint-wrap {
+  margin-top: 0.24rem;
+  width: fit-content;
+  max-width: 100%;
+  text-align: left;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hero-twint-kicker {
+  margin: 0 0 0.22rem;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(23 21 19 / 82%);
+}
+
+.hero-twint-button-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.hero-twint-button-shell > div {
+  transform: scale(0.82);
+  transform-origin: left center;
+}
+
+.hero-twint-wrap--compact .hero-twint-button-shell > div {
+  transform: scale(0.76);
+}
+
+@media (max-width: 760px) {
+  .hero-twint-wrap {
+    margin-top: 0;
+    width: fit-content;
+  }
+
+  .hero-twint-button-shell > div,
+  .hero-twint-wrap--compact .hero-twint-button-shell > div {
+    transform-origin: left center;
   }
 }

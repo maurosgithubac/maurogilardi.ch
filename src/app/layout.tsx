@@ -32,6 +32,14 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${sifonn.variable} antialiased`}>
         <SeoRootJsonLd />
         <div className="global-top-tabs" role="navigation" aria-label="Schnellzugriff">
+          <a
+            href="/sponsoring#goenner-memberships-title"
+            className="global-newsletter-tab global-twint-text-tab"
+            aria-label="Direkt zu TWINT"
+            title="TWINT"
+          >
+            TWINT
+          </a>
           <a href="/#newsletter" className="global-newsletter-tab">
             Newsletter
           </a>
