@@ -46,6 +46,9 @@ export function GlobalTopTabs() {
       <a href="/#newsletter" className="global-newsletter-tab">
         Newsletter
       </a>
+      <a href="#kontakt" className="global-newsletter-tab" title="Kontakt">
+        Kontakt
+      </a>
       <a
         href="/#pgt-events"
         className="global-events-tab"

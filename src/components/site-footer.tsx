@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
 import { socialProfiles } from "@/content/socialProfiles";
+import { FooterContactForm } from "@/components/footer-contact-form";
 import { SiteFooterLegalLinks } from "@/components/site-footer-legal-links";
+
+type SiteFooterProps = {
+  variant?: "default" | "on-dark";
+  showContactForm?: boolean;
+};
 
 export function SiteFooterCredit() {
   return (
@@ -19,11 +25,15 @@ export function SiteFooterCredit() {
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ variant = "default", showContactForm = true }: SiteFooterProps) {
   const year = new Date().getFullYear();
+  const footerClassName = variant === "on-dark" ? "site-footer site-footer--on-dark" : "site-footer";
+
   return (
-    <footer className="site-footer">
+    <footer className={footerClassName}>
       <div className="site-footer-inner">
+        {showContactForm ? <FooterContactForm /> : null}
+
         <p>
           © {year}{" "}
           <Link href="/ueber-mich" className="site-footer-brand-link">
@@ -35,6 +45,7 @@ export function SiteFooter() {
           <Link href="/blog">Blog</Link>
           <Link href="/sponsoring">Sponsoring</Link>
           <Link href="/ueber-mich">Über mich</Link>
+          {showContactForm ? <a href="#kontakt">Kontakt</a> : null}
           <a href={socialProfiles.instagram.url} target="_blank" rel="noopener noreferrer">
             {socialProfiles.instagram.label}
           </a>

@@ -7,9 +7,7 @@ import type { PostRow, SponsorRow } from "@/types/content";
 import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
 import { siteContent } from "@/content/siteContent";
-import { SiteFooterCredit } from "@/components/site-footer";
-import { SiteFooterLegalLinks } from "@/components/site-footer-legal-links";
-import { socialProfiles } from "@/content/socialProfiles";
+import { SiteFooter } from "@/components/site-footer";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
@@ -276,30 +274,7 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
         </SectionReveal>
       </main>
 
-      <footer className="site-footer site-footer--on-dark">
-        <div className="site-footer-inner">
-          <p>
-            © {new Date().getFullYear()}{" "}
-            <Link href="/ueber-mich" className="site-footer-brand-link">
-              {siteContent.brand.name}
-            </Link>
-          </p>
-          <p className="site-footer-links">
-            <Link href="/blog">Blog</Link>
-            <Link href="/sponsoring">Sponsoring</Link>
-            <Link href="/ueber-mich">Über mich</Link>
-            <a href="#newsletter">Newsletter</a>
-            <a href={socialProfiles.instagram.url} target="_blank" rel="noopener noreferrer">
-              {socialProfiles.instagram.label}
-            </a>
-            <a href={socialProfiles.linkedin.url} target="_blank" rel="noopener noreferrer">
-              {socialProfiles.linkedin.label}
-            </a>
-            <SiteFooterLegalLinks />
-          </p>
-          <SiteFooterCredit />
-        </div>
-      </footer>
+      <SiteFooter variant="on-dark" />
     </div>
   );
 }

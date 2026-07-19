@@ -93,8 +93,8 @@ export const datenschutzSections: LegalSection[] = [
     id: "formulare",
     title: "Newsletter & Kontaktformulare",
     paragraphs: [
-      "Wenn du dich für den Newsletter anmeldest oder das Sponsoring-/Gönner-Formular nutzt, verarbeite ich die von dir angegebenen Daten (z. B. Name, E-Mail, Nachricht) zur Bearbeitung deiner Anfrage.",
-      "Die Newsletter-Anmeldung kann über einen externen Dienstleister (z. B. Beehiiv) erfolgen. Gönner-Anfragen werden in einer Datenbank (Supabase) gespeichert und per E-Mail-Dienst (z. B. Resend) bearbeitet.",
+      "Wenn du dich für den Newsletter anmeldest, das Kontaktformular nutzt oder das Sponsoring-/Gönner-Formular absendest, verarbeite ich die von dir angegebenen Daten (z. B. Name, E-Mail, Nachricht) zur Bearbeitung deiner Anfrage.",
+      "Die Newsletter-Anmeldung kann über einen externen Dienstleister (z. B. Beehiiv) erfolgen. Kontaktnachrichten und Gönner-Anfragen werden per E-Mail-Dienst (z. B. Resend) bearbeitet; Gönner-Anfragen zusätzlich in einer Datenbank (Supabase) gespeichert.",
     ],
     bullets: [
       "Zweck: Versand von Updates bzw. Beantwortung deiner Anfrage",

@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
           </Link>
         </div>
       </main>
-      <SiteFooter />
+      <SiteFooter showContactForm={false} />
     </div>
   );
 }

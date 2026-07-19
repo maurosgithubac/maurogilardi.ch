@@ -14,7 +14,4 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
       <SiteHeader variant="document" />
       <AdminTabNav />
       <div className="admin-body">{children}</div>
-      <SiteFooter />
-    </div>
-  );
-}
+      <SiteFooter showContactForm={false} />
