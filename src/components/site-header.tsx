@@ -86,8 +86,10 @@ export function SiteHeader({ variant, inOverlayStack }: Props) {
             alt={brandLogo.alt}
             width={brandLogo.width}
             height={brandLogo.height}
+            sizes={`${brandLogo.width}px`}
             className="site-header-logo"
             priority={variant === "overlay"}
+            unoptimized
           />
         </span>
       </Link>

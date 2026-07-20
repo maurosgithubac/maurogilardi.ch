@@ -146,7 +146,11 @@ export default function AdminSponsorsPage() {
           return (
             <li key={s.id} className="admin-sponsor-row">
               <div className="admin-sponsor-logo-wrap">
-                {src ? <Image src={src} alt={s.name} width={100} height={40} className="admin-sponsor-logo" /> : s.name}
+                {src ? (
+                  <Image src={src} alt={s.name} width={100} height={40} sizes="100px" className="admin-sponsor-logo" />
+                ) : (
+                  s.name
+                )}
               </div>
               <div>
                 <div>{s.name}</div>

@@ -53,6 +53,7 @@ export default async function BlogPage() {
             fill
             className="stage-bg about-hero-bg"
             priority
+            sizes="100vw"
           />
           <div className="stage-overlay about-hero-overlay" />
           <AboutHeroMotionCopy

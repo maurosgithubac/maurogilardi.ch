@@ -141,7 +141,7 @@ export function AdminPostForm({ initial }: Props) {
           </label>
           {previewUrl ? (
             <div className="admin-preview">
-              <Image src={previewUrl} alt="" width={320} height={200} className="admin-preview-img" />
+              <Image src={previewUrl} alt="" width={320} height={200} sizes="320px" className="admin-preview-img" />
             </div>
           ) : null}
         </div>

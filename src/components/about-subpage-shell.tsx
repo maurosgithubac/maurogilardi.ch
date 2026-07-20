@@ -33,6 +33,7 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
             fill
             className={["stage-bg", "about-hero-bg", heroBgClassName].filter(Boolean).join(" ")}
             priority
+            sizes="100vw"
           />
           <div className="stage-overlay about-hero-overlay" />
           <HeroCopyReveal className="subpage-copy about-hero-copy">

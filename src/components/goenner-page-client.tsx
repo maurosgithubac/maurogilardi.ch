@@ -85,6 +85,7 @@ export function GoennerPageClient() {
             fill
             className="stage-bg about-hero-bg"
             priority
+            sizes="100vw"
           />
           <div className="stage-overlay about-hero-overlay" />
           <HeroCopyReveal className="subpage-copy about-hero-copy">

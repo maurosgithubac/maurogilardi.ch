@@ -290,7 +290,7 @@ function ClientMarquee({
         {sponsors.map((s, index) => {
           const href = s.logo_url;
           const inner = (
-            <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={168} height={64} className="blog-marquee-logo" /> : s.name}</span>
+            <span className="blog-marquee-item">{href ? <Image src={href} alt={s.name} width={168} height={64} sizes="168px" className="blog-marquee-logo" /> : s.name}</span>
           );
           const url = s.website_url;
           if (!url) {

@@ -15,7 +15,9 @@
     "posts:publish-podium-pgt": "node --env-file=.env.local scripts/publish-zweites-podium-pgt.mjs",
     "posts:publish-marokko-swing": "node --env-file=.env.local scripts/publish-marokko-swing.mjs",
     "posts:publish-zurueck-in-europa": "node --env-file=.env.local scripts/publish-zurueck-in-europa.mjs",
-    "posts:publish-europa-2-0": "node --env-file=.env.local scripts/publish-europa-2-0.mjs"
+    "posts:publish-europa-2-0": "node --env-file=.env.local scripts/publish-europa-2-0.mjs",
+    "images:optimize-public": "node scripts/optimize-public-images.mjs",
+    "images:refresh-supabase-cache": "node --env-file=.env.local scripts/refresh-supabase-image-cache.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.0",

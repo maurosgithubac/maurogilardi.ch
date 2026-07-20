@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isAdminSession } from "@/lib/admin-auth";
+import { ASSET_CACHE_MAX_AGE_SECONDS } from "@/lib/asset-cache";
 import { readEnv } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
   async function uploadOnce() {
     return supabase.storage.from(bucket).upload(path, buffer, {
       contentType: uploadFile.type || "application/octet-stream",
+      cacheControl: String(ASSET_CACHE_MAX_AGE_SECONDS),
       upsert: false,
     });
   }

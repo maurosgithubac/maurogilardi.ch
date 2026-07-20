@@ -65,8 +65,10 @@ export default function AdminLoginPage() {
               alt={brandLogo.alt}
               width={160}
               height={38}
+              sizes="160px"
               className="admin-brand-logo"
               priority
+              unoptimized
             />
           </Link>
           <div className="admin-login-lockup">
