@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
@@ -10,6 +11,7 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
       .maybeSingle();
 
     if (error) {

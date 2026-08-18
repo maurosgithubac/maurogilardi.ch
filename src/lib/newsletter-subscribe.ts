@@ -28,6 +28,7 @@ const NEWSLETTER_ADDED_MESSAGE =
 export async function runNewsletterSubscribe(
   emailRaw: string,
   referringSite: string | null,
+  options?: { sendWelcomeEmail?: boolean; utmCampaign?: string },
 ): Promise<NewsletterSubscribeOutcome> {
   const email = String(emailRaw || "").trim().toLowerCase();
   if (!isNewsletterEmailValid(email)) {
@@ -36,16 +37,19 @@ export async function runNewsletterSubscribe(
 
   const apiKey = process.env.BEEHIIV_API_KEY?.trim();
   const publicationId = process.env.BEEHIIV_PUBLICATION_ID?.trim();
+  const sendWelcomeEmail =
+    options?.sendWelcomeEmail ?? process.env.BEEHIIV_SEND_WELCOME_EMAIL !== "false";
 
   if (apiKey && publicationId) {
     try {
       const result = await subscribeEmailToBeehiiv(email, {
         publicationId,
         apiKey,
-        sendWelcomeEmail: process.env.BEEHIIV_SEND_WELCOME_EMAIL !== "false",
+        sendWelcomeEmail,
         reactivateExisting: process.env.BEEHIIV_REACTIVATE_EXISTING === "true",
         referringSite,
         newsletterListIds: beehiivListIdsFromEnv(),
+        utmCampaign: options?.utmCampaign,
       });
 
       if (result.ok) {

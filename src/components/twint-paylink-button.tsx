@@ -2,14 +2,19 @@
 
 import { useEffect, useMemo } from "react";
 
+export const TWINT_PAYLINK_URL = "https://pay.raisenow.io/pjczf";
+
 type Props = {
   kicker?: string;
   compact?: boolean;
+  /** Native branded CTA for the homepage hero. Widget stays for other pages. */
+  variant?: "widget" | "hero";
 };
 
 export function TwintPaylinkButton({
   kicker = "Mit freiem Betrag unterstützen",
   compact = true,
+  variant = "widget",
 }: Props) {
   const containerId = useMemo(
     () => `rnw-paylink-button-pjczf-${Math.random().toString(36).slice(2, 8)}`,
@@ -18,6 +23,8 @@ export function TwintPaylinkButton({
   const selector = useMemo(() => `#${containerId}`, [containerId]);
 
   useEffect(() => {
+    if (variant === "hero") return;
+
     const target = document.querySelector<HTMLElement>(selector);
     if (!target) return;
 
@@ -44,7 +51,21 @@ export function TwintPaylinkButton({
       script.remove();
       target.innerHTML = "";
     };
-  }, [selector]);
+  }, [selector, variant, containerId]);
+
+  if (variant === "hero") {
+    return (
+      <a
+        href={TWINT_PAYLINK_URL}
+        className="hero-twint-cta"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Mit TWINT unterstützen"
+      >
+        TWINT
+      </a>
+    );
+  }
 
   return (
     <div className={`hero-twint-wrap${compact ? " hero-twint-wrap--compact" : ""}`} aria-label="Direkte Unterstützung per TWINT">

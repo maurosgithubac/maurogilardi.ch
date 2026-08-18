@@ -43,6 +43,7 @@ export async function subscribeEmailToBeehiiv(
     reactivateExisting: boolean;
     referringSite?: string | null;
     newsletterListIds?: string[];
+    utmCampaign?: string;
   },
 ): Promise<BeehiivSubscribeResult> {
   const url = `${BEEHIIV_API}/publications/${encodeURIComponent(options.publicationId)}/subscriptions`;
@@ -53,7 +54,7 @@ export async function subscribeEmailToBeehiiv(
     reactivate_existing: options.reactivateExisting,
     utm_source: "maurogilardi.ch",
     utm_medium: "website",
-    utm_campaign: "homepage_signup",
+    utm_campaign: options.utmCampaign || "homepage_signup",
   };
 
   if (options.referringSite) {

@@ -85,35 +85,24 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
               <p className="label about-hero-label">{siteContent.brand.role}</p>
             </HeroRevealItem>
             <HeroRevealItem>
-              <h1>{siteContent.brand.homepageH1}</h1>
+              <h1>{siteContent.brand.name}</h1>
             </HeroRevealItem>
             <HeroRevealItem>
-              <p className="about-hero-lead about-hero-lead--welcome">Willkommen — hier folgst du mir auf der Tour.</p>
-            </HeroRevealItem>
-            <HeroRevealItem>
-              <p className="about-hero-lead">{siteContent.brand.intro}</p>
+              <p className="about-hero-lead">Hier folgst du mir auf der Tour.</p>
             </HeroRevealItem>
             <HeroRevealItem>
               <div className="about-hero-actions">
-                <Link href="/blog" className="about-btn about-btn-primary">
-                  Zu meinen Beiträgen
+                <TwintPaylinkButton variant="hero" />
+                <Link href="/blog" className="about-btn about-btn-ghost">
+                  Beiträge
                 </Link>
-                <a href="#newsletter" className="about-btn about-btn-ghost">
-                  Newsletter
-                </a>
               </div>
-            </HeroRevealItem>
-            <HeroRevealItem>
-              <TwintPaylinkButton />
             </HeroRevealItem>
           </HeroCopyReveal>
         </section>
 
         {marqueeSponsors.length > 0 && (
           <SectionReveal className="blog-sponsors" aria-label="Sponsoren">
-            <p className="blog-sponsors-label">
-              <span>Meine Sponsoren</span>
-            </p>
             <ClientMarquee sponsors={marqueeSponsors} />
           </SectionReveal>
         )}
@@ -122,7 +111,6 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
           <div className="blog-latest-head">
             <div className="blog-latest-head-text">
               <h2>Beiträge</h2>
-              <p className="blog-latest-sub">Das schreib ich gerade — vom Platz und aus der Vorbereitung.</p>
             </div>
             <Link href="/blog" className="blog-latest-cta">
               Alle anzeigen
@@ -155,7 +143,6 @@ export function HomeShell({ posts, sponsors, upcomingPgtEvents }: Props) {
                           <div className="blog-card-body">
                             <time dateTime={post.created_at}>{postDateFormatter.format(new Date(post.created_at))}</time>
                             <h3>{post.title}</h3>
-                            {post.description ? <p>{post.description}</p> : null}
                           </div>
                         </Link>
                       </RevealItem>

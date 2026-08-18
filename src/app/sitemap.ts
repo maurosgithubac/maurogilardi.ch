@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { demoPosts } from "@/content/demoPosts";
+import { visibleDemoPosts } from "@/content/demoPosts";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { SITE_URL } from "@/lib/seo/constants";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -31,14 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from("posts")
       .select("slug, created_at")
       .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
       .order("created_at", { ascending: false });
     posts = data ?? [];
   } catch {
-    posts = demoPosts.map((p) => ({ slug: p.slug, created_at: p.created_at }));
+    posts = visibleDemoPosts().map((p) => ({ slug: p.slug, created_at: p.created_at }));
   }
 
   if (posts.length === 0) {
-    posts = demoPosts.map((p) => ({ slug: p.slug, created_at: p.created_at }));
+    posts = visibleDemoPosts().map((p) => ({ slug: p.slug, created_at: p.created_at }));
   }
 
   const now = new Date();

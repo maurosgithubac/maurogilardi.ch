@@ -1,6 +1,7 @@
 import { HomeShell } from "@/components/home-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
-import { demoPosts } from "@/content/demoPosts";
+import { visibleDemoPosts } from "@/content/demoPosts";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { getUpcomingPgtSeasonEvents } from "@/content/pgtSeasonEvents";
 import { homeMarqueeSponsorCards } from "@/content/sponsorsSite";
 import { blogImageUrl } from "@/lib/storage-public-url";
@@ -9,8 +10,8 @@ import { homeWebPageJsonLd } from "@/lib/seo/webpage-jsonld";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { PostRow } from "@/types/content";
 
-/** Homepage inkl. „nächste 4 Termine“ — öfter neu gegen PGT-Kalender */
-export const revalidate = 3600;
+/** Homepage inkl. nächster Termine — kurz cachen, damit geplante Posts pünktlich live gehen */
+export const revalidate = 60;
 
 export const metadata = homePageMetadata;
 
@@ -27,6 +28,7 @@ export default async function Home() {
       .from("posts")
       .select("id, slug, title, description, image_path, created_at")
       .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
       .order("created_at", { ascending: false })
       .limit(9);
     posts = (data as PostCard[]) ?? [];
@@ -35,7 +37,7 @@ export default async function Home() {
   }
 
   if (posts.length === 0) {
-    posts = demoPosts.map((post) => ({
+    posts = visibleDemoPosts().map((post) => ({
       id: post.id,
       slug: post.slug,
       title: post.title,

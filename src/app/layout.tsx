@@ -3,7 +3,6 @@ import { Geist } from "next/font/google";
 import localFont from "next/font/local";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { EngagementQuizPopup } from "@/components/engagement-quiz-popup";
-import { GlobalTopTabs } from "@/components/global-top-tabs";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
@@ -32,7 +31,6 @@ export default function RootLayout({
     <html lang="de-CH">
       <body className={`${geistSans.variable} ${sifonn.variable} antialiased`}>
         <SeoRootJsonLd />
-        <GlobalTopTabs />
         {children}
         <CookieConsentBanner />
         <EngagementQuizPopup />

@@ -1,29 +1,68 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   GOENNER_SPONSORING_MIN_CHF,
-  inquiryTierLabel,
+  inquiryTierShort,
+  isLiteContactMembership,
   membershipPriceChf,
 } from "@/content/goennerMemberships";
-import type { GoennerInquiryRow } from "@/types/content";
-
-function formatPostalAddress(row: GoennerInquiryRow): string | null {
-  const street = row.street?.trim();
-  const plz = row.postal_code?.trim();
-  const city = row.city?.trim();
-  if (street && plz && city) return `${street}, ${plz} ${city}`;
-  const parts = [street, plz, city].filter(Boolean);
-  return parts.length > 0 ? parts.join(", ") : null;
-}
+import type { GoennerInquiryRow, GoennerInquiryStatus } from "@/types/content";
 
 function chfFmt(n: number) {
   return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(n);
 }
 
-function isDone(row: GoennerInquiryRow) {
-  return row.status === "completed";
+function statusOf(row: GoennerInquiryRow): GoennerInquiryStatus {
+  if (row.status === "completed" || row.status === "exited") return row.status;
+  return "open";
+}
+
+function commentPreview(row: GoennerInquiryRow) {
+  const admin = row.admin_note?.trim();
+  const msg = row.message?.trim();
+  if (admin && msg) return `${admin}\n\n— Formular —\n${msg}`;
+  return admin || msg || "Kein Kommentar";
+}
+
+function displayName(name: string, max = 16) {
+  const trimmed = name.trim();
+  if (trimmed.length <= max) return trimmed;
+  return `${trimmed.slice(0, max)}…`;
+}
+
+function toDateInput(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+type Filter = "all" | "open" | "paid" | "exited" | "hundert";
+
+type Draft = {
+  email: string;
+  phone: string;
+  amount: string;
+  status: GoennerInquiryStatus;
+  created: string;
+};
+
+function draftFrom(row: GoennerInquiryRow): Draft {
+  const amount =
+    row.amount_chf != null && row.amount_chf !== undefined
+      ? String(row.amount_chf)
+      : String(membershipPriceChf(row.membership_id) || "");
+  return {
+    email: row.email,
+    phone: row.phone || "",
+    amount,
+    status: statusOf(row),
+    created: toDateInput(row.created_at),
+  };
 }
 
 export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[] }) {
@@ -31,240 +70,422 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
   const [, startTransition] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [completeForId, setCompleteForId] = useState<string | null>(null);
-  const [amountDraft, setAmountDraft] = useState("");
+  const [formWarning, setFormWarning] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Filter>("open");
+  const [query, setQuery] = useState("");
+  const [drafts, setDrafts] = useState<Record<string, Draft>>(() =>
+    Object.fromEntries(rows.map((r) => [r.id, draftFrom(r)])),
+  );
+  const [noteOpenId, setNoteOpenId] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
+  const notePanelRef = useRef<HTMLDivElement | null>(null);
 
-  const openRows = rows.filter((r) => !isDone(r));
-  const doneRows = rows
-    .filter(isDone)
-    .sort(
-      (a, b) =>
-        new Date(b.completed_at || 0).getTime() - new Date(a.completed_at || 0).getTime(),
+  useEffect(() => {
+    setDrafts(Object.fromEntries(rows.map((r) => [r.id, draftFrom(r)])));
+  }, [rows]);
+
+  useEffect(() => {
+    if (!noteOpenId) return;
+    function onDoc(e: MouseEvent) {
+      if (notePanelRef.current && !notePanelRef.current.contains(e.target as Node)) {
+        setNoteOpenId(null);
+      }
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [noteOpenId]);
+
+  const openRows = rows.filter((r) => statusOf(r) === "open");
+  const paidRows = rows.filter((r) => statusOf(r) === "completed");
+  const exitedRows = rows.filter((r) => statusOf(r) === "exited");
+  const hundertOpen = openRows.filter((r) => isLiteContactMembership(r.membership_id)).length;
+  const totalChf = paidRows.reduce((s, r) => s + (Number(r.amount_chf) || 0), 0);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows
+      .filter((row) => {
+        const st = statusOf(row);
+        if (filter === "open") return st === "open";
+        if (filter === "paid") return st === "completed";
+        if (filter === "exited") return st === "exited";
+        if (filter === "hundert") return isLiteContactMembership(row.membership_id);
+        return true;
+      })
+      .filter((row) => {
+        if (!q) return true;
+        const hay = [row.name, row.email, row.phone || "", inquiryTierShort(row.membership_id), row.message || "", row.admin_note || ""]
+          .join(" ")
+          .toLowerCase();
+        return hay.includes(q);
+      })
+      .sort((a, b) => {
+        const order = { open: 0, completed: 1, exited: 2 } as const;
+        const diff = order[statusOf(a)] - order[statusOf(b)];
+        if (diff !== 0) return diff;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+  }, [rows, filter, query]);
+
+  function setDraft(id: string, partial: Partial<Draft>) {
+    setDrafts((prev) => ({ ...prev, [id]: { ...prev[id], ...partial } }));
+  }
+
+  function isDirty(row: GoennerInquiryRow) {
+    const d = drafts[row.id];
+    if (!d) return false;
+    const base = draftFrom(row);
+    return (
+      d.email !== base.email ||
+      d.phone !== base.phone ||
+      d.amount !== base.amount ||
+      d.status !== base.status ||
+      d.created !== base.created
     );
-  const totalChf = doneRows.reduce((s, r) => s + (Number(r.amount_chf) || 0), 0);
+  }
 
   async function patch(id: string, body: Record<string, unknown>) {
     setBusyId(id);
     setFormError(null);
+    setFormWarning(null);
     try {
       const res = await fetch(`/api/admin/goenner-inquiries/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string; warning?: string };
       if (!res.ok) {
         setFormError(typeof data.error === "string" ? data.error : "Aktion fehlgeschlagen.");
+        return false;
+      }
+      if (data.warning) setFormWarning(data.warning);
+      startTransition(() => router.refresh());
+      return true;
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function saveRow(row: GoennerInquiryRow) {
+    const d = drafts[row.id];
+    if (!d) return;
+    const n = parseFloat(d.amount.replace(",", "."));
+    if (!Number.isFinite(n) || n < 0) {
+      setFormError("Bitte einen gültigen Betrag eingeben.");
+      return;
+    }
+    if (row.membership_id === "sponsoring" && d.status === "completed" && n < GOENNER_SPONSORING_MIN_CHF) {
+      setFormError(`Sponsoring: Betrag muss ≥ ${GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF sein.`);
+      return;
+    }
+    if (!d.email.trim().includes("@")) {
+      setFormError("Gültige E-Mail erforderlich.");
+      return;
+    }
+    if (!d.created) {
+      setFormError("Eingangsdatum fehlt.");
+      return;
+    }
+
+    await patch(row.id, {
+      email: d.email.trim(),
+      phone: d.phone.trim() || null,
+      amount_chf: n,
+      status: d.status,
+      created_at: d.created,
+      clear_amount: d.status === "open" ? false : undefined,
+    });
+  }
+
+  function openNote(row: GoennerInquiryRow) {
+    setNoteOpenId(row.id);
+    setNoteDraft(row.admin_note || "");
+  }
+
+  async function saveNote(row: GoennerInquiryRow) {
+    const ok = await patch(row.id, { admin_note: noteDraft.trim() || null });
+    if (ok) setNoteOpenId(null);
+  }
+
+  async function deleteRow(row: GoennerInquiryRow) {
+    const okConfirm = window.confirm(
+      `Anfrage von «${row.name}» wirklich löschen?\n\nDieser Schritt kann nicht rückgängig gemacht werden.`,
+    );
+    if (!okConfirm) return;
+
+    setBusyId(row.id);
+    setFormError(null);
+    setFormWarning(null);
+    try {
+      const res = await fetch(`/api/admin/goenner-inquiries/${row.id}`, { method: "DELETE" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setFormError(typeof data.error === "string" ? data.error : "Löschen fehlgeschlagen.");
         return;
       }
-      setCompleteForId(null);
+      if (noteOpenId === row.id) setNoteOpenId(null);
       startTransition(() => router.refresh());
     } finally {
       setBusyId(null);
     }
   }
 
-  function openCompleteForm(row: GoennerInquiryRow) {
-    setCompleteForId(row.id);
-    setAmountDraft(String(membershipPriceChf(row.membership_id) || ""));
-    setFormError(null);
-  }
-
-  function renderCard(row: GoennerInquiryRow, variant: "open" | "completed") {
-    const addressLine = formatPostalAddress(row);
-    const busy = busyId === row.id;
-
-    return (
-      <li key={row.id}>
-        <article
-          className={`admin-goenner-card${variant === "completed" ? " admin-goenner-card--done" : ""}`}
-        >
-          <header className="admin-goenner-card-head">
-            <div className="admin-goenner-card-title">
-              <strong>{row.name}</strong>
-              <span className="admin-goenner-tier">{inquiryTierLabel(row.membership_id)}</span>
-            </div>
-            <div className="admin-goenner-card-meta">
-              {variant === "completed" && row.completed_at ? (
-                <span className="admin-goenner-done-badge" title="Erledigt am">
-                  Erledigt{" "}
-                  {new Date(row.completed_at).toLocaleString("de-CH", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </span>
-              ) : null}
-              <time dateTime={row.created_at}>
-                Eingang:{" "}
-                {new Date(row.created_at).toLocaleString("de-CH", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </time>
-            </div>
-          </header>
-
-          {variant === "completed" && row.amount_chf != null ? (
-            <p className="admin-goenner-amount-line">
-              <span className="admin-goenner-amount-label">Erfasster Betrag</span>
-              <strong className="admin-goenner-amount-value">{chfFmt(Number(row.amount_chf))}</strong>
-            </p>
-          ) : null}
-
-          <div className="admin-goenner-panels">
-            <section className="admin-goenner-panel" aria-label="Kontakt">
-              <h3 className="admin-goenner-panel-title">Kontakt</h3>
-              <p className="admin-goenner-panel-body">
-                <a href={`mailto:${encodeURIComponent(row.email)}`}>{row.email}</a>
-                {row.phone ? (
-                  <>
-                    <br />
-                    <a href={`tel:${row.phone.replace(/\s/g, "")}`}>{row.phone}</a>
-                  </>
-                ) : (
-                  <span className="admin-goenner-dash"> · kein Telefon</span>
-                )}
-              </p>
-            </section>
-
-            <section className="admin-goenner-panel" aria-label="Adresse">
-              <h3 className="admin-goenner-panel-title">Adresse</h3>
-              <p className="admin-goenner-panel-body admin-goenner-panel-body--address">
-                {addressLine ?? <span className="admin-muted">— nicht erfasst (ältere Anfrage)</span>}
-              </p>
-            </section>
-          </div>
-
-          {row.message ? (
-            <section className="admin-goenner-note" aria-label="Nachricht">
-              <h3 className="admin-goenner-panel-title">Nachricht</h3>
-              <p className="admin-goenner-message">{row.message}</p>
-            </section>
-          ) : null}
-
-          {variant === "open" ? (
-            <footer className="admin-goenner-actions">
-              {completeForId === row.id ? (
-                <form
-                  className="admin-goenner-complete-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const n = parseFloat(amountDraft.replace(",", "."));
-                    if (!Number.isFinite(n) || n < 0) {
-                      setFormError("Bitte einen gültigen Betrag eingeben.");
-                      return;
-                    }
-                    if (row.membership_id === "sponsoring" && n < GOENNER_SPONSORING_MIN_CHF) {
-                      setFormError(
-                        `Sponsoring: Betrag muss ≥ ${GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF sein.`,
-                      );
-                      return;
-                    }
-                    void patch(row.id, { status: "completed", amount_chf: n });
-                  }}
-                >
-                  <label className="admin-goenner-amount-field">
-                    <span>Betrag (CHF)</span>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={amountDraft}
-                      onChange={(e) => setAmountDraft(e.target.value)}
-                      disabled={busy}
-                      aria-describedby={`goenner-hint-${row.id}`}
-                    />
-                  </label>
-                  <p id={`goenner-hint-${row.id}`} className="admin-goenner-form-hint">
-                    {row.membership_id === "sponsoring"
-                      ? `Sponsoring: erfasster Betrag ≥ ${GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF (Mindestbetrag); bei höherem Paket anpassen.`
-                      : "Vorschlag = Listenpreis der Stufe; anpassen falls abweichend."}
-                  </p>
-                  <div className="admin-goenner-form-buttons">
-                    <button type="submit" className="admin-btn" disabled={busy}>
-                      {busy ? "Speichern…" : "Als erledigt speichern"}
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn--ghost"
-                      disabled={busy}
-                      onClick={() => {
-                        setCompleteForId(null);
-                        setFormError(null);
-                      }}
-                    >
-                      Abbrechen
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  className="admin-btn"
-                  disabled={busy}
-                  onClick={() => openCompleteForm(row)}
-                >
-                  Als erledigt markieren
-                </button>
-              )}
-            </footer>
-          ) : (
-            <footer className="admin-goenner-actions">
-              <button
-                type="button"
-                className="admin-btn admin-btn--ghost"
-                disabled={busy}
-                onClick={() => {
-                  if (!window.confirm("Anfrage wieder als offen führen? Betrag und Datum werden gelöscht.")) {
-                    return;
-                  }
-                  void patch(row.id, { status: "open" });
-                }}
-              >
-                {busy ? "…" : "Wieder offen"}
-              </button>
-            </footer>
-          )}
-        </article>
-      </li>
-    );
-  }
-
   return (
     <>
-      <div className="admin-inline-kpis">
-        <div className="admin-inline-kpi">
-          <span className="admin-inline-kpi-label">Offen</span>
+      <div className="mgf-kpi-grid">
+        <div className="mgf-kpi">
+          <span className="mgf-kpi-label">Offen</span>
           <strong>{openRows.length}</strong>
         </div>
-        <div className="admin-inline-kpi">
-          <span className="admin-inline-kpi-label">Erledigt</span>
-          <strong>{doneRows.length}</strong>
+        <div className="mgf-kpi">
+          <span className="mgf-kpi-label">100er offen</span>
+          <strong>{hundertOpen}</strong>
         </div>
-        <div className="admin-inline-kpi">
-          <span className="admin-inline-kpi-label">Summe erledigt (CHF)</span>
+        <div className="mgf-kpi">
+          <span className="mgf-kpi-label">Bezahlt</span>
+          <strong>{paidRows.length}</strong>
+        </div>
+        <div className="mgf-kpi">
+          <span className="mgf-kpi-label">Ausgetreten</span>
+          <strong>{exitedRows.length}</strong>
+        </div>
+        <div className="mgf-kpi mgf-kpi--accent">
+          <span className="mgf-kpi-label">Summe bezahlt</span>
           <strong>{chfFmt(totalChf)}</strong>
         </div>
       </div>
 
-      {formError ? <p className="admin-goenner-api-error">{formError}</p> : null}
+      <div className="mgf-inbox-toolbar">
+        <div className="mgf-inbox-filters" role="group" aria-label="Liste filtern">
+          {(
+            [
+              ["open", "Offen"],
+              ["paid", "Bezahlt"],
+              ["exited", "Ausgetreten"],
+              ["hundert", "100er"],
+              ["all", "Alle"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`mgf-inbox-filter${filter === id ? " is-active" : ""}`}
+              onClick={() => setFilter(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <label className="mgf-inbox-search">
+          <span className="sr-only">Suchen</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Name, E-Mail, Telefon…"
+          />
+        </label>
+      </div>
 
-      {openRows.length > 0 ? (
-        <>
-          <h2 className="admin-goenner-section-title">Offene Anfragen</h2>
-          <ul className="admin-goenner-list">{openRows.map((row) => renderCard(row, "open"))}</ul>
-        </>
-      ) : null}
+      {formError ? <p className="mgf-banner mgf-banner--warn">{formError}</p> : null}
+      {formWarning ? <p className="mgf-banner">{formWarning}</p> : null}
 
-      {doneRows.length > 0 ? (
-        <>
-          <h2 className="admin-goenner-section-title admin-goenner-section-title--spaced">Erledigt (Archiv)</h2>
-          <p className="admin-muted admin-goenner-section-dek">
-            Alle erfassten Beträge bleiben in der Datenbank; die Summe oben bezieht sich nur auf erledigte
-            Einträge.
-          </p>
-          <ul className="admin-goenner-list">{doneRows.map((row) => renderCard(row, "completed"))}</ul>
-        </>
-      ) : null}
+      {visible.length === 0 ? (
+        <p className="mgf-muted">Keine Einträge in diesem Filter.</p>
+      ) : (
+        <div className="mgf-table-wrap mgf-inbox-wrap">
+          <table className="mgf-table mgf-inbox-table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Stufe</th>
+                <th scope="col">E-Mail</th>
+                <th scope="col">Telefon</th>
+                <th scope="col">Betrag</th>
+                <th scope="col">Status</th>
+                <th scope="col">Eingang</th>
+                <th scope="col">Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visible.map((row) => {
+                const busy = busyId === row.id;
+                const d = drafts[row.id] ?? draftFrom(row);
+                const st = d.status;
+                const isHundert = isLiteContactMembership(row.membership_id);
+                const dirty = isDirty(row);
+                const tip = commentPreview(row);
+                const hasComment = Boolean(row.message?.trim() || row.admin_note?.trim());
+
+                return (
+                  <tr
+                    key={row.id}
+                    className={[
+                      "mgf-inbox-row",
+                      `mgf-inbox-row--${st}`,
+                      isHundert ? "mgf-inbox-row--hundert" : "",
+                      dirty ? "is-dirty" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <td className="mgf-inbox-name-cell">
+                      <button
+                        type="button"
+                        className={`mgf-inbox-name${hasComment ? " has-note" : ""}`}
+                        title={`${row.name}\n\n${tip}`}
+                        aria-label={row.name}
+                        aria-expanded={noteOpenId === row.id}
+                        onClick={() => openNote(row)}
+                      >
+                        {displayName(row.name)}
+                      </button>
+                      {noteOpenId === row.id ? (
+                        <div className="mgf-inbox-note-pop" ref={notePanelRef} role="dialog" aria-label="Kommentar">
+                          {row.message?.trim() ? (
+                            <div className="mgf-inbox-note-block">
+                              <span className="mgf-inbox-note-label">Formular</span>
+                              <p>{row.message.trim()}</p>
+                            </div>
+                          ) : (
+                            <p className="mgf-muted">Kein Formular-Kommentar.</p>
+                          )}
+                          <label className="mgf-inbox-note-edit">
+                            <span className="mgf-inbox-note-label">Dein Kommentar</span>
+                            <textarea
+                              value={noteDraft}
+                              onChange={(e) => setNoteDraft(e.target.value)}
+                              rows={3}
+                              disabled={busy}
+                              placeholder="Interner Vermerk…"
+                            />
+                          </label>
+                          <div className="mgf-inbox-note-actions">
+                            <button
+                              type="button"
+                              className="mgf-btn mgf-btn--primary mgf-btn--sm"
+                              disabled={busy}
+                              onClick={() => void saveNote(row)}
+                            >
+                              Speichern
+                            </button>
+                            <button
+                              type="button"
+                              className="mgf-btn mgf-btn--ghost mgf-btn--sm"
+                              disabled={busy}
+                              onClick={() => setNoteOpenId(null)}
+                            >
+                              Schliessen
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+                    </td>
+                    <td>
+                      <span className={`mgf-tier-chip mgf-tier-chip--${row.membership_id}`}>
+                        {inquiryTierShort(row.membership_id)}
+                      </span>
+                    </td>
+                    <td>
+                      <input
+                        className="mgf-inbox-input"
+                        type="email"
+                        value={d.email}
+                        disabled={busy}
+                        onChange={(e) => setDraft(row.id, { email: e.target.value })}
+                        aria-label={`E-Mail ${row.name}`}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="mgf-inbox-input"
+                        type="tel"
+                        value={d.phone}
+                        disabled={busy}
+                        onChange={(e) => setDraft(row.id, { phone: e.target.value })}
+                        aria-label={`Telefon ${row.name}`}
+                        placeholder="—"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="mgf-inbox-input mgf-inbox-input--amount"
+                        type="text"
+                        inputMode="decimal"
+                        value={d.amount}
+                        disabled={busy}
+                        onChange={(e) => setDraft(row.id, { amount: e.target.value })}
+                        aria-label={`Betrag ${row.name}`}
+                      />
+                    </td>
+                    <td>
+                      <select
+                        className={`mgf-inbox-select mgf-inbox-select--${st}`}
+                        value={st}
+                        disabled={busy}
+                        onChange={(e) =>
+                          setDraft(row.id, { status: e.target.value as GoennerInquiryStatus })
+                        }
+                        aria-label={`Status ${row.name}`}
+                      >
+                        <option value="open">Offen</option>
+                        <option value="completed">Bezahlt</option>
+                        <option value="exited">Ausgetreten</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        className="mgf-inbox-input mgf-inbox-input--date"
+                        type="date"
+                        value={d.created}
+                        disabled={busy}
+                        onChange={(e) => setDraft(row.id, { created: e.target.value })}
+                        aria-label={`Eingang ${row.name}`}
+                      />
+                    </td>
+                    <td className="mgf-inbox-actions">
+                      <button
+                        type="button"
+                        className="mgf-btn mgf-btn--primary mgf-btn--sm"
+                        disabled={busy || !dirty}
+                        onClick={() => void saveRow(row)}
+                      >
+                        {busy ? "…" : "Speichern"}
+                      </button>
+                      <button
+                        type="button"
+                        className="mgf-btn mgf-btn--danger mgf-btn--sm mgf-btn--icon"
+                        disabled={busy}
+                        onClick={() => void deleteRow(row)}
+                        title="Löschen"
+                        aria-label={`Anfrage von ${row.name} löschen`}
+                      >
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   );
 }

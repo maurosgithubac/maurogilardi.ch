@@ -9,9 +9,14 @@ export type DemoPost = {
 };
 
 import { europa20Post } from "@/content/europa-2-0-post";
+import { juli2026Post } from "@/content/juli-2026-post";
 import { zurueckInEuropaPost } from "@/content/zurueck-in-europa-post";
+import { staanOpenSiegPost } from "@/content/staan-open-sieg-post";
+import { isPostVisible } from "@/lib/blog/visible-posts";
 
 export const demoPosts: DemoPost[] = [
+  staanOpenSiegPost,
+  juli2026Post,
   europa20Post,
   zurueckInEuropaPost,
   {
@@ -159,6 +164,12 @@ export const demoPosts: DemoPost[] = [
   },
 ];
 
-export function findDemoPostBySlug(slug: string): DemoPost | null {
-  return demoPosts.find((post) => post.slug === slug) ?? null;
+export function findDemoPostBySlug(slug: string, now = new Date()): DemoPost | null {
+  const post = demoPosts.find((item) => item.slug === slug);
+  if (!post || !isPostVisible(post.created_at, now)) return null;
+  return post;
+}
+
+export function visibleDemoPosts(now = new Date()): DemoPost[] {
+  return demoPosts.filter((post) => isPostVisible(post.created_at, now));
 }

@@ -1,3 +1,4 @@
+-- 008_post_zweites_podium_pgt.sql
 -- Fallback: Gleicher Inhalt wie scripts/publish-zweites-podium-pgt.mjs
 -- Bild liegt im Next-Public-Verzeichnis: /brand-assets/images/blog/podium-haugschlag-pgt-2026.png
 insert into public.posts (slug, title, description, body, image_path, published, created_at)

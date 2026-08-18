@@ -19,6 +19,8 @@ export type SponsorRow = {
   created_at: string;
 };
 
+export type GoennerInquiryStatus = "open" | "completed" | "exited";
+
 export type GoennerInquiryRow = {
   id: string;
   membership_id: string;
@@ -29,9 +31,11 @@ export type GoennerInquiryRow = {
   postal_code: string | null;
   city: string | null;
   message: string | null;
+  /** Interner Admin-Kommentar (optional, Migration 011_goenner_inquiries_inbox_fields.sql) */
+  admin_note?: string | null;
   created_at: string;
-  /** Nach Migration supabase/goenner_inquiries_status_amount.sql */
-  status?: "open" | "completed";
+  /** Nach Migration 007_goenner_inquiries_status_amount.sql (+ 011 inbox_fields) */
+  status?: GoennerInquiryStatus;
   completed_at?: string | null;
   amount_chf?: number | null;
 };

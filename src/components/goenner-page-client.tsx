@@ -7,6 +7,7 @@ import { goennervereinigungMemberNames } from "@/content/goennervereinigungMembe
 import {
   GOENNER_SPONSORING_MIN_CHF,
   goennerMembershipTiers,
+  isLiteContactMembership,
   tierCardCta,
   tierPriceLine,
   type MembershipId,
@@ -14,6 +15,7 @@ import {
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { Club100JoinModal } from "@/components/club100-join-modal";
 import { HeroCopyReveal, HeroRevealItem, SectionReveal } from "@/components/motion/scroll-reveal";
 import { SwipeStripHint } from "@/components/swipe-strip-hint";
 import { TwintPaylinkButton } from "@/components/twint-paylink-button";
@@ -22,6 +24,8 @@ export function GoennerPageClient() {
   const [membershipId, setMembershipId] = useState<MembershipId | "">("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [club100Open, setClub100Open] = useState(false);
+  const liteSelected = membershipId !== "" && isLiteContactMembership(membershipId);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,6 +33,12 @@ export function GoennerPageClient() {
       setStatus("Bitte wähle eine Option (Mitgliedschaft oder Sponsoring).");
       return;
     }
+    if (liteSelected) {
+      setClub100Open(true);
+      setStatus("");
+      return;
+    }
+
     const form = event.currentTarget;
     const fd = new FormData(form);
     const name = String(fd.get("name") || "").trim();
@@ -97,15 +107,15 @@ export function GoennerPageClient() {
             </HeroRevealItem>
             <HeroRevealItem>
               <p className="about-hero-lead">
-                Mitgliedschaft als Birdie, Eagle oder Albatros — oder Sponsoring mit{" "}
-                <strong>Mindestbetrag ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr. Unten
-                siehst du, was jeweils dabei ist. Ich freue mich auf deine Anfrage.
+                Neu: <strong>100er Club</strong> für 100 CHF / Jahr — oder Birdie, Eagle, Albatros und Sponsoring ab{" "}
+                <strong>≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong>. Unten siehst du, was jeweils
+                dabei ist.
               </p>
             </HeroRevealItem>
             <HeroRevealItem>
               <div className="about-hero-actions">
-                <a href="#sponsoring-form-title" className="about-btn about-btn-primary">
-                  Anfrage senden
+                <a href="#goenner-memberships-title" className="about-btn about-btn-primary">
+                  Modelle ansehen
                 </a>
                 <Link href="/ueber-mich" className="about-btn about-btn-ghost">
                   Über mich
@@ -123,7 +133,7 @@ export function GoennerPageClient() {
             <p className="goenner-memberships-kicker">Mitgliedschaft &amp; Sponsoring</p>
             <h2 id="goenner-memberships-title">Das passende Modell für deine Unterstützung</h2>
             <p className="goenner-memberships-dek">
-              Sponsoring: Mindestbetrag{" "}
+              Der 100er Club startet bei 100 CHF / Jahr. Sponsoring: Mindestbetrag{" "}
               <strong>≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF</strong> pro Jahr — Paket und Leistungen
               stimmen wir individuell ab.
             </p>
@@ -137,18 +147,28 @@ export function GoennerPageClient() {
               {goennerMembershipTiers.map((tier) => (
                 <article
                   key={tier.id}
-                  className={`goenner-tier${tier.id === "eagle" ? " goenner-tier--featured" : ""}${tier.id === "sponsoring" ? " goenner-tier--sponsoring" : ""}`}
+                  className={[
+                    "goenner-tier",
+                    tier.id === "eagle" ? "goenner-tier--featured" : "",
+                    tier.id === "sponsoring" ? "goenner-tier--sponsoring" : "",
+                    tier.id === "hundert" ? "goenner-tier--hundert" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   {tier.id === "eagle" ? (
                     <p className="goenner-tier-badge">
                       <span>Empfohlen</span>
                     </p>
                   ) : null}
+                  {tier.id === "hundert" ? (
+                    <p className="goenner-tier-badge goenner-tier-badge--hundert">
+                      <span>Neu · 100 CHF</span>
+                    </p>
+                  ) : null}
                   {tier.id === "sponsoring" ? (
                     <p className="goenner-tier-badge goenner-tier-badge--sponsoring-min">
-                      <span>
-                        ≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF / Jahr
-                      </span>
+                      <span>≥ {GOENNER_SPONSORING_MIN_CHF.toLocaleString("de-CH")} CHF / Jahr</span>
                     </p>
                   ) : null}
                   <h2 className="goenner-tier-title">{tier.title}</h2>
@@ -162,7 +182,14 @@ export function GoennerPageClient() {
                       </li>
                     ))}
                   </ul>
-                  <p className="goenner-tier-cta">{tierCardCta(tier)}</p>
+                  {tier.id === "hundert" ? (
+                    <button type="button" className="goenner-tier-join-btn" onClick={() => setClub100Open(true)}>
+                      Beitreten
+                      <span className="goenner-tier-join-btn-price">100.- / Jahr</span>
+                    </button>
+                  ) : (
+                    <p className="goenner-tier-cta">{tierCardCta(tier)}</p>
+                  )}
                 </article>
               ))}
             </div>
@@ -184,7 +211,9 @@ export function GoennerPageClient() {
             <h2 id="sponsoring-form-title" className="goenner-form-heading">
               Mitgliedschaft oder Sponsoring anfragen
             </h2>
-            <p className="goenner-form-lead">Ich bestätige deine Anfrage per E-Mail.</p>
+            <p className="goenner-form-lead">
+              100er Club: zuerst Kontaktdaten, danach TWINT in neuem Tab. Alle anderen: Anfrage hier senden.
+            </p>
           </div>
           <form className="goenner-form" onSubmit={onSubmit}>
             <fieldset className="goenner-fieldset">
@@ -197,7 +226,10 @@ export function GoennerPageClient() {
                       name="membership_pick"
                       value={tier.id}
                       checked={membershipId === tier.id}
-                      onChange={() => setMembershipId(tier.id)}
+                      onChange={() => {
+                        setMembershipId(tier.id);
+                        if (tier.id === "hundert") setClub100Open(true);
+                      }}
                     />
                     <span className="goenner-radio-card-body">
                       <span className="goenner-radio-title">{tier.title}</span>
@@ -213,74 +245,99 @@ export function GoennerPageClient() {
                   individuell).
                 </p>
               ) : null}
+              {liteSelected ? (
+                <p className="goenner-fieldset-hint goenner-hundert-hint" role="note">
+                  <strong>100er Club:</strong> Im Popup zuerst Kontaktdaten, dann{" "}
+                  <strong>zahlungspflichtig beitreten</strong> — TWINT öffnet sich in einem neuen Tab.{" "}
+                  <button type="button" className="goenner-hundert-hint-link" onClick={() => setClub100Open(true)}>
+                    Popup öffnen
+                  </button>
+                </p>
+              ) : null}
             </fieldset>
 
-            <div className="goenner-form-grid">
-              <label className="goenner-label">
-                Name
-                <input name="name" type="text" required autoComplete="name" maxLength={200} />
-              </label>
-              <label className="goenner-label">
-                E-Mail
-                <input name="email" type="email" required autoComplete="email" />
-              </label>
-            </div>
-            <label className="goenner-label">
-              Telefon <span className="goenner-optional">(optional)</span>
-              <input name="phone" type="tel" autoComplete="tel" maxLength={80} />
-            </label>
-
-            <fieldset className="goenner-fieldset goenner-fieldset--block">
-              <legend className="goenner-legend">Adresse</legend>
-              <p className="goenner-fieldset-hint">Damit ich dir Post und Infos direkt schicken kann.</p>
-              <div className="goenner-form-grid">
-                <label className="goenner-label goenner-label--span-2">
-                  Strasse & Hausnummer
-                  <input
-                    name="street"
-                    type="text"
-                    required
-                    autoComplete="street-address"
-                    maxLength={300}
-                    placeholder="z. B. Musterweg 12"
-                  />
-                </label>
+            {!liteSelected ? (
+              <>
+                <div className="goenner-form-grid">
+                  <label className="goenner-label">
+                    Name
+                    <input name="name" type="text" required autoComplete="name" maxLength={200} />
+                  </label>
+                  <label className="goenner-label">
+                    E-Mail
+                    <input name="email" type="email" required autoComplete="email" />
+                  </label>
+                </div>
                 <label className="goenner-label">
-                  PLZ
-                  <input name="postal_code" type="text" required autoComplete="postal-code" maxLength={16} inputMode="numeric" />
+                  Telefon <span className="goenner-optional">(optional)</span>
+                  <input name="phone" type="tel" autoComplete="tel" maxLength={80} />
                 </label>
+
+                <fieldset className="goenner-fieldset goenner-fieldset--block">
+                  <legend className="goenner-legend">Adresse</legend>
+                  <p className="goenner-fieldset-hint">Damit ich dir Post und Infos direkt schicken kann.</p>
+                  <div className="goenner-form-grid">
+                    <label className="goenner-label goenner-label--span-2">
+                      Strasse & Hausnummer
+                      <input
+                        name="street"
+                        type="text"
+                        required
+                        autoComplete="street-address"
+                        maxLength={300}
+                        placeholder="z. B. Musterweg 12"
+                      />
+                    </label>
+                    <label className="goenner-label">
+                      PLZ
+                      <input
+                        name="postal_code"
+                        type="text"
+                        required
+                        autoComplete="postal-code"
+                        maxLength={16}
+                        inputMode="numeric"
+                      />
+                    </label>
+                    <label className="goenner-label">
+                      Ort
+                      <input name="city" type="text" required autoComplete="address-level2" maxLength={120} />
+                    </label>
+                  </div>
+                </fieldset>
                 <label className="goenner-label">
-                  Ort
-                  <input name="city" type="text" required autoComplete="address-level2" maxLength={120} />
+                  Nachricht <span className="goenner-optional">(optional)</span>
+                  <textarea name="message" rows={4} maxLength={4000} />
                 </label>
-              </div>
-            </fieldset>
-            <label className="goenner-label">
-              Nachricht <span className="goenner-optional">(optional)</span>
-              <textarea name="message" rows={4} maxLength={4000} />
-            </label>
 
-            <p className="goenner-footnote">* Details und Termine stimme ich persönlich mit dir ab.</p>
+                <p className="goenner-footnote">* Details und Termine stimme ich persönlich mit dir ab.</p>
 
-            <button type="submit" className="goenner-submit" disabled={isSubmitting}>
-              {isSubmitting ? "Wird gesendet…" : "Anfrage senden"}
-            </button>
-            {status ? <p className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") ? " goenner-status--warn" : ""}`}>{status}</p> : null}
+                <button type="submit" className="goenner-submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Wird gesendet…" : "Anfrage senden"}
+                </button>
+              </>
+            ) : (
+              <button type="button" className="goenner-submit" onClick={() => setClub100Open(true)}>
+                100er Club beitreten
+              </button>
+            )}
+            {status ? (
+              <p
+                className={`goenner-status${status.startsWith("Bitte") || status.includes("fehl") || status.includes("100er") ? " goenner-status--warn" : ""}`}
+              >
+                {status}
+              </p>
+            ) : null}
           </form>
         </SectionReveal>
 
-        <SectionReveal
-          className="goenner-supporters-section"
-          aria-labelledby="goenner-supporters-title"
-        >
+        <SectionReveal className="goenner-supporters-section" aria-labelledby="goenner-supporters-title">
           <header className="goenner-supporters-head">
             <p className="goenner-supporters-kicker">MG Gönnervereinigung</p>
             <h2 id="goenner-supporters-title" className="goenner-supporters-heading">
               Unterstützerinnen und Unterstützer
             </h2>
-            <p className="goenner-supporters-lead">
-              Ein grosses Merci an alle, die mich auf diesem Weg begleiten.
-            </p>
+            <p className="goenner-supporters-lead">Ein grosses Merci an alle, die mich auf diesem Weg begleiten.</p>
           </header>
           {goennervereinigungMemberNames.length > 0 ? (
             <ul className="goenner-supporters-chips">
@@ -296,14 +353,14 @@ export function GoennerPageClient() {
             </ul>
           ) : (
             <p className="goenner-supporters-placeholder">
-              Hier erscheinen in Kürze die Namen aller, die mich über die MG Gönnervereinigung
-              unterstützen.
+              Hier erscheinen in Kürze die Namen aller, die mich über die MG Gönnervereinigung unterstützen.
             </p>
           )}
         </SectionReveal>
       </main>
 
       <SiteFooter />
+      <Club100JoinModal open={club100Open} onClose={() => setClub100Open(false)} />
     </div>
   );
 }

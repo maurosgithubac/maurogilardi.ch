@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export async function GET() {
@@ -8,6 +9,7 @@ export async function GET() {
       .from("posts")
       .select("id, slug, title, description, body, image_path, created_at")
       .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
       .order("created_at", { ascending: false });
 
     if (error) {

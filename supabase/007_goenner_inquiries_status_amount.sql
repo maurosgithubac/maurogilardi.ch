@@ -1,5 +1,5 @@
--- Run once in Supabase SQL Editor if goenner_inquiries exists without Status/Betrag.
--- Danach: Anfragen in /admin/goenner als erledigt markieren inkl. CHF-Betrag.
+-- 007_goenner_inquiries_status_amount.sql
+-- Run once if goenner_inquiries exists without status/amount columns.
 
 alter table public.goenner_inquiries add column if not exists status text default 'open';
 alter table public.goenner_inquiries add column if not exists completed_at timestamptz;
@@ -12,7 +12,7 @@ alter table public.goenner_inquiries alter column status set not null;
 
 alter table public.goenner_inquiries drop constraint if exists goenner_inquiries_status_check;
 alter table public.goenner_inquiries
-  add constraint goenner_inquiries_status_check check (status in ('open', 'completed'));
+  add constraint goenner_inquiries_status_check check (status in ('open', 'completed', 'exited'));
 
 drop policy if exists "Admins update goenner inquiries" on public.goenner_inquiries;
 create policy "Admins update goenner inquiries"

@@ -1,7 +1,7 @@
 /** Mindestbetrag für erledigte Sponsoring-Anfragen (Admin & API). */
 export const GOENNER_SPONSORING_MIN_CHF = 2000;
 
-export type MembershipId = "birdie" | "eagle" | "albatros" | "sponsoring";
+export type MembershipId = "hundert" | "birdie" | "eagle" | "albatros" | "sponsoring";
 
 export type MembershipBenefit = { text: string; bold?: boolean };
 
@@ -16,6 +16,16 @@ export type MembershipTier = {
 };
 
 export const goennerMembershipTiers: MembershipTier[] = [
+  {
+    id: "hundert",
+    title: "100er Club",
+    priceChf: 100,
+    benefits: [
+      { text: "Monatlicher Newsletter (Mail)" },
+      { text: "WhatsApp Supporterchat" },
+      { text: "Erwähnung auf Webseite" },
+    ],
+  },
   {
     id: "birdie",
     title: "Birdie Member",
@@ -66,12 +76,35 @@ export const goennerMembershipTiers: MembershipTier[] = [
   },
 ];
 
+/** 100er Club: nur Kontaktdaten, Zahlung zuerst via TWINT. */
+export function isLiteContactMembership(id: string): boolean {
+  return id === "hundert";
+}
+
 export function isKnownMembershipId(id: string): id is MembershipId {
   return goennerMembershipTiers.some((t) => t.id === id);
 }
 
 export function inquiryTierLabel(id: string): string {
   return isKnownMembershipId(id) ? membershipLabel(id) : id;
+}
+
+/** Kurze Stufe für Admin-Tabellen (kein Preis, kein «Member»). */
+export function inquiryTierShort(id: string): string {
+  switch (id) {
+    case "hundert":
+      return "100";
+    case "birdie":
+      return "Birdie";
+    case "eagle":
+      return "Eagle";
+    case "albatros":
+      return "Albatros";
+    case "sponsoring":
+      return "Sponsoring";
+    default:
+      return id;
+  }
 }
 
 export function tierPriceLine(tier: MembershipTier): string {
@@ -81,6 +114,9 @@ export function tierPriceLine(tier: MembershipTier): string {
 export function tierCardCta(tier: MembershipTier): string {
   if (tier.id === "sponsoring") {
     return `Partnerschaft anfragen — ≥ 2'000 CHF / Jahr (Mindestbetrag)`;
+  }
+  if (tier.id === "hundert") {
+    return "Beitreten";
   }
   return `Beitreten für ${tier.priceChf}.- / Jahr`;
 }

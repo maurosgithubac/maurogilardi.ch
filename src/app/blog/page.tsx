@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { demoPosts } from "@/content/demoPosts";
+import { visibleDemoPosts } from "@/content/demoPosts";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { blogIndexMetadata, blogIndexSchema } from "@/lib/seo/page-metadata";
@@ -10,6 +11,8 @@ import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+
+export const revalidate = 60;
 
 export const metadata = blogIndexMetadata;
 
@@ -21,6 +24,7 @@ export default async function BlogPage() {
       .from("posts")
       .select("id, slug, title, description, image_path, created_at")
       .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
       .order("created_at", { ascending: false });
     posts = data ?? [];
   } catch {
@@ -28,7 +32,7 @@ export default async function BlogPage() {
   }
 
   if (posts.length === 0) {
-    posts = demoPosts.map((post) => ({
+    posts = visibleDemoPosts().map((post) => ({
       id: post.id,
       slug: post.slug,
       title: post.title,

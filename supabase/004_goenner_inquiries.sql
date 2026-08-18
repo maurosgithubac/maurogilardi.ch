@@ -1,10 +1,11 @@
--- Run in Supabase SQL Editor after blog_and_sponsors.sql (and admin_users from admin_auth_rls.sql).
+-- 004_goenner_inquiries.sql
+-- Run in Supabase SQL Editor after 002_blog_and_sponsors.sql and 003_admin_auth_rls.sql.
 -- Inserts come from the Next.js API via service role (bypasses RLS).
 -- Admins read rows in the portal with their JWT (policy below).
 
 create table if not exists public.goenner_inquiries (
   id uuid primary key default gen_random_uuid(),
-  membership_id text not null check (membership_id in ('birdie', 'eagle', 'albatros', 'sponsoring')),
+  membership_id text not null check (membership_id in ('hundert', 'birdie', 'eagle', 'albatros', 'sponsoring')),
   name text not null,
   email text not null,
   phone text,
@@ -12,8 +13,9 @@ create table if not exists public.goenner_inquiries (
   postal_code text,
   city text,
   message text,
+  admin_note text,
   created_at timestamptz not null default now(),
-  status text not null default 'open' check (status in ('open', 'completed')),
+  status text not null default 'open' check (status in ('open', 'completed', 'exited')),
   completed_at timestamptz,
   amount_chf numeric(10, 2)
 );
@@ -36,5 +38,12 @@ create policy "Admins update goenner inquiries"
     exists (select 1 from public.admin_users u where u.user_id = auth.uid())
   )
   with check (
+    exists (select 1 from public.admin_users u where u.user_id = auth.uid())
+  );
+
+drop policy if exists "Admins delete goenner inquiries" on public.goenner_inquiries;
+create policy "Admins delete goenner inquiries"
+  on public.goenner_inquiries for delete
+  using (
     exists (select 1 from public.admin_users u where u.user_id = auth.uid())
   );

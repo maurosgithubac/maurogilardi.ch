@@ -6,6 +6,7 @@ import { SITE_URL } from "@/lib/seo/constants";
 import { buildSeoTitle } from "@/lib/seo/build-seo-title";
 import { seoPageTitles } from "@/lib/seo/titles";
 import { findDemoPostBySlug } from "@/content/demoPosts";
+import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
@@ -13,6 +14,8 @@ import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { BlogPostBody } from "@/components/blog-post-body";
+
+export const revalidate = 60;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -36,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         .select("title, description, created_at, image_path")
         .eq("slug", slug)
         .eq("published", true)
+        .lte("created_at", publishedAtOrBeforeIso())
         .maybeSingle();
       post = data as typeof post;
     } catch {
@@ -96,6 +100,7 @@ export default async function BlogPostPage({ params }: Props) {
         .select("slug, title, description, body, image_path, created_at")
         .eq("slug", slug)
         .eq("published", true)
+        .lte("created_at", publishedAtOrBeforeIso())
         .maybeSingle();
       post = data as Pick<PostRow, "slug" | "title" | "description" | "body" | "image_path" | "created_at"> | null;
     }

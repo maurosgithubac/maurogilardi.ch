@@ -1,5 +1,6 @@
--- Run in Supabase SQL Editor AFTER blog_and_sponsors.sql (and newsletter_subscribers.sql if used).
--- Optional: run goenner_inquiries.sql for Gönner membership form → admin inbox.
+-- 003_admin_auth_rls.sql
+-- Run after 002_blog_and_sponsors.sql (and 001_newsletter_subscribers.sql if used).
+-- Optional later: 004_goenner_inquiries.sql for Goenner form -> admin inbox.
 -- Prereqs:
 --   1. Buckets: blog-images, sponsor-logos (public read in Dashboard if you prefer UI).
 --   2. Create an auth user: Authentication → Users → Add user (email + password).

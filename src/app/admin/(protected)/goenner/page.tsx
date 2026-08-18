@@ -1,40 +1,31 @@
-import { AdminGoennerInquiriesClient } from "@/components/admin-goenner-inquiries-client";
+import { AdminGoennerMembersClient } from "@/components/admin-goenner-members-client";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
-import type { GoennerInquiryRow } from "@/types/content";
+import type { GoennerMemberRow, GoennerPaymentRow } from "@/lib/goenner-finance";
 
-export default async function AdminGoennerPage() {
+export default async function AdminGoennerMembersPage() {
   const supabase = await createSupabaseUserServerClient();
-  const { data, error } = await supabase
-    .from("goenner_inquiries")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const membersRes = await supabase.from("goenner_members").select("*").order("name", { ascending: true });
+  const paymentsRes = await supabase.from("goenner_payments").select("*").order("paid_on", { ascending: false });
 
-  const rows = (data as GoennerInquiryRow[]) ?? [];
+  const schemaMissing =
+    Boolean(membersRes.error?.message?.includes("does not exist")) ||
+    Boolean(paymentsRes.error?.message?.includes("does not exist")) ||
+    Boolean(membersRes.error?.message?.includes("schema cache"));
+
+  const members = (membersRes.data as GoennerMemberRow[]) ?? [];
+  const payments = (paymentsRes.data as GoennerPaymentRow[]) ?? [];
 
   return (
-    <div className="admin-card-stack">
-      <header className="admin-page-head">
-        <p className="admin-page-kicker">Sponsoring</p>
-        <h1 className="admin-h1">Anfragen</h1>
-        <p className="admin-muted admin-page-lead">
-          Offene Anfragen abarbeiten (Mitgliedschaft oder Sponsoring ab 2&apos;000 CHF), als erledigt markieren und den
-          Betrag erfassen — erledigte Einträge bleiben im Archiv mit Summe oben.
+    <div className="mgf-page">
+      <header className="mgf-page-head">
+        <p className="mgf-kicker">Ledger</p>
+        <h1 className="mgf-h1">Gönner</h1>
+        <p className="mgf-lead">
+          Verwalte Personen, Kontakte und Zahlungen. Pro Gönner siehst du das laufende Jahr, das Vorjahr und das Total
+          seit 2022.
         </p>
       </header>
-
-      {error ? (
-        <p className="admin-muted">
-          Tabelle fehlt, Spalten fehlen oder keine Berechtigung. In Supabase nacheinander ausführen:{" "}
-          <code className="admin-code">supabase/goenner_inquiries.sql</code>, bei bestehender Tabelle{" "}
-          <code className="admin-code">supabase/goenner_inquiries_add_address.sql</code> und für Status/Beträge{" "}
-          <code className="admin-code">supabase/goenner_inquiries_status_amount.sql</code>, für Sponsoring-Option{" "}
-          <code className="admin-code">supabase/goenner_inquiries_membership_sponsoring.sql</code>.
-        </p>
-      ) : null}
-
-      {!error && rows.length === 0 ? <p className="admin-muted">Noch keine Anfragen.</p> : null}
-
-      {!error && rows.length > 0 ? <AdminGoennerInquiriesClient rows={rows} /> : null}
+      <AdminGoennerMembersClient members={members} payments={payments} schemaMissing={schemaMissing} />
     </div>
   );
 }

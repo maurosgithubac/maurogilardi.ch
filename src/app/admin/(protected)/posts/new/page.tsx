@@ -1,5 +1,5 @@
-import { AdminPostForm } from "@/components/admin-post-form";
+import { redirect } from "next/navigation";
 
-export default function AdminPostNewPage() {
-  return <AdminPostForm />;
+export default function AdminPostsNewRedirectPage() {
+  redirect("/admin");
 }

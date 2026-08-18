@@ -1,5 +1,5 @@
--- Run in Supabase SQL Editor.
--- After this file, run admin_auth_rls.sql for Supabase Auth–based admin + RLS on posts/sponsors/storage.
+-- 002_blog_and_sponsors.sql
+-- After this file, run 003_admin_auth_rls.sql for Supabase Auth admin + RLS on posts/sponsors/storage.
 -- Storage: create two PUBLIC buckets in Dashboard → Storage:
 --   blog-images
 --   sponsor-logos
@@ -36,7 +36,7 @@ alter table public.sponsors enable row level security;
 drop policy if exists "Public read published posts" on public.posts;
 create policy "Public read published posts"
   on public.posts for select
-  using (published = true);
+  using (published = true and created_at <= now());
 
 drop policy if exists "Public read active sponsors" on public.sponsors;
 create policy "Public read active sponsors"
