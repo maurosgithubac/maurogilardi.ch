@@ -1,7 +1,7 @@
 export const STAAN_OPEN_SIEG_SLUG = "sieg-in-den-niederlanden";
 
-/** Live ab 19.08.2026, 11:30 Europe/Zurich (Newsletter 12:00). */
-export const STAAN_OPEN_SIEG_CREATED_AT = "2026-08-19T09:30:00.000Z";
+/** Veröffentlicht 19.08.2026, 11:05 Europe/Zurich. */
+export const STAAN_OPEN_SIEG_CREATED_AT = "2026-08-19T09:05:00.000Z";
 
 export const staanOpenSiegPost = {
   id: "demo-aug-2026-staan-open-sieg",
