@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
 import { AboutSubnav } from "@/components/about-subnav";
@@ -14,6 +15,14 @@ import { uebermichMetadata, uebermichSchema } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = uebermichMetadata;
+
+const aboutFacts = [
+  { label: "Jahrgang", value: "1999" },
+  { label: "Heimat", value: "Graubünden" },
+  { label: "Club", value: "Golfclub Domat/Ems" },
+  { label: "Profi seit", value: "2022" },
+  { label: "Tour 2027", value: "HotelPlanner Tour" },
+];
 
 export default function UeberMichPage() {
   const [lead, ...story] = siteContent.story;
@@ -60,6 +69,25 @@ export default function UeberMichPage() {
                 <h2 id="about-story-title" className="mg-h2">
                   In Kurzform.
                 </h2>
+              </Reveal>
+              <Reveal delay={0.1} className="mg-about-portrait">
+                <figure className="mg-about-portrait__media">
+                  <Image
+                    src={seoImages.portraitStanding}
+                    alt={seoImageAlts.portraitStanding}
+                    fill
+                    sizes="(max-width: 960px) 90vw, 30vw"
+                    className="mg-cover"
+                  />
+                </figure>
+                <dl className="mg-about-facts">
+                  {aboutFacts.map((fact) => (
+                    <div key={fact.label} className="mg-about-facts__row">
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </Reveal>
             </div>
             <div className="mg-about-story__body">

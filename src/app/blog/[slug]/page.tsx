@@ -14,14 +14,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { SupportStickyBar } from "@/components/support-sticky-bar";
 import { SiteHeader } from "@/components/site-header";
 import { BlogPostBody } from "@/components/blog-post-body";
-import { BlogToc } from "@/components/blog-toc";
 import { MgLogo } from "@/components/brand/mg-logo";
-import { FundingAsideCard } from "@/components/funding-strip";
 import { PostCard } from "@/components/post-card";
 import { ParallaxMedia } from "@/components/motion/parallax-media";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 import { visibleDemoPosts } from "@/content/demoPosts";
-import { extractBlogHeadings, readingMinutes } from "@/lib/blog/parse-blog-blocks";
+import { readingMinutes } from "@/lib/blog/parse-blog-blocks";
 import { ReadingProgress } from "@/components/motion/reading-progress";
 import { Reveal } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
@@ -91,7 +89,6 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const img = blogImageUrl(post.image_path);
-  const headings = extractBlogHeadings(post.body);
   const minutes = readingMinutes(post.body);
   const dateLabel = new Date(post.created_at).toLocaleDateString("de-CH", {
     day: "numeric",
@@ -136,17 +133,30 @@ export default async function BlogPostPage({ params }: Props) {
     <div className="mg-page site-page">
       <SeoPageJsonLd schema={blogPostingSchema} />
       <ReadingProgress />
-      <SiteHeader variant="document" />
+      <SiteHeader variant="overlay" />
       <main id="inhalt">
         <article className="mg-article">
-          <header className="mg-article__head mg-container">
-            <nav className="mg-article__crumbs" aria-label="Brotkrumen">
-              <Link href="/blog">Blog</Link>
-              <span aria-hidden="true">/</span>
-              <time dateTime={post.created_at}>{dateLabel}</time>
-            </nav>
-            <SplitText as="h1" text={post.title} className="mg-article__title" onMount stagger={0.04} />
-            <div className="mg-article__intro">
+          <header className="mg-page-hero mg-article-hero mg-grain" data-theme="dark">
+            {img ? (
+              <ParallaxMedia className="mg-hero__media" shift={10} zoom={1.08}>
+                <Image
+                  src={img}
+                  alt={`${post.title} – Beitragsbild`}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="mg-hero__img mg-article-hero__img"
+                />
+              </ParallaxMedia>
+            ) : null}
+            <div className="mg-hero__scrim mg-article-hero__scrim" aria-hidden="true" />
+            <div className="mg-page-hero__content mg-article-hero__content mg-container">
+              <nav className="mg-article__crumbs" aria-label="Brotkrumen">
+                <Link href="/blog">Blog</Link>
+                <span aria-hidden="true">/</span>
+                <time dateTime={post.created_at}>{dateLabel}</time>
+              </nav>
+              <SplitText as="h1" text={post.title} className="mg-article__title" onMount stagger={0.04} />
               {post.description ? (
                 <Reveal y={16} delay={0.25}>
                   <p className="mg-article__dek">{post.description}</p>
@@ -160,43 +170,22 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           </header>
 
-          {img ? (
-            <Reveal className="mg-article__hero mg-container" y={40} delay={0.2}>
-              <ParallaxMedia className="mg-article__hero-frame" shift={8} zoom={1.06}>
-                <Image
-                  src={img}
-                  alt={`${post.title} – Beitragsbild`}
-                  fill
-                  className="mg-cover"
-                  priority
-                  sizes="(max-width: 1280px) calc(100vw - 2rem), 80rem"
-                />
-              </ParallaxMedia>
-            </Reveal>
-          ) : null}
-
-          <div className="mg-article__layout mg-container">
+          <div className="mg-article__column">
             <div className="mg-article__body blog-post-article">
               <BlogPostBody body={post.body} />
             </div>
-            <aside className="mg-article__aside" aria-label="Zum Beitrag">
-              <div className="mg-article__aside-sticky">
-                <BlogToc items={headings} />
-                <div className="mg-author">
-                  <span className="mg-author__mark" aria-hidden="true">
-                    <MgLogo withName={false} />
-                  </span>
-                  <span className="mg-author__text">
-                    <strong>Mauro Gilardi</strong>
-                    <span>SwissPGA Golf Professional</span>
-                  </span>
-                  <Link href="/ueber-mich" className="mg-author__link">
-                    Über mich <span className="mg-btn__arrow" aria-hidden="true">→</span>
-                  </Link>
-                </div>
-                <FundingAsideCard />
-              </div>
-            </aside>
+            <div className="mg-author mg-article__author">
+              <span className="mg-author__mark" aria-hidden="true">
+                <MgLogo withName={false} />
+              </span>
+              <span className="mg-author__text">
+                <strong>Mauro Gilardi</strong>
+                <span>SwissPGA Golf Professional</span>
+              </span>
+              <Link href="/ueber-mich" className="mg-author__link">
+                Über mich <span className="mg-btn__arrow" aria-hidden="true">→</span>
+              </Link>
+            </div>
           </div>
 
           <aside className="mg-article__end mg-container" aria-label="Unterstützen">

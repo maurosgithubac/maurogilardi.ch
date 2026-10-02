@@ -15,9 +15,11 @@ type Props = {
   children: ReactNode;
   /** Altbestand: Fokus oben bei `about-hero-bg--focus-top` */
   heroBgClassName?: string;
+  /** CSS object-position fürs Hero-Bild */
+  heroFocus?: string;
 };
 
-export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, children, heroBgClassName }: Props) {
+export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, children, heroBgClassName, heroFocus }: Props) {
   return (
     <div className="mg-page site-page about-page">
       <SiteHeader variant="overlay" />
@@ -28,7 +30,7 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
           lead={lead}
           image={heroSrc}
           imageAlt={heroAlt}
-          focus={heroBgClassName?.includes("focus-top") ? "50% 15%" : undefined}
+          focus={heroFocus ?? (heroBgClassName?.includes("focus-top") ? "50% 15%" : undefined)}
           actions={
             <>
               <Link href="/ueber-mich" className="mg-btn mg-btn--light">

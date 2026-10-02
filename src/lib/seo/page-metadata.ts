@@ -159,7 +159,7 @@ export const uebermichFaqMetadata: Metadata = buildPageMetadata({
   title: seoPageTitles.faq,
   description:
     "FAQ zu Mauro Gilardi: Pro Golf Tour, HotelPlanner Tour, Swiss PGA, Swiss Golf Team, Rankings und wie du Gönner oder Sponsor wirst – kurz und ehrlich erklärt.",
-  image: "heroPrimary",
+  image: "ironSwing",
 });
 
 export const uebermichSponsorenMetadata: Metadata = buildPageMetadata({
@@ -167,7 +167,7 @@ export const uebermichSponsorenMetadata: Metadata = buildPageMetadata({
   title: seoPageTitles.sponsoren,
   description:
     "Sponsoren und Partner von Mauro Gilardi: Unternehmen und Gönner, die den Schweizer Golfprofi auf dem Weg von der Pro Golf Tour in die HotelPlanner Tour tragen.",
-  image: "portraitTournament",
+  image: "swissGolfFlag",
 });
 
 export const uebermichGallerieMetadata: Metadata = buildPageMetadata({
@@ -175,7 +175,7 @@ export const uebermichGallerieMetadata: Metadata = buildPageMetadata({
   title: seoPageTitles.gallerie,
   description:
     "Bildergalerie von Mauro Gilardi: Impressionen von Turnieren auf der Pro Golf Tour, Training in Graubünden, Golf-Events und Momenten mit dem Swiss Golf Team.",
-  image: "golfEvent",
+  image: "coastCourse",
 });
 
 export const uebermichMediaMetadata: Metadata = buildPageMetadata({
@@ -183,7 +183,7 @@ export const uebermichMediaMetadata: Metadata = buildPageMetadata({
   title: seoPageTitles.media,
   description:
     "Mauro Gilardi in den Medien: Presseberichte, Interviews und Auftritte des Schweizer Golfprofis und Swiss PGA Professional – plus Kontakt für Medienanfragen.",
-  image: "tournamentAction",
+  image: "readingGreen",
 });
 
 export const uebermichEquipmentMetadata: Metadata = buildPageMetadata({
@@ -191,7 +191,7 @@ export const uebermichEquipmentMetadata: Metadata = buildPageMetadata({
   title: seoPageTitles.equipment,
   description:
     "What's in the Bag: Driver, Holz, Rescue, Eisen, Wedges und Putter von Mauro Gilardi, Swiss PGA Professional – das Turnier-Equipment auf der Tour.",
-  image: "golfTeam",
+  image: "puttingAction",
 });
 
 export const impressumMetadata: Metadata = buildPageMetadata({

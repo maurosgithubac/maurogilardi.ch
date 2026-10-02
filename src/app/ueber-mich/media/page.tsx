@@ -43,8 +43,9 @@ export default function UeberMichMediaPage() {
         label="Über mich"
         title="In den Medien"
         lead="Presse, Portale und Tour-Seiten — durchsuchbar nach Quelle. Ich ergänze die Liste, sobald neue Berichte erscheinen."
-        heroSrc={seoImages.tournamentAction}
-        heroAlt={seoImageAlts.tournamentAction}
+        heroSrc={seoImages.readingGreen}
+        heroAlt={seoImageAlts.readingGreen}
+        heroFocus="50% 40%"
       >
         <section className="mg-section mg-section--tight mg-press" aria-labelledby="press-title">
           <div className="mg-container">

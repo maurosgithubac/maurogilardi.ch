@@ -10,6 +10,12 @@ export const seoImages = {
   progolfTour: "/brand-assets/images/mauro-gilardi-progolf-tour-switzerland.jpg",
   golfEvent: "/brand-assets/images/mauro-gilardi-golf-event-schweiz.jpg",
   golfTeam: "/brand-assets/images/mauro-gilardi-golf-team-switzerland.jpg",
+  swissGolfFlag: "/brand-assets/images/mauro-gilardi-swiss-golf-flagge.jpg",
+  puttingAction: "/brand-assets/images/mauro-gilardi-putting-golfprofi.jpg",
+  coastCourse: "/brand-assets/images/mauro-gilardi-golf-taghazout-marokko.jpg",
+  portraitStanding: "/brand-assets/images/mauro-gilardi-portrait-golfprofi.jpg",
+  ironSwing: "/brand-assets/images/mauro-gilardi-playing-professional-switzerland.jpg",
+  readingGreen: "/brand-assets/images/mauro-gilardi-swiss-golf-team.jpg",
 } as const;
 
 export const seoImageAlts = {
@@ -19,6 +25,12 @@ export const seoImageAlts = {
   progolfTour: "Mauro Gilardi mit Siegertrophäe nach einem Turniersieg als Golfprofi",
   golfEvent: "Mauro Gilardi mit Gästen an einem Golf-Event im Fitting-Studio",
   golfTeam: "Mauro Gilardi mit seinem Coach im Trainingszentrum vor Bergkulisse",
+  swissGolfFlag: "Lachender Golfprofi Mauro Gilardi mit verschränkten Armen neben einer Swiss-Golf-Fahne",
+  puttingAction: "Golfprofi Mauro Gilardi beim Putten auf dem Grün",
+  coastCourse: "Mauro Gilardi auf einem Golfplatz über dem Atlantik in Taghazout, Marokko",
+  portraitStanding: "Porträt des Schweizer Golfprofis Mauro Gilardi auf dem Golfplatz",
+  ironSwing: "Mauro Gilardi im Durchschwung nach einem Eisenschlag",
+  readingGreen: "Mauro Gilardi liest in der Hocke die Puttlinie auf dem Grün",
 } as const;
 
 /**
@@ -32,6 +44,12 @@ export const seoOgImagePaths = {
   progolfTour: "/brand-assets/images/og/mauro-gilardi-progolf-tour-switzerland.jpg",
   golfEvent: "/brand-assets/images/og/mauro-gilardi-golf-event-schweiz.jpg",
   golfTeam: "/brand-assets/images/og/mauro-gilardi-golf-team-switzerland.jpg",
+  swissGolfFlag: "/brand-assets/images/og/mauro-gilardi-swiss-golf-flagge.jpg",
+  puttingAction: "/brand-assets/images/og/mauro-gilardi-putting-golfprofi.jpg",
+  coastCourse: "/brand-assets/images/og/mauro-gilardi-golf-taghazout-marokko.jpg",
+  portraitStanding: "/brand-assets/images/og/mauro-gilardi-portrait-golfprofi.jpg",
+  ironSwing: "/brand-assets/images/og/mauro-gilardi-playing-professional-switzerland.jpg",
+  readingGreen: "/brand-assets/images/og/mauro-gilardi-swiss-golf-team.jpg",
 } as const satisfies Record<keyof typeof seoImages, string>;
 
 export type SeoImageKey = keyof typeof seoOgImagePaths;

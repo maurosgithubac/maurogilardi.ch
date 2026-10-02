@@ -90,30 +90,3 @@ export async function FundingHeroCard({ href = "/2027#modelle" }: { href?: strin
     </Link>
   );
 }
-
-/** Kompakte, helle Finanzierungs-Karte (z. B. Seitenleiste im Blog) */
-export async function FundingAsideCard({ href = "/2027#modelle" }: { href?: string }) {
-  if (!seasonCampaign.showFunding) return null;
-  const committed = await getCommittedAnnualChf();
-  if (committed == null) return null;
-  const { year, goalChf } = seasonCampaign;
-  const pct = Math.min(100, Math.round((committed / goalChf) * 100));
-
-  return (
-    <Link href={href} className="mg-aside-funding" data-track="funding_aside_click">
-      <span className="mg-aside-funding__top">
-        <span className="mg-label">Saison {year}</span>
-        <span className="mg-aside-funding__pct mg-mono">{pct} %</span>
-      </span>
-      <span className="mg-funding__bar mg-aside-funding__bar" aria-hidden="true">
-        <span style={{ width: `${pct}%` }} />
-      </span>
-      <span className="mg-aside-funding__text">
-        CHF {chf(committed)} von {chf(goalChf)} getragen
-      </span>
-      <span className="mg-aside-funding__cta">
-        Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
-      </span>
-    </Link>
-  );
-}

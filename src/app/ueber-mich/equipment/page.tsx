@@ -59,8 +59,9 @@ export default function UeberMichEquipmentPage() {
         label="Über mich"
         title="Mein Bag"
         lead="Was ich im Spiel dabei habe — und bei wem ich fitten gehe."
-        heroSrc={seoImages.golfTeam}
-        heroAlt={seoImageAlts.golfTeam}
+        heroSrc={seoImages.puttingAction}
+        heroAlt={seoImageAlts.puttingAction}
+        heroFocus="60% 50%"
         heroBgClassName="about-hero-bg--focus-top"
       >
         <section className="mg-section mg-bag" aria-labelledby="mg-bag-title">

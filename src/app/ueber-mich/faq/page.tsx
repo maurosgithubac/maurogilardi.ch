@@ -23,8 +23,9 @@ export default function UeberMichFaqPage() {
       label="Über mich"
       title="FAQ"
       lead="Antworten zu mir selbst, zu den Touren, Swiss Golf, Swiss PGA und wo du Zahlen sowie Termine nachliest."
-      heroSrc={seoImages.heroPrimary}
-      heroAlt={seoImageAlts.heroPrimary}
+      heroSrc={seoImages.ironSwing}
+      heroAlt={seoImageAlts.ironSwing}
+        heroFocus="50% 22%"
       heroBgClassName="about-hero-bg--focus-top"
     >
       <SeoPageJsonLd

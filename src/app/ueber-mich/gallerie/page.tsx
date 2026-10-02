@@ -35,8 +35,9 @@ export default async function UeberMichGalleriePage() {
         label="Über mich"
         title="Galerie"
         lead="Einblicke in Turniere, Training und Momente neben dem Platz — die Sammlung wächst mit der Saison."
-        heroSrc={seoImages.golfEvent}
-        heroAlt={seoImageAlts.golfEvent}
+        heroSrc={seoImages.coastCourse}
+        heroAlt={seoImageAlts.coastCourse}
+        heroFocus="55% 40%"
       >
         <section className="mg-section mg-section--tight mg-gallery-page" aria-labelledby="gallery-title">
           <div className="mg-container">

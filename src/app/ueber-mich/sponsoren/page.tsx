@@ -125,8 +125,9 @@ export default function UeberMichSponsorenPage() {
         label="Über mich"
         title="Meine Sponsoren"
         lead="Hier siehst du, wer mich unterstützt — Danke an alle, die den Weg mitgehen."
-        heroSrc={seoImages.portraitTournament}
-        heroAlt={seoImageAlts.portraitTournament}
+        heroSrc={seoImages.swissGolfFlag}
+        heroAlt={seoImageAlts.swissGolfFlag}
+        heroFocus="60% 40%"
       >
         <section className="mg-section mg-section--tight mg-sponsors" aria-labelledby="sponsors-title">
           <div className="mg-container">
