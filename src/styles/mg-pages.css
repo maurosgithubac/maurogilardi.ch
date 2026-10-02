@@ -1296,10 +1296,12 @@ html:has(.mg-cookie) .mg-support-bar {
   max-width: none;
 }
 
-.mg-article__title {
-  max-width: 22ch;
-  font-size: var(--mg-step-5);
-  line-height: 0.98;
+/* Einheitliche, gut lesbare Titelgrösse für alle Beiträge — auch bei mehrzeiligen Titeln */
+.mg-article .mg-article__title {
+  max-width: 24ch;
+  font-size: var(--mg-step-3);
+  line-height: 1.08;
+  letter-spacing: var(--mg-tracking-tight);
 }
 
 .mg-article__intro {
@@ -1527,4 +1529,21 @@ html:has(.mg-cookie) .mg-support-bar {
 
 .mg-article__end-card .mg-h3 {
   font-weight: 700;
+}
+
+/* Blog: ruhige Typo-Hierarchie (Titel step-3 · Zwischentitel step-1 · Text) */
+.mg-article__body .blog-post-subheading {
+  margin: 2em 0 0.6em;
+  font-size: var(--mg-step-1);
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.2;
+}
+
+.mg-article__body h3.blog-post-subheading {
+  font-size: var(--mg-step-0);
+}
+
+.mg-article .mg-article__dek {
+  font-size: var(--mg-step-0);
+  line-height: 1.6;
 }
