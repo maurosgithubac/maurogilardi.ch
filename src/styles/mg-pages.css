@@ -1066,3 +1066,58 @@
     transition: none;
   }
 }
+
+/* ——— Gönnerturnier-Galerie: viele kleine Kacheln, Fotos sind bereits schwarzweiss ——— */
+.mg-turnier {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.mg-gallery--dense {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.mg-gallery--dense .mg-gallery__item {
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+
+/* 3:2 wie die (fast ausschliesslich queren) Fotos — nichts abgeschnitten, Wasserzeichen bleibt sichtbar */
+.mg-gallery--dense .mg-gallery__frame {
+  aspect-ratio: 3 / 2;
+  border-radius: var(--mg-r-sm);
+}
+
+@media (min-width: 640px) {
+  .mg-gallery--dense {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+@media (min-width: 1080px) {
+  .mg-gallery--dense {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.mg-turnier__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mg-turnier__credit {
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+  font-style: italic;
+}
+
+.mg-turnier__credit span {
+  color: var(--mg-ink);
+  font-style: normal;
+  font-weight: 600;
+}

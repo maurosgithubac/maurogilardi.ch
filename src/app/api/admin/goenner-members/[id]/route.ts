@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { isKnownMembershipId } from "@/content/goennerMemberships";
+import { isAdminMembershipId } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
+import { parseAmountOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 function validId(id: string) {
@@ -59,8 +60,13 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if ("city" in body) patch.city = String(body.city || "").trim() || null;
   if ("notes" in body) patch.notes = String(body.notes || "").trim() || null;
   if ("active" in body) patch.active = Boolean(body.active);
+  if ("annual_amount_chf" in body) {
+    const annual = parseAmountOrNull(body.annual_amount_chf);
+    if (annual === "invalid") return NextResponse.json({ error: "Ungültiger Jahresbetrag." }, { status: 400 });
+    patch.annual_amount_chf = annual;
+  }
   if (typeof body.membership_id === "string") {
-    if (!isKnownMembershipId(body.membership_id)) {
+    if (!isAdminMembershipId(body.membership_id)) {
       return NextResponse.json({ error: "Ungültige Stufe." }, { status: 400 });
     }
     patch.membership_id = body.membership_id;

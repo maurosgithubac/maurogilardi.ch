@@ -13,7 +13,7 @@ type Item = { src: string; alt: string };
  * Galerie mit Lightbox: das angeklickte Bild "fliegt" per shared layout ins Vollbild.
  * Pfeiltasten blättern, Escape schliesst, Fokus bleibt im Dialog.
  */
-export function GalleryGrid({ items }: { items: Item[] }) {
+export function GalleryGrid({ items, dense = false }: { items: Item[]; /** kleine, gleich grosse Kacheln */ dense?: boolean }) {
   const [active, setActive] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setActive(null), []);
@@ -44,7 +44,7 @@ export function GalleryGrid({ items }: { items: Item[] }) {
 
   return (
     <>
-      <ul className="mg-gallery">
+      <ul className={dense ? "mg-gallery mg-gallery--dense" : "mg-gallery"}>
         {items.map((item, i) => (
           <li key={item.src} className="mg-gallery__item">
             <button
@@ -61,7 +61,7 @@ export function GalleryGrid({ items }: { items: Item[] }) {
                   src={item.src}
                   alt={item.alt}
                   fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 960px) 33vw, 25vw"
+                  sizes={dense ? "(max-width: 640px) 34vw, (max-width: 960px) 25vw, 17vw" : "(max-width: 640px) 50vw, (max-width: 960px) 33vw, 25vw"}
                   className="mg-cover mg-gallery__img"
                 />
               </motion.div>

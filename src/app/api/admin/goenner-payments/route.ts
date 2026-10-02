@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isKnownMembershipId } from "@/content/goennerMemberships";
+import { isAdminMembershipId } from "@/content/goennerMemberships";
 import { GOENNER_FINANCE_START_YEAR } from "@/lib/goenner-finance";
 import { isAdminSession } from "@/lib/admin-auth";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   let membership_id: string | null = null;
   if (body.membership_id != null && String(body.membership_id).trim()) {
     membership_id = String(body.membership_id).trim();
-    if (!isKnownMembershipId(membership_id)) {
+    if (!isAdminMembershipId(membership_id)) {
       return NextResponse.json({ error: "Ungültige Stufe." }, { status: 400 });
     }
   }

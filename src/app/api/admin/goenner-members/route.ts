@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { isKnownMembershipId } from "@/content/goennerMemberships";
+import { isAdminMembershipId } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
+import { parseAmountOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 export async function GET() {
@@ -55,14 +56,20 @@ export async function POST(request: Request) {
   }
 
   const membership_id = String(body.membership_id || "birdie").trim();
-  if (!isKnownMembershipId(membership_id)) {
+  if (!isAdminMembershipId(membership_id)) {
     return NextResponse.json({ error: "Ungültige Stufe." }, { status: 400 });
+  }
+
+  const annual = parseAmountOrNull(body.annual_amount_chf);
+  if (annual === "invalid") {
+    return NextResponse.json({ error: "Ungültiger Jahresbetrag." }, { status: 400 });
   }
 
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase
     .from("goenner_members")
     .insert({
+      ...(annual != null ? { annual_amount_chf: annual } : {}),
       name,
       email: String(body.email || "").trim().toLowerCase() || null,
       phone: String(body.phone || "").trim() || null,

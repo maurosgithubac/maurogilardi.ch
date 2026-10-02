@@ -13,6 +13,8 @@ import { CountUp } from "@/components/motion/count-up";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 import { careerStats } from "@/content/career";
+import { goennerturnierPhotographers, goennerturnierPhotos } from "@/content/goennerturnier-photos";
+import { GoennerturnierGallery } from "@/components/goenner/goennerturnier-gallery";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { sponsoringMetadataSeo, sponsoringSchema } from "@/lib/seo/page-metadata";
 
@@ -107,6 +109,28 @@ export default function SponsoringPage() {
                 <p className="mg-body">Einmalig und unkompliziert per TWINT — jeder Franken fliesst in die Saison.</p>
               </div>
               <TwintPaylinkButton variant="hero" />
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="goennerturnier" className="mg-section" aria-labelledby="turnier-title">
+          <div className="mg-container">
+            <header className="mg-section-head mg-section-head--split">
+              <div>
+                <Reveal>
+                  <p className="mg-eyebrow">Gönnerturnier</p>
+                </Reveal>
+                <SplitText as="h2" id="turnier-title" className="mg-h2" text="Ein Tag mit dem ganzen Team." />
+              </div>
+              <Reveal delay={0.1}>
+                <p className="mg-lead">
+                  Einmal im Jahr spielen wir zusammen — Birdie-, Eagle- und Albatros-Member sind dabei. So sah es in den
+                  letzten Jahren aus.
+                </p>
+              </Reveal>
+            </header>
+            <Reveal>
+              <GoennerturnierGallery photos={goennerturnierPhotos} photographers={goennerturnierPhotographers} />
             </Reveal>
           </div>
         </section>

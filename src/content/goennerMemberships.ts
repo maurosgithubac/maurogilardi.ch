@@ -92,7 +92,18 @@ export function isKnownMembershipId(id: string): id is MembershipId {
   return goennerMembershipTiers.some((t) => t.id === id);
 }
 
+/** Stufen im Admin: öffentliche Modelle + Unterstützungsbeitrag (individueller Betrag) */
+export const adminMembershipOptions: { id: string; title: string }[] = [
+  ...goennerMembershipTiers.map((t) => ({ id: t.id, title: t.title })),
+  { id: "unterstuetzung", title: "Unterstützungsbeitrag" },
+];
+
+export function isAdminMembershipId(id: string): boolean {
+  return adminMembershipOptions.some((o) => o.id === id);
+}
+
 export function inquiryTierLabel(id: string): string {
+  if (id === "unterstuetzung") return "Unterstützungsbeitrag";
   return isKnownMembershipId(id) ? membershipLabel(id) : id;
 }
 
@@ -109,6 +120,8 @@ export function inquiryTierShort(id: string): string {
       return "Albatros";
     case "sponsoring":
       return "Sponsoring";
+    case "unterstuetzung":
+      return "Unterstützung";
     default:
       return id;
   }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
-import { goennerMembershipTiers, inquiryTierLabel } from "@/content/goennerMemberships";
+import { adminMembershipOptions, inquiryTierLabel } from "@/content/goennerMemberships";
 import {
   GOENNER_FINANCE_START_YEAR,
   chfFmt,
@@ -215,12 +215,23 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                 value={draft.membership_id}
                 onChange={(e) => setDraft({ ...draft, membership_id: e.target.value })}
               >
-                {goennerMembershipTiers.map((t) => (
+                {adminMembershipOptions.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.title}
                   </option>
                 ))}
               </select>
+            </label>
+            <label>
+              Jahresbetrag (CHF)
+              <input
+                inputMode="decimal"
+                placeholder="Listenpreis der Stufe"
+                value={draft.annual_amount_chf ?? ""}
+                onChange={(e) =>
+                  setDraft({ ...draft, annual_amount_chf: e.target.value === "" ? null : Number(e.target.value.replace(",", ".")) })
+                }
+              />
             </label>
             <label>
               E-Mail
@@ -302,7 +313,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             <label>
               Stufe (Zahlung)
               <select name="membership_id" defaultValue={member.membership_id}>
-                {goennerMembershipTiers.map((t) => (
+                {adminMembershipOptions.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.title}
                   </option>

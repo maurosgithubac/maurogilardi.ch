@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { goennerMembershipTiers, inquiryTierLabel } from "@/content/goennerMemberships";
+import { adminMembershipOptions, inquiryTierLabel } from "@/content/goennerMemberships";
 import {
+  GOENNER_FINANCE_START_YEAR,
   chfFmt,
+  expectedAnnualChf,
+  paidOnForYear,
+  paymentsInYear,
   withMemberTotals,
   type GoennerMemberRow,
   type GoennerPaymentRow,
@@ -17,31 +21,93 @@ type Props = {
   schemaMissing?: boolean;
 };
 
+type StatusFilter = "all" | "open" | "paid";
+
 export function AdminGoennerMembersClient({ members, payments, schemaMissing }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(currentYear);
   const [query, setQuery] = useState("");
   const [onlyActive, setOnlyActive] = useState(true);
+  const [status, setStatus] = useState<StatusFilter>("all");
   const [showAdd, setShowAdd] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Jahre nur bis zum laufenden Jahr — ein neues Jahr erscheint automatisch ab dem 1. Januar
+  const years = useMemo(() => {
+    const list: number[] = [];
+    for (let y = currentYear; y >= GOENNER_FINANCE_START_YEAR; y--) list.push(y);
+    return list;
+  }, [currentYear]);
+
   const enriched = useMemo(
-    () => members.map((m) => withMemberTotals(m, payments)).sort((a, b) => a.name.localeCompare(b.name, "de-CH")),
-    [members, payments],
+    () =>
+      members
+        .map((m) => {
+          const inYear = paymentsInYear(payments, m.id, year);
+          return {
+            ...withMemberTotals(m, payments),
+            expected: expectedAnnualChf(m),
+            paidInYear: inYear.reduce((s, p) => s + Number(p.amount_chf || 0), 0),
+            isPaid: inYear.length > 0,
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name, "de-CH")),
+    [members, payments, year],
   );
 
   const visible = enriched.filter((m) => {
     if (onlyActive && !m.active) return false;
+    if (status === "open" && m.isPaid) return false;
+    if (status === "paid" && !m.isPaid) return false;
     const q = query.trim().toLowerCase();
     if (!q) return true;
-    return [m.name, m.email || "", m.phone || "", inquiryTierLabel(m.membership_id)]
+    return [m.name, m.email || "", m.phone || "", m.city || "", inquiryTierLabel(m.membership_id)]
       .join(" ")
       .toLowerCase()
       .includes(q);
   });
 
-  const year = new Date().getFullYear();
+  const activeRows = enriched.filter((m) => m.active);
+  const soll = activeRows.reduce((s, m) => s + m.expected, 0);
+  const ist = enriched.reduce((s, m) => s + m.paidInYear, 0);
+  const paidCount = activeRows.filter((m) => m.isPaid).length;
+
+  async function markPaid(member: (typeof enriched)[number]) {
+    if (
+      !window.confirm(
+        `«${member.name}» für ${year} als bezahlt erfassen (${chfFmt(member.expected)})?\nEs wird keine E-Mail versendet.`,
+      )
+    )
+      return;
+    setBusyId(member.id);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/goenner-payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          member_id: member.id,
+          amount_chf: member.expected,
+          paid_on: paidOnForYear(year),
+          membership_id: member.membership_id,
+          method: "other",
+          note: `Jahresbeitrag ${year}`,
+        }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setError(data.error || "Speichern fehlgeschlagen.");
+        return;
+      }
+      startTransition(() => router.refresh());
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -57,6 +123,7 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
           email: fd.get("email"),
           phone: fd.get("phone"),
           membership_id: fd.get("membership_id"),
+          annual_amount_chf: fd.get("annual_amount_chf"),
           notes: fd.get("notes"),
         }),
       });
@@ -104,23 +171,59 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
   return (
     <div className="mgf-stack">
       <div className="mgf-toolbar">
+        <label className="mgf-check">
+          Jahr
+          <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="mgf-search">
           <span className="sr-only">Suchen</span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Name, E-Mail, Telefon…"
+            placeholder="Name, E-Mail, Telefon, Ort…"
           />
+        </label>
+        <label className="mgf-check">
+          Status
+          <select value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)}>
+            <option value="all">Alle</option>
+            <option value="open">Offen</option>
+            <option value="paid">Bezahlt</option>
+          </select>
         </label>
         <label className="mgf-check">
           <input type="checkbox" checked={onlyActive} onChange={(e) => setOnlyActive(e.target.checked)} />
           Nur aktiv
         </label>
+        <a
+          className="mgf-btn mgf-btn--ghost"
+          href={`/api/admin/goenner-report?year=${currentYear - 1}`}
+          title={`Stand 31.12.${currentYear - 1} als CSV (Excel)`}
+        >
+          Jahresreport {currentYear - 1}
+        </a>
+        {year !== currentYear - 1 ? (
+          <a className="mgf-btn mgf-btn--ghost" href={`/api/admin/goenner-report?year=${year}`}>
+            Report {year}
+          </a>
+        ) : null}
         <button type="button" className="mgf-btn mgf-btn--primary" onClick={() => setShowAdd((v) => !v)}>
           {showAdd ? "Abbrechen" : "Gönner hinzufügen"}
         </button>
       </div>
+
+      <p className="mgf-banner">
+        {year}: <strong>{paidCount}</strong> von {activeRows.length} aktiven Gönnern bezahlt · Soll {chfFmt(soll)} ·
+        Eingegangen {chfFmt(ist)} · Offen {chfFmt(Math.max(soll - ist, 0))}. Rechnungen und E-Mails löst du selbst aus
+        — diese Liste versendet nichts.
+      </p>
 
       {error ? <p className="mgf-banner mgf-banner--error">{error}</p> : null}
 
@@ -143,14 +246,18 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
             <label>
               Stufe
               <select name="membership_id" defaultValue="birdie">
-                {goennerMembershipTiers.map((t) => (
+                {adminMembershipOptions.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.title}
                   </option>
                 ))}
               </select>
             </label>
-            <label className="mgf-span-2">
+            <label>
+              Jahresbetrag (CHF)
+              <input name="annual_amount_chf" inputMode="decimal" placeholder="leer = Listenpreis" />
+            </label>
+            <label>
               Notiz
               <input name="notes" maxLength={500} />
             </label>
@@ -167,9 +274,9 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
             <tr>
               <th>Name</th>
               <th>Stufe</th>
+              <th>Jahresbetrag</th>
+              <th>Status {year}</th>
               <th>Kontakt</th>
-              <th>{year}</th>
-              <th>{year - 1}</th>
               <th>Total ab 2022</th>
               <th>Aktion</th>
             </tr>
@@ -178,7 +285,7 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
             {visible.length === 0 ? (
               <tr>
                 <td colSpan={7} className="mgf-empty-cell">
-                  Noch keine Gönner — füge Personen hinzu oder markiere Eingänge als bezahlt.
+                  Keine Gönner für diese Auswahl.
                 </td>
               </tr>
             ) : (
@@ -193,6 +300,14 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
                   <td>
                     <span className="mgf-pill">{inquiryTierLabel(m.membership_id)}</span>
                   </td>
+                  <td className="mgf-num">{chfFmt(m.expected)}</td>
+                  <td>
+                    {m.isPaid ? (
+                      <span className="mgf-pill">bezahlt · {chfFmt(m.paidInYear)}</span>
+                    ) : (
+                      <span className="mgf-pill mgf-pill--muted">offen</span>
+                    )}
+                  </td>
                   <td className="mgf-contact">
                     {m.email ? <a href={`mailto:${m.email}`}>{m.email}</a> : <span>—</span>}
                     {m.phone ? (
@@ -202,11 +317,19 @@ export function AdminGoennerMembersClient({ members, payments, schemaMissing }: 
                       </>
                     ) : null}
                   </td>
-                  <td className="mgf-num">{chfFmt(m.year_chf)}</td>
-                  <td className="mgf-num">{chfFmt(m.last_year_chf)}</td>
                   <td className="mgf-num mgf-num--strong">{chfFmt(m.total_chf)}</td>
                   <td>
                     <div className="mgf-row-actions">
+                      {!m.isPaid && m.active ? (
+                        <button
+                          type="button"
+                          className="mgf-btn mgf-btn--primary mgf-btn--sm"
+                          disabled={busyId === m.id}
+                          onClick={() => void markPaid(m)}
+                        >
+                          {busyId === m.id ? "…" : `Bezahlt ${year}`}
+                        </button>
+                      ) : null}
                       <Link href={`/admin/goenner/${m.id}`} className="mgf-btn mgf-btn--ghost mgf-btn--sm">
                         Öffnen
                       </Link>
