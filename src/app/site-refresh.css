@@ -16,11 +16,6 @@
   @supports (animation-timeline: view()) {
     .about-story,
     .about-projects,
-    .about-faq-page,
-    .about-gallery-page,
-    .about-equipment-page,
-    .about-sponsors-page,
-    .about-media-page,
     .legal-document-section {
       animation: section-enter linear both;
       animation-timeline: view();
@@ -68,27 +63,6 @@
 }
 
 /* ——— Buttons: snappy press, keep lift & glow ——— */
-.about-btn {
-  transition:
-    transform var(--press-duration) var(--ease-out-strong),
-    box-shadow var(--ui-duration) var(--ease-out-strong),
-    background var(--ui-duration) ease,
-    border-color var(--ui-duration) ease,
-    color var(--ui-duration) ease;
-}
-
-.about-btn-primary:hover {
-  transform: translateY(-2px);
-}
-
-.about-btn:active {
-  transform: scale(0.97);
-}
-
-.about-btn-primary:active {
-  transform: scale(0.97);
-  box-shadow: 0 4px 16px rgb(215 25 32 / 22%);
-}
 
 /* ——— Cards: refined lift, no flat hover ——— */
 
@@ -111,21 +85,8 @@
 @media (prefers-reduced-motion: reduce) {
   .about-story,
   .about-projects,
-  .about-faq-page,
-  .about-gallery-page,
-  .about-equipment-page,
-  .about-sponsors-page,
-  .about-media-page,
   .legal-document-section {
     animation: none !important;
-  }
-
-  .about-btn {
-    transition: none !important;
-  }
-
-  .about-btn:active {
-    transform: none;
   }
 }
 

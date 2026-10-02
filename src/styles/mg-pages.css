@@ -26,7 +26,7 @@
   max-width: 18ch;
   color: #fff;
   font-size: var(--mg-step-4);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
   line-height: 0.96;
 }
@@ -181,7 +181,7 @@
 }
 
 .mg-project__type {
-  color: #d71920;
+  color: var(--mg-muted);
   font-size: var(--mg-step--2);
   font-weight: 600;
   letter-spacing: var(--mg-tracking-caps);
@@ -266,6 +266,9 @@
 .mg-timeline {
   position: relative;
   --rail-x: 0.6rem;
+  /* Karten gleiten seitlich herein — nie über den Rand (clip erhält sticky) */
+  overflow-x: clip;
+  overflow-clip-margin: 1rem;
 }
 
 .mg-timeline__rail {
@@ -283,7 +286,7 @@
 .mg-timeline__progress {
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #d71920, #ff5a5f);
+  background: var(--mg-red);
   transform-origin: top;
 }
 
@@ -324,8 +327,8 @@
 .mg-timeline__year-num {
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-3);
-  font-weight: 650;
-  letter-spacing: -0.05em;
+  font-weight: 700;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -338,9 +341,7 @@
   box-shadow: var(--mg-shadow-card);
 }
 
-.mg-timeline__item[data-phase="Professional"] .mg-timeline__card {
-  border-top: 3px solid #d71920;
-}
+
 
 .mg-timeline__title {
   margin-bottom: 0.85rem;
@@ -370,7 +371,7 @@
   top: 0.6em;
   width: 0.35rem;
   height: 1px;
-  background: var(--mg-red);
+  background: var(--mg-ink);
 }
 
 @media (min-width: 900px) {
@@ -470,14 +471,19 @@
 }
 
 .mg-article__crumbs a {
-  color: var(--mg-red);
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--mg-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .mg-article__title {
   font-size: var(--mg-step-4);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
   line-height: 0.98;
 }
@@ -519,13 +525,13 @@
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-2);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1.1;
 }
 
 .mg-article__body .blog-post-body-strong {
   color: var(--mg-ink);
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .mg-article__body .blog-post-inline-figure {
@@ -614,7 +620,7 @@
 
 .mg-why__intro .mg-h3 {
   font-size: var(--mg-step-3);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1.05;
 }
 
@@ -691,7 +697,7 @@
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-1);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--mg-tracking-tight);
 }
 
 .mg-inquiry__options {
@@ -715,9 +721,9 @@
 }
 
 .mg-option[data-checked="true"] {
-  border-color: var(--mg-red);
-  background: var(--mg-red-soft);
-  box-shadow: 0 0 0 1px var(--mg-red);
+  border-color: var(--mg-ink);
+  background: var(--mg-surface);
+  box-shadow: 0 0 0 1px var(--mg-ink);
 }
 
 .mg-option input {
@@ -733,7 +739,7 @@
 }
 
 .mg-option__title {
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .mg-option__price {
@@ -752,7 +758,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--mg-red);
+  color: var(--mg-ink);
   font: inherit;
   font-weight: 600;
   text-decoration: underline;
@@ -820,7 +826,7 @@
 }
 
 .mg-partner-mail a {
-  color: var(--mg-red);
+  color: var(--mg-ink);
   font-weight: 600;
 }
 

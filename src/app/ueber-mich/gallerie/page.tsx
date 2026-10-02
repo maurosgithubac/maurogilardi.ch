@@ -1,6 +1,8 @@
 import { GalleryGrid } from "@/components/gallery-grid";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
+import { Reveal } from "@/components/motion/reveal";
+import { socialProfiles } from "@/content/socialProfiles";
 import {
   aboutGalleryAltFromFilename,
   aboutGalleryImageSrc,
@@ -9,6 +11,7 @@ import {
 import { uebermichGallerieMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import "@/styles/pages/gallery.css";
 
 export const dynamic = "force-dynamic";
 
@@ -31,39 +34,57 @@ export default async function UeberMichGalleriePage() {
         ]}
       />
       <AboutSubpageShell
-      label="Über mich"
-      title="Galerie"
-      lead="Einblicke in Turniere, Training und Momente neben dem Platz — die Sammlung wächst mit der Saison."
-      heroSrc={seoImages.golfEvent}
-      heroAlt={seoImageAlts.golfEvent}
-    >
-      <section className="about-gallery-page" aria-labelledby="about-gallery-title">
-        <div className="about-gallery-inner">
-          <header className="about-gallery-header">
-            <p className="about-gallery-kicker">Impressionen</p>
-            <h2 id="about-gallery-title">Bilder</h2>
-            <p className="about-gallery-lead">
-              Antippen zum Vergrössern — mit den Pfeiltasten blätterst du durch die Sammlung.
-            </p>
-          </header>
+        label="Über mich"
+        title="Galerie"
+        lead="Einblicke in Turniere, Training und Momente neben dem Platz — die Sammlung wächst mit der Saison."
+        heroSrc={seoImages.golfEvent}
+        heroAlt={seoImageAlts.golfEvent}
+      >
+        <section className="mg-section mg-section--tight mg-gallery-page" aria-labelledby="gallery-title">
+          <div className="mg-container">
+            <Reveal as="header" y={20} className="mg-section-head mg-section-head--split mg-gallery-page__head">
+              <div className="mg-gallery-page__intro">
+                <p className="mg-eyebrow">Impressionen</p>
+                <h2 id="gallery-title" className="mg-h3 mg-gallery-page__title">
+                  Bilder von Tour, Training und Events
+                </h2>
+                <p className="mg-body mg-gallery-page__lead">
+                  Antippen zum Vergrössern — mit den Pfeiltasten blätterst du durch die Sammlung.
+                </p>
+              </div>
+              {files.length > 0 ? (
+                <p className="mg-gallery-page__count">
+                  <span className="mg-gallery-page__count-num">{files.length}</span>
+                  <span className="mg-gallery-page__count-label">{files.length === 1 ? "Bild" : "Bilder"}</span>
+                </p>
+              ) : null}
+            </Reveal>
 
-          {files.length === 0 ? (
-            <div className="about-gallery-empty">
-              <p>Noch keine Bilder in der Galerie.</p>
-              <p className="about-gallery-empty-hint">
-                Bilder ablegen in{" "}
-                <code className="about-gallery-code">public/brand-assets/gallerie</code>
-                <span className="about-gallery-empty-formats"> (JPG, PNG, WebP, GIF, AVIF)</span>
-              </p>
-            </div>
-          ) : (
-            <GalleryGrid
-              items={files.map((file) => ({ src: aboutGalleryImageSrc(file), alt: aboutGalleryAltFromFilename(file) }))}
-            />
-          )}
-        </div>
-      </section>
-    </AboutSubpageShell>
+            {files.length === 0 ? (
+              <div className="mg-gallery-page__empty" role="status">
+                <p className="mg-gallery-page__empty-title">Die ersten Bilder folgen bald.</p>
+                <p className="mg-gallery-page__empty-text">
+                  Die Saison läuft — schau wieder vorbei oder folge mir auf{" "}
+                  <a href={socialProfiles.instagram.url} target="_blank" rel="noopener noreferrer">
+                    Instagram
+                    <span className="mg-sr-only"> (öffnet in neuem Tab)</span>
+                  </a>{" "}
+                  für die neusten Eindrücke.
+                </p>
+                {process.env.NODE_ENV !== "production" ? (
+                  <p className="mg-gallery-page__empty-hint">
+                    Bilder ablegen in <code>public/brand-assets/gallerie</code> (JPG, PNG, WebP, GIF, AVIF)
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <GalleryGrid
+                items={files.map((file) => ({ src: aboutGalleryImageSrc(file), alt: aboutGalleryAltFromFilename(file) }))}
+              />
+            )}
+          </div>
+        </section>
+      </AboutSubpageShell>
     </>
   );
 }

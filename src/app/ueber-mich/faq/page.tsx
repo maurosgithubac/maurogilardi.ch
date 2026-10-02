@@ -1,6 +1,10 @@
+import Link from "next/link";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
+import { Reveal } from "@/components/motion/reveal";
+import { FaqTopicNav, type FaqTopic } from "@/components/pages/faq-topic-nav";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import {
+  aboutFaqItemsFlat,
   aboutFaqSections,
   getAboutFaqPageJsonLd,
   getUeberMichFaqBreadcrumbJsonLd,
@@ -8,8 +12,11 @@ import {
 } from "@/content/aboutFaq";
 import { uebermichFaqMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
+import "@/styles/pages/faq.css";
 
 export const metadata = uebermichFaqMetadata;
+
+const faqTopics: FaqTopic[] = aboutFaqSections.map((s) => ({ id: s.id, title: s.title, count: s.items.length }));
 
 export default function UeberMichFaqPage() {
   return (
@@ -22,53 +29,59 @@ export default function UeberMichFaqPage() {
       heroBgClassName="about-hero-bg--focus-top"
     >
       <SeoPageJsonLd schema={[getAboutFaqPageJsonLd(), getUeberMichFaqBreadcrumbJsonLd()]} />
-      <section className="about-faq-page" aria-labelledby="about-faq-heading">
-        <div className="about-faq-page-inner">
-          <header className="about-faq-page-head">
-            <h2 id="about-faq-heading" className="about-faq-page-title">
-              Häufige Fragen
-            </h2>
-            <p className="about-faq-page-intro">
-              Themen gruppiert — nicht nach Wichtigkeit sortiert. Für mehr Tiefe:{" "}
-              <a href="/blog">Blog</a>, <a href="/ueber-mich">Über mich</a>, <a href="/erfolge">Erfolge</a>.
-            </p>
-            <nav className="about-faq-jump" aria-label="Sprung zu FAQ-Themen">
-              <span className="about-faq-jump-label">Zu den Themen</span>
-              <ul className="about-faq-jump-list">
-                {aboutFaqSections.map((s) => (
-                  <li key={s.id}>
-                    <a className="about-faq-jump-link" href={`#faq-${s.id}`}>
-                      {s.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </header>
 
-          <div className="about-faq-sections">
-            {aboutFaqSections.map((section) => (
+      <section className="mg-section mg-faq" aria-labelledby="mg-faq-heading">
+        <div className="mg-container mg-faq__layout">
+          <aside className="mg-faq__aside">
+            <Reveal className="mg-faq__intro">
+              <p className="mg-eyebrow">Häufige Fragen</p>
+              <h2 id="mg-faq-heading" className="mg-h2 mg-faq__title">
+                Kurz gefragt, ehrlich beantwortet.
+              </h2>
+              <p className="mg-body mg-faq__lead">
+                <span className="mg-faq__count">{aboutFaqItemsFlat.length} Fragen</span> in{" "}
+                {aboutFaqSections.length} Themen — gruppiert, nicht nach Wichtigkeit sortiert. Für mehr Tiefe:{" "}
+                <Link href="/blog">Blog</Link>, <Link href="/ueber-mich">Über mich</Link>,{" "}
+                <Link href="/erfolge">Erfolge</Link>.
+              </p>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <FaqTopicNav topics={faqTopics} />
+            </Reveal>
+          </aside>
+
+          <div className="mg-faq__sections">
+            {aboutFaqSections.map((section, sectionIndex) => (
               <section
                 key={section.id}
-                className="about-faq-section"
+                className="mg-faq__group"
                 id={`faq-${section.id}`}
                 aria-labelledby={`faq-${section.id}-title`}
               >
-                <header className="about-faq-section-head">
-                  <h3 id={`faq-${section.id}-title`} className="about-faq-section-title">
-                    {section.title}
-                  </h3>
-                  {section.lead ? <p className="about-faq-section-lead">{section.lead}</p> : null}
-                </header>
-                <div className="about-faq-list">
-                  {section.items.map((item) => (
-                    <details key={item.question} className="about-faq-details">
-                      <summary className="about-faq-summary">{item.question}</summary>
-                      <div className="about-faq-body">
+                <Reveal as="header" className="mg-faq__group-head">
+                  <span className="mg-faq__group-index" aria-hidden="true">
+                    {String(sectionIndex + 1).padStart(2, "0")}
+                  </span>
+                  <div className="mg-faq__group-text">
+                    <h2 id={`faq-${section.id}-title`} className="mg-faq__group-title">
+                      {section.title}
+                    </h2>
+                    {section.lead ? <p className="mg-faq__group-lead">{section.lead}</p> : null}
+                  </div>
+                </Reveal>
+
+                <div className="mg-faq__list">
+                  {section.items.map((item, itemIndex) => (
+                    <details key={item.question} className="mg-faq__item" open={sectionIndex === 0 && itemIndex === 0}>
+                      <summary className="mg-faq__summary">
+                        <h3 className="mg-faq__question">{item.question}</h3>
+                        <span className="mg-faq__icon" aria-hidden="true" />
+                      </summary>
+                      <div className="mg-faq__answer">
                         {item.paragraphs.map((p, i) => (
                           <p
                             key={`${section.id}-${item.question}-${i}`}
-                            className="about-faq-p"
+                            className="mg-body"
                             dangerouslySetInnerHTML={{ __html: parseFaqParagraphToHtml(p) }}
                           />
                         ))}
@@ -79,6 +92,34 @@ export default function UeberMichFaqPage() {
               </section>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="mg-section mg-section--tight mg-faq-cta-wrap" aria-labelledby="mg-faq-cta-title">
+        <div className="mg-container">
+          <Reveal className="mg-faq-cta">
+            <div className="mg-faq-cta__text">
+              <p className="mg-eyebrow">Noch Fragen offen?</p>
+              <h2 id="mg-faq-cta-title" className="mg-h2 mg-faq-cta__title">
+                Schreib mir direkt.
+              </h2>
+              <p className="mg-body mg-faq-cta__lead">
+                Für persönliche Anliegen das Kontaktformular — für Partnerschaften und die Gönnervereinigung die
+                Sponsoring-Seite.
+              </p>
+            </div>
+            <div className="mg-faq-cta__actions">
+              <a href="#kontakt" className="mg-btn mg-btn--dark mg-btn--lg">
+                Kontakt aufnehmen
+                <span className="mg-btn__arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+              <Link href="/sponsoring" className="mg-btn mg-btn--ghost mg-btn--lg">
+                Sponsoring &amp; Gönner
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
     </AboutSubpageShell>

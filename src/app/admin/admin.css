@@ -1456,3 +1456,10 @@
     overflow-x: auto;
   }
 }
+
+/* Daten-Oberflächen ohne Display-Schrift (PRODUCT.md) — Admin bleibt serifenlos */
+.admin-app {
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-geist-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-geist-sans);
+}

@@ -2,31 +2,46 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "mg-cookie-consent";
+const CHANGE_EVENT = "mg-cookie-consent-change";
+
+function subscribe(onChange: () => void) {
+  window.addEventListener(CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
+// Fallback, falls localStorage blockiert ist (privater Modus): Bestätigung im Speicher halten
+let acceptedInMemory = false;
+
+function readAccepted(): boolean {
+  if (acceptedInMemory) return true;
+  try {
+    return Boolean(localStorage.getItem(STORAGE_KEY));
+  } catch {
+    return false;
+  }
+}
 
 export function CookieConsentBanner() {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) setVisible(true);
-    } catch {
-      setVisible(true);
-    }
-  }, [pathname]);
+  // Gespeicherte Auswahl als externer Store; Server rendert "bereits bestätigt" (kein Flackern, kein Hydration-Fehler)
+  const accepted = useSyncExternalStore(subscribe, readAccepted, () => true);
+  const visible = !accepted;
 
   function accept() {
+    acceptedInMemory = true;
     try {
       localStorage.setItem(STORAGE_KEY, "accepted");
     } catch {
       /* ignore */
     }
-    setVisible(false);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }
 
   if (!visible || pathname.startsWith("/admin")) return null;

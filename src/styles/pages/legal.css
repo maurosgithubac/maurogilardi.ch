@@ -1,0 +1,208 @@
+/*
+ * Rechtliches (Impressum, Datenschutz) — Dokument-Layout im MG-System.
+ * Mobile: Inhaltsverzeichnis als ruhige Liste über dem Text.
+ * Desktop: Inhaltsverzeichnis sticky links, Text max. 42rem.
+ */
+
+.mg-legaldoc {
+  display: grid;
+  gap: clamp(2rem, 5vw, 3rem);
+  color: var(--mg-ink-2);
+  font-family: var(--mg-font-body);
+}
+
+/* ——— Inhaltsverzeichnis ——— */
+.mg-legaldoc__toc {
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-md);
+  background: var(--mg-surface);
+}
+
+.mg-legaldoc__toc-title {
+  margin: 0 0 0.6rem;
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mg-muted);
+}
+
+.mg-legaldoc__toc-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-legaldoc__toc-link {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.25rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--mg-hair);
+  color: var(--mg-ink-2);
+  font-size: var(--mg-step--1);
+  line-height: 1.35;
+  text-decoration: none;
+  transition: color var(--mg-dur) var(--mg-ease);
+}
+
+.mg-legaldoc__toc-list li:first-child .mg-legaldoc__toc-link {
+  border-top: 0;
+}
+
+.mg-legaldoc__toc-link:hover {
+  color: var(--mg-ink);
+}
+
+.mg-legaldoc__toc-link:hover span:last-child {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.mg-legaldoc__toc-num,
+.mg-legaldoc__num {
+  font-family: var(--mg-font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0;
+  color: var(--mg-muted);
+}
+
+/* ——— Abschnitte ——— */
+.mg-legaldoc__content {
+  min-width: 0;
+  max-width: var(--mg-max-text);
+}
+
+.mg-legaldoc__section {
+  padding-block: clamp(1.75rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--mg-line);
+  scroll-margin-top: calc(var(--mg-header-h) + 1.5rem);
+}
+
+.mg-legaldoc__section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* Spezifität bewusst über .mg-legal__body :where(h2) */
+.mg-legaldoc .mg-legaldoc__title {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: baseline;
+  margin: 0 0 1rem;
+  font-family: var(--mg-font-display);
+  font-size: var(--mg-step-2);
+  font-weight: 700;
+  letter-spacing: var(--mg-tracking-display);
+  line-height: 1.15;
+  color: var(--mg-ink);
+}
+
+/* Einziger Rotakzent pro Abschnitt: die Nummer */
+.mg-legaldoc__title .mg-legaldoc__num {
+  font-size: var(--mg-step-0);
+  font-weight: 600;
+  color: var(--mg-red);
+}
+
+.mg-legaldoc__text {
+  display: grid;
+  gap: 0.85rem;
+  padding-left: 2.75rem;
+  font-size: var(--mg-step-0);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mg-legaldoc .mg-legaldoc__text :where(p, ul) {
+  margin: 0;
+}
+
+.mg-legaldoc__list {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-legaldoc__list li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.mg-legaldoc__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.55rem;
+  height: 1px;
+  background: var(--mg-ink-2);
+}
+
+.mg-legaldoc__text a {
+  color: var(--mg-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--mg-line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color var(--mg-dur) var(--mg-ease);
+}
+
+.mg-legaldoc__text a:hover {
+  text-decoration-color: var(--mg-ink);
+}
+
+/* Sehr schmale Geräte: Einzug zurücknehmen, Nummer über dem Titel */
+@media (max-width: 479px) {
+  .mg-legaldoc .mg-legaldoc__title {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .mg-legaldoc__text {
+    padding-left: 0;
+  }
+}
+
+/* ——— Desktop: sticky Inhaltsverzeichnis links ——— */
+@media (min-width: 1024px) {
+  .mg-legal__inner:has(.mg-legaldoc) {
+    max-width: 70rem;
+  }
+
+  .mg-legal__inner:has(.mg-legaldoc) .mg-legal__head {
+    max-width: 52rem;
+  }
+
+  .mg-legaldoc {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: clamp(3rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .mg-legaldoc__toc {
+    position: sticky;
+    top: calc(var(--mg-header-h) + 2rem);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .mg-legaldoc__toc-link {
+    border-top-color: var(--mg-line);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-legaldoc__toc-link,
+  .mg-legaldoc__text a {
+    transition: none;
+  }
+}

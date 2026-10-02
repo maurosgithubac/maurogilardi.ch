@@ -114,10 +114,30 @@
   flex: none;
 }
 
+.mg-header__brand {
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
 .mg-header__logo {
-  height: 2.35rem;
+  height: 2rem;
   width: auto;
   display: block;
+}
+
+.mg-header__wordmark {
+  font-family: var(--mg-font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .mg-header__wordmark {
+    display: none;
+  }
 }
 
 .mg-header__nav {
@@ -378,7 +398,7 @@
   font-family: var(--mg-font-display);
   font-size: clamp(2rem, 9vw, 3rem);
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--mg-tracking-display);
   text-decoration: none;
 }
 
@@ -458,7 +478,7 @@
 
 .mg-footer__cta-title {
   font-size: var(--mg-step-5);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
   line-height: 0.92;
   max-width: 14ch;
@@ -509,6 +529,20 @@
   color: var(--mg-ink-2);
   text-decoration: none;
   transition: color var(--mg-dur-fast) ease;
+}
+
+@media (max-width: 699px) {
+  /* Touch-Ziele ≥ 44px */
+  .mg-footer__col ul {
+    gap: 0;
+  }
+
+  .mg-footer__col a,
+  .mg-footer__bottom a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
 }
 
 .mg-footer__col a:hover {
@@ -754,6 +788,11 @@ html[data-mg-overlays] .mg-cookie {
 }
 
 /* ——— Quiz-Popup im neuen Look ——— */
+.engagement-quiz-kicker {
+  color: var(--mg-red) !important;
+  letter-spacing: 0.22em !important;
+}
+
 .engagement-quiz-dialog {
   border-radius: var(--mg-r-xl) !important;
   font-family: var(--mg-font-body);

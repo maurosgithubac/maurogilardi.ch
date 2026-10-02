@@ -1,0 +1,315 @@
+/*
+ * /ueber-mich/sponsoren — Sponsoren nach Stufen
+ * Nur MG-Tokens. Rot: Eyebrow + Pfeil im Hover-Zustand.
+ */
+
+.mg-sponsors__head {
+  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.mg-sponsors__head-main,
+.mg-sponsors__head-aside {
+  display: grid;
+  gap: 1rem;
+  align-content: end;
+}
+
+.mg-sponsors__head-aside {
+  gap: 1.5rem;
+}
+
+.mg-sponsors__facts {
+  display: flex;
+  gap: 2.5rem;
+  margin: 0;
+}
+
+.mg-sponsors__facts > div {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--mg-line-strong);
+  min-width: 5.5rem;
+}
+
+.mg-sponsors__facts dt {
+  order: 2;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+}
+
+.mg-sponsors__facts dd {
+  order: 1;
+  margin: 0;
+  font-size: var(--mg-step-3);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--mg-ink);
+}
+
+/* ——— Stufen ——— */
+.mg-sponsors__tiers {
+  display: grid;
+  gap: clamp(3rem, 7vw, 5.5rem);
+}
+
+.mg-sponsor-tier {
+  display: grid;
+  gap: 1.75rem;
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  border-top: 1px solid var(--mg-ink);
+}
+
+.mg-sponsor-tier__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.4rem;
+  align-content: start;
+}
+
+.mg-sponsor-tier__index {
+  grid-row: span 3;
+  font-size: var(--mg-step--1);
+  font-weight: 700;
+  color: var(--mg-muted);
+  font-variant-numeric: lining-nums tabular-nums;
+  padding-top: 0.45rem;
+}
+
+.mg-legacy-content .mg-sponsor-tier__title {
+  font-size: var(--mg-step-2);
+  font-weight: 700;
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.1;
+}
+
+.mg-sponsor-tier__dek {
+  color: var(--mg-ink-2);
+  font-size: var(--mg-step-0);
+  line-height: 1.55;
+  max-width: 28rem;
+}
+
+.mg-sponsor-tier__count {
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ——— Logo-Kacheln ——— */
+.mg-sponsor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mg-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-sponsor-tier--3 .mg-sponsor-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mg-sponsor-grid__item {
+  display: flex;
+  min-width: 0;
+}
+
+.mg-sponsor-tile {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-lg);
+  background: var(--mg-surface);
+  color: var(--mg-ink);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color var(--mg-dur) var(--mg-ease),
+    box-shadow var(--mg-dur) var(--mg-ease),
+    transform var(--mg-dur) var(--mg-ease);
+}
+
+.mg-sponsor-tile--link:hover {
+  border-color: var(--mg-line-strong);
+  box-shadow: var(--mg-shadow-card);
+  transform: translateY(-3px);
+}
+
+.mg-sponsor-tile--link:focus-visible {
+  outline: 2px solid var(--mg-red);
+  outline-offset: 3px;
+}
+
+.mg-sponsor-tile__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  margin: clamp(1.25rem, 3vw, 2rem);
+  margin-bottom: 0;
+}
+
+.mg-sponsor-tier--3 .mg-sponsor-tile__media {
+  aspect-ratio: 4 / 3;
+  margin: 1rem;
+  margin-bottom: 0;
+}
+
+.mg-sponsor-tile__logo {
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.72;
+  transition:
+    filter var(--mg-dur-slow) var(--mg-ease),
+    opacity var(--mg-dur-slow) var(--mg-ease),
+    transform var(--mg-dur-slow) var(--mg-ease);
+}
+
+.mg-sponsor-tile:hover .mg-sponsor-tile__logo,
+.mg-sponsor-tile:focus-visible .mg-sponsor-tile__logo {
+  filter: none;
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+.mg-sponsor-tile__meta {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: auto;
+  padding: 1rem clamp(1.25rem, 3vw, 2rem) clamp(1.1rem, 2.5vw, 1.5rem);
+  border-top: 1px solid var(--mg-hair);
+}
+
+.mg-sponsor-tile__media + .mg-sponsor-tile__meta {
+  margin-top: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.mg-sponsor-tier--3 .mg-sponsor-tile__meta {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.mg-sponsor-tile__name {
+  font-family: var(--mg-font-display);
+  font-size: var(--mg-step-0);
+  font-weight: 700;
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.25;
+}
+
+.mg-sponsor-tier--3 .mg-sponsor-tile__name {
+  font-size: var(--mg-step--1);
+}
+
+.mg-sponsor-tile__url {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+  overflow-wrap: anywhere;
+}
+
+.mg-sponsor-tile__arrow {
+  display: inline-block;
+  transition:
+    transform var(--mg-dur) var(--mg-ease),
+    color var(--mg-dur) var(--mg-ease);
+}
+
+.mg-sponsor-tile--link:hover .mg-sponsor-tile__arrow {
+  color: var(--mg-red);
+  transform: translate(2px, -2px);
+}
+
+@media (min-width: 560px) {
+  .mg-sponsor-tier--1 .mg-sponsor-grid,
+  .mg-sponsor-tier--2 .mg-sponsor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .mg-sponsor-tier {
+    grid-template-columns: minmax(14rem, 1fr) minmax(0, 3fr);
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+
+  .mg-sponsor-tier__head {
+    position: sticky;
+    top: calc(var(--mg-header-h) + 5.5rem);
+    align-self: start;
+  }
+
+  .mg-sponsor-tier--1 .mg-sponsor-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mg-sponsor-tier--3 .mg-sponsor-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ——— CTA ——— */
+.mg-sponsors-cta {
+  padding-top: 0;
+}
+
+.mg-sponsors-cta__panel {
+  display: grid;
+  gap: 1.75rem;
+  padding: clamp(1.75rem, 5vw, 3.5rem);
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-xl);
+  background: var(--mg-paper-2);
+}
+
+.mg-sponsors-cta__copy {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 36rem;
+}
+
+.mg-legacy-content .mg-sponsors-cta__title {
+  font-size: var(--mg-step-3);
+  letter-spacing: var(--mg-tracking-display);
+}
+
+.mg-sponsors-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (max-width: 479px) {
+  .mg-sponsors-cta__actions .mg-btn {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (min-width: 900px) {
+  .mg-sponsors-cta__panel {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-sponsor-tile,
+  .mg-sponsor-tile__logo,
+  .mg-sponsor-tile__arrow {
+    transition: none;
+  }
+
+  .mg-sponsor-tile--link:hover,
+  .mg-sponsor-tile:hover .mg-sponsor-tile__logo {
+    transform: none;
+  }
+}

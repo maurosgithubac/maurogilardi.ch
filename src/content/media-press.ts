@@ -58,6 +58,11 @@ export const pressOutlets: PressOutlet[] = [
     description: "Förderung Nachwuchs & Elite",
   },
   {
+    id: "dp-world-tour",
+    label: "DP World Tour",
+    description: "Europäische Tour & Challenge/HotelPlanner Tour",
+  },
+  {
     id: "weitere",
     label: "Weitere",
     description: "Portale & Daten",

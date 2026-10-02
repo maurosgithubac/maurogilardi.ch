@@ -1,0 +1,304 @@
+/*
+ * Mein Bag (/ueber-mich/equipment) — editoriales Spec-Sheet im MG-Design-System.
+ * Nur Tokens aus mg-tokens.css, Rot nur im Eyebrow.
+ */
+
+/* ——— Bag ——— */
+.mg-bag {
+  padding-top: clamp(3rem, 6vw, 5rem);
+}
+
+.mg-bag__head {
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.mg-bag__head-main {
+  display: grid;
+  gap: 1rem;
+}
+
+.mg-bag__head-aside {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.mg-bag__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  margin: 0;
+}
+
+.mg-bag__stats dd {
+  margin: 0;
+}
+
+.mg-bag__stats .mg-stat {
+  /* dt steht im Markup vor dd → Zahl optisch nach oben */
+  grid-template-areas: "value" "label";
+}
+
+.mg-bag__stats .mg-stat__label {
+  grid-area: label;
+}
+
+.mg-bag__stat-value {
+  grid-area: value;
+  font-size: var(--mg-step-3);
+  font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--mg-ink);
+}
+
+/* Raster: 1 → 2 → 3 Spalten (9 Positionen = 3 × 3) */
+.mg-bag__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--mg-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .mg-bag__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .mg-bag__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 1.6vw, 1.5rem);
+  }
+}
+
+.mg-bag__item {
+  display: flex;
+  min-width: 0;
+}
+
+.mg-bag__card {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-lg);
+  background: var(--mg-surface);
+  box-shadow: var(--mg-shadow-card);
+  transition:
+    box-shadow var(--mg-dur) var(--mg-ease),
+    border-color var(--mg-dur) var(--mg-ease);
+  will-change: transform;
+}
+
+.mg-bag__card:hover {
+  border-color: var(--mg-line-strong);
+  box-shadow: var(--mg-shadow-float);
+}
+
+.mg-bag__article {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* Freisteller auf Weiss — die PNGs haben weissen Grund */
+.mg-bag__media {
+  position: relative;
+  aspect-ratio: 6 / 5;
+  background: #fff;
+  border-bottom: 1px solid var(--mg-hair);
+  overflow: hidden;
+}
+
+.mg-bag__img {
+  object-fit: contain;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  transition: transform var(--mg-dur-slow) var(--mg-ease);
+}
+
+.mg-bag__card:hover .mg-bag__img {
+  transform: scale(1.04) translateY(-2%);
+}
+
+.mg-bag__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+}
+
+.mg-bag__body {
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  flex: 1;
+  padding: clamp(1.15rem, 2.4vw, 1.6rem);
+}
+
+.mg-bag__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mg-muted);
+}
+
+.mg-bag__index {
+  order: 2;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--mg-grey);
+}
+
+.mg-bag__slot {
+  color: var(--mg-ink);
+}
+
+.mg-bag__model {
+  display: grid;
+  gap: 0.2rem;
+  font-size: var(--mg-step-1);
+  font-weight: 700;
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.15;
+}
+
+.mg-bag__brand {
+  font-size: var(--mg-step--1);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0;
+  color: var(--mg-muted);
+}
+
+.mg-bag__name {
+  font-variant-numeric: lining-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Spec-Tabelle: Label links, Wert rechts, feine Haarlinien */
+.mg-bag__specs {
+  display: grid;
+  margin: 0.25rem 0 0;
+  border-top: 1px solid var(--mg-hair);
+}
+
+.mg-bag__spec {
+  display: grid;
+  grid-template-columns: 5.75rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--mg-hair);
+  font-size: var(--mg-step--1);
+  line-height: 1.45;
+}
+
+.mg-bag__spec dt {
+  color: var(--mg-muted);
+}
+
+.mg-bag__spec dd {
+  margin: 0;
+  color: var(--mg-ink-2);
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.mg-bag__footnote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--mg-line);
+  font-size: var(--mg-step--1);
+}
+
+.mg-bag__footnote .mg-link-arrow {
+  min-height: 44px;
+}
+
+/* ——— Fitting-Partner ——— */
+.mg-fitter {
+  background: var(--mg-paper-2);
+}
+
+.mg-fitter__layout {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .mg-fitter__layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+.mg-fitter__frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--mg-r-xl);
+  overflow: hidden;
+  background: var(--mg-line);
+  box-shadow: var(--mg-shadow-card);
+}
+
+.mg-fitter__img {
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+.mg-fitter__copy {
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
+}
+
+.mg-fitter__title {
+  font-size: var(--mg-step-3);
+}
+
+.mg-fitter__text {
+  display: grid;
+  gap: 1rem;
+  max-width: var(--mg-max-text);
+}
+
+.mg-fitter__cta {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 639px) {
+  .mg-bag__spec {
+    grid-template-columns: 5rem minmax(0, 1fr);
+  }
+
+  .mg-fitter__cta {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-bag__card,
+  .mg-bag__img {
+    transition: none;
+  }
+
+  .mg-bag__card:hover .mg-bag__img {
+    transform: none;
+  }
+}

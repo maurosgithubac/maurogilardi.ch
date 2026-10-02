@@ -91,7 +91,11 @@ export function SiteHeader({ variant }: Props) {
       <header ref={headerRef} className="mg-header" data-solid={solid ? "true" : "false"} data-tone={tone} data-open={menuOpen ? "true" : "false"}>
         <div className="mg-header__bar">
           <Link href="/" className="mg-header__brand" aria-label="Mauro Gilardi — Startseite">
-            <MgLogo className="mg-header__logo" title="Mauro Gilardi" />
+            {/* Kleine Grösse: Monogramm ohne Namenszug (sonst unlesbar), Name als Playfair-Versalien daneben */}
+            <MgLogo className="mg-header__logo" withName={false} title="Mauro Gilardi" />
+            <span className="mg-header__wordmark" aria-hidden="true">
+              Mauro Gilardi
+            </span>
           </Link>
 
           <nav className="mg-header__nav" aria-label="Hauptnavigation">
@@ -162,7 +166,7 @@ export function SiteHeader({ variant }: Props) {
               </a>
             ) : null}
             <Magnetic className="mg-header__cta">
-              <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--sm">
+              <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--sm">
                 Gönner werden
               </Link>
             </Magnetic>
@@ -234,7 +238,7 @@ export function SiteHeader({ variant }: Props) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { delay: 0.45 } }}
               >
-                <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--lg" onClick={closeMenu}>
+                <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--lg" onClick={closeMenu}>
                   Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
                 </Link>
                 <Link href="/#newsletter" className="mg-btn mg-btn--glass mg-btn--lg" onClick={closeMenu}>

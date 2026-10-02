@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import localFont from "next/font/local";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { EngagementQuizPopup } from "@/components/engagement-quiz-popup";
@@ -13,26 +13,15 @@ import "@/styles/mg-chrome.css";
 import "@/styles/mg-home.css";
 import "@/styles/mg-pages.css";
 
-/** Display: Inter Tight — Überschriften, grosse Zahlen */
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+/**
+ * Markenschrift Gilardi Golf: Playfair Display für Titel UND Fliesstext
+ * (verbindlich laut Brand-System des Sponsoring-Dossiers). Variable Font inkl. Kursiv.
+ */
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
-});
-
-/** Fliesstext & UI */
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-/** Zahlen, Daten, Scores */
-const mono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500"],
 });
 
 const sifonn = localFont({
@@ -55,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     // Font-Variablen auf <html>, damit :root-Tokens sie auflösen können
-    <html lang="de-CH" className={`${interTight.variable} ${inter.variable} ${mono.variable} ${sifonn.variable}`}>
+    <html lang="de-CH" className={`${playfair.variable} ${sifonn.variable}`}>
       <body className="antialiased">
         <SeoRootJsonLd />
         <MotionProvider>

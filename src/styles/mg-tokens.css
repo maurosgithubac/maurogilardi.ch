@@ -6,14 +6,17 @@
 
 :root {
   /* Farbe — hell */
-  --mg-ink: #0b0b0c;
-  --mg-ink-2: #3a3936;
-  --mg-muted: #6b6862;
-  --mg-paper: #f6f5f2;
-  --mg-paper-2: #eeece7;
+  /* Palette aus dem Brand-System (Sponsoring-Dossier) */
+  --mg-ink: #0b0b0b;
+  --mg-ink-2: #34322e;
+  --mg-muted: #66625b; /* dunkler als Dossier-Grau #8c8880 → AA-Kontrast für Fliesstext */
+  --mg-grey: #8c8880; /* nur für Deko/Linien-Labels */
+  --mg-paper: #faf9f6;
+  --mg-paper-2: #f1efea;
   --mg-surface: #ffffff;
-  --mg-line: rgb(11 11 12 / 9%);
-  --mg-line-strong: rgb(11 11 12 / 16%);
+  --mg-hair: #e4e1da;
+  --mg-line: #e4e1da;
+  --mg-line-strong: #d3cfc6;
   --mg-red: #d71920;
   --mg-red-hover: #b8141a;
   --mg-red-soft: rgb(215 25 32 / 8%);
@@ -21,9 +24,10 @@
   --mg-focus: rgb(215 25 32 / 45%);
 
   /* Typo */
-  --mg-font-display: var(--font-inter-tight), "Inter Tight", system-ui, sans-serif;
-  --mg-font-body: var(--font-inter), "Inter", system-ui, sans-serif;
-  --mg-font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
+  /* Eine Markenschrift für alles: Playfair Display (Titel, Fliesstext, Zahlen, UI) */
+  --mg-font-display: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --mg-font-body: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --mg-font-mono: var(--mg-font-display); /* Zahlen: Playfair mit Tabellenziffern statt Mono */
 
   --mg-step--2: 0.75rem;
   --mg-step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
@@ -34,8 +38,9 @@
   --mg-step-4: clamp(2.6rem, 1.8rem + 4vw, 5.5rem);
   --mg-step-5: clamp(3.4rem, 1.6rem + 8.4vw, 10rem);
 
-  --mg-tracking-display: -0.045em;
-  --mg-tracking-tight: -0.025em;
+  /* Serifen-Laufweite: nur leicht enger, sonst kleben die Serifen */
+  --mg-tracking-display: -0.02em;
+  --mg-tracking-tight: -0.01em;
   --mg-tracking-caps: 0.14em;
 
   /* Layout */
@@ -70,12 +75,13 @@
 
 /* Dunkle Sektionen: Tokens tauschen, Rot bleibt */
 [data-theme="dark"] {
-  --mg-ink: #f4f3ef;
-  --mg-ink-2: #cfccc4;
-  --mg-muted: #9a978f;
-  --mg-paper: #0b0b0c;
-  --mg-paper-2: #141414;
+  --mg-ink: #faf9f6;
+  --mg-ink-2: #d6d2ca;
+  --mg-muted: #a39f97;
+  --mg-paper: #0b0b0b;
+  --mg-paper-2: #151515;
   --mg-surface: #161616;
+  --mg-hair: rgb(255 255 255 / 12%);
   --mg-line: rgb(255 255 255 / 10%);
   --mg-line-strong: rgb(255 255 255 / 18%);
   --mg-red-soft: rgb(215 25 32 / 16%);
@@ -91,9 +97,11 @@ html {
 }
 
 body {
-  --font-geist-sans: var(--font-inter);
+  /* Altbestand (Geist-Variable) ebenfalls auf die Markenschrift */
+  --font-geist-sans: var(--font-playfair);
   font-family: var(--mg-font-body);
-  font-feature-settings: "ss01", "cv11";
+  font-feature-settings: "lnum", "kern";
+  font-variant-numeric: lining-nums;
   text-rendering: optimizeLegibility;
 }
 
@@ -106,9 +114,9 @@ body {
 
 .mg-page :where(h1, h2, h3, h4) {
   font-family: var(--mg-font-display);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-tight);
-  line-height: 1.05;
+  line-height: 1.1;
   margin: 0;
   text-wrap: balance;
 }
@@ -197,40 +205,37 @@ body {
 }
 
 /* ——— Typo-Bausteine ——— */
+/* Eyebrow wie im Dossier: rot, Grossbuchstaben, weit gesperrt */
 .mg-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   font-family: var(--mg-font-body);
-  font-size: var(--mg-step--2);
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: var(--mg-tracking-caps);
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--mg-muted);
+  color: var(--mg-red);
 }
 
-.mg-eyebrow::before {
-  content: "";
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: var(--mg-red);
-  flex: none;
+/* Auf Schwarz minimal heller, damit das kleine Label AA-Kontrast erreicht */
+[data-theme="dark"] .mg-eyebrow {
+  color: #f2393f;
 }
 
 .mg-display {
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-5);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
-  line-height: 0.92;
+  line-height: 0.98;
 }
 
 .mg-h2 {
   font-size: var(--mg-step-4);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
-  line-height: 0.98;
+  line-height: 1.04;
 }
 
 .mg-h3 {
@@ -256,14 +261,17 @@ body {
   color: var(--mg-muted);
 }
 
+/* Akzentwort in Titeln: Playfair Kursiv statt Farbe (Rot bleibt sparsam) */
 .mg-accent {
-  color: var(--mg-red);
+  font-style: italic;
+  font-weight: 600;
 }
 
+/* Zahlen: Playfair mit Versal- und Tabellenziffern (keine zweite Schrift) */
 .mg-mono {
-  font-family: var(--mg-font-mono);
-  font-feature-settings: "tnum";
-  letter-spacing: -0.02em;
+  font-family: var(--mg-font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0;
 }
 
 /* ——— Buttons ——— */
@@ -308,15 +316,25 @@ body {
   cursor: progress;
 }
 
+/* Primär: Tinte auf hell, Papier auf dunkel — Rot erst als Hover-Akzent (Brand: Rot sparsam) */
 .mg-btn--primary {
-  --btn-bg: var(--mg-red);
-  --btn-fg: var(--mg-on-red);
-  box-shadow: 0 10px 30px rgb(215 25 32 / 28%);
+  --btn-bg: var(--mg-ink);
+  --btn-fg: var(--mg-paper);
 }
 
 .mg-btn--primary:hover {
+  --btn-bg: var(--mg-red);
+  --btn-fg: var(--mg-on-red);
+}
+
+/* Der eine rote Akzent im Header ("Gönner werden") */
+.mg-btn--accent {
+  --btn-bg: var(--mg-red);
+  --btn-fg: var(--mg-on-red);
+}
+
+.mg-btn--accent:hover {
   --btn-bg: var(--mg-red-hover);
-  box-shadow: 0 14px 36px rgb(215 25 32 / 36%);
 }
 
 .mg-btn--dark:hover {
@@ -391,6 +409,12 @@ body {
   transition: border-color var(--mg-dur) var(--mg-ease), color var(--mg-dur) var(--mg-ease);
 }
 
+@media (pointer: coarse) {
+  .mg-link-arrow {
+    min-height: 2.75rem;
+  }
+}
+
 .mg-link-arrow:hover {
   border-color: var(--mg-red);
   color: var(--mg-red);
@@ -436,7 +460,9 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Roter Schein passt nicht zum Dossier (dunkle Seiten = Foto + Verlauf) — ausgeblendet */
 .mg-glow {
+  display: none;
   position: absolute;
   pointer-events: none;
   width: min(60rem, 120vw);

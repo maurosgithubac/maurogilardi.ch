@@ -44,8 +44,12 @@
   gap: 1.1rem;
 }
 
-.mg-hero__eyebrow {
-  color: rgb(255 255 255 / 75%);
+/* Eyebrow bleibt rot (Dossier-Cover); Fotos auf dunklen Flächen in Graustufen */
+.mg-hero__img,
+.mg-story__photo img,
+.mg-partner-teaser__media img,
+.mg-bento__post-img {
+  filter: grayscale(1) contrast(1.06);
 }
 
 .mg-hero__title {
@@ -272,8 +276,8 @@
 .mg-story__fill {
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-3);
-  font-weight: 550;
-  letter-spacing: -0.035em;
+  font-weight: 500;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1.12;
   color: var(--mg-ink);
 }
@@ -301,7 +305,7 @@
 
 .mg-value__index {
   grid-row: span 2;
-  color: var(--mg-red);
+  color: var(--mg-muted);
   font-size: var(--mg-step--1);
   padding-top: 0.3rem;
 }
@@ -367,13 +371,13 @@
 }
 
 .mg-milestone__year {
-  color: #d71920;
+  color: var(--mg-muted);
   font-size: var(--mg-step--1);
 }
 
 .mg-milestone__title {
   font-size: var(--mg-step-2);
-  letter-spacing: -0.035em;
+  letter-spacing: var(--mg-tracking-display);
 }
 
 .mg-milestone__text {
@@ -395,8 +399,10 @@
 }
 
 .mg-milestones__cell--feature .mg-milestone {
-  background: linear-gradient(150deg, rgb(215 25 32 / 92%), rgb(140 14 19 / 92%));
-  border-color: transparent;
+  /* Aktuell-Block wie im Dossier: dunkle Fläche, eine rote Linie */
+  background: linear-gradient(160deg, #1f1e1c, #121212);
+  border-color: rgb(255 255 255 / 14%);
+  border-top: 2px solid var(--mg-red);
 }
 
 .mg-milestones__cell--feature .mg-milestone__year,
@@ -496,7 +502,7 @@
 
 .mg-events__date {
   grid-column: 1 / -1;
-  color: var(--mg-red);
+  color: var(--mg-muted);
   font-size: var(--mg-step--1);
 }
 
@@ -601,18 +607,10 @@
 }
 
 .mg-bento__newsletter {
-  background: #d71920;
-  color: #fff;
+  background: #0b0b0b;
+  color: #faf9f6;
   border-color: transparent;
   scroll-margin-top: calc(var(--mg-header-h) + 2rem);
-}
-
-.mg-bento__nl-eyebrow {
-  color: rgb(255 255 255 / 80%);
-}
-
-.mg-bento__nl-eyebrow::before {
-  background: #fff;
 }
 
 .mg-bento__newsletter .mg-input {
@@ -641,7 +639,7 @@
 
 .mg-bento__budget-title {
   font-size: var(--mg-step-2);
-  letter-spacing: -0.035em;
+  letter-spacing: var(--mg-tracking-display);
 }
 
 .mg-bento__budget-figure {
@@ -652,7 +650,7 @@
   font-size: var(--mg-step-4);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.05em;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1;
 }
 
@@ -733,7 +731,7 @@
 
 .mg-tier__title {
   font-size: var(--mg-step-2);
-  letter-spacing: -0.035em;
+  letter-spacing: var(--mg-tracking-display);
 }
 
 .mg-tier__price {
@@ -751,7 +749,7 @@
   font-size: var(--mg-step-3);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.045em;
+  letter-spacing: var(--mg-tracking-display);
   margin-right: 0.3rem;
 }
 
@@ -776,11 +774,10 @@
   content: "";
   width: 0.9rem;
   height: 0.9rem;
-  margin-top: 0.18rem;
-  border-radius: 50%;
-  background: var(--mg-red-soft)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.2l2 2 4-4.4' fill='none' stroke='%23d71920' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / 0.7rem no-repeat;
+  margin-top: 0.22rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .mg-tier__list li.is-bold {
@@ -802,7 +799,7 @@
   position: relative;
   overflow: hidden;
   border-color: transparent;
-  background: linear-gradient(155deg, #d71920 0%, #a8101a 100%);
+  background: linear-gradient(160deg, #1f1e1c 0%, #0b0b0b 100%);
   color: #fff;
 }
 
@@ -820,19 +817,16 @@
   color: #fff;
 }
 
-.mg-tier--club .mg-tier__list li::before {
-  background-color: rgb(255 255 255 / 18%);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.2l2 2 4-4.4' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-
+/* Ein Badge pro Abschnitt darf rot sein (100er Club) — "Empfohlen" bleibt Tinte */
 .mg-chip--red {
   border-color: transparent;
-  background: var(--mg-red);
-  color: #fff;
+  background: var(--mg-ink);
+  color: var(--mg-paper);
 }
 
 .mg-chip--on-red {
-  border-color: rgb(255 255 255 / 35%);
+  border-color: transparent;
+  background: var(--mg-red);
   color: #fff;
 }
 
@@ -850,7 +844,7 @@
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-1);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--mg-tracking-tight);
   margin-bottom: 0.25rem;
 }
 
@@ -910,7 +904,7 @@
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-1);
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--mg-tracking-tight);
   white-space: nowrap;
 }
 
@@ -964,12 +958,12 @@
 
 .mg-check-list li::before {
   content: "";
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 50%;
-  background: var(--mg-red)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.2l2 2 4-4.4' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-    center / 0.85rem no-repeat;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.4l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 @media (min-width: 960px) {
@@ -1032,7 +1026,7 @@
 .mg-post__placeholder {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--mg-paper-2), var(--mg-red-soft));
+  background: var(--mg-paper-2);
 }
 
 .mg-post__body {
@@ -1049,7 +1043,7 @@
 
 .mg-post__title {
   font-size: var(--mg-step-1);
-  letter-spacing: -0.025em;
+  letter-spacing: var(--mg-tracking-tight);
   line-height: 1.2;
   transition: color var(--mg-dur) var(--mg-ease);
 }
@@ -1082,7 +1076,7 @@
 
 .mg-post--feature .mg-post__title {
   font-size: var(--mg-step-3);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--mg-tracking-display);
   line-height: 1.02;
 }
 
