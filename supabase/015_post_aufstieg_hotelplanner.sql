@@ -28,7 +28,7 @@ Ein ganz besonderer Dank geht an meine Familie, die mir immer die Freiheit gegeb
 Ich danke euch von ganzem Herzen und freue mich riesig auf diese neue Challenge im kommenden Jahr.
 
 **DANKE und Let's fucking go!**$BODY$,
-  '/brand-assets/images/blog/aufstieg-hotelplanner-tour-2026.png',
+  '/brand-assets/images/aufstieg.png',
   true,
   '2026-10-02T10:00:00.000Z'
 )
