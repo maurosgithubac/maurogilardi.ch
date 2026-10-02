@@ -1,13 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { careerHighlights } from "@/content/career";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export function MilestonesSection() {
   return (
     <section className="mg-section mg-milestones mg-grain" data-theme="dark" aria-labelledby="milestones-title">
-      <div className="mg-glow mg-milestones__glow" aria-hidden="true" />
       <div className="mg-container">
         <header className="mg-section-head mg-section-head--split">
           <div>
@@ -40,6 +41,18 @@ export function MilestonesSection() {
             return (
               <StaggerItem as="li" key={m.title} className={`mg-milestones__cell${i === 0 ? " mg-milestones__cell--feature" : ""}`}>
                 <TiltCard className="mg-milestone">
+                  {i === 0 ? (
+                    // Aktuell-Block wie im Dossier: Graustufen-Foto + dunkler Verlauf
+                    <div className="mg-milestone__media" aria-hidden="true">
+                      <Image
+                        src={seoImages.progolfTour}
+                        alt={seoImageAlts.progolfTour}
+                        fill
+                        sizes="(max-width: 1080px) 100vw, 60vw"
+                        className="mg-cover"
+                      />
+                    </div>
+                  ) : null}
                   {m.href ? (
                     <Link href={m.href} className="mg-milestone__link">
                       {inner}

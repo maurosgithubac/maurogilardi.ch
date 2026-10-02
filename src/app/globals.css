@@ -325,35 +325,6 @@ body {
   color: var(--site-muted);
 }
 
-.site-footer-credit {
-  width: 100%;
-  margin-top: 2rem !important;
-  padding-top: 1.35rem;
-  border-top: 1px solid rgb(23 21 19 / 8%);
-  font-family: var(--font-display);
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: none;
-  color: var(--site-muted);
-  text-align: center;
-}
-
-.site-footer-credit-brand {
-  font-family: var(--font-sifonn), var(--font-geist-sans), system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.01em;
-  text-transform: none;
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.2s var(--ease-out);
-}
-
-.site-footer-credit-brand:hover {
-  color: var(--site-ink);
-}
-
 .footer-contact {
   width: min(34rem, 100%);
   margin: 0 auto 2rem;
@@ -1611,33 +1582,6 @@ body {
   text-transform: uppercase;
 }
 
-.engagement-quiz-goenner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.55rem 0.95rem;
-  border-radius: var(--radius-full);
-  border: 1px solid rgb(23 21 19 / 12%);
-  background: #fff;
-  color: var(--site-ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition:
-    border-color 0.2s var(--ease-out),
-    background 0.2s var(--ease-out),
-    color 0.2s var(--ease-out);
-}
-
-.engagement-quiz-goenner:hover {
-  border-color: var(--primary);
-  background: rgb(215 25 32 / 6%);
-  color: var(--primary);
-}
-
 @media (max-width: 680px) {
   .engagement-quiz-dialog {
     padding: 1rem 0.95rem 1.1rem;
@@ -1650,11 +1594,6 @@ body {
 
   .engagement-quiz-footer {
     flex-wrap: wrap;
-  }
-
-  .engagement-quiz-goenner {
-    flex: 1 1 auto;
-    justify-content: center;
   }
 }
 

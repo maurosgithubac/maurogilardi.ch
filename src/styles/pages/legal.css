@@ -106,7 +106,7 @@
 .mg-legaldoc__title .mg-legaldoc__num {
   font-size: var(--mg-step-0);
   font-weight: 600;
-  color: var(--mg-red);
+  color: var(--mg-grey);
 }
 
 .mg-legaldoc__text {

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
-import localFont from "next/font/local";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { EngagementQuizPopup } from "@/components/engagement-quiz-popup";
 import { MotionProvider } from "@/components/motion/motion-provider";
@@ -24,13 +23,6 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const sifonn = localFont({
-  src: "./fonts/Sifonn.woff",
-  variable: "--font-sifonn",
-  display: "swap",
-  weight: "700",
-});
-
 export const metadata: Metadata = siteRootMetadata;
 
 export const viewport: Viewport = {
@@ -44,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     // Font-Variablen auf <html>, damit :root-Tokens sie auflösen können
-    <html lang="de-CH" className={`${playfair.variable} ${sifonn.variable}`}>
+    <html lang="de-CH" className={playfair.variable}>
       <body className="antialiased">
         <SeoRootJsonLd />
         <MotionProvider>

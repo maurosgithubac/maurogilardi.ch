@@ -37,7 +37,7 @@ export function GoennerInquiryForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!tier) {
-      setStatus({ kind: "error", text: "Bitte wähle eine Mitgliedschaft." });
+      setStatus({ kind: "error", text: "Bitte wähle ein Gönner-Modell." });
       return;
     }
     const form = event.currentTarget;
@@ -80,7 +80,7 @@ export function GoennerInquiryForm() {
     <>
       <form className="mg-inquiry" onSubmit={onSubmit} noValidate={false}>
         <fieldset className="mg-inquiry__tiers">
-          <legend className="mg-inquiry__legend">Mitgliedschaft wählen</legend>
+          <legend className="mg-inquiry__legend">Gönner-Modell wählen</legend>
           <div className="mg-inquiry__options">
             {MEMBER_TIERS.map((t) => (
               <label key={t.id} className="mg-option" data-checked={tier === t.id ? "true" : undefined}>

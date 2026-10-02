@@ -11,6 +11,8 @@ export function isLikelySectionHeading(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed || trimmed.includes("\n")) return false;
   if (trimmed.startsWith("{{IMAGE:")) return false;
+  // Komplett fett gesetzte Zeile = betonter Absatz (z. B. Schlusszeile), keine Überschrift
+  if (trimmed.startsWith("**")) return false;
   if (trimmed.length < 2 || trimmed.length > 72) return false;
   if (/[.!?]$/.test(trimmed)) return false;
   if (trimmed.includes(",")) return false;

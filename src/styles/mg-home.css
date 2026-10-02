@@ -12,7 +12,7 @@
   padding-block: calc(var(--mg-header-h) + 4rem) clamp(3rem, 7vw, 5.5rem);
   overflow: hidden;
   color: #fff;
-  background: #0b0b0c;
+  background: #0b0b0b;
 }
 
 .mg-hero__media {
@@ -32,9 +32,9 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(180deg, rgb(11 11 12 / 55%) 0%, rgb(11 11 12 / 0%) 28%),
-    linear-gradient(0deg, rgb(11 11 12 / 92%) 0%, rgb(11 11 12 / 55%) 32%, rgb(11 11 12 / 0%) 62%),
-    linear-gradient(90deg, rgb(11 11 12 / 55%) 0%, rgb(11 11 12 / 0%) 60%);
+    linear-gradient(180deg, rgb(11 11 11 / 60%) 0%, rgb(11 11 11 / 0%) 30%),
+    linear-gradient(0deg, rgb(11 11 11 / 94%) 0%, rgb(11 11 11 / 62%) 36%, rgb(11 11 11 / 0%) 68%),
+    linear-gradient(90deg, rgb(11 11 11 / 72%) 0%, rgb(11 11 11 / 30%) 45%, rgb(11 11 11 / 0%) 72%);
 }
 
 .mg-hero__content {
@@ -42,6 +42,19 @@
   z-index: 2;
   display: grid;
   gap: 1.1rem;
+}
+
+/* Rote Eyebrow auf Fotos: helleres Rot + weicher Schatten für Lesbarkeit */
+.mg-hero .mg-eyebrow,
+.mg-page-hero .mg-eyebrow {
+  color: var(--mg-red-on-dark);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 60%);
+}
+
+@media (max-width: 719px) {
+  .mg-hero__img {
+    object-position: 72% 22%;
+  }
 }
 
 /* Eyebrow bleibt rot (Dossier-Cover); Fotos auf dunklen Flächen in Graustufen */
@@ -134,10 +147,11 @@
 .mg-announce__tag {
   padding: 0.25rem 0.6rem;
   border-radius: var(--mg-r-full);
-  background: #d71920;
-  font-size: 0.7rem;
+  background: var(--mg-paper);
+  color: var(--mg-ink);
+  font-size: var(--mg-step--2);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--mg-tracking-caps);
   text-transform: uppercase;
 }
 
@@ -182,7 +196,7 @@
 .mg-stat__value {
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-4);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: var(--mg-tracking-display);
   line-height: 0.9;
   font-feature-settings: "tnum";
@@ -405,6 +419,48 @@
   border-top: 2px solid var(--mg-red);
 }
 
+.mg-milestone {
+  position: relative;
+  overflow: hidden;
+}
+
+.mg-milestone__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.mg-milestone__media img {
+  filter: grayscale(1) contrast(1.06);
+  opacity: 0.55;
+  transition: transform 0.9s var(--mg-ease), opacity var(--mg-dur) var(--mg-ease);
+}
+
+.mg-milestone__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgb(11 11 11 / 96%) 0%, rgb(11 11 11 / 70%) 45%, rgb(11 11 11 / 25%) 100%);
+}
+
+.mg-milestone:hover .mg-milestone__media img {
+  transform: scale(1.04);
+  opacity: 0.7;
+}
+
+.mg-milestone__link {
+  position: relative;
+  z-index: 1;
+}
+
+.mg-milestones__cell--feature .mg-milestone {
+  min-height: 24rem;
+}
+
+.mg-milestones__cell--feature .mg-milestone__link {
+  align-content: end;
+}
+
 .mg-milestones__cell--feature .mg-milestone__year,
 .mg-milestones__cell--feature .mg-milestone__text {
   color: rgb(255 255 255 / 85%);
@@ -433,9 +489,10 @@
     grid-column: span 2;
   }
 
+  /* Feature links über drei Zeilen, drei Karten rechts gestapelt — keine Lücken */
   .mg-milestones__cell--feature {
     grid-column: span 4;
-    grid-row: span 2;
+    grid-row: span 3;
   }
 
   .mg-milestones__cell--feature .mg-milestone__link {
@@ -557,7 +614,7 @@
   color: #fff;
   text-decoration: none;
   isolation: isolate;
-  background: #0b0b0c;
+  background: #0b0b0b;
 }
 
 .mg-bento__post-img {
@@ -573,7 +630,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(0deg, rgb(11 11 12 / 90%) 0%, rgb(11 11 12 / 20%) 60%, rgb(11 11 12 / 5%) 100%);
+  background: linear-gradient(0deg, rgb(11 11 11 / 94%) 0%, rgb(11 11 11 / 78%) 45%, rgb(11 11 11 / 35%) 75%, rgb(11 11 11 / 15%) 100%);
 }
 
 .mg-bento__post-body {
@@ -607,8 +664,8 @@
 }
 
 .mg-bento__newsletter {
-  background: #0b0b0b;
-  color: #faf9f6;
+  background: var(--mg-paper);
+  color: var(--mg-ink);
   border-color: transparent;
   scroll-margin-top: calc(var(--mg-header-h) + 2rem);
 }
@@ -645,7 +702,7 @@
 .mg-bento__budget-figure {
   display: block;
   margin-top: 0.4rem;
-  color: var(--mg-red);
+  color: var(--mg-ink);
   font-family: var(--mg-font-display);
   font-size: var(--mg-step-4);
   font-weight: 600;
@@ -734,6 +791,21 @@
   letter-spacing: var(--mg-tracking-display);
 }
 
+@media (max-width: 719px) {
+  .mg-tier__spacer {
+    display: none;
+  }
+}
+
+/* Preise auf gleicher Höhe, auch wenn ein Titel umbricht */
+@media (min-width: 720px) {
+  .mg-tier__title {
+    min-height: 2.3em;
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
 .mg-tier__price {
   color: var(--mg-muted);
   font-size: var(--mg-step--1);
@@ -818,6 +890,7 @@
 }
 
 /* Ein Badge pro Abschnitt darf rot sein (100er Club) — "Empfohlen" bleibt Tinte */
+.mg-chip--ink,
 .mg-chip--red {
   border-color: transparent;
   background: var(--mg-ink);

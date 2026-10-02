@@ -29,8 +29,8 @@ export function ErfolgeTimeline({ entries }: { entries: CareerEntry[] }) {
               <motion.span
                 className="mg-timeline__dot"
                 aria-hidden="true"
-                initial={{ scale: 0.6, backgroundColor: "rgb(11 11 12 / 18%)" }}
-                whileInView={{ scale: 1, backgroundColor: "#d71920" }}
+                initial={{ scale: 0.6, backgroundColor: "rgb(11 11 11 / 18%)" }}
+                whileInView={{ scale: 1, backgroundColor: "#0b0b0b" }}
                 viewport={{ once: false, margin: "0px 0px -45% 0px" }}
                 transition={{ duration: 0.4 }}
               />

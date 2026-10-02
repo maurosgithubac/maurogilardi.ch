@@ -49,14 +49,14 @@ export const siteContent = {
       {
         name: "maurogilardi.ch",
         href: "https://maurogilardi.ch",
-        type: "Eigene Webseite",
+        type: "Eigene Website",
         text: "Meine persönliche Plattform mit Updates zu Tour, Projekten und Partnern.",
       },
       {
         name: "saameducation.com",
         href: "https://saameducation.com",
         type: "Non-Profit",
-        text: "Webseite für die Organisation meiner Schwester zum Aufbau von Infrastruktur in Südafrika.",
+        text: "Website für die Organisation meiner Schwester zum Aufbau von Infrastruktur in Südafrika.",
       },
       {
         name: "creativegemini.ch",
@@ -84,7 +84,7 @@ export const siteContent = {
       },
     ],
     kpis: [
-      { label: "Webseiten", value: "4" },
+      { label: "Websites", value: "4" },
       { label: "Apps", value: "2" },
       { label: "Verbandsfunktion", value: "1" },
     ],

@@ -20,7 +20,7 @@ export const metadata = uebermichSponsorenMetadata;
 /** Sichtbares Linkziel: Domain ohne www bzw. Hinweis auf interne Seite */
 function linkLabel(href: string | null): string | null {
   if (!href) return null;
-  if (href.startsWith("/")) return "Sponsoring-Seite";
+  if (href.startsWith("/")) return "Gönner-Seite";
   try {
     return new URL(href).hostname.replace(/^www\./, "");
   } catch {
@@ -39,7 +39,7 @@ function SponsorLink({ sponsor, children }: { sponsor: SiteSponsor; children: Re
   }
   if (href.startsWith("/")) {
     return (
-      <Link href={href} className="mg-sponsor-tile mg-sponsor-tile--link" aria-label={`${displayName} – zur Sponsoring-Seite`}>
+      <Link href={href} className="mg-sponsor-tile mg-sponsor-tile--link" aria-label={`${displayName} – zur Gönner-Seite`}>
         {children}
       </Link>
     );
@@ -144,11 +144,11 @@ export default function UeberMichSponsorenPage() {
               </Reveal>
               <Reveal className="mg-sponsors__head-aside" delay={0.1}>
                 <p className="mg-lead">
-                  Drei Stufen. Klick öffnet die Website — MG Gönnervereinigung führt zur Sponsoring-Seite.
+                  Drei Stufen. Ein Klick auf das Logo öffnet die Website des Partners.
                 </p>
                 <dl className="mg-sponsors__facts">
                   <div>
-                    <dt>Partner</dt>
+                    <dt>Sponsoren</dt>
                     <dd className="mg-mono">{total}</dd>
                   </div>
                   <div>
@@ -171,7 +171,7 @@ export default function UeberMichSponsorenPage() {
           <div className="mg-container">
             <Reveal className="mg-sponsors-cta__panel">
               <div className="mg-sponsors-cta__copy">
-                <p className="mg-eyebrow">Sponsoring</p>
+                <p className="mg-eyebrow">Für Unternehmen</p>
                 <h2 id="sponsors-cta-title" className="mg-h3 mg-sponsors-cta__title">
                   Partner werden
                 </h2>
@@ -184,7 +184,7 @@ export default function UeberMichSponsorenPage() {
                   Partner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
                 </Link>
                 <Link href="/sponsoring" className="mg-btn mg-btn--ghost">
-                  Sponsoring &amp; Mitgliedschaften
+                  Gönner werden
                 </Link>
               </div>
             </Reveal>

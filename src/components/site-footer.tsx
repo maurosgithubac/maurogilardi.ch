@@ -17,8 +17,8 @@ type SiteFooterProps = {
 export function SiteFooterCredit() {
   return (
     <p className="mg-footer__credit">
-      Webseite umgesetzt von{" "}
-      <a href="https://sibatusig.ch" target="_blank" rel="noopener noreferrer" className="site-footer-credit-brand">
+      Website umgesetzt von{" "}
+      <a href="https://sibatusig.ch" target="_blank" rel="noopener noreferrer" className="mg-footer__credit-link">
         sibatusig.ch
       </a>
     </p>
@@ -48,7 +48,7 @@ const COLUMNS: { title: string; links: { href: string; label: string; external?:
     title: "Mehr",
     links: [
       { href: "/ueber-mich/gallerie", label: "Galerie" },
-      { href: "/ueber-mich/media", label: "Medien & Presse" },
+      { href: "/ueber-mich/media", label: "Medien" },
       { href: "/ueber-mich/equipment", label: "Mein Bag" },
       { href: "/ueber-mich/faq", label: "FAQ" },
     ],
@@ -69,9 +69,7 @@ export function SiteFooter({ showContactForm = true }: SiteFooterProps) {
 
   return (
     <footer className="mg-footer mg-grain" data-theme="dark">
-      <div className="mg-glow mg-footer__glow" aria-hidden="true" />
-
-      {showContactForm ? (
+            {showContactForm ? (
         <section className="mg-footer__cta mg-container" aria-labelledby="mg-footer-cta-title">
           <Reveal>
             <p className="mg-eyebrow">Teil meines Teams</p>

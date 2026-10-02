@@ -151,7 +151,7 @@ export const careerStats = {
   pgtRankingCurrent: 4,
   pgtRankingYear: 2026,
   supporters: goennervereinigungMemberNames.filter((n) => n.trim()).length,
-  seasonBudgetChf: 55000,
+  seasonBudgetChf: 75000,
 };
 
 /** Die vier stärksten Momente — Startseite "Meilensteine" */

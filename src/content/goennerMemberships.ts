@@ -23,7 +23,7 @@ export const goennerMembershipTiers: MembershipTier[] = [
     benefits: [
       { text: "Monatlicher Newsletter (Mail)" },
       { text: "WhatsApp Supporterchat" },
-      { text: "Erwähnung auf Webseite" },
+      { text: "Erwähnung auf der Website" },
     ],
   },
   {
@@ -34,7 +34,7 @@ export const goennerMembershipTiers: MembershipTier[] = [
       { text: "Jährliches Gönnerturnier (SEP/OKT)" },
       { text: "Monatlicher Newsletter (Mail)" },
       { text: "WhatsApp Supporterchat" },
-      { text: "Erwähnung auf Webseite" },
+      { text: "Erwähnung auf der Website" },
     ],
   },
   {
@@ -45,7 +45,7 @@ export const goennerMembershipTiers: MembershipTier[] = [
       { text: "Jährliches Gönnerturnier (SEP/OKT)" },
       { text: "Monatlicher Newsletter (Mail)" },
       { text: "WhatsApp Supporterchat" },
-      { text: "Erwähnung auf Webseite" },
+      { text: "Erwähnung auf der Website" },
       { text: "Golfklinik vor Gönnerturnier*", bold: true },
     ],
   },
@@ -57,7 +57,7 @@ export const goennerMembershipTiers: MembershipTier[] = [
       { text: "Jährliches Gönnerturnier (SEP/OKT)" },
       { text: "Monatlicher Newsletter (Mail)" },
       { text: "WhatsApp Supporterchat" },
-      { text: "Erwähnung auf Webseite" },
+      { text: "Erwähnung auf der Website" },
       { text: "Golfklinik vor Gönnerturnier*", bold: true },
       { text: "Jährliche Golfrunde mit mir*", bold: true },
     ],
@@ -70,7 +70,7 @@ export const goennerMembershipTiers: MembershipTier[] = [
     benefits: [
       { text: "Mindestbetrag ≥ 2'000 CHF pro Jahr", bold: true },
       { text: "Partnerschaft mit messbarer Sichtbarkeit für deine Marke" },
-      { text: "Erwähnung auf Webseite & in der Kommunikation (je nach Paket)" },
+      { text: "Erwähnung auf der Website & in der Kommunikation (je nach Paket)" },
       { text: "Individuelles Paket — Umfang und Leistungen stimmen wir persönlich ab", bold: true },
     ],
   },

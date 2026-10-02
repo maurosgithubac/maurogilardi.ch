@@ -34,6 +34,8 @@ export function FaqTopicNav({ topics }: Props) {
         // Oberstes sichtbares Thema gewinnt
         const first = topics.find((topic) => visible.has(topic.id));
         if (first) setActive(first.id);
+        // Wieder oberhalb des ersten Themas → erstes Thema aktiv statt des zuletzt gesehenen
+        else if (targets[0].getBoundingClientRect().top > window.innerHeight * 0.3) setActive(topics[0]?.id ?? null);
       },
       { rootMargin: "-30% 0px -55% 0px", threshold: 0 },
     );

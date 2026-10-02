@@ -21,7 +21,7 @@ export const metadata = partnerMetadata;
 const OFFER = [
   {
     title: "Sichtbarkeit",
-    text: "Präsenz auf meiner Webseite und in meiner Kommunikation — Umfang je nach Paket.",
+    text: "Präsenz auf meiner Website und in meiner Kommunikation — Umfang je nach Paket.",
   },
   {
     title: "Erlebnisse",
@@ -32,8 +32,8 @@ const OFFER = [
     text: "Ehrliche Inhalte von der Tour, die deine Marke mit Leistungssport aus der Schweiz verbinden.",
   },
   {
-    title: "Massgeschneidert",
-    text: "Kein Paket von der Stange: Ziele, Leistungen und Budget legen wir gemeinsam fest.",
+    title: "Nach Absprache",
+    text: "Ziele, Leistungen und Budget legen wir gemeinsam fest — passend zu deinem Unternehmen.",
   },
 ];
 

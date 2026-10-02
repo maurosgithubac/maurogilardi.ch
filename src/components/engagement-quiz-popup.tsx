@@ -151,7 +151,7 @@ export function EngagementQuizPopup() {
                 <p className="engagement-quiz-feedback">{selected.feedback}</p>
               </div>
             )}
-            <button type="button" className="engagement-quiz-continue" onClick={handleContinue}>
+            <button type="button" className="mg-btn mg-btn--primary engagement-quiz-continue-btn" onClick={handleContinue}>
               Weiter
             </button>
           </div>
@@ -183,7 +183,7 @@ export function EngagementQuizPopup() {
             </svg>
             <span className="engagement-quiz-newsletter-label">Newsletter</span>
           </Link>
-          <Link href="/sponsoring#modelle" className="engagement-quiz-goenner" onClick={handleFooterNavigate}>
+          <Link href="/sponsoring#modelle" className="mg-btn mg-btn--accent mg-btn--sm" onClick={handleFooterNavigate}>
             Gönner werden
           </Link>
         </div>

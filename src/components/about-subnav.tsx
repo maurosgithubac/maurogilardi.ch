@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
+import { useEffect, useRef } from "react";
 
 const LINKS = [
   { href: "/ueber-mich", label: "Überblick" },
@@ -16,10 +17,19 @@ const LINKS = [
 /** Segment-Navigation mit gleitendem Aktiv-Indikator (shared layout). */
 export function AboutSubnav() {
   const pathname = usePathname();
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // Mobil: aktiven Eintrag in der horizontal scrollbaren Leiste zentrieren (nur die Leiste, nicht die Seite)
+  useEffect(() => {
+    const list = listRef.current;
+    const active = list?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!list || !active || list.scrollWidth <= list.clientWidth) return;
+    list.scrollLeft = active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2;
+  }, [pathname]);
 
   return (
     <nav className="mg-subnav" aria-label="Bereiche: Über mich">
-      <ul className="mg-subnav__list">
+      <ul ref={listRef} className="mg-subnav__list">
         {LINKS.map(({ href, label }) => {
           const active = pathname === href;
           return (

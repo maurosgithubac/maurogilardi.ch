@@ -20,25 +20,25 @@ export const engagementQuizQuestions: EngagementQuizQuestion[] = [
     question: "Was schätzt du: Was kostet mich eine komplette Pro-Golf-Saison?",
     options: [
       {
-        id: "40k",
-        label: "40'000 CHF",
+        id: "50k",
+        label: "50'000 CHF",
         isCorrect: false,
         feedback:
-          "Darunter liegt es bei mir selten — allein Reisen, Hotels, Startgebühren und Training summieren sich schnell.",
+          "Damit komme ich nicht durch die Saison — allein Reisen, Hotels, Startgebühren und Training summieren sich schnell.",
       },
       {
-        id: "55k",
-        label: "55'000 CHF",
+        id: "75k",
+        label: "75'000 CHF",
         isCorrect: true,
         feedback:
           "Für mich realistisch: Turniere, Reisen, Hotels, Coaching, Equipment — ohne Lebenshaltung wie Krankenkasse oder Miete.",
       },
       {
-        id: "70k",
-        label: "70'000 CHF",
+        id: "100k",
+        label: "100'000 CHF",
         isCorrect: false,
         feedback:
-          "Kann passieren, wenn ich viele Events spiele und lange unterwegs bin — oft liegt es bei mir aber eher bei rund 55'000 CHF.",
+          "Das wäre eine sehr lange Saison mit vielen Fernreisen — bei mir liegt es eher bei rund 75'000 CHF.",
       },
     ],
   },

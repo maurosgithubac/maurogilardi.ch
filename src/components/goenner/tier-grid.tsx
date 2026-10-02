@@ -22,7 +22,7 @@ export function TierGrid({ inquiryHref = "/sponsoring?modell={id}#anfrage", head
       {club ? (
         <StaggerItem className="mg-tier mg-tier--club mg-grain">
           <div className="mg-tier__top">
-            <span className="mg-chip mg-chip--on-red">Beliebtester Einstieg</span>
+            <span className="mg-chip mg-chip--on-red">Einstieg ab 100 CHF</span>
             <Heading className="mg-tier__title">{club.title}</Heading>
             <p className="mg-tier__price">
               <span className="mg-mono">{club.priceChf}</span> CHF / Jahr
@@ -42,7 +42,7 @@ export function TierGrid({ inquiryHref = "/sponsoring?modell={id}#anfrage", head
       {memberTiers.map((tier) => (
         <StaggerItem key={tier.id} className={`mg-tier${tier.id === "eagle" ? " mg-tier--featured" : ""}`}>
           <div className="mg-tier__top">
-            {tier.id === "eagle" ? <span className="mg-chip mg-chip--red">Empfohlen</span> : <span className="mg-tier__spacer" />}
+            {tier.id === "eagle" ? <span className="mg-chip mg-chip--ink">Empfohlen</span> : <span className="mg-tier__spacer" />}
             <Heading className="mg-tier__title">{tier.title}</Heading>
             <p className="mg-tier__price">
               <span className="mg-mono">{chf.format(tier.priceChf)}</span> CHF / Jahr

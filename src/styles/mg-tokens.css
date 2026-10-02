@@ -22,6 +22,10 @@
   --mg-red-soft: rgb(215 25 32 / 8%);
   --mg-on-red: #ffffff;
   --mg-focus: rgb(215 25 32 / 45%);
+  --mg-red-on-dark: #ff4d52; /* kleines Rot auf Schwarz/Fotos mit AA-Kontrast */
+  --mg-success: #135c33;
+  --mg-success-bg: #e9f6ee;
+  --mg-tracking-eyebrow: 0.22em;
 
   /* Typo */
   /* Eine Markenschrift für alles: Playfair Display (Titel, Fliesstext, Zahlen, UI) */
@@ -59,8 +63,8 @@
   --mg-r-full: 999px;
 
   /* Schatten (nur zwei) */
-  --mg-shadow-card: 0 1px 2px rgb(11 11 12 / 4%), 0 8px 24px rgb(11 11 12 / 6%);
-  --mg-shadow-float: 0 2px 6px rgb(11 11 12 / 6%), 0 24px 60px rgb(11 11 12 / 14%);
+  --mg-shadow-card: 0 1px 2px rgb(11 11 11 / 4%), 0 8px 24px rgb(11 11 11 / 6%);
+  --mg-shadow-float: 0 2px 6px rgb(11 11 11 / 6%), 0 24px 60px rgb(11 11 11 / 14%);
 
   /* Motion */
   --mg-ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -213,14 +217,24 @@ body {
   font-family: var(--mg-font-body);
   font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--mg-tracking-eyebrow);
   text-transform: uppercase;
   color: var(--mg-red);
 }
 
 /* Auf Schwarz minimal heller, damit das kleine Label AA-Kontrast erreicht */
 [data-theme="dark"] .mg-eyebrow {
-  color: #f2393f;
+  color: var(--mg-red-on-dark);
+}
+
+/* Neutrales Kleinlabel (Karten-Ebene) — die rote Eyebrow bleibt den Abschnitten vorbehalten */
+.mg-label {
+  font-family: var(--mg-font-body);
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mg-muted);
 }
 
 .mg-display {
@@ -323,8 +337,7 @@ body {
 }
 
 .mg-btn--primary:hover {
-  --btn-bg: var(--mg-red);
-  --btn-fg: var(--mg-on-red);
+  --btn-bg: var(--mg-ink-2);
 }
 
 /* Der eine rote Akzent im Header ("Gönner werden") */
@@ -338,12 +351,12 @@ body {
 }
 
 .mg-btn--dark:hover {
-  --btn-bg: #26252a;
+  --btn-bg: #22211f;
 }
 
 .mg-btn--light {
   --btn-bg: #fff;
-  --btn-fg: #0b0b0c;
+  --btn-fg: #0b0b0b;
 }
 
 .mg-btn--light:hover {
@@ -372,7 +385,7 @@ body {
 
 .mg-btn--glass:hover {
   --btn-bg: #fff;
-  --btn-fg: #0b0b0c;
+  --btn-fg: #0b0b0b;
 }
 
 .mg-btn--sm {

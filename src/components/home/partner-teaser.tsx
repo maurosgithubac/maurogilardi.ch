@@ -6,7 +6,7 @@ import { SplitText } from "@/components/motion/split-text";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 const POINTS = [
-  "Sichtbarkeit auf Webseite und in meiner Kommunikation — je nach Paket",
+  "Sichtbarkeit auf meiner Website und in meiner Kommunikation — je nach Paket",
   "Golfkliniken, Golfrunden und Anlässe für dein Team",
   "Ein Paket, das wir persönlich auf deine Ziele abstimmen",
 ];

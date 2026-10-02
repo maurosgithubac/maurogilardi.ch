@@ -87,7 +87,7 @@ export default function SponsoringPage() {
             <header className="mg-section-head mg-section-head--split">
               <div>
                 <Reveal>
-                  <p className="mg-eyebrow">Mitgliedschaften</p>
+                  <p className="mg-eyebrow">Gönner-Modelle</p>
                 </Reveal>
                 <SplitText as="h2" id="modelle-title" className="mg-h2" text="Das passende Modell." />
               </div>
@@ -106,7 +106,7 @@ export default function SponsoringPage() {
                 <p className="mg-support__twint-title">Mit freiem Betrag unterstützen</p>
                 <p className="mg-body">Einmalig und unkompliziert per TWINT — jeder Franken fliesst in die Saison.</p>
               </div>
-              <TwintPaylinkButton kicker="" />
+              <TwintPaylinkButton variant="hero" />
             </Reveal>
           </div>
         </section>
@@ -119,7 +119,7 @@ export default function SponsoringPage() {
               </Reveal>
               <Reveal delay={0.05}>
                 <h2 id="anfrage-title" className="mg-h2">
-                  Mitglied werden.
+                  Gönner werden.
                 </h2>
               </Reveal>
               <Reveal delay={0.1}>

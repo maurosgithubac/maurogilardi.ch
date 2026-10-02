@@ -64,7 +64,7 @@ export function SeasonBento({ events, latestPost }: Props) {
                   ) : null}
                   <div className="mg-bento__post-scrim" aria-hidden="true" />
                   <div className="mg-bento__post-body" data-theme="dark">
-                    <span className="mg-chip mg-chip--glass">Neuster Beitrag</span>
+                    <span className="mg-chip mg-chip--glass">Neuester Beitrag</span>
                     <time dateTime={latestPost.created_at} className="mg-bento__post-date">
                       {dateFmt.format(new Date(latestPost.created_at))}
                     </time>
@@ -79,8 +79,8 @@ export function SeasonBento({ events, latestPost }: Props) {
           </StaggerItem>
 
           <StaggerItem className="mg-bento__cell mg-bento__cell--newsletter">
-            <article id="newsletter" className="mg-card mg-bento__card mg-bento__newsletter mg-grain" aria-labelledby="bento-nl-title">
-              <p className="mg-eyebrow mg-bento__nl-eyebrow">Newsletter</p>
+            <article id="newsletter" className="mg-card mg-bento__card mg-bento__newsletter mg-grain" data-theme="dark" aria-labelledby="bento-nl-title">
+              <p className="mg-label">Newsletter</p>
               <h3 id="bento-nl-title" className="mg-h3">
                 Updates direkt von der Tour — ehrlich, ab und zu, nie Spam.
               </h3>
@@ -90,7 +90,7 @@ export function SeasonBento({ events, latestPost }: Props) {
 
           <StaggerItem className="mg-bento__cell mg-bento__cell--budget">
             <article className="mg-card mg-bento__card mg-bento__budget" aria-labelledby="bento-budget-title">
-              <p className="mg-eyebrow">Transparenz</p>
+              <p className="mg-label">Transparenz</p>
               <h3 id="bento-budget-title" className="mg-bento__budget-title">
                 Eine Saison kostet mich rund{" "}
                 <span className="mg-bento__budget-figure mg-mono">
