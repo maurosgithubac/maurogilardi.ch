@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Gönnerturnier-Originale (gross, lokal) — Web-Versionen via scripts/build-goennerturnier-photos.mjs
 /public/brand-assets/images/Goennerverein/
+
+# Mockups (lokale Ergebnisse, nicht im Repo)
+/mockups/
