@@ -8,6 +8,7 @@ export type DemoPost = {
   created_at: string;
 };
 
+import { aufstiegHotelplannerPost } from "@/content/aufstieg-hotelplanner-post";
 import { europa20Post } from "@/content/europa-2-0-post";
 import { juli2026Post } from "@/content/juli-2026-post";
 import { zurueckInEuropaPost } from "@/content/zurueck-in-europa-post";
@@ -15,6 +16,7 @@ import { staanOpenSiegPost } from "@/content/staan-open-sieg-post";
 import { isPostVisible } from "@/lib/blog/visible-posts";
 
 export const demoPosts: DemoPost[] = [
+  aufstiegHotelplannerPost,
   staanOpenSiegPost,
   juli2026Post,
   europa20Post,

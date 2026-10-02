@@ -36,11 +36,7 @@ Am 31. Juli fand das 4. MG Invitational in Domat/Ems statt. Ein wichtiger Tag f�
 
 Der Tag hatte von Hitze und Sonnenschein bis zum Gewitterabbruch alles mit dabei. In der Klinik am Vormittag konnte ich ein paar Insights zu meinen Trainingsmethoden und Schwunggedanken mitteilen und gewisse Fragen beantworten, die man sonst eventuell nicht so einfach erklären kann. Danach ging es auf den Platz zu einem gemütlichen Scramble, bei dem ich mich wie jedes Jahr von Flight zu Flight mitspielend alle 2 Löcher zufallen liess. Leider hat es aufgrund des Gewitterabbruchs nicht für alle gereicht, dafür konnte ich dann bei einem gemütlichen Abendessen einen etwas tieferen Einblick in meine laufende Saison und einen Ausblick auf den Rest der Saison geben, ein paar mehr Fragen beantworten, mich mit allen austauschen, noch individuelle Fragen beantworten und den Abend gemeinsam ausklingen lassen.
 
-DANKE an alle 40 Anwesenden und alle, die mich auf meinem Weg begleiten. Ich schätze jeden Support und hoffe, den einen oder anderen mal auf dem Golfplatz zu sehen.`,
-  image_path: "/brand-assets/images/blog/mg-invitational-2026.png",
-  created_at: JULI_2026_CREATED_AT,
-};
-$BODY$,
+DANKE an alle 40 Anwesenden und alle, die mich auf meinem Weg begleiten. Ich schätze jeden Support und hoffe, den einen oder anderen mal auf dem Golfplatz zu sehen.$BODY$,
   '/brand-assets/images/blog/mg-invitational-2026.png',
   true,
   '2026-07-31T10:00:00.000Z'
