@@ -45,7 +45,7 @@ export function HomeHero() {
           </Reveal>
           <Reveal y={20} delay={0.55} className="mg-hero__actions">
             <Magnetic>
-              <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--lg">
+              <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--lg" data-track="hero_cta">
                 Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
               </Link>
             </Magnetic>

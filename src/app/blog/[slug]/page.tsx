@@ -12,6 +12,7 @@ import { blogImageUrl } from "@/lib/storage-public-url";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
+import { SupportStickyBar } from "@/components/support-sticky-bar";
 import { SiteHeader } from "@/components/site-header";
 import { BlogPostBody } from "@/components/blog-post-body";
 import { ReadingProgress } from "@/components/motion/reading-progress";
@@ -196,6 +197,7 @@ export default async function BlogPostPage({ params }: Props) {
         </article>
       </main>
       <SiteFooter />
+      <SupportStickyBar />
     </div>
   );
 }

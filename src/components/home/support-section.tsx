@@ -32,7 +32,7 @@ export function SupportSection() {
             <p className="mg-body">Mit TWINT einen freien Betrag schicken — dauert zehn Sekunden.</p>
           </div>
           <div className="mg-support__twint-actions">
-            <a href={TWINT_PAYLINK_URL} target="_blank" rel="noopener noreferrer" className="mg-btn mg-btn--dark">
+            <a href={TWINT_PAYLINK_URL} target="_blank" rel="noopener noreferrer" className="mg-btn mg-btn--dark" data-track="twint_click" data-track-label="home">
               Mit TWINT unterstützen <span aria-hidden="true">↗</span>
             </a>
             <Link href="/partner" className="mg-link-arrow">

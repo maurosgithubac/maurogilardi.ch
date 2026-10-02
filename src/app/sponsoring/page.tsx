@@ -139,7 +139,7 @@ export default function SponsoringPage() {
           <div className="mg-container mg-inquiry-layout">
             <div className="mg-inquiry-layout__intro">
               <Reveal>
-                <p className="mg-eyebrow">Anfrage</p>
+                <p className="mg-eyebrow">Anmeldung</p>
               </Reveal>
               <Reveal delay={0.05}>
                 <h2 id="anfrage-title" className="mg-h2">
@@ -150,17 +150,17 @@ export default function SponsoringPage() {
                 <ol className="mg-steps">
                   <li>
                     <span>
-                      <strong>Anfrage senden</strong> — dauert eine Minute.
+                      <strong>Anmelden</strong> — dauert eine Minute.
                     </span>
                   </li>
                   <li>
                     <span>
-                      <strong>Ich melde mich</strong> persönlich bei dir.
+                      <strong>Rechnung oder TWINT</strong> — wie es dir passt.
                     </span>
                   </li>
                   <li>
                     <span>
-                      <strong>Rechnung &amp; Willkommen</strong> — ab dann bist du Teil des Teams.
+                      <strong>Willkommen im Team</strong> — Newsletter, WhatsApp-Chat, Gönnerturnier.
                     </span>
                   </li>
                 </ol>

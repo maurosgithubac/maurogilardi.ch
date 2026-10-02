@@ -4,6 +4,7 @@ import { AboutSubnav } from "@/components/about-subnav";
 import { PageHero } from "@/components/page-hero";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
+import { SupportStickyBar } from "@/components/support-sticky-bar";
 import { SiteHeader } from "@/components/site-header";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { ScrollFillText } from "@/components/motion/scroll-fill-text";
@@ -129,6 +130,7 @@ export default function UeberMichPage() {
       </main>
 
       <SiteFooter />
+      <SupportStickyBar />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsEvents } from "@/components/analytics-events";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { EngagementQuizPopup } from "@/components/engagement-quiz-popup";
 import { MotionProvider } from "@/components/motion/motion-provider";
@@ -44,6 +46,8 @@ export default function RootLayout({
           <CookieConsentBanner />
           <EngagementQuizPopup />
         </MotionProvider>
+        <AnalyticsEvents />
+        <Analytics />
       </body>
     </html>
   );

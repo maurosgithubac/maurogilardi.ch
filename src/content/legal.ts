@@ -103,6 +103,18 @@ export const datenschutzSections: LegalSection[] = [
     ],
   },
   {
+    id: "statistik",
+    title: "Reichweitenmessung (Vercel Web Analytics)",
+    paragraphs: [
+      "Um zu verstehen, welche Inhalte genutzt werden, setze ich Vercel Web Analytics ein. Es werden keine Cookies gesetzt und keine personenbezogenen Profile erstellt; Besuche werden anonymisiert und aggregiert ausgewertet (z. B. Seitenaufrufe, Klicks auf Schaltflächen wie «Gönner werden»).",
+    ],
+    bullets: [
+      "Anbieter: Vercel Inc. (Hosting der Website)",
+      "Zweck: anonyme Reichweiten- und Nutzungsstatistik",
+      "Rechtsgrundlage: berechtigtes Interesse an der Verbesserung der Website",
+    ],
+  },
+  {
     id: "cookies",
     title: "Cookies & lokale Speicherung",
     paragraphs: [

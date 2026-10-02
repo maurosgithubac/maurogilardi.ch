@@ -3,6 +3,7 @@ import { ErfolgeTimeline } from "@/components/erfolge-timeline";
 import { PageHero } from "@/components/page-hero";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
+import { SupportStickyBar } from "@/components/support-sticky-bar";
 import { SiteHeader } from "@/components/site-header";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
@@ -93,6 +94,7 @@ export default function ErfolgePage() {
       </main>
 
       <SiteFooter />
+      <SupportStickyBar />
     </div>
   );
 }

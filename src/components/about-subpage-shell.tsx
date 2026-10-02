@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { AboutSubnav } from "@/components/about-subnav";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
+import { SupportStickyBar } from "@/components/support-sticky-bar";
 import { SiteHeader } from "@/components/site-header";
 
 type Props = {
@@ -46,6 +47,7 @@ export function AboutSubpageShell({ label, title, lead, heroSrc, heroAlt, childr
       </main>
 
       <SiteFooter />
+      <SupportStickyBar />
     </div>
   );
 }

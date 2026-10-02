@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Club100JoinModal } from "@/components/club100-join-modal";
 import { MG_EASE } from "@/components/motion/motion-provider";
+import { trackEvent } from "@/components/analytics-events";
+import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import {
   goennerMembershipTiers,
   isMemberTierId,
@@ -33,6 +35,7 @@ export function GoennerInquiryForm() {
   const [status, setStatus] = useState<{ kind: "idle" | "ok" | "error"; text: string }>({ kind: "idle", text: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [club100Open, setClub100Open] = useState(false);
+  const [payment, setPayment] = useState<"rechnung" | "twint">("rechnung");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -58,7 +61,7 @@ export function GoennerInquiryForm() {
           street: value("street"),
           postal_code: value("postal_code"),
           city: value("city"),
-          message: value("message") || null,
+          message: [`Zahlungswunsch: ${payment === "twint" ? "TWINT" : "Rechnung"}`, value("message")].filter(Boolean).join("\n\n"),
         }),
       });
       const data = (await response.json()) as { message?: string; error?: string };
@@ -66,7 +69,14 @@ export function GoennerInquiryForm() {
         setStatus({ kind: "error", text: data.error || "Etwas ist schiefgelaufen." });
         return;
       }
-      setStatus({ kind: "ok", text: data.message || "Vielen Dank — ich melde mich bei dir." });
+      trackEvent("goenner_joined", { modell: tier });
+      setStatus({
+        kind: "ok",
+        text:
+          payment === "twint"
+            ? "Danke, du bist dabei! Ich melde mich persönlich — den Betrag kannst du direkt per TWINT senden."
+            : "Danke, du bist dabei! Ich melde mich persönlich und schicke dir die Rechnung.",
+      });
       form.reset();
       setTier("");
     } catch {
@@ -133,9 +143,25 @@ export function GoennerInquiryForm() {
           </label>
         </div>
 
+        <fieldset className="mg-inquiry__tiers">
+          <legend className="mg-inquiry__legend">Bezahlung</legend>
+          <div className="mg-inquiry__options mg-inquiry__options--two">
+            <label className="mg-option" data-checked={payment === "rechnung" ? "true" : undefined}>
+              <input type="radio" name="payment" value="rechnung" checked={payment === "rechnung"} onChange={() => setPayment("rechnung")} />
+              <span className="mg-option__title">Per Rechnung</span>
+              <span className="mg-option__price">Ich schicke dir die Rechnung</span>
+            </label>
+            <label className="mg-option" data-checked={payment === "twint" ? "true" : undefined}>
+              <input type="radio" name="payment" value="twint" checked={payment === "twint"} onChange={() => setPayment("twint")} />
+              <span className="mg-option__title">Per TWINT</span>
+              <span className="mg-option__price">Direkt nach der Anmeldung</span>
+            </label>
+          </div>
+        </fieldset>
+
         <div className="mg-inquiry__submit">
           <button type="submit" className="mg-btn mg-btn--primary mg-btn--lg" disabled={isSubmitting}>
-            {isSubmitting ? "Wird gesendet…" : "Anfrage senden"}
+            {isSubmitting ? "Wird gesendet…" : "Jetzt beitreten"}
             <span className="mg-btn__arrow" aria-hidden="true">
               →
             </span>
@@ -158,6 +184,18 @@ export function GoennerInquiryForm() {
               </motion.p>
             ) : null}
           </AnimatePresence>
+          {status.kind === "ok" && payment === "twint" ? (
+            <a
+              href={TWINT_PAYLINK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mg-btn mg-btn--dark mg-inquiry__twint"
+              data-track="twint_click"
+              data-track-label="after_join"
+            >
+              Jetzt per TWINT bezahlen <span aria-hidden="true">↗</span>
+            </a>
+          ) : null}
         </div>
       </form>
       <Club100JoinModal open={club100Open} onClose={() => setClub100Open(false)} />

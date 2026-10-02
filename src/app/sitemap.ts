@@ -21,6 +21,7 @@ const STATIC_ROUTES: {
   { path: "/erfolge", changeFrequency: "monthly", priority: 0.8 },
   { path: "/sponsoring", changeFrequency: "monthly", priority: 0.8 },
   { path: "/partner", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/2027", changeFrequency: "monthly", priority: 0.85 },
   { path: "/impressum", changeFrequency: "yearly", priority: 0.4 },
   { path: "/datenschutz", changeFrequency: "yearly", priority: 0.4 },
 ];

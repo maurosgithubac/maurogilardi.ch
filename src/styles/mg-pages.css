@@ -1121,3 +1121,149 @@
   font-style: normal;
   font-weight: 600;
 }
+
+
+/* ——— Conversion: Kampagne /2027, mobile Leiste, Namenswand-CTA ——— */
+.mg-campaign-budget {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.mg-campaign-budget .mg-h2 {
+  font-variant-numeric: lining-nums tabular-nums;
+  margin-block: 0.75rem 1rem;
+}
+
+.mg-campaign-progress {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.75rem;
+  max-width: 34rem;
+}
+
+.mg-campaign-progress__bar {
+  height: 0.6rem;
+  border-radius: var(--mg-r-full);
+  background: var(--mg-paper-2);
+  overflow: hidden;
+}
+
+.mg-campaign-progress__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mg-red);
+}
+
+.mg-campaign-progress__label {
+  color: var(--mg-ink-2);
+  font-size: var(--mg-step--1);
+}
+
+@media (min-width: 960px) {
+  .mg-campaign-budget {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 5rem;
+    align-items: end;
+  }
+}
+
+.mg-tier__per-day {
+  color: rgb(250 249 246 / 70%);
+  font-size: var(--mg-step--2);
+  font-style: italic;
+}
+
+.mg-inquiry__options--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mg-names__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.mg-names__head .mg-names__title {
+  margin-bottom: 0;
+}
+
+.mg-names__join {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  color: var(--mg-ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--mg-line-strong);
+}
+
+.mg-names__join:hover .mg-btn__arrow {
+  transform: translateX(4px);
+}
+
+.mg-support-bar {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem 0.6rem 1.1rem;
+  border-radius: var(--mg-r-full);
+  background: rgb(11 11 11 / 94%);
+  color: #faf9f6;
+  box-shadow: var(--mg-shadow-float);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.mg-support-bar__text {
+  display: grid;
+  flex: 1;
+  line-height: 1.2;
+  font-size: var(--mg-step--1);
+}
+
+.mg-support-bar__text span {
+  color: rgb(250 249 246 / 70%);
+  font-size: var(--mg-step--2);
+}
+
+.mg-support-bar__close {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mg-support-bar__close svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+/* Nur mobil; Cookie-Hinweis hat Vorrang */
+@media (min-width: 720px) {
+  .mg-support-bar {
+    display: none;
+  }
+}
+
+html:has(.mg-cookie) .mg-support-bar {
+  display: none;
+}
+
+.mg-inquiry__twint {
+  margin-top: 0.75rem;
+}

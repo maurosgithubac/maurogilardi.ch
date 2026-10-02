@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { MG_EASE } from "@/components/motion/motion-provider";
 import { Portal } from "@/components/portal";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
+import { trackEvent } from "@/components/analytics-events";
 import { useFocusTrap, useOverlayLock } from "@/lib/ui/use-overlay";
 
 type Step = "contact" | "done";
@@ -68,6 +69,7 @@ export function Club100JoinModal({ open, onClose }: Props) {
         return;
       }
 
+      trackEvent("club100_joined");
       openTwintInNewTab();
       setStatus(
         data.message ||

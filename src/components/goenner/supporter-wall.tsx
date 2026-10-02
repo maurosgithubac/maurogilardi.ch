@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Marquee } from "@/components/motion/marquee";
 import { goennervereinigungMemberNames } from "@/content/goennervereinigungMembers";
 
@@ -13,9 +14,12 @@ export function SupporterWall() {
 
   return (
     <div className="mg-names">
-      <p className="mg-names__title mg-container">
-        Merci an {names.length} Gönnerinnen und Gönner der MG Gönnervereinigung
-      </p>
+      <div className="mg-names__head mg-container">
+        <p className="mg-names__title">Merci an {names.length} Gönnerinnen und Gönner der MG Gönnervereinigung</p>
+        <Link href="/sponsoring#modelle" className="mg-names__join" data-track="wall_join_click">
+          Werde Nummer {names.length + 1} <span className="mg-btn__arrow" aria-hidden="true">→</span>
+        </Link>
+      </div>
       <Marquee speed={1.6} direction={-1} aria-label="Gönnerinnen und Gönner, Teil 1">
         <ul className="mg-names__row">
           {names.slice(0, half).map((n) => (

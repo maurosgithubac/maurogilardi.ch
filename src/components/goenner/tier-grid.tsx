@@ -27,13 +27,14 @@ export function TierGrid({ inquiryHref = "/sponsoring?modell={id}#anfrage", head
             <p className="mg-tier__price">
               <span className="mg-mono">{club.priceChf}</span> CHF / Jahr
             </p>
+            <p className="mg-tier__per-day">Weniger als 30 Rappen pro Tag</p>
           </div>
           <ul className="mg-tier__list">
             {club.benefits.map((b) => (
               <li key={b.text}>{b.text}</li>
             ))}
           </ul>
-          <Club100JoinButton className="mg-btn mg-btn--light mg-btn--lg mg-tier__cta">
+          <Club100JoinButton className="mg-btn mg-btn--light mg-btn--lg mg-tier__cta" track="club100_open">
             Jetzt beitreten <span className="mg-btn__arrow" aria-hidden="true">→</span>
           </Club100JoinButton>
         </StaggerItem>
@@ -55,8 +56,13 @@ export function TierGrid({ inquiryHref = "/sponsoring?modell={id}#anfrage", head
               </li>
             ))}
           </ul>
-          <Link href={inquiryHref.replace("{id}", tier.id)} className="mg-btn mg-btn--ghost mg-tier__cta">
-            {tier.title.replace(" Member", "")} anfragen
+          <Link
+            href={inquiryHref.replace("{id}", tier.id)}
+            className="mg-btn mg-btn--ghost mg-tier__cta"
+            data-track="tier_join_click"
+            data-track-label={tier.id}
+          >
+            {tier.title.replace(" Member", "")} beitreten
           </Link>
         </StaggerItem>
       ))}

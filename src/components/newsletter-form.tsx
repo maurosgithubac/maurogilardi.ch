@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useId, useRef } from "react";
 import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
+import { trackEvent } from "@/components/analytics-events";
 
 type Props = {
   /** "light" = Button hell (auf dunklem/rotem Grund) */
@@ -15,7 +16,10 @@ export function NewsletterForm({ tone = "light" }: Props) {
   const [state, formAction, pending] = useActionState(newsletterSubscribeAction, initialNewsletterFormState);
 
   useEffect(() => {
-    if (state.message && !state.error) formRef.current?.reset();
+    if (state.message && !state.error) {
+      formRef.current?.reset();
+      trackEvent("newsletter_subscribed");
+    }
   }, [state.message, state.error]);
 
   return (

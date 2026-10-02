@@ -168,7 +168,7 @@ export function SiteHeader({ variant }: Props) {
               </a>
             ) : null}
             <Magnetic className="mg-header__cta">
-              <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--sm">
+              <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--sm" data-track="header_cta">
                 Gönner werden
               </Link>
             </Magnetic>

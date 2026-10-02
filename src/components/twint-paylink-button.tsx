@@ -54,7 +54,7 @@ export function TwintPaylinkButton({
 
   if (variant === "hero") {
     return (
-      <a href={TWINT_PAYLINK_URL} className="mg-btn mg-btn--dark" target="_blank" rel="noopener noreferrer">
+      <a href={TWINT_PAYLINK_URL} className="mg-btn mg-btn--dark" target="_blank" rel="noopener noreferrer" data-track="twint_click">
         Mit TWINT unterstützen <span aria-hidden="true">↗</span>
       </a>
     );
