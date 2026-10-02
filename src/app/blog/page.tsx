@@ -3,7 +3,8 @@ import { visibleDemoPosts } from "@/content/demoPosts";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
-import { blogIndexMetadata, blogIndexSchema } from "@/lib/seo/page-metadata";
+import { blogIndexMetadata } from "@/lib/seo/page-metadata";
+import { blogIndexGraph } from "@/lib/seo/webpage-jsonld";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import type { PostRow } from "@/types/content";
 import { PageHero } from "@/components/page-hero";
@@ -40,7 +41,7 @@ export default async function BlogPage() {
 
   return (
     <div className="mg-page site-page blog-page">
-      <SeoPageJsonLd schema={blogIndexSchema} />
+      <SeoPageJsonLd schema={blogIndexGraph(posts)} />
       <SiteHeader variant="overlay" />
       <main id="inhalt">
         <PageHero

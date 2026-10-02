@@ -10,12 +10,10 @@ import {
 } from "@/lib/about-gallery-images";
 import { uebermichGallerieMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
-import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import { galleryPageGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/gallery.css";
 
 export const dynamic = "force-dynamic";
-
-const PAGE_PATH = "/ueber-mich/gallerie";
 
 const GALLERY_DESCRIPTION =
   "Impressionen von der Tour, Training und Events — Bilder aus meinem Alltag als Profigolfer.";
@@ -28,10 +26,10 @@ export default async function UeberMichGalleriePage() {
   return (
     <>
       <SeoPageJsonLd
-        schema={[
-          webPageJsonLd({ path: PAGE_PATH, name: "Galerie – Impressionen", description: GALLERY_DESCRIPTION }),
-          ueberMichChildBreadcrumbJsonLd("Galerie", PAGE_PATH),
-        ]}
+        schema={galleryPageGraph(
+          files.map((f) => ({ src: aboutGalleryImageSrc(f), alt: aboutGalleryAltFromFilename(f) })),
+          GALLERY_DESCRIPTION,
+        )}
       />
       <AboutSubpageShell
         label="Über mich"

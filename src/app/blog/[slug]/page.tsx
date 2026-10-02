@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { SITE_URL } from "@/lib/seo/constants";
-import { buildSeoTitle } from "@/lib/seo/build-seo-title";
-import { seoPageTitles } from "@/lib/seo/titles";
+import { blogPostNotFoundMetadata, buildBlogPostMetadata } from "@/lib/seo/page-metadata";
 import { findDemoPostBySlug } from "@/content/demoPosts";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
+import { blogPostingGraph } from "@/lib/seo/webpage-jsonld";
 import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
 import { SupportStickyBar } from "@/components/support-sticky-bar";
@@ -59,45 +58,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  if (!post) return { title: { absolute: seoPageTitles.blogFallback } };
+  if (!post) return blogPostNotFoundMetadata;
 
-  const seoTitle = buildSeoTitle(post.title);
-  const title = { absolute: seoTitle };
-  const desc =
-    post.description?.trim() ||
-    `${post.title} – Tour-Update von Mauro Gilardi (Gilardi Golf), Schweizer Golf Professional auf der Pro Golf Tour.`;
-  const canonical = `${SITE_URL}/blog/${slug}`;
-  const img = blogImageUrl(post.image_path);
-
-  return {
-    title,
-    description: desc,
-    keywords: [
-      post.title,
-      "Mauro Gilardi",
-      "Schweizer Golf Professional",
-      "Pro Golf Tour",
-      "SwissPGA",
-      "Gilardi Golf",
-      "Golf Graubünden",
-    ],
-    alternates: { canonical },
-    openGraph: {
-      type: "article",
-      title: seoTitle,
-      description: desc,
-      url: canonical,
-      publishedTime: post.created_at,
-      authors: [`${SITE_URL}/#mauro-gilardi`],
-      images: img ? [{ url: img, alt: `${post.title} – Mauro Gilardi Gilardi Golf` }] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: seoTitle,
-      description: desc,
-      images: img ? [img] : undefined,
-    },
-  };
+  return buildBlogPostMetadata({
+    slug,
+    title: post.title,
+    description: post.description,
+    created_at: post.created_at,
+    imageUrl: blogImageUrl(post.image_path),
+  });
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -154,21 +123,14 @@ export default async function BlogPostPage({ params }: Props) {
       .slice(0, 3);
   }
 
-  const blogPostingSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description || undefined,
-    datePublished: post.created_at,
-    dateModified: post.created_at,
-    url: `https://www.maurogilardi.ch/blog/${post.slug}`,
-    ...(img ? { image: img } : {}),
-    author: { "@id": "https://www.maurogilardi.ch/#mauro-gilardi" },
-    publisher: { "@id": "https://www.maurogilardi.ch/#mauro-gilardi" },
-    inLanguage: "de-CH",
-    about: { "@type": "Sport", name: "Golf" },
-    keywords: "Schweizer Golf Professional, Golf Schweiz, SwissPGA, Pro Golf Tour",
-  };
+  const blogPostingSchema = blogPostingGraph({
+    slug: post.slug,
+    title: post.title,
+    description: post.description,
+    created_at: post.created_at,
+    image: img,
+    wordCount: post.body.replace(/\{\{IMAGE:[^}]*\}\}/g, " ").split(/\s+/).filter(Boolean).length,
+  });
 
   return (
     <div className="mg-page site-page">

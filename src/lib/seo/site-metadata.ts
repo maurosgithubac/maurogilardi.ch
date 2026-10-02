@@ -4,15 +4,13 @@ import { readEnvOptional } from "@/lib/env";
 import {
   SITE_URL,
   entityKeywords,
-  seoImageAlts,
-  seoImages,
-  seoOgImages,
-  seoTwitterImages,
+  seoOgImage,
+  seoOgImagePaths,
 } from "@/lib/seo/constants";
 import { seoPageTitles, seoSiteName } from "@/lib/seo/titles";
 
 const defaultDescription =
-  "Gilardi Golf – Mauro Gilardi, Swiss PGA Professional und Schweizer Golfprofi aus Graubünden. Playing Professional auf der Pro Golf Tour, Golf Coach und Golf Events in der Schweiz.";
+  "Mauro Gilardi ist Schweizer Golfprofi und Swiss PGA Professional aus Graubünden. 2026 gelang ihm der Aufstieg von der Pro Golf Tour in die HotelPlanner Tour.";
 
 /** Root metadata — Open Graph; Summary-Card-Feldern für externe Link-Vorschau (kein eigenes Twitter/X-Konto) */
 export const siteRootMetadata: Metadata = {
@@ -31,12 +29,11 @@ export const siteRootMetadata: Metadata = {
   creator: "Mauro Gilardi",
   publisher: "Mauro Gilardi",
 
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      "de-CH": SITE_URL,
-    },
-  },
+  /*
+   * Kein globales `alternates.canonical`: Es würde an jede Seite ohne eigenes
+   * canonical vererbt (404, Admin) und dort fälschlich auf die Startseite zeigen.
+   * Jede öffentliche Seite setzt ihr canonical selbst (buildPageMetadata).
+   */
 
   openGraph: {
     type: "profile",
@@ -45,7 +42,7 @@ export const siteRootMetadata: Metadata = {
     siteName: seoSiteName,
     title: seoPageTitles.home,
     description: defaultDescription,
-    images: seoOgImages(seoImages.heroPrimary, seoImageAlts.heroPrimary),
+    images: seoOgImage("heroPrimary"),
     firstName: "Mauro",
     lastName: "Gilardi",
     gender: "male",
@@ -56,7 +53,7 @@ export const siteRootMetadata: Metadata = {
     card: "summary_large_image",
     title: seoPageTitles.home,
     description: defaultDescription,
-    images: seoTwitterImages(seoImages.heroPrimary),
+    images: [seoOgImagePaths.heroPrimary],
   },
 
   robots: {

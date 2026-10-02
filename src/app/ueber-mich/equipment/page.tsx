@@ -8,7 +8,7 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { equipmentBag, equipmentTheGolfersMalans, type EquipmentBagItem } from "@/content/equipment";
 import { uebermichEquipmentMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
-import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import { ueberMichChildGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/equipment.css";
 
 const PAGE_PATH = "/ueber-mich/equipment";
@@ -48,10 +48,12 @@ export default function UeberMichEquipmentPage() {
   return (
     <>
       <SeoPageJsonLd
-        schema={[
-          webPageJsonLd({ path: PAGE_PATH, name: "Mein Bag – Equipment", description: EQUIPMENT_DESCRIPTION }),
-          ueberMichChildBreadcrumbJsonLd("Mein Bag", PAGE_PATH),
-        ]}
+        schema={ueberMichChildGraph({
+          path: PAGE_PATH,
+          leafName: "Mein Bag",
+          name: "Mein Bag – Equipment",
+          description: EQUIPMENT_DESCRIPTION,
+        })}
       />
       <AboutSubpageShell
         label="Über mich"

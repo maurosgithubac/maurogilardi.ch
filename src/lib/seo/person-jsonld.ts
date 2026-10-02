@@ -1,193 +1,191 @@
-/** Person-, Athlete- und Entity-JSON-LD für Mauro Gilardi */
+/**
+ * Root-Entity-Graph (schema.org) — Person, WebSite und die Organisationen, mit denen Mauro Gilardi verbunden ist.
+ * Wird im Root-Layout als ein einziger `@graph` ausgegeben; Seiten verweisen nur noch per `@id` darauf.
+ */
 
-import { personSameAs } from "@/content/socialProfiles";
-import { siteContent } from "@/content/siteContent";
-import { SITE_URL, brandLogo, seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { allSiteSponsorsFlat } from "@/content/sponsorsSite";
+import { SITE_URL, seoImageAlts, seoImages } from "@/lib/seo/constants";
+import {
+  ORG_IDS,
+  PERSON_ID,
+  PORTRAIT_ID,
+  WEBSITE_ID,
+  keyPressReports,
+  personAwards,
+  personFacts,
+  personSameAsUrls,
+  personSummary,
+} from "@/lib/seo/facts";
 
-export const PERSON_ID = `${SITE_URL}/#mauro-gilardi`;
-export const WEBSITE_ID = `${SITE_URL}/#website`;
+export { PERSON_ID, WEBSITE_ID } from "@/lib/seo/facts";
 
-export function buildPersonJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": ["Person", "Athlete", "SportsPerson"],
-    "@id": PERSON_ID,
-    name: "Mauro Gilardi",
-    alternateName: [
-      "Gilardi Golf",
-      "Mauro Gilardi Golf",
-      "Mauro Gilardi Swiss PGA",
-      "Mauro Gilardi Professional Golfer",
-      "Schweizer Golfprofi Graubünden",
-    ],
-    description:
-      "Mauro Gilardi ist ein Schweizer Golfprofi, Swiss PGA Professional, Playing Professional und Mitglied des Swiss Golf Teams. Aktiv auf der Pro Golf Tour in Europa als Tour Professional und Schweizer Spitzensportler.",
-    url: SITE_URL,
-    email: siteContent.contact.email,
-    image: {
-      "@type": "ImageObject",
-      url: `${SITE_URL}${seoImages.heroPrimary}`,
-      description: seoImageAlts.heroPrimary,
+type Node = Record<string, unknown>;
+
+const graubuenden = {
+  "@type": "AdministrativeArea",
+  name: "Graubünden",
+  sameAs: "https://www.wikidata.org/wiki/Q11925",
+  containedInPlace: { "@type": "Country", name: "Schweiz", sameAs: "https://www.wikidata.org/wiki/Q39" },
+};
+
+/** Organisationen als eigene Knoten mit stabilen IDs */
+export function buildOrganizationNodes(): Node[] {
+  return [
+    {
+      "@type": "SportsOrganization",
+      "@id": ORG_IDS.swissPga,
+      name: "Swiss PGA",
+      alternateName: "SwissPGA",
+      url: "https://www.swisspga.ch",
+      sport: "Golf",
+      description: "Berufsverband der Golf Professionals in der Schweiz.",
     },
-    logo: {
-      "@type": "ImageObject",
-      url: `${SITE_URL}${brandLogo.path}`,
-      description: brandLogo.alt,
+    {
+      "@type": "SportsOrganization",
+      "@id": ORG_IDS.swissGolf,
+      name: "Swiss Golf",
+      url: "https://www.swissgolf.ch",
+      sport: "Golf",
+      description: "Dachverband des Golfsports in der Schweiz.",
     },
-    nationality: {
-      "@type": "Country",
-      name: "Schweiz",
-      sameAs: "https://www.wikidata.org/wiki/Q39",
-    },
-    birthPlace: {
-      "@type": "Place",
-      name: "Graubünden, Schweiz",
-      address: {
-        "@type": "PostalAddress",
-        addressRegion: "Graubünden",
-        addressCountry: "CH",
-      },
-    },
-    homeLocation: {
-      "@type": "Place",
-      name: "Graubünden, Schweiz",
-      address: {
-        "@type": "PostalAddress",
-        addressRegion: "Graubünden",
-        addressCountry: "CH",
-      },
-    },
-    jobTitle: [
-      "Swiss PGA Professional",
-      "Schweizer Golf Professional",
-      "Professional Golfer",
-      "Playing Professional",
-      "Tour Professional",
-      "Golf Coach",
-      "Golf Referent",
-      "Golf Event Host",
-    ],
-    hasOccupation: [
-      {
-        "@type": "Occupation",
-        name: "Swiss PGA Professional",
-        occupationLocation: { "@type": "Country", name: "Schweiz" },
-        description:
-          "Professioneller Golfspieler auf der Pro Golf Tour (PGT), Swiss PGA zertifizierter Golf Professional und Playing Professional aus der Schweiz",
-      },
-      {
-        "@type": "Occupation",
-        name: "Golf Coach",
-        occupationLocation: { "@type": "Country", name: "Schweiz" },
-        description: "Golf Coaching, Performance Training und Golf Clinics in der Schweiz",
-      },
-      {
-        "@type": "Occupation",
-        name: "Golf Referent",
-        occupationLocation: { "@type": "Country", name: "Schweiz" },
-        description: "Referate zu Spitzensport, Leistungssport und High Performance",
-      },
-    ],
-    sport: "Golf",
-    athlete: {
+    {
       "@type": "SportsTeam",
+      "@id": ORG_IDS.swissGolfTeam,
       name: "Swiss Golf Team",
       url: "https://www.swissgolf.ch/de/sport/leistungssport/swiss-golf-team/",
+      sport: "Golf",
+      parentOrganization: { "@id": ORG_IDS.swissGolf },
+      athlete: { "@id": PERSON_ID },
+    },
+    {
+      "@type": "SportsOrganization",
+      "@id": ORG_IDS.proGolfTour,
+      name: "Pro Golf Tour",
+      alternateName: "PGT",
+      url: "https://www.progolftour.de",
+      sport: "Golf",
+      description: "Europäische Profi-Entwicklungstour (Order of Merit als Aufstiegsweg in die HotelPlanner Tour).",
+    },
+    {
+      "@type": "SportsOrganization",
+      "@id": ORG_IDS.homeClub,
+      name: personFacts.homeClub.name,
+      url: personFacts.homeClub.url,
+      sport: "Golf",
+      location: { "@type": "Place", name: "Domat/Ems", address: { "@type": "PostalAddress", addressLocality: "Domat/Ems", addressRegion: "GR", addressCountry: "CH" } },
+    },
+    {
+      "@type": "Organization",
+      "@id": ORG_IDS.goennervereinigung,
+      name: "MG Gönnervereinigung",
+      url: `${SITE_URL}/sponsoring`,
+      description: "Gönnerstruktur, mit der Privatpersonen die Profikarriere von Mauro Gilardi mittragen.",
+      founder: { "@id": PERSON_ID },
+    },
+  ];
+}
+
+/** Sponsoren aus sponsorsSite.ts — nur externe Organisationen (Verbände/Team/eigene Gönnervereinigung separat) */
+function sponsorNodes(): Node[] {
+  return allSiteSponsorsFlat()
+    .filter((s) => s.href?.startsWith("http") && s.id !== "swissgolf")
+    .map((s) =>
+      s.id === "gcde" ? { "@id": ORG_IDS.homeClub } : { "@type": "Organization", name: s.displayName, url: s.href },
+    );
+}
+
+export function buildPersonJsonLd(): Node {
+  return {
+    "@type": "Person",
+    "@id": PERSON_ID,
+    name: personFacts.name,
+    givenName: personFacts.givenName,
+    familyName: personFacts.familyName,
+    alternateName: personFacts.brand,
+    description: personSummary,
+    url: `${SITE_URL}/`,
+    mainEntityOfPage: { "@id": `${SITE_URL}/ueber-mich#webpage` },
+    email: `mailto:${personFacts.email}`,
+    image: {
+      "@type": "ImageObject",
+      "@id": PORTRAIT_ID,
+      url: `${SITE_URL}${seoImages.heroPrimary}`,
+      contentUrl: `${SITE_URL}${seoImages.heroPrimary}`,
+      caption: seoImageAlts.heroPrimary,
+    },
+    nationality: { "@type": "Country", name: personFacts.nationality, sameAs: "https://www.wikidata.org/wiki/Q39" },
+    homeLocation: { "@type": "Place", name: "Graubünden, Schweiz", containedInPlace: graubuenden },
+    jobTitle: ["Professional Golfer", "Swiss PGA Playing Professional"],
+    hasOccupation: {
+      "@type": "Occupation",
+      name: "Professional Golfer",
+      occupationLocation: { "@type": "Country", name: "Schweiz" },
+      description: `Playing Professional seit ${personFacts.proSince}; 2026 Pro Golf Tour, ab 2027 HotelPlanner Tour.`,
     },
     memberOf: [
-      { "@type": "SportsOrganization", name: "SwissPGA", url: "https://www.swisspga.ch" },
       {
-        "@type": "SportsOrganization",
-        name: "Swiss Golf Team",
-        url: "https://www.swissgolf.ch/de/sport/leistungssport/swiss-golf-team/",
+        "@type": "OrganizationRole",
+        memberOf: { "@id": ORG_IDS.swissPga },
+        roleName: "Playing Professional",
       },
-      { "@type": "SportsOrganization", name: "Pro Golf Tour", url: "https://www.progolftour.de" },
-      { "@type": "SportsOrganization", name: "Swiss Golf", url: "https://www.swissgolf.ch" },
-    ],
-    sponsor: [
       {
-        "@type": "Organization",
-        name: "Friends Of Swiss Golf Talents",
-        url: "https://friendsofswissgolftalents.ch/",
+        "@type": "OrganizationRole",
+        memberOf: { "@id": ORG_IDS.swissPga },
+        roleName: "Board Member und Head of Playing Professional Commission",
+        startDate: "2026",
       },
-      { "@type": "Organization", name: "Spitzensport der Schweizer Armee" },
-      { "@type": "Organization", name: "The Golfers Malans", url: "https://www.thegolfers.ch/" },
-      { "@type": "Organization", name: "Casutt Druck & Werbetechnik", url: "https://www.casutt-gruppe.ch/" },
+      { "@id": ORG_IDS.swissGolfTeam },
+      { "@id": ORG_IDS.homeClub },
     ],
+    affiliation: [{ "@id": ORG_IDS.proGolfTour }, { "@id": ORG_IDS.swissGolf }],
+    award: personAwards,
     knowsAbout: [
       "Golf",
       "Profigolf",
-      "Swiss PGA",
-      "Schweizer Golf",
       "Pro Golf Tour",
-      "Playing Professional",
-      "Golf Coaching",
-      "Golf Performance Training",
-      "Golf Events",
-      "Golf Clinics",
-      "Spitzensport",
+      "HotelPlanner Tour",
+      "DP World Tour",
+      "Golf-Schwunganalyse (3D)",
       "Leistungssport",
-      "Mental Training Golf",
-      "Golf Referate",
-      "Beat the Pro",
-      "Corporate Golf Events",
+      "Spitzensport-Management",
+      "Sportsponsoring",
+      "Informatik",
+      "App-Entwicklung",
     ],
-    sameAs: personSameAs,
+    sponsor: sponsorNodes(),
+    funder: { "@id": ORG_IDS.goennervereinigung },
+    sameAs: personSameAsUrls,
+    subjectOf: keyPressReports().map((item) => ({
+      "@type": "NewsArticle",
+      headline: item.title,
+      url: item.href,
+      ...(item.sortYear > 0 ? { datePublished: String(item.sortYear) } : {}),
+      publisher: { "@type": "Organization", name: item.outletLabel },
+    })),
   };
 }
 
-export function buildWebsiteJsonLd() {
+export function buildWebsiteJsonLd(): Node {
   return {
-    "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": WEBSITE_ID,
-    url: SITE_URL,
-    name: "Gilardi Golf | Mauro Gilardi Swiss PGA Professional",
+    url: `${SITE_URL}/`,
+    name: "Mauro Gilardi",
+    alternateName: ["Gilardi Golf", "maurogilardi.ch"],
     description:
-      "Offizielle Website von Mauro Gilardi, Swiss PGA Professional. Schweizer Golfprofi, Playing Professional, Golf Coach, Referent und Gastgeber von Golf Experiences.",
+      "Offizielle Website von Mauro Gilardi, Schweizer Profigolfer und Swiss PGA Playing Professional: Tour-Updates, Erfolge, Gönner und Sponsoring.",
     inLanguage: "de-CH",
+    publisher: { "@id": PERSON_ID },
     author: { "@id": PERSON_ID },
     about: { "@id": PERSON_ID },
-    publisher: { "@id": PERSON_ID },
-    logo: {
-      "@type": "ImageObject",
-      url: `${SITE_URL}${brandLogo.path}`,
-      description: brandLogo.alt,
-    },
+    copyrightHolder: { "@id": PERSON_ID },
   };
 }
 
-export function buildProfessionalServiceJsonLd() {
+/** Ein `@graph` für das Root-Layout */
+export function buildRootGraph(): Node {
   return {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "@id": `${SITE_URL}/#professional-services`,
-    name: "Mauro Gilardi – Golf Coaching, Events & Referate",
-    description:
-      "Golf Coaching Schweiz, Golf Events, Beat the Pro, Golf Clinics und Spitzensport-Referate mit Mauro Gilardi, Swiss PGA Professional.",
-    url: SITE_URL,
-    areaServed: [
-      { "@type": "AdministrativeArea", name: "Graubünden, Schweiz" },
-      { "@type": "AdministrativeArea", name: "Ostschweiz, Schweiz" },
-      { "@type": "Country", name: "Schweiz" },
-    ],
-    provider: { "@id": PERSON_ID },
-    serviceType: [
-      "Golf Coaching",
-      "Golf Performance Training",
-      "Golf Events",
-      "Golf Clinics",
-      "Beat the Pro",
-      "Corporate Golf Events",
-      "Spitzensport Referate",
-      "Keynote Speaker Sport",
-    ],
-    knowsAbout: [
-      "Golf Coach Schweiz",
-      "Golf Event Schweiz",
-      "Golf Referent Schweiz",
-      "Playing Professional",
-      "Swiss PGA Professional",
-    ],
+    "@graph": [buildPersonJsonLd(), buildWebsiteJsonLd(), ...buildOrganizationNodes()],
   };
 }

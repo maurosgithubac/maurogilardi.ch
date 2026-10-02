@@ -1,58 +1,54 @@
 /**
- * SEO title builder — ABB-style: [Primary topic] | [Brand]
- * Target ~50–58 characters; primary keyword front-loaded.
+ * SEO title builder — Muster: [Primäres Keyword] | [Marke]
+ * Ziel ≤ 60 Zeichen, Keyword vorne, Marke hinten.
+ *
+ * Wichtig: Der primäre Teil wird NIE mitten in einer Phrase abgeschnitten
+ * (früherer Bug: «Endspurt zum Aufstieg in | …»). Ist der Platz knapp, wird
+ * zuerst die Marke gekürzt und notfalls ganz weggelassen.
  */
 
 export const SEO_BRAND = {
   person: "Mauro Gilardi",
   brand: "Gilardi Golf",
-  /** Standard suffix for inner pages & blog posts */
+  /** Standard-Suffix für Unterseiten mit kurzem Keyword */
   suffix: "Mauro Gilardi · Gilardi Golf",
-  /** Shorter suffix when space is tight */
-  suffixShort: "Mauro Gilardi | Gilardi Golf",
+  /** Kurzes Suffix, wenn das Keyword länger ist */
+  suffixShort: "Mauro Gilardi",
   geo: "Graubünden",
   region: "Golf Schweiz",
 } as const;
 
-const DEFAULT_MAX = 58;
+export const SEO_TITLE_MAX = 60;
 
-function truncateAtWord(text: string, maxLen: number): string {
-  const trimmed = text.trim();
-  if (trimmed.length <= maxLen) return trimmed;
-  const slice = trimmed.slice(0, maxLen);
-  const lastSpace = slice.lastIndexOf(" ");
-  if (lastSpace > maxLen * 0.5) return slice.slice(0, lastSpace);
-  return slice;
-}
-
-/** Inner page / blog: `Topic | Mauro Gilardi · Gilardi Golf` */
+/**
+ * Inner page / blog: `Topic | Marke`.
+ * Reihenfolge: langes Suffix → kurzes Suffix → nur Topic (ungekürzt).
+ */
 export function buildSeoTitle(
   primary: string,
   options?: {
+    /** Bevorzugtes Suffix; Default: `Mauro Gilardi · Gilardi Golf` */
     suffix?: string;
     maxLength?: number;
     separator?: " | " | " – ";
   },
 ): string {
-  const suffix = options?.suffix ?? SEO_BRAND.suffix;
-  const maxLen = options?.maxLength ?? DEFAULT_MAX;
+  const maxLen = options?.maxLength ?? SEO_TITLE_MAX;
   const sep = options?.separator ?? " | ";
-  const primaryClean = primary.trim();
+  const primaryClean = primary.replace(/\s+/g, " ").trim();
+  const suffixes = [options?.suffix ?? SEO_BRAND.suffix, SEO_BRAND.suffixShort];
 
-  const full = `${primaryClean}${sep}${suffix}`;
-  if (full.length <= maxLen) return full;
-
-  const budget = maxLen - sep.length - suffix.length;
-  const shortPrimary = truncateAtWord(primaryClean, Math.max(budget, 12));
-  return `${shortPrimary}${sep}${suffix}`;
+  for (const suffix of suffixes) {
+    const full = `${primaryClean}${sep}${suffix}`;
+    if (full.length <= maxLen) return full;
+  }
+  return primaryClean;
 }
 
-/** Homepage: brand + person first (corporate pattern) */
+/** Homepage: Person zuerst, dann Positionierung und Marke */
 export function buildHomeSeoTitle(
-  primary = "Mauro Gilardi",
-  secondary = "Gilardi Golf – Swiss PGA Professional",
+  primary = "Mauro Gilardi – Schweizer Golfprofi",
+  secondary: string = SEO_BRAND.brand,
 ): string {
-  const full = `${primary} | ${secondary}`;
-  if (full.length <= DEFAULT_MAX) return full;
-  return truncateAtWord(full, DEFAULT_MAX);
+  return `${primary} | ${secondary}`;
 }

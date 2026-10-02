@@ -7,10 +7,8 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { siteSponsorTiers, trimmedSponsorLogo, type SiteSponsor, type SiteSponsorTier } from "@/content/sponsorsSite";
 import { uebermichSponsorenMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
-import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import { sponsorenPageGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/sponsoren.css";
-
-const PAGE_PATH = "/ueber-mich/sponsoren";
 
 const SPONSOREN_DESCRIPTION =
   "Wer mich unterstützt — nach Stufen sortiert, mit Links. So findest du meine Sponsoren schnell.";
@@ -121,10 +119,7 @@ export default function UeberMichSponsorenPage() {
   return (
     <>
       <SeoPageJsonLd
-        schema={[
-          webPageJsonLd({ path: PAGE_PATH, name: "Meine Sponsoren", description: SPONSOREN_DESCRIPTION }),
-          ueberMichChildBreadcrumbJsonLd("Sponsoren", PAGE_PATH),
-        ]}
+        schema={sponsorenPageGraph(SPONSOREN_DESCRIPTION)}
       />
       <AboutSubpageShell
         label="Über mich"

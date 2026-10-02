@@ -1,61 +1,48 @@
 import { buildHomeSeoTitle, buildSeoTitle } from "@/lib/seo/build-seo-title";
 
-/** Central page titles — keyword-rich, brand-consistent, ~50–58 chars */
-
+/**
+ * Zentrale Seitentitel — Keyword vorne, Marke hinten, ≤ 60 Zeichen.
+ *
+ * Keyword-Verteilung (keine Kannibalisierung):
+ * - /                      Brand «Mauro Gilardi», «Gilardi Golf», «Schweizer Golfprofi»
+ * - /ueber-mich            «Swiss PGA Professional», «Golfprofi Graubünden»
+ * - /erfolge               «Pro Golf Tour» (Resultate)
+ * - /blog                  Turnierberichte / Tour-Updates
+ * - /sponsoring            «Golf Gönner werden» (Gönnervereinigung)
+ * - /2027                  «HotelPlanner Tour» Saison-Kampagne (Gönner, sekundär)
+ * - /partner               «Golf Sponsoring Schweiz» (Unternehmen)
+ */
 export const seoPageTitles = {
-  home: buildHomeSeoTitle("Mauro Gilardi", "Gilardi Golf – Swiss PGA Professional"),
+  home: buildHomeSeoTitle("Mauro Gilardi – Schweizer Golfprofi", "Gilardi Golf"),
 
-  ueberMich: buildSeoTitle("Schweizer Golfprofi Graubünden", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  ueberMich: buildSeoTitle("Swiss PGA Professional aus Graubünden", { suffix: "Mauro Gilardi" }),
 
-  blog: buildSeoTitle("Golf Blog Pro Golf Tour", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  blog: buildSeoTitle("Golf-Blog: Turnierberichte von der Tour", { suffix: "Mauro Gilardi" }),
 
-  erfolge: buildSeoTitle("Turniererfolge Golf Schweiz", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  erfolge: buildSeoTitle("Erfolge & Resultate auf der Pro Golf Tour", { suffix: "Mauro Gilardi" }),
 
-  sponsoring: buildSeoTitle("Sponsoring Golf Professional", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  sponsoring: buildSeoTitle("Golf Gönner werden – Gönnervereinigung", { suffix: "Mauro Gilardi" }),
 
-  partner: buildSeoTitle("Sponsoring für Firmen", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  partner: buildSeoTitle("Golf Sponsoring Schweiz für Unternehmen", { suffix: "Mauro Gilardi" }),
 
-  faq: buildSeoTitle("FAQ Swiss PGA & Pro Golf Tour", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  saison2027: buildSeoTitle("Saison 2027 auf der HotelPlanner Tour", { suffix: "Mauro Gilardi" }),
 
-  sponsoren: buildSeoTitle("Sponsoren & Partner Golf", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  faq: buildSeoTitle("FAQ: Pro Golf Tour, Swiss PGA & Gönner", { suffix: "Mauro Gilardi" }),
 
-  gallerie: buildSeoTitle("Golf Galerie Tour Schweiz", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  sponsoren: buildSeoTitle("Sponsoren & Partner"),
 
-  media: buildSeoTitle("Presse & Medien Golf Pro", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  gallerie: buildSeoTitle("Golf-Galerie: Bilder von Tour & Training", { suffix: "Mauro Gilardi" }),
 
-  equipment: buildSeoTitle("Golf Equipment Mein Bag", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  media: buildSeoTitle("Presse & Medienberichte"),
 
-  impressum: buildSeoTitle("Impressum", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  equipment: buildSeoTitle("Equipment: Schläger im Bag"),
 
-  datenschutz: buildSeoTitle("Datenschutz", {
-    suffix: "Mauro Gilardi · maurogilardi.ch",
-  }),
+  impressum: buildSeoTitle("Impressum"),
 
-  blogFallback: buildSeoTitle("Golf Beitrag", {
-    suffix: "Mauro Gilardi · Gilardi Golf",
-  }),
+  datenschutz: buildSeoTitle("Datenschutzerklärung"),
+
+  blogFallback: buildSeoTitle("Golf-Blog"),
 } as const;
 
-export const seoSiteName = "Gilardi Golf | Mauro Gilardi Swiss PGA";
+/** og:site_name — kurz und markenkonsistent */
+export const seoSiteName = "Mauro Gilardi · Gilardi Golf";

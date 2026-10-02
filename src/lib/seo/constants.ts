@@ -13,13 +13,28 @@ export const seoImages = {
 } as const;
 
 export const seoImageAlts = {
-  heroPrimary: "Mauro Gilardi, Swiss PGA Professional aus der Schweiz",
-  portraitTournament: "Mauro Gilardi während eines internationalen Golfturniers",
-  tournamentAction: "Schweizer Golfprofi Mauro Gilardi auf der ProGolf Tour",
-  progolfTour: "Schweizer Golfprofi Mauro Gilardi auf der ProGolf Tour",
-  golfEvent: "Mauro Gilardi bei einem Golf Event in der Schweiz",
-  golfTeam: "Mauro Gilardi, Swiss PGA Professional mit Team",
+  heroPrimary: "Mauro Gilardi, Swiss PGA Professional, vor einer Swiss-Golf-Fahne",
+  portraitTournament: "Schweizer Golfprofi Mauro Gilardi im Gespräch auf der Driving Range",
+  tournamentAction: "Mauro Gilardi beim Eisenschlag vor Zuschauern an einem Profiturnier",
+  progolfTour: "Mauro Gilardi mit Siegertrophäe nach einem Turniersieg als Golfprofi",
+  golfEvent: "Mauro Gilardi mit Gästen an einem Golf-Event im Fitting-Studio",
+  golfTeam: "Mauro Gilardi mit seinem Coach im Trainingszentrum vor Bergkulisse",
 } as const;
+
+/**
+ * Open-Graph-/Twitter-Bilder im Format 1200×630 (Zuschnitte der seoImages).
+ * Gleiche Dateinamen wie die Originale, Ordner `og/`.
+ */
+export const seoOgImagePaths = {
+  heroPrimary: "/brand-assets/images/og/mauro-gilardi-swiss-pga-professional.jpg",
+  portraitTournament: "/brand-assets/images/og/mauro-gilardi-professional-golfer-switzerland.jpg",
+  tournamentAction: "/brand-assets/images/og/mauro-gilardi-golf-tournament-switzerland.jpg",
+  progolfTour: "/brand-assets/images/og/mauro-gilardi-progolf-tour-switzerland.jpg",
+  golfEvent: "/brand-assets/images/og/mauro-gilardi-golf-event-schweiz.jpg",
+  golfTeam: "/brand-assets/images/og/mauro-gilardi-golf-team-switzerland.jpg",
+} as const satisfies Record<keyof typeof seoImages, string>;
+
+export type SeoImageKey = keyof typeof seoOgImagePaths;
 
 /** Offizielles Markenlogo — eine Quelle für Header, Admin, Schema & SEO */
 export const brandLogo = {
@@ -62,4 +77,9 @@ export function seoOgImages(
 
 export function seoTwitterImages(path: string) {
   return [path];
+}
+
+/** OG-Bild (1200×630) inkl. Alt-Text für einen der zentralen Bild-Schlüssel */
+export function seoOgImage(key: SeoImageKey) {
+  return seoOgImages(seoOgImagePaths[key], seoImageAlts[key]);
 }

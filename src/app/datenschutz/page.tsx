@@ -3,7 +3,7 @@ import { LegalPageShell } from "@/components/legal-page-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { datenschutzSections } from "@/content/legal";
 import { datenschutzMetadata } from "@/lib/seo/page-metadata";
-import { webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import { simplePageGraph } from "@/lib/seo/webpage-jsonld";
 
 export const metadata = datenschutzMetadata;
 
@@ -11,11 +11,12 @@ export default function DatenschutzPage() {
   return (
     <>
       <SeoPageJsonLd
-        schema={webPageJsonLd({
-          path: "/datenschutz",
-          name: "Datenschutz — Mauro Gilardi",
-          description: datenschutzMetadata.description ?? "Datenschutzerklärung für maurogilardi.ch",
-        })}
+        schema={simplePageGraph(
+          "/datenschutz",
+          "Datenschutz — Mauro Gilardi",
+          "Datenschutz",
+          datenschutzMetadata.description ?? "Datenschutzerklärung für maurogilardi.ch",
+        )}
       />
       <LegalPageShell
         title="Datenschutz"

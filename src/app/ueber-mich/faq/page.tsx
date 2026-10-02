@@ -6,12 +6,11 @@ import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import {
   aboutFaqItemsFlat,
   aboutFaqSections,
-  getAboutFaqPageJsonLd,
-  getUeberMichFaqBreadcrumbJsonLd,
   parseFaqParagraphToHtml,
 } from "@/content/aboutFaq";
 import { uebermichFaqMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { faqPageGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/faq.css";
 
 export const metadata = uebermichFaqMetadata;
@@ -28,7 +27,11 @@ export default function UeberMichFaqPage() {
       heroAlt={seoImageAlts.heroPrimary}
       heroBgClassName="about-hero-bg--focus-top"
     >
-      <SeoPageJsonLd schema={[getAboutFaqPageJsonLd(), getUeberMichFaqBreadcrumbJsonLd()]} />
+      <SeoPageJsonLd
+        schema={faqPageGraph(
+          "Häufige Fragen zu Mauro Gilardi: Pro Golf Tour, HotelPlanner Tour, Swiss PGA, Swiss Golf Team, Rankings und Gönnervereinigung.",
+        )}
+      />
 
       <section className="mg-section mg-faq" aria-labelledby="mg-faq-heading">
         <div className="mg-container mg-faq__layout">

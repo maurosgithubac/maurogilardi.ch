@@ -6,31 +6,22 @@ import { GoennerturnierGallery } from "@/components/goenner/goennerturnier-galle
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 import { seasonCampaign } from "@/content/campaign";
 import { FundingStrip } from "@/components/funding-strip";
 import { goennerturnierPhotographers, goennerturnierPhotos } from "@/content/goennerturnier-photos";
-import { SITE_URL, seoImageAlts, seoImages, seoOgImages } from "@/lib/seo/constants";
+import { seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { SAISON_2027_DESCRIPTION, saison2027Metadata } from "@/lib/seo/page-metadata";
+import { saison2027Graph } from "@/lib/seo/webpage-jsonld";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import { getSupporterCount } from "@/lib/public-stats";
 
-const TITLE = `Saison ${seasonCampaign.year} möglich machen | Mauro Gilardi`;
-const DESCRIPTION =
-  "Aufstieg in die HotelPlanner Tour geschafft. Werde Gönner ab 100 CHF im Jahr und trage Mauro Gilardis erste Saison eine Stufe unter der DP World Tour mit.";
+const DESCRIPTION = SAISON_2027_DESCRIPTION;
 
-export const metadata: Metadata = {
-  title: { absolute: TITLE },
-  description: DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}/2027` },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: `${SITE_URL}/2027`,
-    images: seoOgImages(seoImages.heroPrimary, seoImageAlts.heroPrimary),
-  },
-};
+export const metadata: Metadata = saison2027Metadata;
 
 /** Kennzahlen aus dem Admin-Portal stündlich aktualisieren */
 export const revalidate = 3600;
@@ -48,6 +39,7 @@ export default async function Saison2027Page() {
 
   return (
     <div className="mg-page site-page">
+      <SeoPageJsonLd schema={saison2027Graph(DESCRIPTION)} />
       <SiteHeader variant="overlay" />
       <main id="inhalt">
         <PageHero

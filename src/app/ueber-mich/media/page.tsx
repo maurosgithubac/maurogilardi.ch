@@ -6,10 +6,8 @@ import { enrichAndSortPressItems, pressOutlets, type PressOutlet } from "@/conte
 import { siteContent } from "@/content/siteContent";
 import { uebermichMediaMetadata } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
-import { ueberMichChildBreadcrumbJsonLd, webPageJsonLd } from "@/lib/seo/webpage-jsonld";
+import { mediaPageGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/media.css";
-
-const PAGE_PATH = "/ueber-mich/media";
 
 const MEDIA_DESCRIPTION =
   "Berichte, Interviews und Artikel über Mauro Gilardi — Swiss Golf, Golf.ch, Pro Golf Tour, Regionalmedien und mehr.";
@@ -39,10 +37,7 @@ export default function UeberMichMediaPage() {
   return (
     <>
       <SeoPageJsonLd
-        schema={[
-          webPageJsonLd({ path: PAGE_PATH, name: "In den Medien – Presse", description: MEDIA_DESCRIPTION }),
-          ueberMichChildBreadcrumbJsonLd("Medien", PAGE_PATH),
-        ]}
+        schema={mediaPageGraph(items, MEDIA_DESCRIPTION)}
       />
       <AboutSubpageShell
         label="Über mich"

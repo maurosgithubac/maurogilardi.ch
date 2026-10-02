@@ -1,19 +1,8 @@
-/** Root Structured Data — Person + WebSite + ProfessionalService */
+/** Root Structured Data — ein `@graph` mit Person, WebSite und verbundenen Organisationen */
 
-import {
-  buildPersonJsonLd,
-  buildProfessionalServiceJsonLd,
-  buildWebsiteJsonLd,
-} from "@/lib/seo/person-jsonld";
+import { buildRootGraph } from "@/lib/seo/person-jsonld";
+import { serializeJsonLd } from "@/components/seo-page-json-ld";
 
 export function SeoRootJsonLd() {
-  const schemas = [buildPersonJsonLd(), buildWebsiteJsonLd(), buildProfessionalServiceJsonLd()];
-
-  return (
-    <>
-      {schemas.map((schema, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      ))}
-    </>
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildRootGraph()) }} />;
 }
