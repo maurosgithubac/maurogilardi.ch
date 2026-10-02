@@ -1267,3 +1267,11 @@ html:has(.mg-cookie) .mg-support-bar {
 .mg-inquiry__twint {
   margin-top: 0.75rem;
 }
+
+/* Mobil: kompaktere Seiten-Heros, damit der nächste Abschnitt sichtbar anschneidet */
+@media (max-width: 719px) {
+  .mg-page-hero {
+    min-height: max(28rem, 64svh);
+    padding-bottom: 2.25rem;
+  }
+}

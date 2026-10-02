@@ -1198,3 +1198,11 @@
     transform: none;
   }
 }
+
+/* Mobil: Hero nicht ganz bildschirmfüllend — der Anschnitt darunter zeigt, dass Inhalt folgt */
+@media (max-width: 719px) {
+  .mg-hero {
+    min-height: max(34rem, 86svh);
+    padding-bottom: 2.5rem;
+  }
+}
