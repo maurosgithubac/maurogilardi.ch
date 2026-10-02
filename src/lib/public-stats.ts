@@ -38,8 +38,9 @@ export async function getSponsorPartnerCount(): Promise<number | null> {
 }
 
 /**
- * Getragene Jahresbeiträge: Summe der vereinbarten Beiträge aller aktiven Gönner und Sponsoren
- * (Material-Partner zählen nicht). Liest nur Beträge/Stufen, keine Personendaten.
+ * Aktueller Stand für den Finanzierungs-Streifen: Summe der vereinbarten Jahresbeiträge aller
+ * aktiven Gönner (Kategorie Gönner). Sponsoren — inkl. Spitzensport der Armee — und Partner
+ * sind bewusst ausgeklammert. Liest nur Beträge/Stufen, keine Personendaten.
  */
 export async function getCommittedAnnualChf(): Promise<number | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,7 +48,7 @@ export async function getCommittedAnnualChf(): Promise<number | null> {
   if (!url || !key) return null;
   try {
     const res = await fetch(
-      `${url}/rest/v1/goenner_members?select=annual_amount_chf,membership_id,contribution_type&active=is.true&category=in.(goenner,sponsor)`,
+      `${url}/rest/v1/goenner_members?select=annual_amount_chf,membership_id,contribution_type&active=is.true&category=eq.goenner`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 3600 } },
     );
     if (!res.ok) return null;
