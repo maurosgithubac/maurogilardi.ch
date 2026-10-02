@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { HomeHero } from "@/components/home/home-hero";
+import { FundingStrip } from "@/components/funding-strip";
 import { ProofBand } from "@/components/home/proof-band";
 import { StorySection } from "@/components/home/story-section";
 import { MilestonesSection } from "@/components/home/milestones-section";
@@ -67,6 +68,7 @@ export default async function Home() {
       <SiteHeader variant="overlay" />
       <main id="inhalt">
         <HomeHero />
+        <FundingStrip />
         <ProofBand />
         <StorySection />
         <MilestonesSection />

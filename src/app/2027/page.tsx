@@ -10,6 +10,7 @@ import { CountUp } from "@/components/motion/count-up";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 import { seasonCampaign } from "@/content/campaign";
+import { FundingStrip } from "@/components/funding-strip";
 import { goennerturnierPhotographers, goennerturnierPhotos } from "@/content/goennerturnier-photos";
 import { SITE_URL, seoImageAlts, seoImages, seoOgImages } from "@/lib/seo/constants";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
@@ -43,8 +44,7 @@ const COSTS = [
 /** Kampagnenseite (Link in Instagram-Bio, Newsletter, Posts): eine Botschaft, ein Ziel. */
 export default async function Saison2027Page() {
   const supporters = await getSupporterCount();
-  const { year, goalChf, committedChf } = seasonCampaign;
-  const pct = committedChf != null ? Math.min(100, Math.round((committedChf / goalChf) * 100)) : null;
+  const { year, goalChf } = seasonCampaign;
 
   return (
     <div className="mg-page site-page">
@@ -68,6 +68,8 @@ export default async function Saison2027Page() {
           }
         />
 
+        <FundingStrip href="#modelle" />
+
         <section className="mg-section mg-section--tight" aria-labelledby="budget-title">
           <div className="mg-container mg-campaign-budget">
             <div>
@@ -85,23 +87,6 @@ export default async function Saison2027Page() {
                   Bonus.
                 </p>
               </Reveal>
-              {pct != null ? (
-                <Reveal delay={0.15} className="mg-campaign-progress">
-                  <div
-                    className="mg-campaign-progress__bar"
-                    role="progressbar"
-                    aria-valuemin={0}
-                    aria-valuemax={goalChf}
-                    aria-valuenow={committedChf ?? 0}
-                    aria-label={`Saison ${year} finanziert`}
-                  >
-                    <span style={{ width: `${pct}%` }} />
-                  </div>
-                  <p className="mg-campaign-progress__label">
-                    <strong>{pct} %</strong> getragen — hilf mit, den Rest zu schliessen.
-                  </p>
-                </Reveal>
-              ) : null}
             </div>
             <Stagger as="ul" className="mg-promises">
               {COSTS.map((c, i) => (

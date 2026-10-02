@@ -1206,3 +1206,112 @@
     padding-bottom: 2.5rem;
   }
 }
+
+/* ——— Finanzierungs-Streifen (Saisonbudget) — bewusst flach ——— */
+.mg-funding {
+  border-bottom: 1px solid var(--mg-line);
+  background: var(--mg-surface);
+}
+
+.mg-funding__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "text cta"
+    "bar bar";
+  align-items: center;
+  gap: 0.35rem 1rem;
+  padding-block: 0.7rem 0.8rem;
+}
+
+.mg-funding__text {
+  grid-area: text;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.75rem;
+  font-size: var(--mg-step--1);
+  line-height: 1.3;
+}
+
+.mg-funding__label {
+  color: var(--mg-red);
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.mg-funding__text strong {
+  font-weight: 700;
+}
+
+.mg-funding__text strong span {
+  color: var(--mg-muted);
+  font-weight: 400;
+}
+
+.mg-funding__open {
+  color: var(--mg-muted);
+  font-style: italic;
+}
+
+.mg-funding__bar {
+  grid-area: bar;
+  height: 4px;
+  border-radius: var(--mg-r-full);
+  background: var(--mg-paper-2);
+  overflow: hidden;
+}
+
+.mg-funding__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mg-red);
+  transform-origin: left;
+  animation: mg-funding-fill 1.4s var(--mg-ease) both 0.3s;
+}
+
+@keyframes mg-funding-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.mg-funding__cta {
+  grid-area: cta;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.75rem;
+  color: var(--mg-ink);
+  font-size: var(--mg-step--1);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mg-funding__cta:hover .mg-btn__arrow {
+  transform: translateX(4px);
+}
+
+/* Desktop: alles in einer Zeile */
+@media (min-width: 960px) {
+  .mg-funding__inner {
+    grid-template-columns: auto minmax(8rem, 1fr) auto;
+    grid-template-areas: "text bar cta";
+    gap: 1.5rem;
+    padding-block: 0.55rem;
+  }
+
+  /* Maus statt Finger: kleinere Klickfläche reicht, Streifen bleibt flach */
+  .mg-funding__cta {
+    min-height: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-funding__bar span {
+    animation: none;
+  }
+}
