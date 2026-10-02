@@ -10,18 +10,19 @@ type Props = {
 
 export function LegalPageShell({ title, lead, children }: Props) {
   return (
-    <div className="site-page legal-page">
+    <div className="mg-page site-page legal-page">
       <SiteHeader variant="document" />
-      <main className="legal-page-main">
-        <article className="legal-page-inner">
-          <header className="legal-page-head">
-            <h1>{title}</h1>
-            {lead ? <p className="legal-page-lead">{lead}</p> : null}
+      <main id="inhalt" className="mg-legal">
+        <article className="mg-legal__inner mg-container">
+          <header className="mg-legal__head">
+            <p className="mg-eyebrow">Rechtliches</p>
+            <h1 className="mg-h2">{title}</h1>
+            {lead ? <p className="mg-lead">{lead}</p> : null}
           </header>
-          {children}
+          <div className="mg-legal__body">{children}</div>
         </article>
       </main>
-      <SiteFooter />
+      <SiteFooter showContactForm={false} />
     </div>
   );
 }

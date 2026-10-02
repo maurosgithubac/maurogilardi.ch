@@ -20,6 +20,7 @@ const STATIC_ROUTES: {
   { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
   { path: "/erfolge", changeFrequency: "monthly", priority: 0.8 },
   { path: "/sponsoring", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/partner", changeFrequency: "monthly", priority: 0.8 },
   { path: "/impressum", changeFrequency: "yearly", priority: 0.4 },
   { path: "/datenschutz", changeFrequency: "yearly", priority: 0.4 },
 ];

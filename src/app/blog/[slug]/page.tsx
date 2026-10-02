@@ -14,6 +14,9 @@ import type { PostRow } from "@/types/content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { BlogPostBody } from "@/components/blog-post-body";
+import { ReadingProgress } from "@/components/motion/reading-progress";
+import { Reveal } from "@/components/motion/reveal";
+import { SplitText } from "@/components/motion/split-text";
 
 export const revalidate = 60;
 
@@ -128,49 +131,71 @@ export default async function BlogPostPage({ params }: Props) {
   };
 
   return (
-    <article className="blog-post site-page">
+    <div className="mg-page site-page">
       <SeoPageJsonLd schema={blogPostingSchema} />
+      <ReadingProgress />
       <SiteHeader variant="document" />
-      <div className="blog-post-layout">
-        <nav className="blog-post-breadcrumb" aria-label="Navigation">
-          <Link href="/blog">Zum Blog</Link>
-          <span aria-hidden className="blog-post-breadcrumb-sep">
-            /
-          </span>
-          <span className="blog-post-breadcrumb-current" title={post.title}>
-            {post.title}
-          </span>
-        </nav>
-        {img ? (
-          <div className="blog-post-hero">
-            <Image
-              src={img}
-              alt={`${post.title} – Beitragsbild`}
-              fill
-              className="blog-post-hero-img"
-              priority
-              sizes="(max-width: 904px) calc(100vw - 2rem), 56rem"
-            />
-            <div className="blog-post-hero-scrim" />
+      <main id="inhalt">
+        <article className="mg-article">
+          <header className="mg-article__head mg-container">
+            <nav className="mg-article__crumbs" aria-label="Brotkrumen">
+              <Link href="/blog">Blog</Link>
+              <span aria-hidden="true">/</span>
+              <time dateTime={post.created_at}>
+                {new Date(post.created_at).toLocaleDateString("de-CH", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </time>
+            </nav>
+            <SplitText as="h1" text={post.title} className="mg-article__title" onMount stagger={0.04} />
+            {post.description ? (
+              <Reveal y={16} delay={0.25}>
+                <p className="mg-article__dek">{post.description}</p>
+              </Reveal>
+            ) : null}
+          </header>
+
+          {img ? (
+            <Reveal className="mg-article__hero mg-container" y={40} delay={0.2}>
+              <div className="mg-article__hero-frame">
+                <Image
+                  src={img}
+                  alt={`${post.title} – Beitragsbild`}
+                  fill
+                  className="mg-cover"
+                  priority
+                  sizes="(max-width: 1280px) calc(100vw - 2rem), 80rem"
+                />
+              </div>
+            </Reveal>
+          ) : null}
+
+          <div className="mg-article__body blog-post-article">
+            <BlogPostBody body={post.body} />
           </div>
-        ) : null}
-        <div className="blog-post-inner blog-post-article">
-          <time className="blog-post-date" dateTime={post.created_at}>
-            {new Date(post.created_at).toLocaleDateString("de-CH", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </time>
-          <h1>{post.title}</h1>
-          {post.description ? <p className="blog-post-dek">{post.description}</p> : null}
-          <BlogPostBody body={post.body} />
-          <Link href="/blog" className="blog-post-back">
-            ← Zurück zum Blog
-          </Link>
-        </div>
-      </div>
+
+          <aside className="mg-article__end mg-container" aria-label="Unterstützen">
+            <div className="mg-article__end-card mg-grain" data-theme="dark">
+              <p className="mg-eyebrow">Gefällt dir, was du liest?</p>
+              <p className="mg-h3">Werde Teil meines Teams und begleite mich auf die HotelPlanner Tour.</p>
+              <div className="mg-hero__actions">
+                <Link href="/sponsoring" className="mg-btn mg-btn--primary">
+                  Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
+                </Link>
+                <Link href="/#newsletter" className="mg-btn mg-btn--glass">
+                  Newsletter
+                </Link>
+              </div>
+            </div>
+            <Link href="/blog" className="mg-link-arrow">
+              ← Alle Beiträge
+            </Link>
+          </aside>
+        </article>
+      </main>
       <SiteFooter />
-    </article>
+    </div>
   );
 }

@@ -1,115 +1,134 @@
-import Image from "next/image";
 import Link from "next/link";
 import { siteContent } from "@/content/siteContent";
-import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
 import { AboutSubnav } from "@/components/about-subnav";
+import { PageHero } from "@/components/page-hero";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
+import { ScrollFillText } from "@/components/motion/scroll-fill-text";
+import { TiltCard } from "@/components/motion/tilt-card";
+import { CountUp } from "@/components/motion/count-up";
 import { uebermichMetadata, uebermichSchema } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = uebermichMetadata;
 
 export default function UeberMichPage() {
-  return (
-    <>
-      <SeoPageJsonLd schema={uebermichSchema} />
-      <div className="site-page about-page">
-      <div className="site-header-fixed-stack">
-        <SiteHeader variant="overlay" inOverlayStack />
-      </div>
+  const [lead, ...story] = siteContent.story;
+  const { projectsShowcase } = siteContent;
 
-      <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero blog-index-hero-unified">
-          <Image
-            src={seoImages.portraitTournament}
-            alt={seoImageAlts.portraitTournament}
-            fill
-            className="stage-bg about-hero-bg"
-            priority
-            sizes="100vw"
-          />
-          <div className="stage-overlay about-hero-overlay" />
-          <AboutHeroMotionCopy
-            label="Über mich"
-            title="Mauro Gilardi – Schweizer Golf Professional aus Graubünden"
-            lead={
-              <>
-                <strong>Karriere wie ein Unternehmen.</strong>{" "}
-                Leistungssport, Unternehmertum und klare Strukturen verbinden sich zu einem Weg mit einem Ziel:
-                langfristiger Erfolg im Golf - und darüber hinaus.
-              </>
-            }
-            actions={
-              <>
-                <Link href="/blog" className="about-btn about-btn-primary">
-                  Zum Blog
-                </Link>
-                <Link href="/sponsoring" className="about-btn about-btn-ghost">
-                  Sponsoring
-                </Link>
-              </>
-            }
-          />
-        </section>
+  return (
+    <div className="mg-page site-page about-page">
+      <SeoPageJsonLd schema={uebermichSchema} />
+      <SiteHeader variant="overlay" />
+
+      <main id="inhalt">
+        <PageHero
+          eyebrow="Über mich"
+          title="Mauro Gilardi – Schweizer Golf Professional aus Graubünden"
+          lead={
+            <>
+              <strong>Karriere wie ein Unternehmen.</strong> Leistungssport, Unternehmertum und klare Strukturen — mit
+              einem Ziel: langfristiger Erfolg im Golf und darüber hinaus.
+            </>
+          }
+          image={seoImages.portraitTournament}
+          imageAlt={seoImageAlts.portraitTournament}
+          actions={
+            <>
+              <Link href="/erfolge" className="mg-btn mg-btn--light">
+                Meine Erfolge
+              </Link>
+              <Link href="/blog" className="mg-btn mg-btn--glass">
+                Zum Blog
+              </Link>
+            </>
+          }
+        />
 
         <AboutSubnav />
 
-        <section className="about-story" aria-labelledby="about-story-title">
-          <div className="about-story-inner">
-            <h2 id="about-story-title">Mein Weg — in Kurzform</h2>
-            <div className="about-story-layout">
-              <div className="about-story-grid">
-                {siteContent.story.map((paragraph, index) => (
-                  <p key={index} className={index === 0 ? "about-story-lead" : undefined}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+        <section className="mg-section" aria-labelledby="about-story-title">
+          <div className="mg-container mg-about-story">
+            <div className="mg-about-story__head">
+              <Reveal>
+                <p className="mg-eyebrow">Mein Weg</p>
+              </Reveal>
+              <Reveal delay={0.05}>
+                <h2 id="about-story-title" className="mg-h2">
+                  In Kurzform.
+                </h2>
+              </Reveal>
+            </div>
+            <div className="mg-about-story__body">
+              <ScrollFillText className="mg-story__fill" text={lead} />
+              {story.map((paragraph) => (
+                <Reveal key={paragraph.slice(0, 32)}>
+                  <p className="mg-body mg-about-story__para">{paragraph}</p>
+                </Reveal>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="about-projects" aria-labelledby="about-projects-title">
-          <div className="about-projects-inner">
-            <h2 id="about-projects-title">Was ich neben der Tour noch mache</h2>
-            <p className="about-projects-intro">{siteContent.projectsShowcase.intro}</p>
+        <section className="mg-section mg-about-projects mg-grain" data-theme="dark" aria-labelledby="about-projects-title">
+          <div className="mg-container">
+            <header className="mg-section-head mg-section-head--split">
+              <div>
+                <Reveal>
+                  <p className="mg-eyebrow">Neben der Tour</p>
+                </Reveal>
+                <Reveal delay={0.05}>
+                  <h2 id="about-projects-title" className="mg-h2">
+                    Sport, IT und Struktur.
+                  </h2>
+                </Reveal>
+              </div>
+              <Reveal delay={0.1}>
+                <p className="mg-lead">{projectsShowcase.intro}</p>
+              </Reveal>
+            </header>
 
-            <ul className="about-projects-roles">
-              {siteContent.projectsShowcase.responsibilities.map((role) => (
-                <li key={role}>{role}</li>
+            <Stagger as="ul" className="mg-kpis" aria-label="Projektkennzahlen">
+              {projectsShowcase.kpis.map((kpi) => (
+                <StaggerItem as="li" key={kpi.label} className="mg-stat">
+                  <span className="mg-stat__value">
+                    <CountUp to={Number(kpi.value)} />
+                  </span>
+                  <span className="mg-stat__label">{kpi.label}</span>
+                </StaggerItem>
               ))}
-            </ul>
+            </Stagger>
 
-            <ul className="about-projects-grid">
-              {siteContent.projectsShowcase.projects.map((project) => (
-                <li key={project.name} className="about-project-card">
-                  <p className="about-project-type">{project.type}</p>
-                  <h3>
-                    <a href={project.href} target="_blank" rel="noopener noreferrer">
-                      {project.name}
+            <Reveal>
+              <ul className="mg-roles">
+                {projectsShowcase.responsibilities.map((role) => (
+                  <li key={role}>{role}</li>
+                ))}
+              </ul>
+            </Reveal>
+
+            <Stagger as="ul" className="mg-projects" stagger={0.07}>
+              {projectsShowcase.projects.map((project) => (
+                <StaggerItem as="li" key={project.name}>
+                  <TiltCard className="mg-project">
+                    <a href={project.href} target="_blank" rel="noopener noreferrer" className="mg-project__link">
+                      <span className="mg-project__type">{project.type}</span>
+                      <h3 className="mg-project__name">
+                        {project.name} <span aria-hidden="true">↗</span>
+                      </h3>
+                      <p className="mg-project__text">{project.text}</p>
                     </a>
-                  </h3>
-                  <p>{project.text}</p>
-                </li>
+                  </TiltCard>
+                </StaggerItem>
               ))}
-            </ul>
-
-            <ul className="about-projects-kpis" aria-label="Projektkennzahlen">
-              {siteContent.projectsShowcase.kpis.map((kpi) => (
-                <li key={kpi.label} className="about-project-kpi">
-                  <span className="about-project-kpi-value">{kpi.value}</span>
-                  <span className="about-project-kpi-label">{kpi.label}</span>
-                </li>
-              ))}
-            </ul>
+            </Stagger>
           </div>
         </section>
       </main>
 
       <SiteFooter />
     </div>
-    </>
   );
 }

@@ -253,6 +253,47 @@ export const sponsoringSchema = {
   },
 };
 
+export const partnerMetadata: Metadata = {
+  title: {
+    absolute: seoPageTitles.partner,
+  },
+  description:
+    "Sponsoring und Partnerschaft mit Mauro Gilardi, Swiss PGA Professional — Aufstieg in die HotelPlanner Tour, Pakete ab 2'000 CHF pro Jahr, individuell abgestimmt.",
+  keywords: [
+    "Golf Sponsoring Schweiz",
+    "Sponsoring Unternehmen Golf",
+    "Mauro Gilardi Partner",
+    "HotelPlanner Tour Schweizer",
+    "Swiss PGA Sponsoring",
+    "Sport Sponsoring Graubünden",
+  ],
+  alternates: {
+    canonical: `${SITE_URL}/partner`,
+  },
+  openGraph: {
+    title: seoPageTitles.partner,
+    description: "Partnerschaft mit Mauro Gilardi: Sichtbarkeit auf dem Weg zur DP World Tour.",
+    url: `${SITE_URL}/partner`,
+    images: seoOgImages(seoImages.golfTeam, seoImageAlts.golfTeam),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: seoPageTitles.partner,
+    description: "Sponsoring und Partnerschaften mit Mauro Gilardi, Swiss PGA Professional.",
+  },
+};
+
+export const partnerSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Partnerschaft & Sponsoring für Unternehmen – Mauro Gilardi",
+  description: "Sponsoring-Pakete für Unternehmen mit Mauro Gilardi, Swiss PGA Golf Professional",
+  url: `${SITE_URL}/partner`,
+  mainEntity: {
+    "@id": `${SITE_URL}/#mauro-gilardi`,
+  },
+};
+
 export const uebermichFaqMetadata: Metadata = {
   title: {
     absolute: seoPageTitles.faq,

@@ -1,0 +1,512 @@
+/*
+ * MG Design-System (Refresh 2026)
+ * Eine Quelle für Farben, Typo, Abstände, Radien, Schatten und Motion.
+ * Neue Komponenten nutzen ausschliesslich diese Tokens und das Präfix `mg-`.
+ */
+
+:root {
+  /* Farbe — hell */
+  --mg-ink: #0b0b0c;
+  --mg-ink-2: #3a3936;
+  --mg-muted: #6b6862;
+  --mg-paper: #f6f5f2;
+  --mg-paper-2: #eeece7;
+  --mg-surface: #ffffff;
+  --mg-line: rgb(11 11 12 / 9%);
+  --mg-line-strong: rgb(11 11 12 / 16%);
+  --mg-red: #d71920;
+  --mg-red-hover: #b8141a;
+  --mg-red-soft: rgb(215 25 32 / 8%);
+  --mg-on-red: #ffffff;
+  --mg-focus: rgb(215 25 32 / 45%);
+
+  /* Typo */
+  --mg-font-display: var(--font-inter-tight), "Inter Tight", system-ui, sans-serif;
+  --mg-font-body: var(--font-inter), "Inter", system-ui, sans-serif;
+  --mg-font-mono: var(--font-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --mg-step--2: 0.75rem;
+  --mg-step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
+  --mg-step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --mg-step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --mg-step-2: clamp(1.5rem, 1.25rem + 1.1vw, 2.2rem);
+  --mg-step-3: clamp(2rem, 1.5rem + 2.3vw, 3.4rem);
+  --mg-step-4: clamp(2.6rem, 1.8rem + 4vw, 5.5rem);
+  --mg-step-5: clamp(3.4rem, 1.6rem + 8.4vw, 10rem);
+
+  --mg-tracking-display: -0.045em;
+  --mg-tracking-tight: -0.025em;
+  --mg-tracking-caps: 0.14em;
+
+  /* Layout */
+  --mg-max: 80rem;
+  --mg-max-text: 42rem;
+  --mg-gutter: clamp(1rem, 4vw, 2.5rem);
+  --mg-section: clamp(5rem, 10vw, 9.5rem);
+  --mg-gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  --mg-header-h: 4.25rem;
+
+  /* Radien */
+  --mg-r-sm: 8px;
+  --mg-r-md: 16px;
+  --mg-r-lg: 24px;
+  --mg-r-xl: 32px;
+  --mg-r-full: 999px;
+
+  /* Schatten (nur zwei) */
+  --mg-shadow-card: 0 1px 2px rgb(11 11 12 / 4%), 0 8px 24px rgb(11 11 12 / 6%);
+  --mg-shadow-float: 0 2px 6px rgb(11 11 12 / 6%), 0 24px 60px rgb(11 11 12 / 14%);
+
+  /* Motion */
+  --mg-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --mg-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --mg-dur-fast: 160ms;
+  --mg-dur: 280ms;
+  --mg-dur-slow: 600ms;
+
+  /* Altbestand auf neue Typo umbiegen — alle bestehenden Seiten erben die neue Schrift */
+  --font-display: var(--mg-font-display);
+}
+
+/* Dunkle Sektionen: Tokens tauschen, Rot bleibt */
+[data-theme="dark"] {
+  --mg-ink: #f4f3ef;
+  --mg-ink-2: #cfccc4;
+  --mg-muted: #9a978f;
+  --mg-paper: #0b0b0c;
+  --mg-paper-2: #141414;
+  --mg-surface: #161616;
+  --mg-line: rgb(255 255 255 / 10%);
+  --mg-line-strong: rgb(255 255 255 / 18%);
+  --mg-red-soft: rgb(215 25 32 / 16%);
+  --mg-shadow-card: 0 1px 0 rgb(255 255 255 / 6%) inset, 0 20px 50px rgb(0 0 0 / 35%);
+  background: var(--mg-paper);
+  color: var(--mg-ink);
+}
+
+/* ——— Basis ——— */
+html {
+  scroll-padding-top: calc(var(--mg-header-h) + 1.5rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  --font-geist-sans: var(--font-inter);
+  font-family: var(--mg-font-body);
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+}
+
+.mg-page {
+  background: var(--mg-paper);
+  color: var(--mg-ink);
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.mg-page :where(h1, h2, h3, h4) {
+  font-family: var(--mg-font-display);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.mg-page :where(p) {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+:where(.mg-page) :focus-visible {
+  outline: 2px solid var(--mg-red);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--mg-red);
+  color: #fff;
+}
+
+.mg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mg-skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.6rem 1rem;
+  border-radius: var(--mg-r-full);
+  background: var(--mg-ink);
+  color: var(--mg-paper);
+  font-size: var(--mg-step--1);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--mg-dur) var(--mg-ease);
+}
+
+.mg-skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ——— Layout-Primitive ——— */
+.mg-container {
+  width: min(var(--mg-max), 100% - var(--mg-gutter) * 2);
+  margin-inline: auto;
+}
+
+.mg-section {
+  position: relative;
+  padding-block: var(--mg-section);
+}
+
+.mg-section--tight {
+  padding-block: calc(var(--mg-section) * 0.6);
+}
+
+.mg-section-head {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  max-width: 52rem;
+}
+
+.mg-section-head--split {
+  max-width: none;
+  grid-template-columns: 1fr;
+  align-items: end;
+}
+
+@media (min-width: 960px) {
+  .mg-section-head--split {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* ——— Typo-Bausteine ——— */
+.mg-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mg-font-body);
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-caps);
+  text-transform: uppercase;
+  color: var(--mg-muted);
+}
+
+.mg-eyebrow::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--mg-red);
+  flex: none;
+}
+
+.mg-display {
+  font-family: var(--mg-font-display);
+  font-size: var(--mg-step-5);
+  font-weight: 650;
+  letter-spacing: var(--mg-tracking-display);
+  line-height: 0.92;
+}
+
+.mg-h2 {
+  font-size: var(--mg-step-4);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-display);
+  line-height: 0.98;
+}
+
+.mg-h3 {
+  font-size: var(--mg-step-2);
+  letter-spacing: var(--mg-tracking-tight);
+  line-height: 1.1;
+}
+
+.mg-lead {
+  font-size: var(--mg-step-1);
+  line-height: 1.5;
+  color: var(--mg-ink-2);
+  max-width: var(--mg-max-text);
+}
+
+.mg-body {
+  font-size: var(--mg-step-0);
+  line-height: 1.65;
+  color: var(--mg-ink-2);
+}
+
+.mg-muted {
+  color: var(--mg-muted);
+}
+
+.mg-accent {
+  color: var(--mg-red);
+}
+
+.mg-mono {
+  font-family: var(--mg-font-mono);
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
+}
+
+/* ——— Buttons ——— */
+.mg-btn {
+  --btn-bg: var(--mg-ink);
+  --btn-fg: var(--mg-paper);
+  --btn-border: transparent;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0 1.4rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--mg-r-full);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    background var(--mg-dur) var(--mg-ease),
+    color var(--mg-dur) var(--mg-ease),
+    border-color var(--mg-dur) var(--mg-ease),
+    box-shadow var(--mg-dur) var(--mg-ease),
+    transform var(--mg-dur-fast) var(--mg-ease);
+}
+
+.mg-btn:active {
+  transform: scale(0.97);
+}
+
+.mg-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.mg-btn--primary {
+  --btn-bg: var(--mg-red);
+  --btn-fg: var(--mg-on-red);
+  box-shadow: 0 10px 30px rgb(215 25 32 / 28%);
+}
+
+.mg-btn--primary:hover {
+  --btn-bg: var(--mg-red-hover);
+  box-shadow: 0 14px 36px rgb(215 25 32 / 36%);
+}
+
+.mg-btn--dark:hover {
+  --btn-bg: #26252a;
+}
+
+.mg-btn--light {
+  --btn-bg: #fff;
+  --btn-fg: #0b0b0c;
+}
+
+.mg-btn--light:hover {
+  --btn-bg: #f1efea;
+}
+
+.mg-btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--mg-ink);
+  --btn-border: var(--mg-line-strong);
+}
+
+.mg-btn--ghost:hover {
+  --btn-bg: var(--mg-ink);
+  --btn-fg: var(--mg-paper);
+  --btn-border: var(--mg-ink);
+}
+
+.mg-btn--glass {
+  --btn-bg: rgb(255 255 255 / 12%);
+  --btn-fg: #fff;
+  --btn-border: rgb(255 255 255 / 28%);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.mg-btn--glass:hover {
+  --btn-bg: #fff;
+  --btn-fg: #0b0b0c;
+}
+
+.mg-btn--sm {
+  min-height: 2.5rem;
+  padding: 0 1.05rem;
+  font-size: 0.875rem;
+}
+
+.mg-btn--lg {
+  min-height: 3.5rem;
+  padding: 0 1.8rem;
+  font-size: 1.02rem;
+}
+
+.mg-btn__arrow {
+  display: inline-block;
+  transition: transform var(--mg-dur) var(--mg-ease);
+}
+
+.mg-btn:hover .mg-btn__arrow,
+.mg-link-arrow:hover .mg-btn__arrow {
+  transform: translateX(4px);
+}
+
+.mg-link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--mg-ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--mg-line-strong);
+  padding-bottom: 0.2rem;
+  transition: border-color var(--mg-dur) var(--mg-ease), color var(--mg-dur) var(--mg-ease);
+}
+
+.mg-link-arrow:hover {
+  border-color: var(--mg-red);
+  color: var(--mg-red);
+}
+
+/* ——— Oberflächen ——— */
+.mg-card {
+  position: relative;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-lg);
+  background: var(--mg-surface);
+  box-shadow: var(--mg-shadow-card);
+  overflow: hidden;
+}
+
+.mg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--mg-line-strong);
+  border-radius: var(--mg-r-full);
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mg-ink-2);
+}
+
+/* Filmkorn — subtil, nur für dunkle Flächen */
+.mg-grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.mg-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.mg-glow {
+  position: absolute;
+  pointer-events: none;
+  width: min(60rem, 120vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(215 25 32 / 22%) 0%, rgb(215 25 32 / 0%) 62%);
+  filter: blur(10px);
+  z-index: 0;
+}
+
+/* ——— Formulare ——— */
+.mg-field {
+  display: grid;
+  gap: 0.45rem;
+  font-size: var(--mg-step--1);
+  font-weight: 600;
+  color: var(--mg-ink-2);
+}
+
+.mg-input,
+.mg-field :is(input, textarea, select) {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--mg-line-strong);
+  border-radius: var(--mg-r-md);
+  background: var(--mg-surface);
+  color: var(--mg-ink);
+  font: inherit;
+  font-weight: 400;
+  font-size: 1rem;
+  transition: border-color var(--mg-dur) var(--mg-ease), box-shadow var(--mg-dur) var(--mg-ease);
+}
+
+.mg-field textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.mg-input::placeholder,
+.mg-field :is(input, textarea)::placeholder {
+  color: var(--mg-muted);
+  opacity: 0.8;
+}
+
+.mg-input:focus-visible,
+.mg-field :is(input, textarea, select):focus-visible {
+  outline: none;
+  border-color: var(--mg-red);
+  box-shadow: 0 0 0 4px var(--mg-red-soft);
+}
+
+.mg-optional {
+  font-weight: 400;
+  color: var(--mg-muted);
+}
+
+.mg-form-status {
+  font-size: var(--mg-step--1);
+  color: var(--mg-ink-2);
+}
+
+.mg-form-status--error {
+  color: var(--mg-red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-btn,
+  .mg-btn__arrow,
+  .mg-link-arrow {
+    transition: none;
+  }
+}

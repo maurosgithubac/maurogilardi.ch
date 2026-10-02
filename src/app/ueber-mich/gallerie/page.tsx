@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { GalleryGrid } from "@/components/gallery-grid";
 import { AboutSubpageShell } from "@/components/about-subpage-shell";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import {
@@ -43,7 +43,7 @@ export default async function UeberMichGalleriePage() {
             <p className="about-gallery-kicker">Impressionen</p>
             <h2 id="about-gallery-title">Bilder</h2>
             <p className="about-gallery-lead">
-              Die Sammlung wird ergänzt, sobald neue Motive dazukommen — sortiert nach Dateiname.
+              Antippen zum Vergrössern — mit den Pfeiltasten blätterst du durch die Sammlung.
             </p>
           </header>
 
@@ -57,27 +57,9 @@ export default async function UeberMichGalleriePage() {
               </p>
             </div>
           ) : (
-            <ul className="about-gallery-grid">
-              {files.map((file) => {
-                const src = aboutGalleryImageSrc(file);
-                const alt = aboutGalleryAltFromFilename(file);
-                return (
-                  <li key={file} className="about-gallery-item">
-                    <figure className="about-gallery-figure">
-                      <div className="about-gallery-aspect">
-                        <Image
-                          src={src}
-                          alt={alt}
-                          fill
-                          sizes="(max-width: 520px) 100vw, (max-width: 900px) 50vw, 33vw"
-                          className="about-gallery-img"
-                        />
-                      </div>
-                    </figure>
-                  </li>
-                );
-              })}
-            </ul>
+            <GalleryGrid
+              items={files.map((file) => ({ src: aboutGalleryImageSrc(file), alt: aboutGalleryAltFromFilename(file) }))}
+            />
           )}
         </div>
       </section>

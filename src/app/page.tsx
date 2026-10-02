@@ -1,9 +1,18 @@
-import { HomeShell } from "@/components/home-shell";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
+import { HomeHero } from "@/components/home/home-hero";
+import { ProofBand } from "@/components/home/proof-band";
+import { StorySection } from "@/components/home/story-section";
+import { MilestonesSection } from "@/components/home/milestones-section";
+import { SeasonBento } from "@/components/home/season-bento";
+import { SupportSection } from "@/components/home/support-section";
+import { PartnerTeaser } from "@/components/home/partner-teaser";
+import { LatestPosts } from "@/components/home/latest-posts";
+import type { HomePost } from "@/components/home/types";
 import { visibleDemoPosts } from "@/content/demoPosts";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { getUpcomingPgtSeasonEvents } from "@/content/pgtSeasonEvents";
-import { homeMarqueeSponsorCards } from "@/content/sponsorsSite";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { HOME_PAGE_DESCRIPTION, homePageMetadata } from "@/lib/seo/page-metadata";
 import { homeWebPageJsonLd } from "@/lib/seo/webpage-jsonld";
@@ -15,13 +24,10 @@ export const revalidate = 60;
 
 export const metadata = homePageMetadata;
 
-export default async function Home() {
-  type PostCard = Pick<PostRow, "id" | "slug" | "title" | "description" | "image_path" | "created_at">;
-  type HomePostCard = Omit<PostCard, "image_path"> & { image_url: string | null };
-  type HomeSponsorCard = { id: string; name: string; website_url: string | null; logo_url: string };
+type PostSource = Pick<PostRow, "id" | "slug" | "title" | "description" | "image_path" | "created_at">;
 
-  let posts: PostCard[] = [];
-
+async function loadPosts(): Promise<HomePost[]> {
+  let posts: PostSource[] = [];
   try {
     const supabase = createSupabaseServerClient();
     const { data } = await supabase
@@ -30,24 +36,17 @@ export default async function Home() {
       .eq("published", true)
       .lte("created_at", publishedAtOrBeforeIso())
       .order("created_at", { ascending: false })
-      .limit(9);
-    posts = (data as PostCard[]) ?? [];
+      .limit(4);
+    posts = (data as PostSource[]) ?? [];
   } catch {
     /* Supabase nicht konfiguriert oder Tabellen fehlen */
   }
 
   if (posts.length === 0) {
-    posts = visibleDemoPosts().map((post) => ({
-      id: post.id,
-      slug: post.slug,
-      title: post.title,
-      description: post.description,
-      image_path: post.image_path,
-      created_at: post.created_at,
-    }));
+    posts = visibleDemoPosts().slice(0, 4);
   }
 
-  const homePosts: HomePostCard[] = posts.map((post) => ({
+  return posts.map((post) => ({
     id: post.id,
     slug: post.slug,
     title: post.title,
@@ -55,15 +54,28 @@ export default async function Home() {
     created_at: post.created_at,
     image_url: blogImageUrl(post.image_path),
   }));
+}
 
-  const homeSponsors: HomeSponsorCard[] = homeMarqueeSponsorCards();
-
+export default async function Home() {
+  const posts = await loadPosts();
   const upcomingPgtEvents = getUpcomingPgtSeasonEvents(new Date());
+  const [latestPost, ...morePosts] = posts;
 
   return (
-    <>
+    <div className="mg-page">
       <SeoPageJsonLd schema={homeWebPageJsonLd(HOME_PAGE_DESCRIPTION)} />
-      <HomeShell posts={homePosts} sponsors={homeSponsors} upcomingPgtEvents={upcomingPgtEvents} />
-    </>
+      <SiteHeader variant="overlay" />
+      <main id="inhalt">
+        <HomeHero />
+        <ProofBand />
+        <StorySection />
+        <MilestonesSection />
+        <SeasonBento events={upcomingPgtEvents} latestPost={latestPost ?? null} />
+        <SupportSection />
+        <PartnerTeaser />
+        <LatestPosts posts={morePosts.slice(0, 3)} />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

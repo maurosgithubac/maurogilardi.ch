@@ -76,6 +76,13 @@ export const goennerMembershipTiers: MembershipTier[] = [
   },
 ];
 
+/** Mitgliedschaften mit Anfrageformular (Adresse für Rechnung nötig) */
+export type MemberTierId = Extract<MembershipId, "birdie" | "eagle" | "albatros">;
+
+export function isMemberTierId(value: string | undefined): value is MemberTierId {
+  return value === "birdie" || value === "eagle" || value === "albatros";
+}
+
 /** 100er Club: nur Kontaktdaten, Zahlung zuerst via TWINT. */
 export function isLiteContactMembership(id: string): boolean {
   return id === "hundert";

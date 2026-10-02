@@ -40,18 +40,18 @@ export function FooterContactForm() {
   }
 
   return (
-    <section id="kontakt" className="footer-contact" aria-labelledby="footer-contact-title">
-      <div className="footer-contact-intro">
-        <p className="footer-contact-kicker">Kontakt</p>
-        <h2 id="footer-contact-title" className="footer-contact-title">
+    <section id="kontakt" className="mg-contact" aria-labelledby="footer-contact-title">
+      <div className="mg-contact__intro">
+        <p className="mg-eyebrow">Kontakt</p>
+        <h2 id="footer-contact-title" className="mg-h3">
           Schreib mir
         </h2>
-        <p className="footer-contact-lead">Kurze Frage oder Anliegen? Ich melde mich bei dir.</p>
+        <p className="mg-body">Kurze Frage, Medienanfrage oder Idee für eine Zusammenarbeit? Ich melde mich bei dir.</p>
       </div>
 
-      <form className="footer-contact-form" onSubmit={onSubmit} noValidate>
-        <div className="footer-contact-row">
-          <label className="footer-contact-label" htmlFor="footer-contact-name">
+      <form className="mg-contact__form" onSubmit={onSubmit} noValidate>
+        <div className="mg-contact__row">
+          <label className="mg-field" htmlFor="footer-contact-name">
             Name
             <input
               id="footer-contact-name"
@@ -66,7 +66,7 @@ export function FooterContactForm() {
               placeholder="Dein Name"
             />
           </label>
-          <label className="footer-contact-label" htmlFor="footer-contact-email">
+          <label className="mg-field" htmlFor="footer-contact-email">
             E-Mail
             <input
               id="footer-contact-email"
@@ -81,7 +81,7 @@ export function FooterContactForm() {
           </label>
         </div>
 
-        <label className="footer-contact-label" htmlFor="footer-contact-message">
+        <label className="mg-field" htmlFor="footer-contact-message">
           Nachricht
           <textarea
             id="footer-contact-message"
@@ -96,18 +96,20 @@ export function FooterContactForm() {
           />
         </label>
 
-        <div className="footer-contact-actions">
-          <button type="submit" className="footer-contact-submit" disabled={status === "loading"}>
+        <div className="mg-contact__actions">
+          <button type="submit" className="mg-btn mg-btn--light" disabled={status === "loading"}>
             {status === "loading" ? "Wird gesendet…" : "Nachricht senden"}
+            <span className="mg-btn__arrow" aria-hidden="true">
+              →
+            </span>
           </button>
-          {feedback ? (
-            <p
-              className={`form-message${status === "error" ? " form-message--error" : ""}`}
-              role={status === "error" ? "alert" : "status"}
-            >
-              {feedback}
-            </p>
-          ) : null}
+          <p
+            className={`mg-form-status${status === "error" ? " mg-form-status--error" : ""}`}
+            role={status === "error" ? "alert" : "status"}
+            aria-live="polite"
+          >
+            {feedback}
+          </p>
         </div>
       </form>
     </section>

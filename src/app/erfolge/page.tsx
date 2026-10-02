@@ -1,209 +1,98 @@
-import Image from "next/image";
 import Link from "next/link";
-import { AboutHeroMotionCopy } from "@/components/about-hero-motion-copy";
-import {
-  ErfolgeTimeline,
-  type ErfolgeTimelineEntry,
-  type ErfolgeTimelinePhase,
-} from "@/components/erfolge-timeline";
+import { ErfolgeTimeline } from "@/components/erfolge-timeline";
+import { PageHero } from "@/components/page-hero";
 import { SeoPageJsonLd } from "@/components/seo-page-json-ld";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { CountUp } from "@/components/motion/count-up";
+import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
+import { careerStats, careerTimelineNewestFirst } from "@/content/career";
 import { erfolgeMetadata, erfolgeSchema } from "@/lib/seo/page-metadata";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 
 export const metadata = erfolgeMetadata;
 
-const phaseLabel: Record<ErfolgeTimelinePhase, string> = {
-  Foundation: "Foundation",
-  Development: "Development",
-  Professional: "Professional",
-};
-
-const timelineEntries: ErfolgeTimelineEntry[] = [
-  {
-    year: "1999",
-    title: "Geburt & sportliche Prägung",
-    phase: "Foundation",
-    details: [
-      "Geburt und frühe Bewegungsförderung durch Familie.",
-      "Tennis als frühe koordinative Grundlage.",
-      "Hauptsportarten: Unihockey und Eishockey.",
-    ],
-  },
-  {
-    year: "2005",
-    title: "Einstieg in den Golfsport",
-    phase: "Foundation",
-    details: [
-      "Beginn mit Golf und erste Turniererfahrung.",
-      "Starts auf U14-Level.",
-      "Golf entwickelt sich schrittweise zum Hauptfokus.",
-    ],
-  },
-  {
-    year: "2012",
-    title: "Erste internationale Erfahrung",
-    phase: "Development",
-    details: [
-      "Erste internationale Turniererfahrung in Holland.",
-      "Klare Entscheidung für Golf als Primärsport.",
-      "Reduktion anderer Sportarten zugunsten gezielter Entwicklung.",
-    ],
-  },
-  {
-    year: "2016 / 2018",
-    title: "Datenbasierter Trainingsansatz",
-    phase: "Development",
-    details: [
-      "Einstieg in 3D-Schwunganalyse, unter anderem mit Dr. Rob Neal.",
-      "Systematische Performance-Arbeit mit messbaren Parametern.",
-    ],
-  },
-  {
-    year: "2017",
-    title: "Sieg Engadin International Amateur Championship",
-    phase: "Development",
-    details: ["Turniersieg auf Amateur-Spitzenniveau.", "Eintritt ins World Amateur Golf Ranking (WAGR)."],
-  },
-  {
-    year: "2020",
-    title: "Team-Erfolg auf europäischer Bühne",
-    phase: "Development",
-    details: [
-      "Bronzemedaille bei der Team-Europameisterschaft.",
-      "Wichtiger Beitrag zum Schweizer Teamerfolg.",
-      "Sieg bei den Österreichischen Internationalen Meisterschaften als erster grosser internationaler Titel.",
-    ],
-  },
-  {
-    year: "2021",
-    title: "Nationale Spitzenförderung",
-    phase: "Development",
-    details: [
-      "Erneute Teilnahme an der Team-Europameisterschaft.",
-      "Teil der ersten Spitzensport-RS in Magglingen.",
-    ],
-  },
-  {
-    year: "2022",
-    title: "Übergang zum Professional Golfer",
-    phase: "Development",
-    details: ["Wechsel vom Amateur- ins Profigolf."],
-  },
-  {
-    year: "2023",
-    title: "Einstieg ins Pro-Level",
-    phase: "Professional",
-    details: [
-      "Erste Saison als Playing Professional.",
-      "Teilzeitstelle bei Würth ITensis parallel zum Tourbetrieb.",
-      "Starts auf Pro Golf Tour und Challenge Tour.",
-      "Erster geschaffter Cut auf der Challenge Tour.",
-    ],
-  },
-  {
-    year: "2024",
-    title: "Etablierung im Tour-Alltag",
-    phase: "Professional",
-    details: [
-      "Erste volle Saison auf der Pro Golf Tour.",
-      "8 Starts auf der Challenge Tour mit 4 geschafften Cuts.",
-      "50. Rang im Pro Golf Tour Ranking bei rund zwei Dritteln der Turniere.",
-      "Deutliche Leistungssteigerung.",
-      "August 2024: Kündigung des Jobs und 100% Fokus auf Golf.",
-    ],
-  },
-  {
-    year: "2025",
-    title: "Breakthrough Season",
-    phase: "Professional",
-    details: [
-      "Erste Saison als Vollzeit-Profi.",
-      "1. Sieg auf der Pro Golf Tour.",
-      "Sieben Top-15-Resultate auf der Pro Golf Tour.",
-      "Swiss Golf Open Champion.",
-      "17. Rang bei einem Challenge-Tour-Event (Swiss Challenge).",
-      "13. Rang im Jahresranking der Pro Golf Tour.",
-    ],
-  },
-  {
-    year: "2026",
-    title: "Next Level",
-    phase: "Professional",
-    details: [
-      "2. Rang bei einem Pro Golf Tour Event.",
-      "Start CAS Elite Sports Management.",
-      "Board Member SwissPGA.",
-      "Head of Playing Professional Commission.",
-    ],
-  },
-];
-
-/** Neueste Station zuerst, beim Scrollen zurück in die Vergangenheit */
-const timelineEntriesDisplay = [...timelineEntries].reverse();
-
 export default function ErfolgePage() {
   return (
-    <>
+    <div className="mg-page site-page erfolge-page">
       <SeoPageJsonLd schema={erfolgeSchema} />
-      <div className="site-page erfolge-page">
-      <div className="site-header-fixed-stack">
-        <SiteHeader variant="overlay" inOverlayStack />
-      </div>
+      <SiteHeader variant="overlay" />
 
-      <main className="subpage-shell subpage-shell--flush">
-        <section className="subpage-hero about-hero erfolge-hero blog-index-hero-unified">
-          <Image
-            src={seoImages.progolfTour}
-            alt={seoImageAlts.progolfTour}
-            fill
-            className="stage-bg about-hero-bg"
-            priority
-            sizes="100vw"
-          />
-          <div className="stage-overlay about-hero-overlay" />
-          <AboutHeroMotionCopy
-            label="Erfolge"
-            title="So bin ich bis hierhin gekommen."
-            lead="Von den ersten Schlägen bis zur Tour — hier siehst du die Stationen, die für mich zählen."
-            actions={
-              <>
-                <Link href="/blog" className="about-btn about-btn-primary">
-                  Zum Blog
-                </Link>
-                <Link href="/sponsoring" className="about-btn about-btn-ghost">
-                  Sponsoring
-                </Link>
-              </>
-            }
-          />
+      <main id="inhalt">
+        <PageHero
+          eyebrow="Erfolge"
+          title="So bin ich bis hierhin gekommen."
+          lead="Von den ersten Schlägen 2005 bis zum Aufstieg in die HotelPlanner Tour — die Stationen, die für mich zählen."
+          image={seoImages.progolfTour}
+          imageAlt={seoImageAlts.progolfTour}
+          actions={
+            <>
+              <Link href="/blog/aufstieg-hotelplanner-tour" className="mg-btn mg-btn--primary">
+                Aufstieg 2026 <span className="mg-btn__arrow" aria-hidden="true">→</span>
+              </Link>
+              <Link href="/sponsoring" className="mg-btn mg-btn--glass">
+                Gönner werden
+              </Link>
+            </>
+          }
+        />
+
+        <section className="mg-proof" aria-label="Kennzahlen">
+          <Stagger as="ul" className="mg-proof__stats mg-container">
+            <StaggerItem as="li" className="mg-stat">
+              <span className="mg-stat__value">
+                <CountUp to={careerStats.pgtWins} />
+              </span>
+              <span className="mg-stat__label">Siege auf der Pro Golf Tour</span>
+            </StaggerItem>
+            <StaggerItem as="li" className="mg-stat">
+              <span className="mg-stat__value">
+                <CountUp to={careerStats.pgtRankingCurrent} suffix="." />
+              </span>
+              <span className="mg-stat__label">Rang Pro Golf Tour {careerStats.pgtRankingYear}</span>
+            </StaggerItem>
+            <StaggerItem as="li" className="mg-stat">
+              <span className="mg-stat__value">
+                <CountUp to={new Date().getFullYear() - 2005} />
+              </span>
+              <span className="mg-stat__label">Jahre Golf</span>
+            </StaggerItem>
+            <StaggerItem as="li" className="mg-stat">
+              <span className="mg-stat__value">{careerStats.proSince}</span>
+              <span className="mg-stat__label">Playing Professional seit</span>
+            </StaggerItem>
+          </Stagger>
         </section>
 
-        <section className="erfolge-timeline-section" aria-labelledby="erfolge-timeline-title">
-          <div className="erfolge-timeline-head">
-            <p className="erfolge-timeline-kicker">Zeitstrahl</p>
-            <h2 id="erfolge-timeline-title">Erfolge und Meilensteine</h2>
-            <p className="erfolge-timeline-lead">
-              Oben steht, was am aktuellsten ist — weiter unten geht’s zurück zu den Anfängen.
-            </p>
-            <ul className="erfolge-phase-legend" aria-label="Phasen">
-              <li>Foundation</li>
-              <li>Development</li>
-              <li>Professional</li>
-            </ul>
-          </div>
+        <section className="mg-section" aria-labelledby="erfolge-timeline-title">
+          <div className="mg-container">
+            <header className="mg-section-head mg-section-head--split">
+              <div>
+                <Reveal>
+                  <p className="mg-eyebrow">Zeitstrahl</p>
+                </Reveal>
+                <Reveal delay={0.05}>
+                  <h2 id="erfolge-timeline-title" className="mg-h2">
+                    Erfolge und Meilensteine.
+                  </h2>
+                </Reveal>
+              </div>
+              <Reveal delay={0.1}>
+                <p className="mg-lead">Oben das Aktuellste — weiter unten geht es zurück zu den Anfängen.</p>
+                <ul className="mg-phase-legend" aria-label="Phasen">
+                  <li data-phase="Professional">Professional</li>
+                  <li data-phase="Development">Development</li>
+                  <li data-phase="Foundation">Foundation</li>
+                </ul>
+              </Reveal>
+            </header>
 
-          <div className="erfolge-timeline-progress" aria-hidden>
-            <span className="erfolge-timeline-progress-dot" />
+            <ErfolgeTimeline entries={careerTimelineNewestFirst} />
           </div>
-
-          <ErfolgeTimeline entries={timelineEntriesDisplay} phaseLabel={phaseLabel} />
         </section>
       </main>
 
       <SiteFooter />
     </div>
-    </>
   );
 }

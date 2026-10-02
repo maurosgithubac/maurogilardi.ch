@@ -21,6 +21,10 @@ export const seoPageTitles = {
     suffix: "Mauro Gilardi · Gilardi Golf",
   }),
 
+  partner: buildSeoTitle("Sponsoring für Firmen", {
+    suffix: "Mauro Gilardi · Gilardi Golf",
+  }),
+
   faq: buildSeoTitle("FAQ Swiss PGA & Pro Golf Tour", {
     suffix: "Mauro Gilardi · Gilardi Golf",
   }),

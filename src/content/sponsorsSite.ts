@@ -127,6 +127,11 @@ export const siteSponsorTiers: SiteSponsorTier[] = [
   },
 ];
 
+/** Beschnittene Logo-Variante (ohne Quadrat-Leerraum) — erzeugt via `node scripts/trim-sponsor-logos.mjs` */
+export function trimmedSponsorLogo(imageSrc: string): string {
+  return imageSrc.replace("/Sponsors/", "/Sponsors/trim/").replace(/\.(jpe?g|webp)$/i, ".png");
+}
+
 export function allSiteSponsorsFlat(): SiteSponsor[] {
   return siteSponsorTiers.flatMap((t) => t.sponsors);
 }
@@ -142,6 +147,6 @@ export function homeMarqueeSponsorCards(): {
     id: s.id,
     name: s.displayName,
     website_url: s.href,
-    logo_url: s.imageSrc,
+    logo_url: trimmedSponsorLogo(s.imageSrc),
   }));
 }

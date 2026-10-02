@@ -16,6 +16,7 @@ import {
   markQuizPopupShown,
   registerSubpageView,
 } from "@/lib/engagement-quiz/storage";
+import { isOverlayOpen, useFocusTrap, useOverlayLock } from "@/lib/ui/use-overlay";
 
 export function EngagementQuizPopup() {
   const pathname = usePathname();
@@ -29,6 +30,8 @@ export function EngagementQuizPopup() {
 
   const tryOpen = useCallback(() => {
     if (open || pathname.startsWith("/admin")) return;
+    // Nie über ein offenes Menü/Modal (z. B. 100er-Club-Beitritt) legen
+    if (isOverlayOpen()) return;
     if (!canShowQuizPopup(pathname)) return;
 
     const next = getNextQuizQuestion();
@@ -68,24 +71,8 @@ export function EngagementQuizPopup() {
     tryOpen();
   }, [elapsed, pathname, tryOpen]);
 
-  useEffect(() => {
-    if (!open) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeWithoutAnswer();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    dialogRef.current?.focus();
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, closeWithoutAnswer]);
+  useOverlayLock(open);
+  useFocusTrap(dialogRef, open, closeWithoutAnswer);
 
   function handleSelect(option: EngagementQuizOption) {
     if (!question || selected) return;
@@ -196,7 +183,7 @@ export function EngagementQuizPopup() {
             </svg>
             <span className="engagement-quiz-newsletter-label">Newsletter</span>
           </Link>
-          <Link href="/sponsoring#goenner-memberships-title" className="engagement-quiz-goenner" onClick={handleFooterNavigate}>
+          <Link href="/sponsoring#modelle" className="engagement-quiz-goenner" onClick={handleFooterNavigate}>
             Gönner werden
           </Link>
         </div>

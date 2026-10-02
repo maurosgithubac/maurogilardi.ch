@@ -31,19 +31,15 @@ export function CookieConsentBanner() {
 
   if (!visible || pathname.startsWith("/admin")) return null;
 
+  // Kompakter Hinweis statt Banner: nur technisch notwendige Cookies, blockiert keine Inhalte
   return (
-    <div className="cookie-consent" role="dialog" aria-labelledby="cookie-consent-title" aria-live="polite">
-      <div className="cookie-consent-inner">
-        <p id="cookie-consent-title" className="cookie-consent-text">
-          Diese Website verwendet technisch notwendige Cookies und speichert deine Auswahl lokal. Details in der{" "}
-          <Link href="/datenschutz">Datenschutzerklärung</Link>.
-        </p>
-        <div className="cookie-consent-actions">
-          <button type="button" className="cookie-consent-btn" onClick={accept}>
-            Verstanden
-          </button>
-        </div>
-      </div>
-    </div>
+    <aside className="mg-cookie" aria-label="Hinweis zu Cookies">
+      <p>
+        Nur technisch notwendige Cookies. <Link href="/datenschutz">Datenschutz</Link>
+      </p>
+      <button type="button" className="mg-btn mg-btn--light mg-btn--sm" onClick={accept}>
+        Ok
+      </button>
+    </aside>
   );
 }

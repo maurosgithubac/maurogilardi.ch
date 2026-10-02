@@ -180,7 +180,10 @@ export async function POST(request: Request) {
   let postal_code = String(body.postal_code || "").trim();
   let city = String(body.city || "").trim();
 
-  if (!lite) {
+  // Adresse nur für Mitgliedschaften (Rechnungsversand); Sponsoring-Anfragen von Firmen bleiben schlank
+  const needsAddress = !lite && membership_id !== "sponsoring";
+
+  if (needsAddress) {
     if (street.length < 3 || street.length > 300) {
       return NextResponse.json({ error: "Bitte gib Strasse und Hausnummer an." }, { status: 400 });
     }

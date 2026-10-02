@@ -1,10 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { brandLogo } from "@/lib/seo/constants";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { MgLogo } from "@/components/brand/mg-logo";
+import { Magnetic } from "@/components/motion/magnetic";
+import { MG_EASE } from "@/components/motion/motion-provider";
+import { getPgtEventLiveOnDate, livescoringLinkForEvent, pgtSeasonEvents2026 } from "@/content/pgtSeasonEvents";
+import { useFocusTrap, useOverlayLock } from "@/lib/ui/use-overlay";
 
 type NavSublink = { href: string; label: string };
 
@@ -19,12 +23,14 @@ const NAV: NavItem[] = [
   { href: "/", label: "Home", match: (p) => p === "/" },
   { href: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") },
   { href: "/erfolge", label: "Erfolge", match: (p) => p.startsWith("/erfolge") },
-  { href: "/sponsoring", label: "Sponsoring", match: (p) => p.startsWith("/sponsoring") },
+  { href: "/sponsoring", label: "Gönner", match: (p) => p.startsWith("/sponsoring") },
+  { href: "/partner", label: "Partner", match: (p) => p.startsWith("/partner") },
   {
     href: "/ueber-mich",
     label: "Über mich",
     match: (p) => p.startsWith("/ueber-mich"),
     sublinks: [
+      { href: "/ueber-mich", label: "Überblick" },
       { href: "/ueber-mich/sponsoren", label: "Sponsoren" },
       { href: "/ueber-mich/gallerie", label: "Galerie" },
       { href: "/ueber-mich/media", label: "Medien" },
@@ -34,162 +40,212 @@ const NAV: NavItem[] = [
   },
 ];
 
-const ABOUT_SUB_ID = "site-header-about-sub";
-
 type Variant = "overlay" | "document";
 
 type Props = {
+  /** overlay = transparent über einem dunklen Hero, document = Seiten ohne Hero */
   variant: Variant;
+  /** @deprecated Altbestand — der Header ist jetzt immer selbst fixiert */
   inOverlayStack?: boolean;
 };
 
-export function SiteHeader({ variant, inOverlayStack }: Props) {
+function subscribeScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
+const noopSubscribe = () => () => {};
+
+export function SiteHeader({ variant }: Props) {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [aboutMobileOpen, setAboutMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
+  const headerRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (variant !== "overlay") return;
-    const onScroll = () => setScrolled(window.scrollY > 48);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [variant]);
+  // Scroll-Zustand als externer Store: kein setState im Effect, Server rendert "oben"
+  const scrolled = useSyncExternalStore(subscribeScroll, () => window.scrollY > 32, () => false);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-    setAboutMobileOpen(false);
-  }, [pathname]);
+  // Live-Turnier nur im Browser bestimmen (Datum), ID als stabiler Snapshot
+  const liveEventId = useSyncExternalStore(noopSubscribe, () => getPgtEventLiveOnDate(new Date())?.id ?? null, () => null);
+  const liveEvent = liveEventId ? (pgtSeasonEvents2026.find((ev) => ev.id === liveEventId) ?? null) : null;
 
-  useEffect(() => {
-    if (!mobileMenuOpen) {
-      setAboutMobileOpen(false);
-      return;
-    }
-    if (pathname.startsWith("/ueber-mich/")) {
-      setAboutMobileOpen(true);
-    }
-  }, [mobileMenuOpen, pathname]);
+  // Menü bei Seitenwechsel schliessen (während des Renderns statt per Effect)
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setMenuOpen(false);
+  }
 
-  const headerClass =
-    variant === "overlay"
-      ? `site-header site-header--overlay${inOverlayStack ? " site-header--overlay-in-stack" : ""}${scrolled ? " site-header--overlay-solid" : ""}`
-      : "site-header site-header--document";
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useOverlayLock(menuOpen);
+  // Falle über den ganzen Header, damit auch der Schliessen-Button per Tab erreichbar ist
+  useFocusTrap(headerRef, menuOpen, closeMenu);
+
+  const solid = variant === "document" || scrolled || menuOpen;
+  const tone = solid ? "light" : "dark";
 
   return (
-    <header className={headerClass}>
-      <Link href="/" className="site-header-brand">
-        <span className="site-header-brand-mark">
-          <Image
-            src={brandLogo.path}
-            alt={brandLogo.alt}
-            width={brandLogo.width}
-            height={brandLogo.height}
-            sizes={`${brandLogo.width}px`}
-            className="site-header-logo"
-            priority={variant === "overlay"}
-            unoptimized
-          />
-        </span>
-      </Link>
-      <button
-        type="button"
-        className={`site-header-menu-toggle${mobileMenuOpen ? " is-open" : ""}`}
-        aria-label={mobileMenuOpen ? "Navigation schliessen" : "Navigation öffnen"}
-        aria-expanded={mobileMenuOpen}
-        aria-controls="site-header-nav"
-        onClick={() => setMobileMenuOpen((open) => !open)}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-      <nav
-        id="site-header-nav"
-        className={`site-header-nav${mobileMenuOpen ? " site-header-nav--open" : ""}`}
-        aria-label="Hauptnavigation"
-      >
-        {NAV.map((item) => {
-          const active = item.match(pathname);
-          const sublinks = item.sublinks;
+    <>
+      <a href="#inhalt" className="mg-skip-link">
+        Zum Inhalt springen
+      </a>
+      <header ref={headerRef} className="mg-header" data-solid={solid ? "true" : "false"} data-tone={tone} data-open={menuOpen ? "true" : "false"}>
+        <div className="mg-header__bar">
+          <Link href="/" className="mg-header__brand" aria-label="Mauro Gilardi — Startseite">
+            <MgLogo className="mg-header__logo" title="Mauro Gilardi" />
+          </Link>
 
-          if (sublinks?.length) {
-            return (
-              <div
-                key={item.href}
-                className={`site-header-nav-dropdown${aboutMobileOpen ? " site-header-nav-dropdown--mobile-open" : ""}`}
-              >
-                <div className="site-header-nav-dropdown-trigger">
-                  <Link
-                    href={item.href}
-                    className={active ? "site-header-nav-link site-header-nav-link--active" : "site-header-nav-link"}
-                    aria-current={pathname === item.href ? "page" : undefined}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                  <button
-                    type="button"
-                    className="site-header-nav-dropdown-caret"
-                    aria-expanded={aboutMobileOpen}
-                    aria-controls={ABOUT_SUB_ID}
-                    aria-label="Unterseiten zu Über mich anzeigen"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setAboutMobileOpen((v) => !v);
-                    }}
-                  >
-                    <span className="site-header-nav-dropdown-caret-icon" aria-hidden />
-                  </button>
-                </div>
-                <div id={ABOUT_SUB_ID} className="site-header-nav-dropdown-panel" role="menu">
-                  {sublinks.map((sub) => {
-                    const subActive = pathname === sub.href;
-                    return (
+          <nav className="mg-header__nav" aria-label="Hauptnavigation">
+            <ul className="mg-header__list">
+              {NAV.map((item) => {
+                const active = item.match(pathname);
+                if (item.sublinks) {
+                  return (
+                    <li key={item.href} className="mg-header__item mg-header__item--has-sub">
                       <Link
-                        key={sub.href}
-                        href={sub.href}
-                        role="menuitem"
-                        className={
-                          subActive
-                            ? "site-header-nav-dropdown-item site-header-nav-dropdown-item--active"
-                            : "site-header-nav-dropdown-item"
-                        }
-                        aria-current={subActive ? "page" : undefined}
-                        onClick={() => setMobileMenuOpen(false)}
+                        href={item.href}
+                        className="mg-header__link"
+                        data-active={active ? "true" : undefined}
+                        aria-current={pathname === item.href ? "page" : undefined}
                       >
-                        {sub.label}
+                        {item.label}
+                        <svg className="mg-header__caret" viewBox="0 0 10 6" aria-hidden="true">
+                          <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
                       </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
+                      <div className="mg-header__sub">
+                        <ul>
+                          {item.sublinks.map((sub) => (
+                            <li key={sub.href}>
+                              <Link
+                                href={sub.href}
+                                className="mg-header__sublink"
+                                aria-current={pathname === sub.href ? "page" : undefined}
+                              >
+                                {sub.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={item.href} className="mg-header__item">
+                    <Link
+                      href={item.href}
+                      className="mg-header__link"
+                      data-active={active ? "true" : undefined}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={active ? "site-header-nav-link site-header-nav-link--active" : "site-header-nav-link"}
-              aria-current={active ? "page" : undefined}
-              onClick={() => setMobileMenuOpen(false)}
+          <div className="mg-header__actions">
+            {liveEvent ? (
+              <a
+                href={livescoringLinkForEvent(liveEvent)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mg-live-pill"
+                aria-label={`Livescoring: ${liveEvent.name}`}
+                title={liveEvent.name}
+              >
+                <span className="mg-live-pill__dot" aria-hidden="true" />
+                <span>Live</span>
+                <span className="mg-live-pill__event">{liveEvent.name}</span>
+              </a>
+            ) : null}
+            <Magnetic className="mg-header__cta">
+              <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--sm">
+                Gönner werden
+              </Link>
+            </Magnetic>
+            <button
+              type="button"
+              className="mg-burger"
+              aria-label={menuOpen ? "Navigation schliessen" : "Navigation öffnen"}
+              aria-expanded={menuOpen}
+              aria-controls="mg-mobile-nav"
+              onClick={() => setMenuOpen((open) => !open)}
             >
-              {item.label}
-            </Link>
-          );
-        })}
-        <Link
-          href="/sponsoring#sponsoring-form-title"
-          className="site-header-nav-link site-header-nav-link--cta"
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          Gönner werden
-        </Link>
-      </nav>
-      {mobileMenuOpen ? <button type="button" className="site-header-nav-backdrop" aria-hidden onClick={() => setMobileMenuOpen(false)} /> : null}
-    </header>
+              <span />
+              <span />
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {menuOpen ? (
+            <motion.div
+              key="mobile-nav"
+              id="mg-mobile-nav"
+              className="mg-mobile-nav"
+              data-theme="dark"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation"
+              initial={{ clipPath: "inset(0 0 100% 0 round 0 0 32px 32px)" }}
+              animate={{ clipPath: "inset(0 0 0% 0 round 0 0 0px 0px)" }}
+              exit={{ clipPath: "inset(0 0 100% 0 round 0 0 32px 32px)" }}
+              transition={{ duration: 0.6, ease: MG_EASE }}
+            >
+              <motion.ul
+                className="mg-mobile-nav__list"
+                initial="hidden"
+                animate="show"
+                variants={{ show: { transition: { staggerChildren: 0.05, delayChildren: 0.15 } } }}
+              >
+                {NAV.map((item) => (
+                  <motion.li
+                    key={item.href}
+                    variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: MG_EASE } } }}
+                  >
+                    <Link
+                      href={item.href}
+                      className="mg-mobile-nav__link"
+                      data-active={item.match(pathname) ? "true" : undefined}
+                      aria-current={pathname === item.href ? "page" : undefined}
+                      onClick={closeMenu}
+                    >
+                      {item.label}
+                    </Link>
+                    {item.sublinks ? (
+                      <ul className="mg-mobile-nav__sub">
+                        {item.sublinks.slice(1).map((sub) => (
+                          <li key={sub.href}>
+                            <Link href={sub.href} aria-current={pathname === sub.href ? "page" : undefined} onClick={closeMenu}>
+                              {sub.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </motion.li>
+                ))}
+              </motion.ul>
+              <motion.div
+                className="mg-mobile-nav__foot"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { delay: 0.45 } }}
+              >
+                <Link href="/sponsoring" className="mg-btn mg-btn--primary mg-btn--lg" onClick={closeMenu}>
+                  Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
+                </Link>
+                <Link href="/#newsletter" className="mg-btn mg-btn--glass mg-btn--lg" onClick={closeMenu}>
+                  Newsletter
+                </Link>
+              </motion.div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </header>
+      {variant === "document" ? <div className="mg-header-spacer" aria-hidden="true" /> : null}
+    </>
   );
 }
