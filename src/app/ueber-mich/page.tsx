@@ -27,11 +27,11 @@ export default function UeberMichPage() {
       <main id="inhalt">
         <PageHero
           eyebrow="Über mich"
-          title="Mauro Gilardi – Schweizer Golf Professional aus Graubünden"
+          title="Mauro Gilardi."
           lead={
             <>
-              <strong>Karriere wie ein Unternehmen.</strong> Leistungssport, Unternehmertum und klare Strukturen — mit
-              einem Ziel: langfristiger Erfolg im Golf und darüber hinaus.
+              <strong>Schweizer Golf Professional aus Graubünden.</strong> Karriere wie ein Unternehmen: Leistungssport,
+              Unternehmertum und klare Strukturen — mit einem Ziel: langfristiger Erfolg im Golf und darüber hinaus.
             </>
           }
           image={seoImages.portraitTournament}
