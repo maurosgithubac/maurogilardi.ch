@@ -1281,3 +1281,26 @@ html:has(.mg-cookie) .mg-support-bar {
 .mg-lightbox--mono .mg-lightbox__img {
   filter: grayscale(1) contrast(1.06);
 }
+
+/* ——— Blog-Beitrag: eine einheitliche Lesespalte ———
+   Brotkrumen, Titel, Einleitung, Titelbild, Text, Inline-Bilder und Abschluss-Karte
+   teilen sich exakt dieselbe Breite und schliessen bündig ab. */
+.mg-article {
+  --mg-article-w: 52rem;
+}
+
+.mg-article .mg-article__head,
+.mg-article .mg-article__hero,
+.mg-article .mg-article__body,
+.mg-article .mg-article__end {
+  width: min(var(--mg-article-w), 100% - var(--mg-gutter) * 2);
+  margin-inline: auto;
+}
+
+.mg-article .mg-article__hero-frame {
+  border-radius: var(--mg-r-lg);
+}
+
+.mg-article .mg-article__dek {
+  max-width: none;
+}
