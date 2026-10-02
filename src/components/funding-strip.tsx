@@ -47,3 +47,46 @@ export async function FundingStrip({ href = "/2027#modelle" }: { href?: string }
     </section>
   );
 }
+
+/**
+ * Finanzierungs-Karte im Hero (Landing Screen): Glas-Karte auf dem Foto,
+ * grosse Prozentzahl, kräftiger Balken — sofort sichtbar ohne Scrollen.
+ */
+export async function FundingHeroCard({ href = "/2027#modelle" }: { href?: string }) {
+  if (!seasonCampaign.showFunding) return null;
+  const committed = await getCommittedAnnualChf();
+  if (committed == null) return null;
+
+  const { year, goalChf } = seasonCampaign;
+  const pct = Math.min(100, Math.round((committed / goalChf) * 100));
+  const open = Math.max(0, goalChf - committed);
+
+  return (
+    <Link href={href} className="mg-funding-card" data-track="funding_hero_click" aria-label={`Saison ${year}: ${pct} Prozent getragen — mithelfen`}>
+      <span className="mg-funding-card__top">
+        <span className="mg-funding-card__label">Saison {year} finanzieren</span>
+        <span className="mg-funding-card__pct mg-mono">{pct} %</span>
+      </span>
+      <span
+        className="mg-funding-card__bar"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={goalChf}
+        aria-valuenow={Math.min(committed, goalChf)}
+      >
+        <span style={{ width: `${pct}%` }} />
+      </span>
+      <span className="mg-funding-card__bottom">
+        <span className="mg-mono">
+          CHF {chf(committed)} <span className="mg-funding-card__muted">von {chf(goalChf)}</span>
+        </span>
+        <span className="mg-funding-card__cta">
+          {open > 0 ? `Noch ${chf(open)} — mithelfen` : "Merci — Ziel erreicht"}{" "}
+          <span className="mg-btn__arrow" aria-hidden="true">
+            →
+          </span>
+        </span>
+      </span>
+    </Link>
+  );
+}

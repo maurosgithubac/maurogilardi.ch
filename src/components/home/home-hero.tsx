@@ -6,8 +6,9 @@ import { SplitText } from "@/components/motion/split-text";
 import { Magnetic } from "@/components/motion/magnetic";
 import { siteContent } from "@/content/siteContent";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { FundingHeroCard } from "@/components/funding-strip";
 
-export function HomeHero() {
+export async function HomeHero() {
   return (
     <section className="mg-hero mg-grain" data-theme="dark" aria-label="Start">
       <ParallaxMedia className="mg-hero__media">
@@ -54,6 +55,11 @@ export function HomeHero() {
             </a>
           </Reveal>
         </div>
+
+        {/* Saisonfinanzierung direkt im Landing Screen */}
+        <Reveal y={16} delay={0.65} className="mg-hero__funding">
+          <FundingHeroCard />
+        </Reveal>
       </ScrollFadeOut>
 
       <a href="#story" className="mg-hero__scroll" aria-label="Weiter nach unten scrollen">

@@ -1258,7 +1258,7 @@
 
 .mg-funding__bar {
   grid-area: bar;
-  height: 4px;
+  height: 6px;
   border-radius: var(--mg-r-full);
   background: var(--mg-paper-2);
   overflow: hidden;
@@ -1312,6 +1312,108 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mg-funding__bar span {
+    animation: none;
+  }
+}
+
+/* ——— Finanzierungs-Karte im Startseiten-Hero (Landing Screen) ——— */
+.mg-hero__funding {
+  margin-top: 1.25rem;
+  max-width: 34rem;
+}
+
+.mg-funding-card {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem 1rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: var(--mg-r-lg);
+  background: rgb(11 11 11 / 45%);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 35%);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  transition: border-color var(--mg-dur) var(--mg-ease), background var(--mg-dur) var(--mg-ease), transform var(--mg-dur) var(--mg-ease);
+}
+
+.mg-funding-card:hover {
+  border-color: rgb(255 255 255 / 40%);
+  background: rgb(11 11 11 / 58%);
+  transform: translateY(-2px);
+}
+
+.mg-funding-card:hover .mg-btn__arrow {
+  transform: translateX(4px);
+}
+
+.mg-funding-card__top,
+.mg-funding-card__bottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mg-funding-card__label {
+  color: var(--mg-red-on-dark);
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  letter-spacing: var(--mg-tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.mg-funding-card__pct {
+  font-size: var(--mg-step-2);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mg-funding-card__bar {
+  display: block;
+  height: 8px;
+  border-radius: var(--mg-r-full);
+  background: rgb(255 255 255 / 20%);
+  overflow: hidden;
+}
+
+.mg-funding-card__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mg-red);
+  box-shadow: 0 0 16px rgb(215 25 32 / 60%);
+  transform-origin: left;
+  animation: mg-funding-fill 1.6s var(--mg-ease) both 0.9s;
+}
+
+.mg-funding-card__bottom {
+  font-size: var(--mg-step--1);
+}
+
+.mg-funding-card__muted {
+  color: rgb(255 255 255 / 65%);
+}
+
+.mg-funding-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 419px) {
+  .mg-funding-card__bottom {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-funding-card,
+  .mg-funding-card__bar span {
+    transition: none;
     animation: none;
   }
 }
