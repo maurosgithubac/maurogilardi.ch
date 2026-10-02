@@ -101,24 +101,24 @@ export function AdminPostForm({ initial }: Props) {
   }
 
   return (
-    <div className="admin-card-stack">
-      <header className="admin-page-head">
-        <p className="admin-page-kicker">Blog</p>
-        <h1 className="admin-h1">{editing ? "Beitrag bearbeiten" : "Neuer Beitrag"}</h1>
-        <p className="admin-muted admin-page-lead">
+    <div className="ap-page ap-page--narrow">
+      <header className="ap-page-head">
+        <p className="ap-eyebrow">Blog</p>
+        <h1 className="ap-h1">{editing ? "Beitrag bearbeiten" : "Neuer Beitrag"}</h1>
+        <p className="ap-page-desc">
           {editing
             ? "Bearbeite Inhalt, Titelbild und Veröffentlichungsstatus dieses Beitrags."
             : "Neuen Blog-Artikel anlegen und direkt mit Bild für die Website vorbereiten."}
         </p>
       </header>
 
-      <form className="admin-form admin-form-card" onSubmit={onSubmit}>
-        <div className="admin-field-grid">
-          <label className="admin-field admin-field--wide">
+      <form className="ap-card ap-form" onSubmit={onSubmit}>
+        <div className="ap-form-grid">
+          <label className="ap-field ap-span-2">
             Titel
             <input value={title} onChange={(event) => setTitle(event.target.value)} required />
           </label>
-          <label className="admin-field admin-field--wide">
+          <label className="ap-field ap-span-2">
             Kurzbeschreibung
             <input
               value={description}
@@ -128,33 +128,33 @@ export function AdminPostForm({ initial }: Props) {
           </label>
         </div>
 
-        <label className="admin-field">
+        <label className="ap-field">
           Text
           <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={12} required />
         </label>
 
-        <div className="admin-media-block">
-          <label className="admin-field">
+        <div className="ap-media">
+          <label className="ap-field">
             Titelbild
             <input type="file" accept="image/*" onChange={(event) => onFileChange(event.target.files?.[0] ?? null)} />
-            {uploading ? <span className="admin-hint">Lade Bild hoch…</span> : <span className="admin-hint">JPG/PNG empfohlen.</span>}
+            {uploading ? <span className="ap-hint">Lade Bild hoch…</span> : <span className="ap-hint">JPG/PNG empfohlen.</span>}
           </label>
           {previewUrl ? (
-            <div className="admin-preview">
-              <Image src={previewUrl} alt="" width={320} height={200} sizes="320px" className="admin-preview-img" />
+            <div className="ap-preview">
+              <Image src={previewUrl} alt="" width={320} height={200} sizes="320px" className="ap-preview-img" />
             </div>
           ) : null}
         </div>
 
-        <label className="admin-check">
+        <label className="ap-switch">
           <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
           Veröffentlicht
         </label>
 
-        {error ? <p className="admin-error">{error}</p> : null}
+        {error ? <p className="ap-banner ap-banner--error">{error}</p> : null}
 
-        <div className="admin-form-actions">
-          <button type="submit" className="admin-submit" disabled={saving}>
+        <div className="ap-form-actions">
+          <button type="submit" className="ap-btn ap-btn--primary" disabled={saving}>
             {saving ? "Speichert..." : editing ? "Änderungen speichern" : "Beitrag erstellen"}
           </button>
         </div>

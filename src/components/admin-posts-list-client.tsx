@@ -37,26 +37,26 @@ export function AdminPostsListClient({ initialPosts }: Props) {
 
   return (
     <>
-      {error ? <p className="admin-error">{error}</p> : null}
+      {error ? <p className="ap-banner ap-banner--error">{error}</p> : null}
       {posts.length === 0 ? (
-        <p className="admin-muted">Noch keine Beiträge.</p>
+        <p className="ap-muted-sm">Noch keine Beiträge.</p>
       ) : (
-        <ul className="admin-list">
+        <ul className="ap-list">
           {posts.map((post) => (
-            <li key={post.id} className="admin-list-item">
+            <li key={post.id} className="ap-list-item">
               <div>
                 <strong>{post.title}</strong>
-                <span className={`admin-badge${post.published ? " admin-badge--live" : " admin-badge--draft"}`}>
+                <span className={`ap-status ${post.published ? "ap-status--paid" : "ap-status--none"}`}>
                   {post.published ? "Live" : "Entwurf"}
                 </span>
               </div>
-              <div className="admin-list-actions">
-                <Link href={`/admin/posts/${post.id}`} className="admin-link">
+              <div className="ap-row-actions">
+                <Link href={`/admin/posts/${post.id}`} className="ap-btn ap-btn--ghost ap-btn--sm">
                   Bearbeiten
                 </Link>
                 <button
                   type="button"
-                  className="admin-danger"
+                  className="ap-btn ap-btn--danger-ghost ap-btn--sm"
                   onClick={() => onDelete(post)}
                   disabled={busyId === post.id}
                 >

@@ -9,9 +9,12 @@ import {
   membershipPriceChf,
 } from "@/content/goennerMemberships";
 import type { GoennerInquiryRow, GoennerInquiryStatus } from "@/types/content";
+import { IconNote, IconSearch, IconTrash } from "@/components/admin/admin-icons";
+import { TierTag } from "@/components/admin/admin-ui";
 
 function chfFmt(n: number) {
-  return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(n);
+  // Node-ICU (') und Browser (’) unterscheiden sich — vereinheitlichen gegen Hydration-Fehler
+  return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(n).replace(/['‘’]/g, "’");
 }
 
 function statusOf(row: GoennerInquiryRow): GoennerInquiryStatus {
@@ -231,33 +234,41 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
     }
   }
 
+  const counts: Record<Filter, number> = {
+    open: openRows.length,
+    paid: paidRows.length,
+    exited: exitedRows.length,
+    hundert: rows.filter((r) => isLiteContactMembership(r.membership_id)).length,
+    all: rows.length,
+  };
+
   return (
     <>
-      <div className="mgf-kpi-grid">
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">Offen</span>
-          <strong>{openRows.length}</strong>
+      <dl className="ap-statline" aria-label="Eingänge in Zahlen">
+        <div className={openRows.length > 0 ? "is-alert" : undefined}>
+          <dt>Offen</dt>
+          <dd>{openRows.length}</dd>
         </div>
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">100er offen</span>
-          <strong>{hundertOpen}</strong>
+        <div>
+          <dt>100er offen</dt>
+          <dd>{hundertOpen}</dd>
         </div>
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">Bezahlt</span>
-          <strong>{paidRows.length}</strong>
+        <div>
+          <dt>Bezahlt</dt>
+          <dd>{paidRows.length}</dd>
         </div>
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">Ausgetreten</span>
-          <strong>{exitedRows.length}</strong>
+        <div>
+          <dt>Ausgetreten</dt>
+          <dd>{exitedRows.length}</dd>
         </div>
-        <div className="mgf-kpi mgf-kpi--accent">
-          <span className="mgf-kpi-label">Summe bezahlt</span>
-          <strong>{chfFmt(totalChf)}</strong>
+        <div>
+          <dt>Summe bezahlt</dt>
+          <dd>{chfFmt(totalChf)}</dd>
         </div>
-      </div>
+      </dl>
 
-      <div className="mgf-inbox-toolbar">
-        <div className="mgf-inbox-filters" role="group" aria-label="Liste filtern">
+      <div className="ap-toolbar" role="search">
+        <div className="ap-segment" role="group" aria-label="Liste filtern">
           {(
             [
               ["open", "Offen"],
@@ -270,17 +281,21 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
             <button
               key={id}
               type="button"
-              className={`mgf-inbox-filter${filter === id ? " is-active" : ""}`}
+              className="ap-segment-btn"
+              aria-pressed={filter === id}
               onClick={() => setFilter(id)}
             >
               {label}
+              <span className="ap-segment-count">{counts[id]}</span>
             </button>
           ))}
         </div>
-        <label className="mgf-inbox-search">
-          <span className="sr-only">Suchen</span>
+        <label className="ap-search">
+          <IconSearch />
+          <span className="sr-only">Eingänge suchen</span>
           <input
             type="search"
+            className="ap-input"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Name, E-Mail, Telefon…"
@@ -288,24 +303,40 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
         </label>
       </div>
 
-      {formError ? <p className="mgf-banner mgf-banner--warn">{formError}</p> : null}
-      {formWarning ? <p className="mgf-banner">{formWarning}</p> : null}
+      {formError ? (
+        <p className="ap-banner ap-banner--error" role="alert">
+          {formError}
+        </p>
+      ) : null}
+      {formWarning ? (
+        <p className="ap-banner ap-banner--warn" role="status">
+          {formWarning}
+        </p>
+      ) : null}
 
       {visible.length === 0 ? (
-        <p className="mgf-muted">Keine Einträge in diesem Filter.</p>
+        <div className="ap-card ap-empty">
+          <p className="ap-empty-title">Keine Einträge in diesem Filter</p>
+          <p className="ap-muted-sm">Anderen Filter wählen oder Suche leeren.</p>
+        </div>
       ) : (
-        <div className="mgf-table-wrap mgf-inbox-wrap">
-          <table className="mgf-table mgf-inbox-table">
+        <div className="ap-table-wrap">
+          <table className="ap-table ap-table--inbox">
+            <caption className="sr-only">Eingänge, {visible.length} Einträge</caption>
             <thead>
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Stufe</th>
                 <th scope="col">E-Mail</th>
                 <th scope="col">Telefon</th>
-                <th scope="col">Betrag</th>
+                <th scope="col" className="ap-num">
+                  Betrag CHF
+                </th>
                 <th scope="col">Status</th>
                 <th scope="col">Eingang</th>
-                <th scope="col">Aktion</th>
+                <th scope="col" className="ap-col-actions">
+                  <span className="sr-only">Aktionen</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -321,39 +352,41 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                 return (
                   <tr
                     key={row.id}
-                    className={[
-                      "mgf-inbox-row",
-                      `mgf-inbox-row--${st}`,
-                      isHundert ? "mgf-inbox-row--hundert" : "",
-                      dirty ? "is-dirty" : "",
-                    ]
+                    className={["ap-inbox-row", `is-${st}`, isHundert ? "is-hundert" : "", dirty ? "is-dirty" : ""]
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    <td className="mgf-inbox-name-cell">
+                    <td className="ap-cell-name">
                       <button
                         type="button"
-                        className={`mgf-inbox-name${hasComment ? " has-note" : ""}`}
+                        className="ap-inbox-name"
                         title={`${row.name}\n\n${tip}`}
-                        aria-label={row.name}
+                        aria-label={`${row.name} – Kommentar ${hasComment ? "anzeigen" : "hinzufügen"}`}
                         aria-expanded={noteOpenId === row.id}
                         onClick={() => openNote(row)}
                       >
-                        {displayName(row.name)}
+                        <span>{displayName(row.name, 26)}</span>
+                        {hasComment ? (
+                          <span className="ap-note-flag" aria-hidden="true">
+                            <IconNote size={13} />
+                          </span>
+                        ) : null}
                       </button>
+                      {dirty ? <span className="ap-dirty-hint">Ungespeichert</span> : null}
                       {noteOpenId === row.id ? (
-                        <div className="mgf-inbox-note-pop" ref={notePanelRef} role="dialog" aria-label="Kommentar">
+                        <div className="ap-popover" ref={notePanelRef} role="dialog" aria-label={`Kommentar ${row.name}`}>
                           {row.message?.trim() ? (
-                            <div className="mgf-inbox-note-block">
-                              <span className="mgf-inbox-note-label">Formular</span>
+                            <div className="ap-popover-block">
+                              <span className="ap-label">Formular</span>
                               <p>{row.message.trim()}</p>
                             </div>
                           ) : (
-                            <p className="mgf-muted">Kein Formular-Kommentar.</p>
+                            <p className="ap-muted-sm">Kein Formular-Kommentar.</p>
                           )}
-                          <label className="mgf-inbox-note-edit">
-                            <span className="mgf-inbox-note-label">Dein Kommentar</span>
+                          <label className="ap-field">
+                            <span className="ap-label">Dein Kommentar</span>
                             <textarea
+                              className="ap-input ap-textarea"
                               value={noteDraft}
                               onChange={(e) => setNoteDraft(e.target.value)}
                               rows={3}
@@ -361,35 +394,33 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                               placeholder="Interner Vermerk…"
                             />
                           </label>
-                          <div className="mgf-inbox-note-actions">
+                          <div className="ap-form-actions">
                             <button
                               type="button"
-                              className="mgf-btn mgf-btn--primary mgf-btn--sm"
-                              disabled={busy}
-                              onClick={() => void saveNote(row)}
-                            >
-                              Speichern
-                            </button>
-                            <button
-                              type="button"
-                              className="mgf-btn mgf-btn--ghost mgf-btn--sm"
+                              className="ap-btn ap-btn--ghost ap-btn--sm"
                               disabled={busy}
                               onClick={() => setNoteOpenId(null)}
                             >
                               Schliessen
                             </button>
+                            <button
+                              type="button"
+                              className="ap-btn ap-btn--primary ap-btn--sm"
+                              disabled={busy}
+                              onClick={() => void saveNote(row)}
+                            >
+                              Speichern
+                            </button>
                           </div>
                         </div>
                       ) : null}
                     </td>
-                    <td>
-                      <span className={`mgf-tier-chip mgf-tier-chip--${row.membership_id}`}>
-                        {inquiryTierShort(row.membership_id)}
-                      </span>
+                    <td data-label="Stufe">
+                      <TierTag id={row.membership_id}>{inquiryTierShort(row.membership_id)}</TierTag>
                     </td>
-                    <td>
+                    <td data-label="E-Mail">
                       <input
-                        className="mgf-inbox-input"
+                        className="ap-cell-input"
                         type="email"
                         value={d.email}
                         disabled={busy}
@@ -397,9 +428,9 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                         aria-label={`E-Mail ${row.name}`}
                       />
                     </td>
-                    <td>
+                    <td data-label="Telefon">
                       <input
-                        className="mgf-inbox-input"
+                        className="ap-cell-input"
                         type="tel"
                         value={d.phone}
                         disabled={busy}
@@ -408,9 +439,9 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                         placeholder="—"
                       />
                     </td>
-                    <td>
+                    <td data-label="Betrag CHF">
                       <input
-                        className="mgf-inbox-input mgf-inbox-input--amount"
+                        className="ap-cell-input ap-cell-input--num"
                         type="text"
                         inputMode="decimal"
                         value={d.amount}
@@ -419,24 +450,22 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                         aria-label={`Betrag ${row.name}`}
                       />
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <select
-                        className={`mgf-inbox-select mgf-inbox-select--${st}`}
+                        className={`ap-status-select is-${st}`}
                         value={st}
                         disabled={busy}
-                        onChange={(e) =>
-                          setDraft(row.id, { status: e.target.value as GoennerInquiryStatus })
-                        }
+                        onChange={(e) => setDraft(row.id, { status: e.target.value as GoennerInquiryStatus })}
                         aria-label={`Status ${row.name}`}
                       >
-                        <option value="open">Offen</option>
-                        <option value="completed">Bezahlt</option>
-                        <option value="exited">Ausgetreten</option>
+                        <option value="open">○ Offen</option>
+                        <option value="completed">✓ Bezahlt</option>
+                        <option value="exited">– Ausgetreten</option>
                       </select>
                     </td>
-                    <td>
+                    <td data-label="Eingang">
                       <input
-                        className="mgf-inbox-input mgf-inbox-input--date"
+                        className="ap-cell-input ap-cell-input--date"
                         type="date"
                         value={d.created}
                         disabled={busy}
@@ -444,40 +473,27 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                         aria-label={`Eingang ${row.name}`}
                       />
                     </td>
-                    <td className="mgf-inbox-actions">
-                      <button
-                        type="button"
-                        className="mgf-btn mgf-btn--primary mgf-btn--sm"
-                        disabled={busy || !dirty}
-                        onClick={() => void saveRow(row)}
-                      >
-                        {busy ? "…" : "Speichern"}
-                      </button>
-                      <button
-                        type="button"
-                        className="mgf-btn mgf-btn--danger mgf-btn--sm mgf-btn--icon"
-                        disabled={busy}
-                        onClick={() => void deleteRow(row)}
-                        title="Löschen"
-                        aria-label={`Anfrage von ${row.name} löschen`}
-                      >
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
+                    <td className="ap-col-actions">
+                      <div className="ap-row-actions">
+                        <button
+                          type="button"
+                          className="ap-btn ap-btn--primary ap-btn--sm"
+                          disabled={busy || !dirty}
+                          onClick={() => void saveRow(row)}
                         >
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          <line x1="10" y1="11" x2="10" y2="17" />
-                          <line x1="14" y1="11" x2="14" y2="17" />
-                        </svg>
-                      </button>
+                          {busy ? "…" : "Speichern"}
+                        </button>
+                        <button
+                          type="button"
+                          className="ap-icon-btn ap-icon-btn--danger"
+                          disabled={busy}
+                          onClick={() => void deleteRow(row)}
+                          title="Löschen"
+                          aria-label={`Anfrage von ${row.name} löschen`}
+                        >
+                          <IconTrash />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

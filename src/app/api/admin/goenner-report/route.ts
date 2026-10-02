@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { inquiryTierLabel } from "@/content/goennerMemberships";
+import { contributionTypeLabel, inquiryTierLabel, memberCategoryLabel } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import {
   GOENNER_FINANCE_START_YEAR,
@@ -52,6 +52,9 @@ export async function GET(request: Request) {
 
   const header = [
     "Name",
+    "Organisation",
+    "Kategorie",
+    "Leistung",
     "Stufe",
     "Jahresbetrag CHF",
     `Bezahlt ${year} CHF`,
@@ -78,6 +81,9 @@ export async function GET(request: Request) {
     if (mine.length > 0) paidCount += 1;
     return [
       m.name,
+      m.organization,
+      memberCategoryLabel(m.category),
+      contributionTypeLabel(m.contribution_type),
       inquiryTierLabel(m.membership_id),
       chf(expectedAnnualChf(m)),
       chf(paid),

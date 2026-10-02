@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdminMembershipId } from "@/content/goennerMemberships";
+import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import { parseAmountOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
@@ -65,11 +65,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ungültiger Jahresbetrag." }, { status: 400 });
   }
 
+  if (body.category != null && !isMemberCategory(body.category)) {
+    return NextResponse.json({ error: "Ungültige Kategorie." }, { status: 400 });
+  }
+  if (body.contribution_type != null && !isContributionType(body.contribution_type)) {
+    return NextResponse.json({ error: "Ungültige Art der Leistung." }, { status: 400 });
+  }
+  const organization = String(body.organization || "").trim() || null;
+
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase
     .from("goenner_members")
     .insert({
       ...(annual != null ? { annual_amount_chf: annual } : {}),
+      ...(isMemberCategory(body.category) ? { category: body.category } : {}),
+      ...(isContributionType(body.contribution_type) ? { contribution_type: body.contribution_type } : {}),
+      ...(organization ? { organization } : {}),
       name,
       email: String(body.email || "").trim().toLowerCase() || null,
       phone: String(body.phone || "").trim() || null,

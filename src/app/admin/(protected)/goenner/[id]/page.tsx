@@ -16,11 +16,9 @@ export default async function AdminGoennerMemberPage({ params }: { params: Promi
     .order("paid_on", { ascending: false });
 
   return (
-    <div className="mgf-page">
-      <AdminGoennerMemberDetailClient
-        member={member as GoennerMemberRow}
-        payments={(payments as GoennerPaymentRow[]) ?? []}
-      />
-    </div>
+    <AdminGoennerMemberDetailClient
+      member={member as GoennerMemberRow}
+      payments={(payments as GoennerPaymentRow[]) ?? []}
+    />
   );
 }

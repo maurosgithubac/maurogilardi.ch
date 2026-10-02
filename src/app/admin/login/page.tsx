@@ -1,13 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { brandLogo } from "@/lib/seo/constants";
+import { MgLogo } from "@/components/brand/mg-logo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -55,34 +52,20 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="admin-app site-page">
-      <SiteHeader variant="document" />
-      <main className="admin-login">
-        <div className="admin-login-card">
-          <Link href="/" className="admin-login-logo-link">
-            <Image
-              src={brandLogo.path}
-              alt={brandLogo.alt}
-              width={160}
-              height={38}
-              sizes="160px"
-              className="admin-brand-logo"
-              priority
-              unoptimized
-            />
+    <div className="admin-app">
+      <main className="ap-login">
+        <div className="ap-login-card">
+          <Link href="/" className="ap-login-brand" aria-label="Zur Website von Mauro Gilardi">
+            <MgLogo withName={false} className="ap-login-mark" title="MG" />
           </Link>
-          <div className="admin-login-lockup">
-            <span className="admin-brand-name">Mauro Gilardi</span>
-            <span className="admin-brand-badge">Admin</span>
-          </div>
-          <p className="admin-login-dek">
-            Zugang nur für freigeschaltete Admins. Gleiche Anmeldedaten wie dein Supabase-Benutzer.
-          </p>
-          <h1 className="admin-login-title">Anmelden</h1>
-          <form onSubmit={onSubmit} className="admin-login-form">
-            <label>
-              E-Mail
+          <p className="ap-eyebrow">Gönner-Admin</p>
+          <h1 className="ap-h1">Anmelden</h1>
+          <p className="ap-page-desc">Zugang nur für freigeschaltete Admins. Gleiche Anmeldedaten wie dein Supabase-Benutzer.</p>
+          <form onSubmit={onSubmit} className="ap-form ap-login-form">
+            <label className="ap-field">
+              <span className="ap-label">E-Mail</span>
               <input
+                className="ap-input"
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -90,9 +73,10 @@ export default function AdminLoginPage() {
                 required
               />
             </label>
-            <label>
-              Passwort
+            <label className="ap-field">
+              <span className="ap-label">Passwort</span>
               <input
+                className="ap-input"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -100,17 +84,20 @@ export default function AdminLoginPage() {
                 required
               />
             </label>
-            <button type="submit" disabled={loading}>
-              {loading ? "..." : "Anmelden"}
+            {error ? (
+              <p className="ap-banner ap-banner--error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button type="submit" className="ap-btn ap-btn--primary ap-btn--block" disabled={loading}>
+              {loading ? "Anmelden…" : "Anmelden"}
             </button>
-            {error ? <p className="admin-error">{error}</p> : null}
           </form>
-          <Link href="/" className="admin-login-back">
-            Zur Website
-          </Link>
         </div>
+        <Link href="/" className="ap-login-back">
+          ← Zur Website
+        </Link>
       </main>
-      <SiteFooter showContactForm={false} />
     </div>
   );
 }

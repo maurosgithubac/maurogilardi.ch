@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdminMembershipId } from "@/content/goennerMemberships";
+import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import { parseAmountOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
@@ -60,6 +60,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if ("city" in body) patch.city = String(body.city || "").trim() || null;
   if ("notes" in body) patch.notes = String(body.notes || "").trim() || null;
   if ("active" in body) patch.active = Boolean(body.active);
+  if ("category" in body && body.category != null) {
+    if (!isMemberCategory(body.category)) return NextResponse.json({ error: "Ungültige Kategorie." }, { status: 400 });
+    patch.category = body.category;
+  }
+  if ("contribution_type" in body && body.contribution_type != null) {
+    if (!isContributionType(body.contribution_type))
+      return NextResponse.json({ error: "Ungültige Art der Leistung." }, { status: 400 });
+    patch.contribution_type = body.contribution_type;
+  }
+  if ("organization" in body) patch.organization = String(body.organization || "").trim() || null;
   if ("annual_amount_chf" in body) {
     const annual = parseAmountOrNull(body.annual_amount_chf);
     if (annual === "invalid") return NextResponse.json({ error: "Ungültiger Jahresbetrag." }, { status: 400 });

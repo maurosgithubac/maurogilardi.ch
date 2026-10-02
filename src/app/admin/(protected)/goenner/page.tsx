@@ -2,7 +2,15 @@ import { AdminGoennerMembersClient } from "@/components/admin-goenner-members-cl
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerMemberRow, GoennerPaymentRow } from "@/lib/goenner-finance";
 
-export default async function AdminGoennerMembersPage() {
+type SearchParams = Promise<{ status?: string; year?: string; bereich?: string }>;
+
+export default async function AdminGoennerMembersPage({ searchParams }: { searchParams: SearchParams }) {
+  const sp = await searchParams;
+  const initialStatus = sp.status === "open" || sp.status === "paid" ? sp.status : undefined;
+  const initialCategory =
+    sp.bereich === "goenner" || sp.bereich === "sponsor" || sp.bereich === "partner" ? sp.bereich : undefined;
+  const initialYear = sp.year && /^\d{4}$/.test(sp.year) ? Number(sp.year) : undefined;
+
   const supabase = await createSupabaseUserServerClient();
   const membersRes = await supabase.from("goenner_members").select("*").order("name", { ascending: true });
   const paymentsRes = await supabase.from("goenner_payments").select("*").order("paid_on", { ascending: false });
@@ -16,16 +24,13 @@ export default async function AdminGoennerMembersPage() {
   const payments = (paymentsRes.data as GoennerPaymentRow[]) ?? [];
 
   return (
-    <div className="mgf-page">
-      <header className="mgf-page-head">
-        <p className="mgf-kicker">Ledger</p>
-        <h1 className="mgf-h1">Gönner</h1>
-        <p className="mgf-lead">
-          Verwalte Personen, Kontakte und Zahlungen. Pro Gönner siehst du das laufende Jahr, das Vorjahr und das Total
-          seit 2022.
-        </p>
-      </header>
-      <AdminGoennerMembersClient members={members} payments={payments} schemaMissing={schemaMissing} />
-    </div>
+    <AdminGoennerMembersClient
+      members={members}
+      payments={payments}
+      schemaMissing={schemaMissing}
+      initialStatus={initialStatus}
+      initialYear={initialYear}
+      initialCategory={initialCategory}
+    />
   );
 }

@@ -96,7 +96,43 @@ export function isKnownMembershipId(id: string): id is MembershipId {
 export const adminMembershipOptions: { id: string; title: string }[] = [
   ...goennerMembershipTiers.map((t) => ({ id: t.id, title: t.title })),
   { id: "unterstuetzung", title: "Unterstützungsbeitrag" },
+  { id: "partner", title: "Partner (Sachleistung)" },
 ];
+
+export type MemberCategory = "goenner" | "sponsor" | "partner";
+export type ContributionType = "geld" | "praemie" | "spesen" | "material" | "verband";
+
+/** Bereich im Portal: Privatpersonen (Gönner), Firmen/Organisationen mit Betrag (Sponsor), Sachleistung (Partner) */
+export const memberCategoryOptions: { id: MemberCategory; label: string }[] = [
+  { id: "goenner", label: "Gönner" },
+  { id: "sponsor", label: "Sponsor" },
+  { id: "partner", label: "Partner" },
+];
+
+/** Art der Gegenleistung */
+export const contributionTypeOptions: { id: ContributionType; label: string }[] = [
+  { id: "geld", label: "Geld" },
+  { id: "praemie", label: "Prämien" },
+  { id: "spesen", label: "Spesen" },
+  { id: "material", label: "Material / Leistung" },
+  { id: "verband", label: "Verbandsbeitrag" },
+];
+
+export function isMemberCategory(id: unknown): id is MemberCategory {
+  return memberCategoryOptions.some((o) => o.id === id);
+}
+
+export function isContributionType(id: unknown): id is ContributionType {
+  return contributionTypeOptions.some((o) => o.id === id);
+}
+
+export function memberCategoryLabel(id: string | null | undefined): string {
+  return memberCategoryOptions.find((o) => o.id === (id || "goenner"))?.label ?? "Gönner";
+}
+
+export function contributionTypeLabel(id: string | null | undefined): string {
+  return contributionTypeOptions.find((o) => o.id === (id || "geld"))?.label ?? "Geld";
+}
 
 export function isAdminMembershipId(id: string): boolean {
   return adminMembershipOptions.some((o) => o.id === id);
@@ -104,6 +140,7 @@ export function isAdminMembershipId(id: string): boolean {
 
 export function inquiryTierLabel(id: string): string {
   if (id === "unterstuetzung") return "Unterstützungsbeitrag";
+  if (id === "partner") return "Partner";
   return isKnownMembershipId(id) ? membershipLabel(id) : id;
 }
 
@@ -122,6 +159,8 @@ export function inquiryTierShort(id: string): string {
       return "Sponsoring";
     case "unterstuetzung":
       return "Unterstützung";
+    case "partner":
+      return "Partner";
     default:
       return id;
   }

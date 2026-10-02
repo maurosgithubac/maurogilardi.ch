@@ -3,16 +3,27 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
-import { adminMembershipOptions, inquiryTierLabel } from "@/content/goennerMemberships";
+import {
+  adminMembershipOptions,
+  contributionTypeLabel,
+  contributionTypeOptions,
+  inquiryTierShort,
+  memberCategoryLabel,
+  memberCategoryOptions,
+  type ContributionType,
+  type MemberCategory,
+} from "@/content/goennerMemberships";
 import {
   GOENNER_FINANCE_START_YEAR,
-  chfFmt,
+  expectedAnnualChf,
   sumPaymentsForYear,
   sumPaymentsTotal,
   type GoennerMemberRow,
   type GoennerPaymentMethod,
   type GoennerPaymentRow,
 } from "@/lib/goenner-finance";
+import { IconArrowLeft, IconFile, IconTrash } from "@/components/admin/admin-icons";
+import { ContributionTag, StatusBadge, TierTag, categoryOf, chf, chfCompact, dateCh } from "@/components/admin/admin-ui";
 
 type Props = {
   member: GoennerMemberRow;
@@ -25,6 +36,8 @@ const METHODS: { id: GoennerPaymentMethod; label: string }[] = [
   { id: "cash", label: "Bar" },
   { id: "other", label: "Andere" },
 ];
+
+const methodLabel = (id: string) => METHODS.find((m) => m.id === id)?.label ?? id;
 
 export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const router = useRouter();
@@ -40,15 +53,27 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const yearTotal = sumPaymentsForYear(payments, year);
   const lastYearTotal = sumPaymentsForYear(payments, lastYear);
   const lastPayment = payments[0] ?? null;
+  const expected = expectedAnnualChf(member);
+  const paidThisYear = payments.some((p) => p.year === year);
+  const billable = expected > 0;
+  const cat = categoryOf(member);
 
-  const byYear = useMemo(() => {
-    const map = new Map<number, number>();
+  // Zeitleiste 2022 … heute: bezahlt / offen pro Jahr
+  const timeline = useMemo(() => {
+    const map = new Map<number, { sum: number; count: number }>();
     for (const p of payments) {
       if (p.year < GOENNER_FINANCE_START_YEAR) continue;
-      map.set(p.year, (map.get(p.year) || 0) + Number(p.amount_chf));
+      const prev = map.get(p.year) || { sum: 0, count: 0 };
+      map.set(p.year, { sum: prev.sum + Number(p.amount_chf), count: prev.count + 1 });
     }
-    return [...map.entries()].sort((a, b) => b[0] - a[0]);
-  }, [payments]);
+    const list: { year: number; sum: number; count: number }[] = [];
+    for (let y = GOENNER_FINANCE_START_YEAR; y <= year; y++) {
+      const v = map.get(y);
+      list.push({ year: y, sum: v?.sum ?? 0, count: v?.count ?? 0 });
+    }
+    return list;
+  }, [payments, year]);
+  const paidYears = timeline.filter((t) => t.count > 0).length;
 
   async function saveMember(event: FormEvent) {
     event.preventDefault();
@@ -149,160 +174,308 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
     }
   }
 
+  const set = <K extends keyof GoennerMemberRow>(key: K, value: GoennerMemberRow[K]) =>
+    setDraft((d) => ({ ...d, [key]: value }));
+
   return (
-    <div className="mgf-stack">
-      <div className="mgf-detail-head">
-        <Link href="/admin/goenner" className="mgf-back">
-          ← Alle Gönner
+    <div className="ap-page">
+      <nav aria-label="Brotkrumen" className="ap-crumbs">
+        <Link href="/admin/goenner" className="ap-back">
+          <IconArrowLeft size={14} />
+          Alle Gönner
         </Link>
-        <div className="mgf-detail-title-row">
+      </nav>
+
+      <header className="ap-detail-head">
+        <div className="ap-detail-id">
+          <span className="ap-avatar" aria-hidden="true">
+            {member.name
+              .split(/\s+/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((s) => s[0]?.toUpperCase())
+              .join("")}
+          </span>
           <div>
-            <h1 className="mgf-h1">{member.name}</h1>
-            <p className="mgf-lead">{inquiryTierLabel(member.membership_id)}</p>
+            <h1 className="ap-h1">{member.name}</h1>
+            {member.organization ? <p className="ap-detail-org">{member.organization}</p> : null}
+            <div className="ap-detail-meta">
+              <span className={`ap-cat ap-cat--${cat} ap-cat--inline`}>{memberCategoryLabel(cat)}</span>
+              <TierTag id={member.membership_id}>{inquiryTierShort(member.membership_id)}</TierTag>
+              <ContributionTag id={member.contribution_type}>{contributionTypeLabel(member.contribution_type)}</ContributionTag>
+              {billable ? <span className="ap-num">{chf(expected)} / Jahr</span> : null}
+              {paidThisYear ? (
+                <StatusBadge state="paid">Bezahlt {year}</StatusBadge>
+              ) : !billable ? (
+                <StatusBadge state="none">{member.contribution_type === "material" ? "Sachleistung" : "Ohne fixen Betrag"}</StatusBadge>
+              ) : member.active ? (
+                <StatusBadge state="open">Offen {year}</StatusBadge>
+              ) : null}
+              {!member.active ? <span className="ap-tag-muted">inaktiv</span> : null}
+            </div>
           </div>
+        </div>
+        <div className="ap-page-actions">
           <button
             type="button"
-            className="mgf-btn mgf-btn--primary"
+            className="ap-btn ap-btn--secondary"
             disabled={invoiceBusy || !lastPayment}
             onClick={() => void downloadInvoice()}
-            title={lastPayment ? `Rechnung über ${chfFmt(Number(lastPayment.amount_chf))}` : "Zuerst Zahlung erfassen"}
+            title={lastPayment ? `Rechnung über ${chf(Number(lastPayment.amount_chf))}` : "Zuerst Zahlung erfassen"}
           >
+            <IconFile />
             {invoiceBusy ? "Erstelle…" : "Rechnung (Word)"}
           </button>
         </div>
-        {lastPayment ? (
-          <p className="mgf-muted">
-            Beleg basiert auf der letzten Einzahlung vom {lastPayment.paid_on} (
-            {chfFmt(Number(lastPayment.amount_chf))}).
-          </p>
-        ) : (
-          <p className="mgf-muted">Für die Rechnung brauchst du mindestens eine erfasste Zahlung.</p>
-        )}
-      </div>
+      </header>
 
-      <div className="mgf-kpi-grid">
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">{year}</span>
-          <strong>{chfFmt(yearTotal)}</strong>
-        </div>
-        <div className="mgf-kpi">
-          <span className="mgf-kpi-label">Letztes Jahr ({lastYear})</span>
-          <strong>{chfFmt(lastYearTotal)}</strong>
-        </div>
-        <div className="mgf-kpi mgf-kpi--accent">
-          <span className="mgf-kpi-label">Total seit {GOENNER_FINANCE_START_YEAR}</span>
-          <strong>{chfFmt(total)}</strong>
-        </div>
-      </div>
+      <p className="ap-muted-sm ap-detail-note">
+        {lastPayment
+          ? `Rechnung basiert auf der letzten Einzahlung vom ${dateCh(lastPayment.paid_on)} (${chf(Number(lastPayment.amount_chf))}).`
+          : "Für die Rechnung brauchst du mindestens eine erfasste Zahlung."}
+      </p>
 
-      {error ? <p className="mgf-banner mgf-banner--error">{error}</p> : null}
+      <dl className="ap-facts">
+        <div>
+          <dt>{year}</dt>
+          <dd>{chfCompact(yearTotal)}</dd>
+        </div>
+        <div>
+          <dt>Vorjahr ({lastYear})</dt>
+          <dd>{chfCompact(lastYearTotal)}</dd>
+        </div>
+        <div>
+          <dt>Total seit {GOENNER_FINANCE_START_YEAR}</dt>
+          <dd>{chfCompact(total)}</dd>
+        </div>
+        <div>
+          <dt>Letzte Zahlung</dt>
+          <dd>{lastPayment ? dateCh(lastPayment.paid_on) : "—"}</dd>
+        </div>
+      </dl>
 
-      <div className="mgf-split">
-        <form className="mgf-panel mgf-form" onSubmit={saveMember}>
-          <h2 className="mgf-panel-title">Stammdaten</h2>
-          <div className="mgf-form-grid">
-            <label>
-              Name
-              <input
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                required
-              />
-            </label>
-            <label>
-              Stufe
-              <select
-                value={draft.membership_id}
-                onChange={(e) => setDraft({ ...draft, membership_id: e.target.value })}
-              >
-                {adminMembershipOptions.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Jahresbetrag (CHF)
-              <input
-                inputMode="decimal"
-                placeholder="Listenpreis der Stufe"
-                value={draft.annual_amount_chf ?? ""}
-                onChange={(e) =>
-                  setDraft({ ...draft, annual_amount_chf: e.target.value === "" ? null : Number(e.target.value.replace(",", ".")) })
-                }
-              />
-            </label>
-            <label>
-              E-Mail
-              <input
-                type="email"
-                value={draft.email || ""}
-                onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-              />
-            </label>
-            <label>
-              Telefon
-              <input
-                type="tel"
-                value={draft.phone || ""}
-                onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
-              />
-            </label>
-            <label className="mgf-span-2">
-              Strasse
-              <input
-                value={draft.street || ""}
-                onChange={(e) => setDraft({ ...draft, street: e.target.value })}
-              />
-            </label>
-            <label>
-              PLZ
-              <input
-                value={draft.postal_code || ""}
-                onChange={(e) => setDraft({ ...draft, postal_code: e.target.value })}
-              />
-            </label>
-            <label>
-              Ort
-              <input value={draft.city || ""} onChange={(e) => setDraft({ ...draft, city: e.target.value })} />
-            </label>
-            <label className="mgf-span-2">
-              Notizen
+      {error ? (
+        <p className="ap-banner ap-banner--error" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <section className="ap-card" aria-labelledby="history-heading">
+        <div className="ap-card-head">
+          <h2 id="history-heading" className="ap-h2">
+            Zahlungshistorie
+          </h2>
+          <span className="ap-card-sub">
+            {paidYears} von {timeline.length} Jahren bezahlt
+          </span>
+        </div>
+        <ol className="ap-timeline">
+          {timeline.map((t) => {
+            const state = t.count > 0 ? "paid" : t.year === year && member.active && billable ? "open" : "none";
+            return (
+              <li key={t.year} className={`ap-timeline-item is-${state}`}>
+                <span className="ap-timeline-year">{t.year}</span>
+                <span className="ap-timeline-dot" aria-hidden="true" />
+                <StatusBadge state={state}>
+                  {state === "paid" ? "Bezahlt" : state === "open" ? "Offen" : "Keine Zahlung"}
+                </StatusBadge>
+                <span className="ap-timeline-amount">{t.count > 0 ? chf(t.sum) : "—"}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <div className="ap-detail-grid">
+        <form className="ap-card ap-form" onSubmit={saveMember} aria-labelledby="master-heading">
+          <div className="ap-card-head">
+            <h2 id="master-heading" className="ap-h2">
+              Stammdaten
+            </h2>
+          </div>
+
+          <fieldset className="ap-fieldset">
+            <legend>Zuordnung</legend>
+            <div className="ap-form-grid">
+              <label className="ap-field">
+                <span className="ap-label">Kategorie</span>
+                <select
+                  className="ap-select"
+                  value={draft.category || "goenner"}
+                  onChange={(e) => set("category", e.target.value as MemberCategory)}
+                >
+                  {memberCategoryOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">Art der Leistung</span>
+                <select
+                  className="ap-select"
+                  value={draft.contribution_type || "geld"}
+                  onChange={(e) => set("contribution_type", e.target.value as ContributionType)}
+                >
+                  {contributionTypeOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ap-field ap-span-2">
+                <span className="ap-label">Organisation</span>
+                <input
+                  className="ap-input"
+                  value={draft.organization || ""}
+                  placeholder="Firma, Verband (optional)"
+                  onChange={(e) => set("organization", e.target.value)}
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="ap-fieldset">
+            <legend>Kontakt</legend>
+            <div className="ap-form-grid">
+              <label className="ap-field ap-span-2">
+                <span className="ap-label">Name / Kontaktperson</span>
+                <input className="ap-input" value={draft.name} onChange={(e) => set("name", e.target.value)} required />
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">E-Mail</span>
+                <input
+                  className="ap-input"
+                  type="email"
+                  value={draft.email || ""}
+                  onChange={(e) => set("email", e.target.value)}
+                />
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">Telefon</span>
+                <input
+                  className="ap-input"
+                  type="tel"
+                  value={draft.phone || ""}
+                  onChange={(e) => set("phone", e.target.value)}
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="ap-fieldset">
+            <legend>Adresse</legend>
+            <div className="ap-form-grid ap-form-grid--addr">
+              <label className="ap-field ap-span-all">
+                <span className="ap-label">Strasse</span>
+                <input className="ap-input" value={draft.street || ""} onChange={(e) => set("street", e.target.value)} />
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">PLZ</span>
+                <input
+                  className="ap-input"
+                  value={draft.postal_code || ""}
+                  onChange={(e) => set("postal_code", e.target.value)}
+                />
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">Ort</span>
+                <input className="ap-input" value={draft.city || ""} onChange={(e) => set("city", e.target.value)} />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="ap-fieldset">
+            <legend>Beitrag</legend>
+            <div className="ap-form-grid">
+              <label className="ap-field">
+                <span className="ap-label">Stufe</span>
+                <select
+                  className="ap-select"
+                  value={draft.membership_id}
+                  onChange={(e) => set("membership_id", e.target.value)}
+                >
+                  {adminMembershipOptions.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">Jahresbetrag (CHF)</span>
+                <input
+                  className="ap-input ap-input--num"
+                  inputMode="decimal"
+                  placeholder="leer = Listenpreis / kein Betrag"
+                  value={draft.annual_amount_chf ?? ""}
+                  onChange={(e) =>
+                    set(
+                      "annual_amount_chf",
+                      e.target.value === "" ? null : Number(e.target.value.replace(",", ".")),
+                    )
+                  }
+                />
+              </label>
+              <label className="ap-switch ap-span-2">
+                <input type="checkbox" checked={draft.active} onChange={(e) => set("active", e.target.checked)} />
+                <span>Aktiv — erscheint in Soll und offenen Beiträgen</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="ap-fieldset">
+            <legend>Notizen</legend>
+            <label className="ap-field">
+              <span className="sr-only">Notizen</span>
               <textarea
+                className="ap-input ap-textarea"
                 rows={3}
                 value={draft.notes || ""}
-                onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
+                onChange={(e) => set("notes", e.target.value)}
               />
             </label>
-            <label className="mgf-check mgf-span-2">
-              <input
-                type="checkbox"
-                checked={draft.active}
-                onChange={(e) => setDraft({ ...draft, active: e.target.checked })}
-              />
-              Aktiv
-            </label>
+          </fieldset>
+
+          <div className="ap-form-actions">
+            <button type="submit" className="ap-btn ap-btn--primary" disabled={busy}>
+              {busy ? "Speichern…" : "Stammdaten speichern"}
+            </button>
           </div>
-          <button type="submit" className="mgf-btn mgf-btn--primary" disabled={busy}>
-            {busy ? "…" : "Stammdaten speichern"}
-          </button>
         </form>
 
-        <form className="mgf-panel mgf-form" onSubmit={addPayment}>
-          <h2 className="mgf-panel-title">Zahlung erfassen</h2>
-          <div className="mgf-form-grid">
-            <label>
-              Betrag (CHF)
-              <input name="amount_chf" required inputMode="decimal" placeholder="100" />
+        <form className="ap-card ap-form ap-card--sticky" onSubmit={addPayment} aria-labelledby="pay-heading">
+          <div className="ap-card-head">
+            <h2 id="pay-heading" className="ap-h2">
+              Zahlung erfassen
+            </h2>
+          </div>
+          <div className="ap-form-grid">
+            <label className="ap-field">
+              <span className="ap-label">Betrag (CHF)</span>
+              <input
+                className="ap-input ap-input--num"
+                name="amount_chf"
+                required
+                inputMode="decimal"
+                placeholder={expected ? String(expected) : "Betrag"}
+              />
             </label>
-            <label>
-              Datum
-              <input name="paid_on" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
+            <label className="ap-field">
+              <span className="ap-label">Datum</span>
+              <input
+                className="ap-input"
+                name="paid_on"
+                type="date"
+                required
+                defaultValue={new Date().toISOString().slice(0, 10)}
+              />
             </label>
-            <label>
-              Methode
-              <select name="method" defaultValue="twint">
+            <label className="ap-field">
+              <span className="ap-label">Methode</span>
+              <select className="ap-select" name="method" defaultValue="twint">
                 {METHODS.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.label}
@@ -310,9 +483,9 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                 ))}
               </select>
             </label>
-            <label>
-              Stufe (Zahlung)
-              <select name="membership_id" defaultValue={member.membership_id}>
+            <label className="ap-field">
+              <span className="ap-label">Stufe (Zahlung)</span>
+              <select className="ap-select" name="membership_id" defaultValue={member.membership_id}>
                 {adminMembershipOptions.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.title}
@@ -320,70 +493,84 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                 ))}
               </select>
             </label>
-            <label className="mgf-span-2">
-              Notiz
-              <input name="note" maxLength={400} />
+            <label className="ap-field ap-span-2">
+              <span className="ap-label">Notiz</span>
+              <input className="ap-input" name="note" maxLength={400} />
             </label>
           </div>
-          <button type="submit" className="mgf-btn mgf-btn--primary" disabled={busy}>
-            {busy ? "…" : "Zahlung hinzufügen"}
-          </button>
+          <div className="ap-form-actions">
+            <button type="submit" className="ap-btn ap-btn--accent" disabled={busy}>
+              {busy ? "Speichern…" : "Zahlung hinzufügen"}
+            </button>
+          </div>
         </form>
       </div>
 
-      <section className="mgf-panel">
-        <h2 className="mgf-panel-title">Jahresübersicht</h2>
-        {byYear.length === 0 ? (
-          <p className="mgf-muted">Noch keine Zahlungen seit {GOENNER_FINANCE_START_YEAR}.</p>
-        ) : (
-          <ul className="mgf-year-list">
-            {byYear.map(([y, sum]) => (
-              <li key={y}>
-                <span>{y}</span>
-                <strong>{chfFmt(sum)}</strong>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mgf-panel">
-        <h2 className="mgf-panel-title">Zahlungen</h2>
-        <div className="mgf-table-wrap">
-          <table className="mgf-table">
+      <section className="ap-card ap-card--flush" aria-labelledby="payments-heading">
+        <div className="ap-card-head">
+          <h2 id="payments-heading" className="ap-h2">
+            Zahlungen
+          </h2>
+          <span className="ap-count">{payments.length}</span>
+        </div>
+        <div className="ap-table-wrap">
+          <table className="ap-table ap-table--payments">
             <thead>
               <tr>
-                <th>Datum</th>
-                <th>Betrag</th>
-                <th>Methode</th>
-                <th>Stufe</th>
-                <th>Notiz</th>
-                <th />
+                <th scope="col">Datum</th>
+                <th scope="col" className="ap-num">
+                  Betrag
+                </th>
+                <th scope="col">Methode</th>
+                <th scope="col">Stufe</th>
+                <th scope="col">Notiz</th>
+                <th scope="col" className="ap-col-actions">
+                  <span className="sr-only">Aktionen</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {payments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="mgf-empty-cell">
-                    Keine Zahlungen — historische Beträge ab {GOENNER_FINANCE_START_YEAR} hier erfassen.
+                <tr className="ap-empty-row">
+                  <td colSpan={6}>
+                    <div className="ap-empty">
+                      <p className="ap-empty-title">Noch keine Zahlungen</p>
+                      <p className="ap-muted-sm">
+                        Historische Beträge ab {GOENNER_FINANCE_START_YEAR} über «Zahlung erfassen» nachtragen.
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 payments.map((p) => (
                   <tr key={p.id}>
-                    <td>{p.paid_on}</td>
-                    <td className="mgf-num mgf-num--strong">{chfFmt(Number(p.amount_chf))}</td>
-                    <td>{p.method}</td>
-                    <td>{p.membership_id ? inquiryTierLabel(p.membership_id) : "—"}</td>
-                    <td>{p.note || "—"}</td>
-                    <td>
+                    <td className="ap-cell-name">
+                      <span className="ap-row-title ap-num">{dateCh(p.paid_on)}</span>
+                    </td>
+                    <td className="ap-num ap-num--strong" data-label="Betrag">
+                      {chf(Number(p.amount_chf))}
+                    </td>
+                    <td data-label="Methode">{methodLabel(p.method)}</td>
+                    <td data-label="Stufe">
+                      {p.membership_id ? (
+                        <TierTag id={p.membership_id}>{inquiryTierShort(p.membership_id)}</TierTag>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td data-label="Notiz" className="ap-cell-note">
+                      {p.note || "—"}
+                    </td>
+                    <td className="ap-col-actions">
                       <button
                         type="button"
-                        className="mgf-btn mgf-btn--danger mgf-btn--sm"
+                        className="ap-icon-btn ap-icon-btn--danger"
                         disabled={busy}
                         onClick={() => void deletePayment(p.id)}
+                        aria-label={`Zahlung vom ${dateCh(p.paid_on)} löschen`}
+                        title="Zahlung löschen"
                       >
-                        Löschen
+                        <IconTrash />
                       </button>
                     </td>
                   </tr>

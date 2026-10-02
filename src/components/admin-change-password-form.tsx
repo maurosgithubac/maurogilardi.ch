@@ -1,11 +1,13 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 const MIN_LEN = 8;
 
 export function AdminChangePasswordForm() {
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -52,7 +54,10 @@ export function AdminChangePasswordForm() {
         return;
       }
 
-      const { error: updateError } = await supabase.auth.updateUser({ password: nextPassword });
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: nextPassword,
+        data: { must_change_password: false },
+      });
       if (updateError) {
         setError(
           updateError.message.includes("same")
@@ -65,7 +70,9 @@ export function AdminChangePasswordForm() {
       setCurrentPassword("");
       setNextPassword("");
       setConfirmPassword("");
-      setSuccess("Passwort wurde geändert. Du bleibst angemeldet.");
+      setSuccess("Passwort wurde geändert. Du wirst zur Übersicht weitergeleitet …");
+      router.replace("/admin");
+      router.refresh();
     } catch {
       setError("Passwort konnte nicht geändert werden.");
     } finally {
@@ -74,10 +81,11 @@ export function AdminChangePasswordForm() {
   }
 
   return (
-    <form className="mgf-form mgf-password-form" onSubmit={(e) => void onSubmit(e)}>
-      <label>
-        Aktuelles Passwort
+    <form className="ap-form ap-password-form" onSubmit={(e) => void onSubmit(e)}>
+      <label className="ap-field">
+        <span className="ap-label">Aktuelles Passwort</span>
         <input
+          className="ap-input"
           type="password"
           autoComplete="current-password"
           value={currentPassword}
@@ -86,9 +94,10 @@ export function AdminChangePasswordForm() {
           required
         />
       </label>
-      <label>
-        Neues Passwort
+      <label className="ap-field">
+        <span className="ap-label">Neues Passwort</span>
         <input
+          className="ap-input"
           type="password"
           autoComplete="new-password"
           value={nextPassword}
@@ -96,11 +105,16 @@ export function AdminChangePasswordForm() {
           disabled={busy}
           minLength={MIN_LEN}
           required
+          aria-describedby="ap-pw-hint"
         />
+        <span id="ap-pw-hint" className="ap-hint">
+          Mindestens {MIN_LEN} Zeichen.
+        </span>
       </label>
-      <label>
-        Neues Passwort bestätigen
+      <label className="ap-field">
+        <span className="ap-label">Neues Passwort bestätigen</span>
         <input
+          className="ap-input"
           type="password"
           autoComplete="new-password"
           value={confirmPassword}
@@ -111,11 +125,19 @@ export function AdminChangePasswordForm() {
         />
       </label>
 
-      {error ? <p className="mgf-banner mgf-banner--warn">{error}</p> : null}
-      {success ? <p className="mgf-banner mgf-banner--ok">{success}</p> : null}
+      {error ? (
+        <p className="ap-banner ap-banner--error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {success ? (
+        <p className="ap-banner ap-banner--ok" role="status">
+          {success}
+        </p>
+      ) : null}
 
-      <div className="mgf-form-actions">
-        <button type="submit" className="mgf-btn mgf-btn--primary" disabled={busy}>
+      <div className="ap-form-actions">
+        <button type="submit" className="ap-btn ap-btn--primary" disabled={busy}>
           {busy ? "Speichern…" : "Passwort ändern"}
         </button>
       </div>

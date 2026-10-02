@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
-import { AdminTabNav } from "@/components/admin-tab-nav";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { isAdminSession } from "@/lib/admin-auth";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 
 export default async function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   if (!(await isAdminSession())) {
@@ -10,11 +8,8 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="admin-app site-page">
-      <SiteHeader variant="document" />
-      <AdminTabNav />
-      <div className="admin-body">{children}</div>
-      <SiteFooter showContactForm={false} />
+    <div className="admin-app">
+      <AdminShell>{children}</AdminShell>
     </div>
   );
 }

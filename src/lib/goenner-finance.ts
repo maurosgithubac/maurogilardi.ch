@@ -1,4 +1,4 @@
-import { membershipPriceChf } from "@/content/goennerMemberships";
+import { membershipPriceChf, type ContributionType, type MemberCategory } from "@/content/goennerMemberships";
 
 /** Finance ledger starts in calendar year 2022. */
 export const GOENNER_FINANCE_START_YEAR = 2022;
@@ -14,6 +14,12 @@ export type GoennerMemberRow = {
   membership_id: string;
   /** Vereinbarter Jahresbeitrag (CHF); null = Listenpreis der Stufe (Migration 016) */
   annual_amount_chf?: number | null;
+  /** Gönner (Default) / Sponsor / Partner — Migration 017 */
+  category?: MemberCategory | null;
+  /** Art der Leistung: Geld (Default), Prämien, Spesen, Material, Verband — Migration 017 */
+  contribution_type?: ContributionType | null;
+  /** Firma / Organisation */
+  organization?: string | null;
   notes: string | null;
   active: boolean;
   inquiry_id: string | null;
@@ -45,9 +51,15 @@ export type GoennerMemberWithTotals = GoennerMemberRow & {
 };
 
 /** Betrag, der beim "Als bezahlt markieren" für ein Jahr verbucht wird */
-export function expectedAnnualChf(member: Pick<GoennerMemberRow, "annual_amount_chf" | "membership_id">): number {
+export function expectedAnnualChf(
+  member: Pick<GoennerMemberRow, "annual_amount_chf" | "membership_id" | "contribution_type">,
+): number {
+  // Sachleistungen erzeugen kein Soll in CHF
+  if (member.contribution_type === "material") return 0;
   const own = member.annual_amount_chf;
   if (own != null && Number.isFinite(Number(own))) return Number(own);
+  // Individuelle Vereinbarungen ohne festen Betrag: kein Listenpreis unterstellen
+  if (["sponsoring", "unterstuetzung", "partner"].includes(member.membership_id)) return 0;
   return membershipPriceChf(member.membership_id);
 }
 
@@ -72,8 +84,11 @@ export function parseAmountOrNull(raw: unknown): number | null | "invalid" {
   return Math.round(n * 100) / 100;
 }
 
+/** "CHF 1’000.00" — eigene Formatierung, weil Node und Browser für de-CH unterschiedliche Apostrophe liefern (Hydration). */
 export function chfFmt(n: number) {
-  return new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(n);
+  const v = Math.round(Number(n || 0) * 100) / 100;
+  const [int, dec] = Math.abs(v).toFixed(2).split(".");
+  return `${v < 0 ? "-" : ""}CHF ${int.replace(/\B(?=(\d{3})+(?!\d))/g, "’")}.${dec}`;
 }
 
 export function sumPaymentsForYear(payments: Pick<GoennerPaymentRow, "amount_chf" | "year">[], year: number) {

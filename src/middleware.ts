@@ -24,7 +24,26 @@ export async function middleware(request: NextRequest) {
   });
 
   /* Refreshes the auth session cookie when needed */
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Neue Admin-Konten mit Startpasswort: erst eigenes Passwort setzen, dann weiter
+  if (user?.user_metadata?.must_change_password === true) {
+    const path = request.nextUrl.pathname;
+    const allowed = path === "/admin/settings" || path === "/admin/login" || path === "/api/admin/logout";
+    if (!allowed) {
+      if (path.startsWith("/api/")) {
+        return NextResponse.json({ error: "Bitte zuerst ein eigenes Passwort vergeben." }, { status: 403 });
+      }
+      const target = request.nextUrl.clone();
+      target.pathname = "/admin/settings";
+      target.search = "?pflicht=1";
+      const redirect = NextResponse.redirect(target);
+      response.cookies.getAll().forEach((c) => redirect.cookies.set(c));
+      return redirect;
+    }
+  }
 
   return response;
 }

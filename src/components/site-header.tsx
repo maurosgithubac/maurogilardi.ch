@@ -17,10 +17,12 @@ type NavItem = {
   label: string;
   match: (path: string) => boolean;
   sublinks?: NavSublink[];
+  /** Nur im Mobile-Menü — auf Desktop führt das Logo zur Startseite */
+  mobileOnly?: boolean;
 };
 
 const NAV: NavItem[] = [
-  { href: "/", label: "Home", match: (p) => p === "/" },
+  { href: "/", label: "Home", match: (p) => p === "/", mobileOnly: true },
   { href: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") },
   { href: "/erfolge", label: "Erfolge", match: (p) => p.startsWith("/erfolge") },
   { href: "/sponsoring", label: "Gönner", match: (p) => p.startsWith("/sponsoring") },
@@ -100,7 +102,7 @@ export function SiteHeader({ variant }: Props) {
 
           <nav className="mg-header__nav" aria-label="Hauptnavigation">
             <ul className="mg-header__list">
-              {NAV.map((item) => {
+              {NAV.filter((item) => !item.mobileOnly).map((item) => {
                 const active = item.match(pathname);
                 if (item.sublinks) {
                   return (
