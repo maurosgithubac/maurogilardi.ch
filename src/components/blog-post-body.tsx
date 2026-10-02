@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { parseBlogTextBlocks } from "@/lib/blog/parse-blog-blocks";
+import { blogHeadingId, parseBlogTextBlocks } from "@/lib/blog/parse-blog-blocks";
 
 type Segment =
   | { type: "text"; content: string }
@@ -54,7 +54,7 @@ function BlogTextContent({ content }: { content: string }) {
         if (block.type === "heading") {
           const Tag = block.level === 2 ? "h2" : "h3";
           return (
-            <Tag key={`h-${index}`} className="blog-post-subheading">
+            <Tag key={`h-${index}`} id={blogHeadingId(block.text)} className="blog-post-subheading">
               {block.text}
             </Tag>
           );

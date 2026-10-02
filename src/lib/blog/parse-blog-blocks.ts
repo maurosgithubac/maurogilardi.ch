@@ -1,3 +1,5 @@
+import { slugify } from "@/lib/slug";
+
 export type BlogTextBlock =
   | { type: "heading"; level: 2 | 3; text: string }
   | { type: "paragraph"; text: string };
@@ -49,4 +51,23 @@ export function parseBlogTextBlocks(text: string): BlogTextBlock[] {
     .split(/\n{2,}/)
     .map(parseBlock)
     .filter((block) => block.type === "paragraph" ? block.text.length > 0 : block.text.length > 0);
+}
+
+/** Anker-ID für Zwischentitel (Inhaltsverzeichnis) */
+export function blogHeadingId(text: string): string {
+  return `abschnitt-${slugify(text)}`;
+}
+
+/** Zwischentitel eines Beitrags für das Inhaltsverzeichnis (Bild-Platzhalter ignoriert) */
+export function extractBlogHeadings(body: string): { id: string; text: string }[] {
+  const text = body.replace(/\{\{IMAGE:[^}]+\}\}/g, "\n\n");
+  return parseBlogTextBlocks(text)
+    .filter((b): b is Extract<BlogTextBlock, { type: "heading" }> => b.type === "heading")
+    .map((b) => ({ id: blogHeadingId(b.text), text: b.text }));
+}
+
+/** Lesezeit in Minuten (ca. 200 Wörter pro Minute) */
+export function readingMinutes(body: string): number {
+  const words = body.replace(/\{\{IMAGE:[^}]+\}\}/g, " ").trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
 }

@@ -1282,25 +1282,249 @@ html:has(.mg-cookie) .mg-support-bar {
   filter: grayscale(1) contrast(1.06);
 }
 
-/* ——— Blog-Beitrag: eine einheitliche Lesespalte ———
-   Brotkrumen, Titel, Einleitung, Titelbild, Text, Inline-Bilder und Abschluss-Karte
-   teilen sich exakt dieselbe Breite und schliessen bündig ab. */
-.mg-article {
-  --mg-article-w: 52rem;
-}
-
+/* ——— Blog-Beitrag: volle Standardbreite (wie Header/Landingpage) ———
+   Kopf, Titelbild und Inhaltsbereich teilen die Container-Breite; der Text läuft in
+   angenehmer Lesebreite links, rechts eine mitlaufende Seitenleiste. */
 .mg-article .mg-article__head,
 .mg-article .mg-article__hero,
-.mg-article .mg-article__body,
 .mg-article .mg-article__end {
-  width: min(var(--mg-article-w), 100% - var(--mg-gutter) * 2);
+  width: min(var(--mg-max), 100% - var(--mg-gutter) * 2);
   margin-inline: auto;
 }
 
-.mg-article .mg-article__hero-frame {
-  border-radius: var(--mg-r-lg);
+.mg-article .mg-article__head {
+  max-width: none;
+}
+
+.mg-article__title {
+  max-width: 22ch;
+  font-size: var(--mg-step-5);
+  line-height: 0.98;
+}
+
+.mg-article__intro {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
 }
 
 .mg-article .mg-article__dek {
-  max-width: none;
+  max-width: 46rem;
+}
+
+.mg-article__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+}
+
+.mg-article .mg-article__hero-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--mg-r-xl);
+  overflow: hidden;
+  background: var(--mg-paper-2);
+}
+
+.mg-article__layout {
+  display: grid;
+  gap: 3rem;
+}
+
+.mg-article .mg-article__body {
+  width: auto;
+  max-width: 46rem;
+  margin-inline: 0;
+}
+
+.mg-article__aside {
+  display: none;
+}
+
+.mg-article__aside-sticky {
+  position: sticky;
+  top: calc(var(--mg-header-h) + 2.5rem);
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Inhaltsverzeichnis */
+.mg-toc {
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--mg-line);
+}
+
+.mg-toc__list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mg-toc__link {
+  position: relative;
+  display: block;
+  padding: 0.35rem 0;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+  line-height: 1.35;
+  text-decoration: none;
+  transition: color var(--mg-dur-fast) ease;
+}
+
+.mg-toc__link:hover,
+.mg-toc__link[data-active="true"] {
+  color: var(--mg-ink);
+}
+
+.mg-toc__marker {
+  position: absolute;
+  left: calc(-1rem - 1px);
+  top: 0.3rem;
+  bottom: 0.3rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--mg-red);
+}
+
+/* Autor-Karte */
+.mg-author {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.25rem 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-md);
+  background: var(--mg-surface);
+}
+
+.mg-author__mark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--mg-ink);
+  color: var(--mg-paper);
+}
+
+.mg-author__mark svg {
+  width: 1.6rem;
+  height: auto;
+}
+
+.mg-author__text {
+  display: grid;
+  line-height: 1.25;
+  font-size: var(--mg-step--1);
+}
+
+.mg-author__text span {
+  color: var(--mg-muted);
+  font-size: var(--mg-step--2);
+}
+
+.mg-author__link {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  color: var(--mg-ink);
+  font-size: var(--mg-step--1);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mg-author__link:hover .mg-btn__arrow,
+.mg-aside-funding:hover .mg-btn__arrow {
+  transform: translateX(4px);
+}
+
+/* Finanzierungs-Karte (hell) */
+.mg-aside-funding {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px solid var(--mg-line);
+  border-radius: var(--mg-r-md);
+  background: var(--mg-surface);
+  color: var(--mg-ink);
+  text-decoration: none;
+  transition: border-color var(--mg-dur) var(--mg-ease), box-shadow var(--mg-dur) var(--mg-ease);
+}
+
+.mg-aside-funding:hover {
+  border-color: var(--mg-line-strong);
+  box-shadow: var(--mg-shadow-card);
+}
+
+.mg-aside-funding__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mg-aside-funding__pct {
+  font-size: var(--mg-step-1);
+  font-weight: 700;
+}
+
+.mg-aside-funding__bar {
+  display: block;
+}
+
+.mg-aside-funding__text {
+  color: var(--mg-muted);
+  font-size: var(--mg-step--2);
+}
+
+.mg-aside-funding__cta {
+  display: inline-flex;
+  gap: 0.35rem;
+  font-size: var(--mg-step--1);
+  font-weight: 600;
+}
+
+.mg-article .mg-article__end {
+  padding-block: clamp(3rem, 6vw, 5rem) 0;
+}
+
+.mg-article__related {
+  padding-top: clamp(3rem, 6vw, 5rem);
+}
+
+@media (min-width: 1080px) {
+  .mg-article .mg-article__hero-frame {
+    aspect-ratio: 21 / 9;
+  }
+
+  .mg-article__layout {
+    grid-template-columns: minmax(0, 46rem) minmax(16rem, 19rem);
+    justify-content: space-between;
+    gap: 4rem;
+  }
+
+  .mg-article__aside {
+    display: block;
+  }
+}
+
+/* Seitenleisten-Balken: nicht die Grid-Fläche des Startseiten-Streifens erben */
+.mg-aside-funding .mg-aside-funding__bar {
+  grid-area: auto;
+}
+
+/* Erster Zwischentitel ohne Aussenabstand — Text beginnt auf Höhe der Seitenleiste */
+.mg-article__body .blog-post-body > :first-child {
+  margin-top: 0;
+}
+
+.mg-article__end-card .mg-h3 {
+  font-weight: 700;
 }
