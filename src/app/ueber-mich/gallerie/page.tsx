@@ -79,6 +79,8 @@ export default async function UeberMichGalleriePage() {
               </div>
             ) : (
               <GalleryGrid
+                dense
+                mono
                 items={files.map((file) => ({ src: aboutGalleryImageSrc(file), alt: aboutGalleryAltFromFilename(file) }))}
               />
             )}

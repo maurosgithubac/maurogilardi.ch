@@ -2,7 +2,6 @@
  * Karriere-Daten — eine Quelle für Erfolge-Seite, Startseite (Kennzahlen, Highlights) und Partner-Seite.
  * Neue Erfolge hier eintragen; alle Seiten aktualisieren sich automatisch.
  */
-import { goennervereinigungMemberNames } from "@/content/goennervereinigungMembers";
 
 export type CareerPhase = "Foundation" | "Development" | "Professional";
 
@@ -150,7 +149,6 @@ export const careerStats = {
   pgtWins: 2,
   pgtRankingCurrent: 4,
   pgtRankingYear: 2026,
-  supporters: goennervereinigungMemberNames.filter((n) => n.trim()).length,
   seasonBudgetChf: 75000,
 };
 

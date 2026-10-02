@@ -20,6 +20,9 @@ import { sponsoringMetadataSeo, sponsoringSchema } from "@/lib/seo/page-metadata
 
 export const metadata: Metadata = sponsoringMetadataSeo;
 
+/** Gönner-Zahl aus dem Admin-Portal stündlich aktualisieren */
+export const revalidate = 3600;
+
 const PROMISES = [
   { title: "Direkt", text: "Du schreibst mir persönlich — ohne Agentur, ohne Umwege." },
   { title: "Persönlich", text: "Details, Termine und Wünsche klären wir im Gespräch." },

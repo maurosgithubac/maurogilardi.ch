@@ -10,10 +10,10 @@ import { CountUp } from "@/components/motion/count-up";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 import { seasonCampaign } from "@/content/campaign";
-import { careerStats } from "@/content/career";
 import { goennerturnierPhotographers, goennerturnierPhotos } from "@/content/goennerturnier-photos";
 import { SITE_URL, seoImageAlts, seoImages, seoOgImages } from "@/lib/seo/constants";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
+import { getSupporterCount } from "@/lib/public-stats";
 
 const TITLE = `Saison ${seasonCampaign.year} möglich machen | Mauro Gilardi`;
 const DESCRIPTION =
@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   },
 };
 
+/** Kennzahlen aus dem Admin-Portal stündlich aktualisieren */
+export const revalidate = 3600;
+
 const COSTS = [
   { title: "Turniere & Startgelder", text: "Eine volle Saison auf der HotelPlanner Tour, quer durch Europa." },
   { title: "Reisen & Unterkunft", text: "Flüge, Auto, Hotels — oft mehrere Wochen am Stück unterwegs." },
@@ -38,7 +41,8 @@ const COSTS = [
 ];
 
 /** Kampagnenseite (Link in Instagram-Bio, Newsletter, Posts): eine Botschaft, ein Ziel. */
-export default function Saison2027Page() {
+export default async function Saison2027Page() {
+  const supporters = await getSupporterCount();
   const { year, goalChf, committedChf } = seasonCampaign;
   const pct = committedChf != null ? Math.min(100, Math.round((committedChf / goalChf) * 100)) : null;
 
@@ -122,7 +126,7 @@ export default function Saison2027Page() {
               </div>
               <Reveal delay={0.1}>
                 <p className="mg-lead">
-                  {careerStats.supporters} Gönnerinnen und Gönner sind schon dabei. Der 100er Club läuft direkt über TWINT,
+                  {supporters} Gönnerinnen und Gönner sind schon dabei. Der 100er Club läuft direkt über TWINT,
                   für die anderen Modelle meldest du dich an und erhältst eine Rechnung.
                 </p>
               </Reveal>

@@ -15,8 +15,12 @@ import { siteContent } from "@/content/siteContent";
 import { siteSponsorTiers, trimmedSponsorLogo } from "@/content/sponsorsSite";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { partnerMetadata, partnerSchema } from "@/lib/seo/page-metadata";
+import { getSupporterCount } from "@/lib/public-stats";
 
 export const metadata = partnerMetadata;
+
+/** Kennzahlen aus dem Admin-Portal stündlich aktualisieren */
+export const revalidate = 3600;
 
 const OFFER = [
   {
@@ -37,7 +41,8 @@ const OFFER = [
   },
 ];
 
-export default function PartnerPage() {
+export default async function PartnerPage() {
+  const supporters = await getSupporterCount();
   const partners = siteSponsorTiers.flatMap((t) => t.sponsors);
 
   return (
@@ -80,7 +85,7 @@ export default function PartnerPage() {
             </StaggerItem>
             <StaggerItem as="li" className="mg-stat">
               <span className="mg-stat__value">
-                <CountUp to={careerStats.supporters} />
+                <CountUp to={supporters} />
               </span>
               <span className="mg-stat__label">Gönnerinnen &amp; Gönner im Team</span>
             </StaggerItem>

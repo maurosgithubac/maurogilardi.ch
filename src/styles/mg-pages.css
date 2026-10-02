@@ -1275,3 +1275,9 @@ html:has(.mg-cookie) .mg-support-bar {
     padding-bottom: 2.25rem;
   }
 }
+
+/* Schwarzweiss für farbige Galerie-Originale (Über mich) — ruhiger, im Markenlook */
+.mg-gallery--mono .mg-gallery__img,
+.mg-lightbox--mono .mg-lightbox__img {
+  filter: grayscale(1) contrast(1.06);
+}

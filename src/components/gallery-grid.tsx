@@ -13,7 +13,17 @@ type Item = { src: string; alt: string };
  * Galerie mit Lightbox: das angeklickte Bild "fliegt" per shared layout ins Vollbild.
  * Pfeiltasten blättern, Escape schliesst, Fokus bleibt im Dialog.
  */
-export function GalleryGrid({ items, dense = false }: { items: Item[]; /** kleine, gleich grosse Kacheln */ dense?: boolean }) {
+export function GalleryGrid({
+  items,
+  dense = false,
+  mono = false,
+}: {
+  items: Item[];
+  /** kleine, gleich grosse Kacheln */
+  dense?: boolean;
+  /** Schwarzweiss (für farbige Originale) */
+  mono?: boolean;
+}) {
   const [active, setActive] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setActive(null), []);
@@ -44,7 +54,7 @@ export function GalleryGrid({ items, dense = false }: { items: Item[]; /** klein
 
   return (
     <>
-      <ul className={dense ? "mg-gallery mg-gallery--dense" : "mg-gallery"}>
+      <ul className={["mg-gallery", dense ? "mg-gallery--dense" : "", mono ? "mg-gallery--mono" : ""].filter(Boolean).join(" ")}>
         {items.map((item, i) => (
           <li key={item.src} className="mg-gallery__item">
             <button
@@ -76,7 +86,7 @@ export function GalleryGrid({ items, dense = false }: { items: Item[]; /** klein
             <motion.div
               key="lightbox"
               ref={dialogRef}
-              className="mg-lightbox"
+              className={mono ? "mg-lightbox mg-lightbox--mono" : "mg-lightbox"}
               role="dialog"
               aria-modal="true"
               aria-label={`Bild ${active + 1} von ${items.length}`}

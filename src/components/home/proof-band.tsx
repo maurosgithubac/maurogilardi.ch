@@ -5,9 +5,12 @@ import { Marquee } from "@/components/motion/marquee";
 import { Stagger, StaggerItem } from "@/components/motion/reveal";
 import { careerStats } from "@/content/career";
 import { homeMarqueeSponsorCards } from "@/content/sponsorsSite";
+import { getSupporterCount } from "@/lib/public-stats";
 
-export function ProofBand() {
+export async function ProofBand() {
   const sponsors = homeMarqueeSponsorCards();
+  // Anzahl live aus dem Admin-Portal (aktive Gönner)
+  const supporters = await getSupporterCount();
 
   return (
     <section className="mg-proof" aria-label="Kennzahlen und Sponsoren">
@@ -26,7 +29,7 @@ export function ProofBand() {
         </StaggerItem>
         <StaggerItem as="li" className="mg-stat">
           <span className="mg-stat__value">
-            <CountUp to={careerStats.supporters} />
+            <CountUp to={supporters} />
           </span>
           <span className="mg-stat__label">Gönnerinnen &amp; Gönner im Team</span>
         </StaggerItem>
