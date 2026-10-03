@@ -1295,9 +1295,9 @@ html:has(.mg-cookie) .mg-support-bar {
   font-size: var(--mg-step--1);
 }
 
-/* Eine Spalte in Lesebreite, zentriert */
+/* Eine Spalte in Standardbreite — bündig mit Hero-Titel, Gönner-Box und Beiträgen */
 .mg-article__column {
-  width: min(44rem, 100% - var(--mg-gutter) * 2);
+  width: min(var(--mg-max), 100% - var(--mg-gutter) * 2);
   margin-inline: auto;
   padding-top: clamp(3rem, 7vw, 5.5rem);
 }
@@ -1308,10 +1308,15 @@ html:has(.mg-cookie) .mg-support-bar {
   margin-inline: 0;
 }
 
-/* Bilder im Text dürfen auf grossen Screens etwas breiter laufen */
+/* Volle Breite: Text auf grossen Screens etwas grösser, damit die Zeilen ruhig lesbar bleiben */
 @media (min-width: 1080px) {
-  .mg-article__body .blog-post-inline-figure {
-    margin-inline: -5rem;
+  .mg-article__body .blog-post-paragraph {
+    font-size: 1.28rem;
+    line-height: 1.8;
+  }
+
+  .mg-article__body .blog-post-inline-figure-aspect {
+    aspect-ratio: 21 / 9;
   }
 }
 
