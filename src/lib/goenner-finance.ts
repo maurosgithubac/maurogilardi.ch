@@ -20,6 +20,8 @@ export type GoennerMemberRow = {
   contribution_type?: ContributionType | null;
   /** Firma / Organisation */
   organization?: string | null;
+  /** Eintrittsdatum (YYYY-MM-DD) — Migration 018 */
+  member_since?: string | null;
   notes: string | null;
   active: boolean;
   inquiry_id: string | null;
@@ -120,4 +122,19 @@ export function withMemberTotals(
     payment_count: mine.length,
     last_paid_on: lastPaid,
   };
+}
+
+/** Datum aus Formular/API: "" → null, YYYY-MM-DD → String, sonst "invalid" */
+export function parseDateOrNull(raw: unknown): string | null | "invalid" {
+  const t = String(raw ?? "").trim();
+  if (!t) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t) || Number.isNaN(Date.parse(t))) return "invalid";
+  return t;
+}
+
+/** "2023-05-10" → "10.05.2023" */
+export function formatDateCh(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return `${d}.${m}.${y}`;
 }

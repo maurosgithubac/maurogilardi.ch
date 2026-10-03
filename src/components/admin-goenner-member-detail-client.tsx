@@ -16,6 +16,7 @@ import {
 import {
   GOENNER_FINANCE_START_YEAR,
   expectedAnnualChf,
+  formatDateCh,
   sumPaymentsForYear,
   sumPaymentsTotal,
   type GoennerMemberRow,
@@ -212,6 +213,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                 <StatusBadge state="open">Offen {year}</StatusBadge>
               ) : null}
               {!member.active ? <span className="ap-tag-muted">inaktiv</span> : null}
+              {member.member_since ? <span className="ap-tag-muted">Mitglied seit {formatDateCh(member.member_since)}</span> : null}
             </div>
           </div>
         </div>
@@ -417,6 +419,15 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                       e.target.value === "" ? null : Number(e.target.value.replace(",", ".")),
                     )
                   }
+                />
+              </label>
+              <label className="ap-field">
+                <span className="ap-label">Mitglied seit</span>
+                <input
+                  className="ap-input"
+                  type="date"
+                  value={draft.member_since ?? ""}
+                  onChange={(e) => set("member_since", e.target.value || null)}
                 />
               </label>
               <label className="ap-switch ap-span-2">

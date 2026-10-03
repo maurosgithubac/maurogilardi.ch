@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
-import { parseAmountOrNull } from "@/lib/goenner-finance";
+import { parseAmountOrNull, parseDateOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 function validId(id: string) {
@@ -70,6 +70,11 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     patch.contribution_type = body.contribution_type;
   }
   if ("organization" in body) patch.organization = String(body.organization || "").trim() || null;
+  if ("member_since" in body) {
+    const since = parseDateOrNull(body.member_since);
+    if (since === "invalid") return NextResponse.json({ error: "Ungültiges Eintrittsdatum." }, { status: 400 });
+    patch.member_since = since;
+  }
   if ("annual_amount_chf" in body) {
     const annual = parseAmountOrNull(body.annual_amount_chf);
     if (annual === "invalid") return NextResponse.json({ error: "Ungültiger Jahresbetrag." }, { status: 400 });

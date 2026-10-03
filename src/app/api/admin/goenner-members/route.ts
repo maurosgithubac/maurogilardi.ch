@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
-import { parseAmountOrNull } from "@/lib/goenner-finance";
+import { parseAmountOrNull, parseDateOrNull } from "@/lib/goenner-finance";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 export async function GET() {
@@ -72,6 +72,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ungültige Art der Leistung." }, { status: 400 });
   }
   const organization = String(body.organization || "").trim() || null;
+  const memberSince = parseDateOrNull(body.member_since);
+  if (memberSince === "invalid") {
+    return NextResponse.json({ error: "Ungültiges Eintrittsdatum." }, { status: 400 });
+  }
 
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase
@@ -81,6 +85,7 @@ export async function POST(request: Request) {
       ...(isMemberCategory(body.category) ? { category: body.category } : {}),
       ...(isContributionType(body.contribution_type) ? { contribution_type: body.contribution_type } : {}),
       ...(organization ? { organization } : {}),
+      ...(memberSince ? { member_since: memberSince } : {}),
       name,
       email: String(body.email || "").trim().toLowerCase() || null,
       phone: String(body.phone || "").trim() || null,

@@ -249,6 +249,7 @@ export function AdminGoennerMembersClient({
           category: fd.get("category"),
           contribution_type: fd.get("contribution_type"),
           organization: fd.get("organization"),
+          member_since: fd.get("member_since"),
           notes: fd.get("notes"),
         }),
       });
@@ -403,6 +404,10 @@ export function AdminGoennerMembersClient({
             <label className="ap-field">
               <span className="ap-label">Jahresbetrag (CHF)</span>
               <input className="ap-input ap-input--num" name="annual_amount_chf" inputMode="decimal" placeholder="leer = Listenpreis / kein Betrag" />
+            </label>
+            <label className="ap-field">
+              <span className="ap-label">Mitglied seit</span>
+              <input className="ap-input" name="member_since" type="date" />
             </label>
             <label className="ap-field">
               <span className="ap-label">Notiz</span>
@@ -562,6 +567,7 @@ export function AdminGoennerMembersClient({
                     ) : null}
                     {!m.active ? <span className="ap-tag-muted">inaktiv</span> : null}
                     {m.organization ? <span className="ap-row-org">{m.organization}</span> : null}
+                    {m.member_since ? <span className="ap-row-org">seit {m.member_since.slice(0, 4)}</span> : null}
                     <span className="ap-row-sub">
                       {m.email ? <a href={`mailto:${m.email}`}>{m.email}</a> : null}
                       {m.email && m.phone ? <span aria-hidden="true"> · </span> : null}
