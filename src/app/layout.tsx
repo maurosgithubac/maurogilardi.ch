@@ -13,6 +13,7 @@ import "@/styles/mg-tokens.css";
 import "@/styles/mg-chrome.css";
 import "@/styles/mg-home.css";
 import "@/styles/mg-pages.css";
+import "@/styles/mg-video.css";
 
 /**
  * Markenschrift Gilardi Golf: Playfair Display für Titel UND Fliesstext

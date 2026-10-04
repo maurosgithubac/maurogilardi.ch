@@ -18,6 +18,8 @@ import { SAISON_2027_DESCRIPTION, saison2027Metadata } from "@/lib/seo/page-meta
 import { saison2027Graph } from "@/lib/seo/webpage-jsonld";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import { getSupporterCount } from "@/lib/public-stats";
+import { VerticalVideo } from "@/components/video/vertical-video";
+import { aufstiegVideo, isCampaignVideoFeatured } from "@/content/campaign-video";
 
 const DESCRIPTION = SAISON_2027_DESCRIPTION;
 
@@ -59,6 +61,38 @@ export default async function Saison2027Page() {
             </>
           }
         />
+
+        {isCampaignVideoFeatured() ? (
+          <section className="mg-section mg-section--tight" aria-labelledby="campaign-video-title">
+            <div className="mg-container mg-campaign-video">
+              <Reveal className="mg-campaign-video__player">
+                <VerticalVideo video={aufstiegVideo} trackLabel="campaign_2027" />
+              </Reveal>
+              <div>
+                <Reveal>
+                  <p className="mg-eyebrow">In 90 Sekunden</p>
+                </Reveal>
+                <Reveal delay={0.05}>
+                  <h2 id="campaign-video-title" className="mg-h2">
+                    Wo ich stehe — und was jetzt kommt.
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.1}>
+                  <p className="mg-lead">
+                    Der Aufstieg ist geschafft, die HotelPlanner Tour ist die zweithöchste Liga in Europa und der direkte
+                    Weg zur DP World Tour. Im Video erzähle ich, was das für mich bedeutet, was eine Saison kostet und wie
+                    du Teil meines Teams wirst.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.15} className="mg-campaign-video__cta">
+                  <a href="#modelle" className="mg-btn mg-btn--primary mg-btn--lg" data-track="campaign_cta" data-track-label="video">
+                    Gönner werden <span className="mg-btn__arrow" aria-hidden="true">↓</span>
+                  </a>
+                </Reveal>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         <FundingStrip href="#modelle" />
 

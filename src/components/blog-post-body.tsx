@@ -1,12 +1,15 @@
 import Image from "next/image";
 import { blogHeadingId, parseBlogTextBlocks } from "@/lib/blog/parse-blog-blocks";
+import { VerticalVideo } from "@/components/video/vertical-video";
+import { videosById } from "@/content/campaign-video";
 
 type Segment =
   | { type: "text"; content: string }
-  | { type: "image"; src: string; alt: string };
+  | { type: "image"; src: string; alt: string }
+  | { type: "video"; id: string; caption: string };
 
-/** Inline-Bilder im Fliesstext: {{IMAGE:/pfad|Alt-Text}} */
-const IMAGE_MARKER = /\{\{IMAGE:([^|]+)\|([^}]+)\}\}/g;
+/** Inline-Medien im Fliesstext: {{IMAGE:/pfad|Alt-Text}} und {{VIDEO:id|Bildunterschrift}} */
+const MEDIA_MARKER = /\{\{(IMAGE|VIDEO):([^|}]+)\|([^}]*)\}\}/g;
 
 const INLINE_BOLD = /\*\*([^*]+)\*\*/g;
 
@@ -15,11 +18,15 @@ export function parseBlogBody(body: string): Segment[] {
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = IMAGE_MARKER.exec(body)) !== null) {
+  while ((match = MEDIA_MARKER.exec(body)) !== null) {
     if (match.index > lastIndex) {
       segments.push({ type: "text", content: body.slice(lastIndex, match.index) });
     }
-    segments.push({ type: "image", src: match[1].trim(), alt: match[2].trim() });
+    if (match[1] === "VIDEO") {
+      segments.push({ type: "video", id: match[2].trim(), caption: match[3].trim() });
+    } else {
+      segments.push({ type: "image", src: match[2].trim(), alt: match[3].trim() });
+    }
     lastIndex = match.index + match[0].length;
   }
 
@@ -78,6 +85,16 @@ export function BlogPostBody({ body }: { body: string }) {
       {segments.map((seg, i) => {
         if (seg.type === "text") {
           return <BlogTextContent key={`t-${i}`} content={seg.content} />;
+        }
+        if (seg.type === "video") {
+          const video = videosById[seg.id];
+          if (!video) return null;
+          return (
+            <figure key={`v-${i}`} className="blog-post-inline-video">
+              <VerticalVideo video={video} trackLabel={`blog_${seg.id}`} />
+              {seg.caption ? <figcaption>{seg.caption}</figcaption> : null}
+            </figure>
+          );
         }
         return (
           <figure key={`i-${i}`} className="blog-post-inline-figure">

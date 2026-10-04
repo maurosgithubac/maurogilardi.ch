@@ -126,7 +126,7 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.description,
     created_at: post.created_at,
     image: img,
-    wordCount: post.body.replace(/\{\{IMAGE:[^}]*\}\}/g, " ").split(/\s+/).filter(Boolean).length,
+    wordCount: post.body.replace(/\{\{(?:IMAGE|VIDEO):[^}]*\}\}/g, " ").split(/\s+/).filter(Boolean).length,
   });
 
   return (

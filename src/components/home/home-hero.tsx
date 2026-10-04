@@ -7,6 +7,8 @@ import { Magnetic } from "@/components/motion/magnetic";
 import { siteContent } from "@/content/siteContent";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { FundingHeroCard } from "@/components/funding-strip";
+import { VideoModalButton } from "@/components/video/video-modal-button";
+import { aufstiegVideo, isCampaignVideoFeatured } from "@/content/campaign-video";
 
 export async function HomeHero() {
   return (
@@ -55,6 +57,20 @@ export async function HomeHero() {
             </a>
           </Reveal>
         </div>
+
+        {isCampaignVideoFeatured() ? (
+          <Reveal y={16} delay={0.6} className="mg-hero__video">
+            <VideoModalButton video={aufstiegVideo} trackLabel="home_hero" className="mg-hero-video-btn">
+              <span className="mg-hero-video-btn__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                </svg>
+              </span>
+              <span>Video: Meine Saison 2027</span>
+              <span className="mg-hero-video-btn__time">{aufstiegVideo.durationLabel}</span>
+            </VideoModalButton>
+          </Reveal>
+        ) : null}
 
         {/* Saisonfinanzierung direkt im Landing Screen */}
         <Reveal y={16} delay={0.65} className="mg-hero__funding">

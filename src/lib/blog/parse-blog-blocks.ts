@@ -12,7 +12,7 @@ const SIGN_OFF = /^(Euer|Bis bald|Danke|Liebe Grüsse|Herzliche Grüsse)\b/i;
 export function isLikelySectionHeading(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed || trimmed.includes("\n")) return false;
-  if (trimmed.startsWith("{{IMAGE:")) return false;
+  if (trimmed.startsWith("{{IMAGE:") || trimmed.startsWith("{{VIDEO:")) return false;
   // Komplett fett gesetzte Zeile = betonter Absatz (z. B. Schlusszeile), keine Überschrift
   if (trimmed.startsWith("**")) return false;
   if (trimmed.length < 2 || trimmed.length > 72) return false;
@@ -60,6 +60,6 @@ export function blogHeadingId(text: string): string {
 
 /** Lesezeit in Minuten (ca. 200 Wörter pro Minute) */
 export function readingMinutes(body: string): number {
-  const words = body.replace(/\{\{IMAGE:[^}]+\}\}/g, " ").trim().split(/\s+/).length;
+  const words = body.replace(/\{\{(?:IMAGE|VIDEO):[^}]+\}\}/g, " ").trim().split(/\s+/).length;
   return Math.max(1, Math.round(words / 200));
 }

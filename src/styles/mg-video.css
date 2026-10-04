@@ -1,0 +1,217 @@
+/*
+ * Hochformat-Video (Kampagne / Blog): Vorschaubild mit Play-Button,
+ * MP4 lädt erst beim Klick. Dazu Hero-Auslöser und Video-Popup.
+ */
+
+.mg-vvideo {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--mg-r-lg);
+  background: #0b0b0b;
+  box-shadow: var(--mg-shadow-float);
+}
+
+.mg-vvideo__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0b0b0b;
+}
+
+video.mg-vvideo__media {
+  object-fit: contain;
+}
+
+.mg-vvideo__poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.mg-vvideo__poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgb(11 11 11 / 55%));
+  pointer-events: none;
+}
+
+.mg-vvideo__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--mg-red);
+  color: #fff;
+  box-shadow: 0 10px 30px rgb(215 25 32 / 40%);
+  transform: translate(-50%, -50%);
+  transition: transform var(--mg-dur) var(--mg-ease), background var(--mg-dur-fast) ease;
+}
+
+.mg-vvideo__play svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-left: 0.2rem;
+}
+
+.mg-vvideo__poster:hover .mg-vvideo__play {
+  background: var(--mg-red-hover);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.mg-vvideo__poster:active .mg-vvideo__play {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.mg-vvideo__poster:focus-visible {
+  outline: 3px solid var(--mg-red);
+  outline-offset: -3px;
+}
+
+.mg-vvideo__duration {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 1;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--mg-r-full);
+  background: rgb(11 11 11 / 70%);
+  color: #fff;
+  font-size: var(--mg-step--2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Hero-Auslöser (Startseite) ——— */
+.mg-hero-video-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 1rem 0.35rem 0.35rem;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: var(--mg-r-full);
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background var(--mg-dur-fast) ease, border-color var(--mg-dur-fast) ease, transform var(--mg-dur) var(--mg-ease);
+}
+
+.mg-hero-video-btn:hover {
+  background: rgb(255 255 255 / 18%);
+  border-color: rgb(255 255 255 / 40%);
+}
+
+.mg-hero-video-btn:active {
+  transform: scale(0.97);
+}
+
+.mg-hero-video-btn__icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--mg-red);
+}
+
+.mg-hero-video-btn__icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  margin-left: 0.1rem;
+}
+
+.mg-hero-video-btn__time {
+  opacity: 0.7;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.mg-hero__video {
+  margin-top: 1.5rem;
+}
+
+/* ——— Video-Popup ——— */
+.mg-video-modal {
+  place-items: center;
+}
+
+.mg-video-modal__dialog {
+  position: relative;
+  width: min(26rem, 100%, calc((100dvh - 3rem) * 9 / 16));
+}
+
+.mg-video-modal__dialog:focus {
+  outline: none;
+}
+
+.mg-video-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  border-color: rgb(255 255 255 / 30%);
+  background: rgb(11 11 11 / 55%);
+  color: #fff;
+}
+
+/* ——— Kampagnenseite /2027 ——— */
+.mg-campaign-video {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+.mg-campaign-video__player {
+  width: min(22rem, 100%);
+  margin-inline: auto;
+}
+
+.mg-campaign-video .mg-h2 {
+  margin-block: 0.75rem 1rem;
+}
+
+.mg-campaign-video__cta {
+  margin-top: 1.75rem;
+}
+
+@media (min-width: 900px) {
+  .mg-campaign-video {
+    grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+    gap: clamp(3rem, 6vw, 6rem);
+  }
+
+  .mg-campaign-video__player {
+    margin-inline: 0;
+  }
+}
+
+/* ——— Blogpost ——— */
+.blog-post-inline-video {
+  width: min(22rem, 100%);
+  margin: 2.5rem auto;
+}
+
+.blog-post-inline-video figcaption {
+  margin-top: 0.75rem;
+  color: var(--mg-muted);
+  font-size: var(--mg-step--1);
+  text-align: center;
+}

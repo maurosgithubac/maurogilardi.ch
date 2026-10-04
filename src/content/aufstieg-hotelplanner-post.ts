@@ -23,6 +23,8 @@ Da ich im zweiten Flight gestartet bin, heisst es nun abwarten und hoffen, dass 
 
 Ultra happy und überwältigt von dem stressigen Nachmittag darf ich endlich offiziell sagen: Ich habe den Aufstieg in die HotelPlanner Tour geschafft. Let's go!
 
+{{VIDEO:aufstieg-geschafft|Wo ich stehe und was die HotelPlanner Tour für mich bedeutet — in 90 Sekunden.}}
+
 Ein riesiger Stein fällt mir vom Herzen. Ich bin unglaublich stolz auf meine Saison und kann es kaum erwarten, auf der HotelPlanner Tour aufzuteen. Die ganzen Entscheidungen, die ich über das Jahr getroffen habe, wie das Auslassen der Swiss Challenge und des Omega European Masters, werden nun belohnt. Ebenfalls bin ich extrem stolz, dass ich in der Schweiz meinem Weg treu geblieben bin, mit der Armee als Unterstützung. In dieser Zeit konnte ich ein unglaublich cooles Team aus Coaches, Sponsoren und Gönnern aufbauen, das mich auf meinem Weg begleitet und mir den Weg ebnet, meine Karriere als Sportler und als Persönlichkeit voranzutreiben.
 
 Ein ganz besonderer Dank geht an meine Familie, die mir immer die Freiheit gegeben hat, meinen eigenen Weg zu gehen, und mich unterstützt, egal was ich mache. Und an Selina, die an meiner Seite steht und mich jeden Tag inspiriert, im Golf auf das Niveau zu kommen, auf dem sie im Curling bereits ist.
