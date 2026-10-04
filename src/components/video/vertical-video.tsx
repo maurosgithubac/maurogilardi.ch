@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { trackEvent } from "@/components/analytics-events";
-import type { CampaignVideo } from "@/content/campaign-video";
+import { youtubeEmbedUrl, type CampaignVideo } from "@/content/campaign-video";
 
 type Props = {
   video: CampaignVideo;
@@ -16,8 +16,8 @@ type Props = {
 };
 
 /**
- * Hochformat-Video, das bis zum Klick nur das optimierte Vorschaubild lädt.
- * Die MP4 wird erst beim Abspielen angefordert — die Seite bleibt schnell.
+ * Hochformat-Video (YouTube Short), das bis zum Klick nur das eigene Vorschaubild lädt.
+ * Der YouTube-Player (und dessen Cookies/Skripte) wird erst beim Abspielen eingebunden.
  */
 export function VerticalVideo({ video, autoPlay = false, trackLabel, sizes = "(max-width: 640px) 90vw, 22rem", className }: Props) {
   const [playing, setPlaying] = useState(autoPlay);
@@ -30,17 +30,13 @@ export function VerticalVideo({ video, autoPlay = false, trackLabel, sizes = "(m
   return (
     <div className={`mg-vvideo${className ? ` ${className}` : ""}`} style={{ aspectRatio: `${video.width} / ${video.height}` }}>
       {playing ? (
-        <video
+        <iframe
           className="mg-vvideo__media"
-          src={video.src}
-          poster={video.poster}
-          width={video.width}
-          height={video.height}
-          controls
-          autoPlay
-          playsInline
-          preload="auto"
-          aria-label={video.title}
+          src={youtubeEmbedUrl(video)}
+          title={video.title}
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
         />
       ) : (
         <button type="button" className="mg-vvideo__poster" onClick={start} aria-label={`Video abspielen: ${video.title}`}>

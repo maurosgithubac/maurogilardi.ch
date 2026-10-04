@@ -1,5 +1,6 @@
 export type CampaignVideo = {
-  src: string;
+  /** YouTube-Video-ID (auch für Shorts) */
+  youtubeId: string;
   poster: string;
   width: number;
   height: number;
@@ -9,7 +10,7 @@ export type CampaignVideo = {
 };
 
 export const aufstiegVideo: CampaignVideo = {
-  src: "/brand-assets/video/aufstieg-geschafft.mp4",
+  youtubeId: "37bZjWo31l4",
   poster: "/brand-assets/video/aufstieg-geschafft-poster.jpg",
   width: 720,
   height: 1280,
@@ -27,4 +28,9 @@ const FEATURED_UNTIL = new Date("2026-12-04T23:00:00.000Z");
 
 export function isCampaignVideoFeatured(now: Date = new Date()): boolean {
   return now < FEATURED_UNTIL;
+}
+
+export function youtubeEmbedUrl(video: CampaignVideo): string {
+  const params = new URLSearchParams({ autoplay: "1", playsinline: "1", rel: "0", modestbranding: "1" });
+  return `https://www.youtube-nocookie.com/embed/${video.youtubeId}?${params.toString()}`;
 }

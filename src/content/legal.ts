@@ -115,6 +115,19 @@ export const datenschutzSections: LegalSection[] = [
     ],
   },
   {
+    id: "youtube",
+    title: "Eingebettete Videos (YouTube)",
+    paragraphs: [
+      "Einzelne Videos sind über YouTube eingebunden. Solange du nicht auf «Abspielen» klickst, wird nur ein Vorschaubild von dieser Website geladen — es werden keine Daten an YouTube übertragen.",
+      "Erst mit dem Klick wird der Player im erweiterten Datenschutzmodus (youtube-nocookie.com) geladen. Dabei werden technische Daten wie deine IP-Adresse an Google übermittelt, und YouTube kann Cookies bzw. lokale Speicherung nutzen.",
+    ],
+    bullets: [
+      "Anbieter: Google Ireland Limited (YouTube)",
+      "Zweck: Wiedergabe von Videos",
+      "Rechtsgrundlage: deine Einwilligung durch den Klick auf «Abspielen»",
+    ],
+  },
+  {
     id: "cookies",
     title: "Cookies & lokale Speicherung",
     paragraphs: [
