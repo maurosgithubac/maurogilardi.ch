@@ -61,6 +61,7 @@ export function GoennerInquiryForm() {
           street: value("street"),
           postal_code: value("postal_code"),
           city: value("city"),
+          payment_method: payment,
           message: [`Zahlungswunsch: ${payment === "twint" ? "TWINT" : "Rechnung"}`, value("message")].filter(Boolean).join("\n\n"),
         }),
       });

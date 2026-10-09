@@ -3,6 +3,7 @@ import { GOENNER_SPONSORING_MIN_CHF, membershipPriceChf } from "@/content/goenne
 import { isAdminSession } from "@/lib/admin-auth";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryStatus } from "@/types/content";
+import { sendPaidMail, type GoennerMailRow } from "@/lib/goenner-mails";
 
 const STATUSES: GoennerInquiryStatus[] = ["open", "completed", "exited"];
 
@@ -184,6 +185,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     patch.phone = phone || null;
   }
 
+  if (body.payment_method !== undefined) {
+    if (body.payment_method !== "rechnung" && body.payment_method !== "twint") {
+      return NextResponse.json({ error: "Zahlungsart muss «rechnung» oder «twint» sein." }, { status: 400 });
+    }
+    if (existing.membership_id === "sponsoring") {
+      return NextResponse.json({ error: "Sponsoring hat keine Standard-Zahlungsart." }, { status: 400 });
+    }
+    patch.payment_method = body.payment_method;
+  }
+
   if (body.admin_note !== undefined) {
     const note = body.admin_note === null ? null : String(body.admin_note).trim();
     patch.admin_note = note || null;
@@ -295,6 +306,22 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     if (nextStatus === "completed" || (willComplete && patch.amount_chf !== undefined && existing.status === "completed")) {
       const amount = Number(data.amount_chf) || membershipPriceChf(data.membership_id);
       await ensureMemberAndPayment(supabase, data, amount, data.created_at);
+    }
+
+    // Bezahlt: Dank-Mail ohne Zahlungsdaten, einmalig (Rechnung, TWINT und 100er Club; nicht Sponsoring)
+    if (nextStatus === "completed" && data.membership_id !== "sponsoring" && !data.thank_you_sent_at) {
+      try {
+        await sendPaidMail(data as GoennerMailRow);
+        await supabase
+          .from("goenner_inquiries")
+          .update({ thank_you_sent_at: new Date().toISOString() })
+          .eq("id", id);
+      } catch (mailError) {
+        console.error("goenner paid mail failed", mailError);
+        warning = `Bezahlt gespeichert, aber die Dank-Mail konnte nicht gesendet werden: ${
+          mailError instanceof Error ? mailError.message : "Unbekannter Fehler"
+        }`;
+      }
     }
     if (nextStatus === "exited") {
       await setMemberActiveByInquiry(supabase, id, false);

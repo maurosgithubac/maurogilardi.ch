@@ -12,6 +12,7 @@ import { createResendClient } from "@/lib/resend";
 import { readEnv } from "@/lib/env";
 import { runNewsletterSubscribe } from "@/lib/newsletter-subscribe";
 import type { CreateEmailOptions } from "resend";
+import { nextInvoiceNumber, sendInvoiceMail, type GoennerMailRow } from "@/lib/goenner-mails";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,6 +27,7 @@ type Body = {
   postal_code?: string;
   city?: string;
   message?: string | null;
+  payment_method?: string | null;
 };
 
 type InquiryPayload = {
@@ -37,6 +39,7 @@ type InquiryPayload = {
   postal_code: string;
   city: string;
   message: string | null;
+  payment_method: "rechnung" | "twint" | null;
 };
 
 async function sendResendEmail(input: CreateEmailOptions) {
@@ -201,6 +204,16 @@ export async function POST(request: Request) {
 
   const message = body.message != null ? String(body.message).trim().slice(0, 4000) : null;
 
+  // Zahlungsart: 100er Club immer TWINT, Sponsoring ohne Standardzahlung, Gönner-Modelle Rechnung oder TWINT.
+  const paymentMethod: "rechnung" | "twint" | null =
+    membership_id === "sponsoring"
+      ? null
+      : membership_id === "hundert"
+        ? "twint"
+        : body.payment_method === "twint"
+          ? "twint"
+          : "rechnung";
+
   const payload: InquiryPayload = {
     membership_id,
     name,
@@ -210,23 +223,33 @@ export async function POST(request: Request) {
     postal_code,
     city,
     message: message || null,
+    payment_method: paymentMethod,
   };
 
   try {
     const supabase = createSupabaseServerClient();
-    const { error } = await supabase.from("goenner_inquiries").insert({
-      membership_id,
-      name,
-      email,
-      phone: phone || null,
-      street: street || null,
-      postal_code: postal_code || null,
-      city: city || null,
-      message: message || null,
-      amount_chf: lite ? membershipPriceChf(membership_id) : null,
-    });
+    const invoiceNumber =
+      paymentMethod === "rechnung" ? await nextInvoiceNumber(supabase) : null;
 
-    if (error) {
+    const { data: inserted, error } = await supabase
+      .from("goenner_inquiries")
+      .insert({
+        membership_id,
+        name,
+        email,
+        phone: phone || null,
+        street: street || null,
+        postal_code: postal_code || null,
+        city: city || null,
+        message: message || null,
+        amount_chf: lite ? membershipPriceChf(membership_id) : null,
+        payment_method: paymentMethod,
+        invoice_number: invoiceNumber,
+      })
+      .select("id,membership_id,name,email,street,postal_code,city,payment_method,invoice_number")
+      .single();
+
+    if (error || !inserted) {
       return NextResponse.json({ error: "Speichern fehlgeschlagen." }, { status: 500 });
     }
 
@@ -257,6 +280,19 @@ export async function POST(request: Request) {
           { error: "Anfrage gespeichert, aber E-Mail-Versand fehlgeschlagen." },
           { status: 500 },
         );
+      }
+    }
+
+    // Rechnung: Dank-Mail mit Zahlungsdaten und QR-Code, sofort nach Einreichung
+    if (paymentMethod === "rechnung") {
+      try {
+        await sendInvoiceMail(inserted as GoennerMailRow);
+        await supabase
+          .from("goenner_inquiries")
+          .update({ invoice_mail_sent_at: new Date().toISOString() })
+          .eq("id", inserted.id);
+      } catch (invoiceError) {
+        console.error("goenner-inquiry invoice mail failed", invoiceError);
       }
     }
 
