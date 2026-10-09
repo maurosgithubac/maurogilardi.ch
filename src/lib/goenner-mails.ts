@@ -248,28 +248,6 @@ export async function sendPaidMail(row: GoennerMailRow): Promise<void> {
   });
 }
 
-/** Erinnerung an dich, wenn eine Rechnung nach 30 Tagen noch offen ist. */
-export async function sendAdminReminder(row: GoennerMailRow & { invoice_mail_sent_at: string | null }): Promise<void> {
-  const to = process.env.GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL?.trim();
-  if (!to) throw new Error("GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL ist nicht gesetzt.");
-  const sent = row.invoice_mail_sent_at ? new Date(row.invoice_mail_sent_at).toLocaleDateString("de-CH") : "-";
-  await sendMail({
-    from: readEnv("RESEND_FROM_EMAIL"),
-    to: [to],
-    subject: `Erinnerung: Rechnung ${row.invoice_number} noch offen`,
-    text: [
-      `Die Rechnung ${row.invoice_number} ist seit 30 Tagen offen.`,
-      "",
-      `Gönner: ${row.name}`,
-      `E-Mail: ${row.email}`,
-      `Modell: ${tierTitle(row.membership_id)} (CHF ${membershipPriceChf(row.membership_id).toFixed(2)})`,
-      `Rechnung versendet am: ${sent}`,
-      "",
-      "Admin: https://www.maurogilardi.ch/admin/goenner/inbox",
-    ].join("\n"),
-  });
-}
-
 /* ——— Eingangsbestätigung: geht bei jeder Anfrage sofort raus ——— */
 
 export type ReceiptInput = {
