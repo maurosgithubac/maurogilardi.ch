@@ -147,7 +147,7 @@ export function invoiceMailContent(row: GoennerMailRow): MailContent {
         </tr>
       </table>
       <p style="margin:22px 0 0;">${escapeHtml(P_CLOSING)}</p>
-      <p style="margin:14px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
+      <p style="margin:22px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
       <p style="margin:0;font-size:13px;color:#66625b;line-height:1.5;">${SIGNATURE.slice(1).map(escapeHtml).join("<br>")}</p>
     </td></tr>
   </table>
@@ -191,7 +191,7 @@ export function paidMailContent(row: GoennerMailRow): MailContent {
       <p style="margin:0 0 14px;">${escapeHtml(P_WELCOME)}</p>
       <div style="border:1px solid #e4e1da;background:#faf9f6;padding:16px 20px;margin:22px 0 6px;font-size:14px;">${escapeHtml(P_PAID)}</div>
       <p style="margin:22px 0 0;">${escapeHtml(P_CLOSING)}</p>
-      <p style="margin:14px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
+      <p style="margin:22px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
       <p style="margin:0;font-size:13px;color:#66625b;line-height:1.5;">${SIGNATURE.slice(1).map(escapeHtml).join("<br>")}</p>
     </td></tr>
   </table>
@@ -338,7 +338,6 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
     : [];
 
   const intro = "Danke, deine Anfrage ist bei mir eingegangen. Hier siehst du, was du angegeben hast.";
-  const outro = "Ich melde mich persönlich bei dir.";
 
   const html = `
 <div style="background:#f1efea;padding:24px 12px;font-family:Georgia,'Playfair Display','Times New Roman',serif;color:#0b0b0b;">
@@ -359,8 +358,7 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
         </td></tr>
       </table>
       ${twintHtml}
-      <p style="margin:22px 0 0;">${escapeHtml(outro)}</p>
-      <p style="margin:14px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
+      <p style="margin:22px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
       <p style="margin:0;font-size:13px;color:#66625b;line-height:1.5;">${SIGNATURE.slice(1).map(escapeHtml).join("<br>")}</p>
     </td></tr>
   </table>
@@ -374,7 +372,6 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
     ...rows.map(([k, v]) => `${k}: ${v}`),
     ...twintText,
     "",
-    outro,
     "",
     ...SIGNATURE,
   ].join("\n");
@@ -400,7 +397,6 @@ export async function sendReceiptMail(input: ReceiptInput): Promise<void> {
 export async function sendContactReceipt(input: { name: string; email: string; message: string }): Promise<void> {
   const first = firstName(input.name);
   const intro = "Danke, deine Nachricht ist bei mir eingegangen. Hier siehst du, was du geschrieben hast.";
-  const outro = "Ich melde mich persönlich bei dir.";
   const rows: [string, string][] = [
     ["Name", input.name],
     ["E-Mail", input.email],
@@ -431,14 +427,13 @@ export async function sendContactReceipt(input: { name: string; email: string; m
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${detailRows}</table>
         </td></tr>
       </table>
-      <p style="margin:22px 0 0;">${escapeHtml(outro)}</p>
-      <p style="margin:14px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
+      <p style="margin:22px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
       <p style="margin:0;font-size:13px;color:#66625b;line-height:1.5;">${SIGNATURE.slice(1).map(escapeHtml).join("<br>")}</p>
     </td></tr>
   </table>
 </div>`;
 
-  const text = [`Hallo ${first}`, "", intro, "", ...rows.map(([k, v]) => `${k}: ${v}`), "", outro, "", ...SIGNATURE].join("\n");
+  const text = [`Hallo ${first}`, "", intro, "", ...rows.map(([k, v]) => `${k}: ${v}`), "", ...SIGNATURE].join("\n");
 
   await sendMail({
     from: readEnv("RESEND_FROM_EMAIL"),
