@@ -308,8 +308,14 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       await ensureMemberAndPayment(supabase, data, amount, data.created_at);
     }
 
-    // Bezahlt: Dank-Mail ohne Zahlungsdaten, einmalig (Rechnung, TWINT und 100er Club; nicht Sponsoring)
-    if (nextStatus === "completed" && data.membership_id !== "sponsoring" && !data.thank_you_sent_at) {
+    // Bezahlt: Dank-Mail ohne Zahlungsdaten, einmalig. Nur bei TWINT (inkl. 100er Club).
+    // Bei Rechnung kam die Dank-Mail schon bei der Einreichung, deshalb hier keine weitere Mail.
+    if (
+      nextStatus === "completed" &&
+      data.payment_method === "twint" &&
+      data.membership_id !== "sponsoring" &&
+      !data.thank_you_sent_at
+    ) {
       try {
         await sendPaidMail(data as GoennerMailRow);
         await supabase

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { siteContent } from "@/content/siteContent";
 import { createResendClient } from "@/lib/resend";
 import { readEnv } from "@/lib/env";
+import { sendContactReceipt } from "@/lib/goenner-mails";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -62,6 +63,13 @@ export async function POST(request: Request) {
         message,
       ].join("\n"),
     });
+
+    // Eingangsbestätigung an die Person. Schlägt sie fehl, bleibt die Nachricht an dich gültig.
+    try {
+      await sendContactReceipt({ name, email, message });
+    } catch (receiptError) {
+      console.error("contact receipt failed", receiptError);
+    }
 
     return NextResponse.json(
       { message: "Vielen Dank! Ich melde mich bei dir." },

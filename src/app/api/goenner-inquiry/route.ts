@@ -12,7 +12,7 @@ import { createResendClient } from "@/lib/resend";
 import { readEnv } from "@/lib/env";
 import { runNewsletterSubscribe } from "@/lib/newsletter-subscribe";
 import type { CreateEmailOptions } from "resend";
-import { nextInvoiceNumber, sendInvoiceMail, type GoennerMailRow } from "@/lib/goenner-mails";
+import { nextInvoiceNumber, sendInvoiceMail, sendReceiptMail, type GoennerMailRow } from "@/lib/goenner-mails";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -50,58 +50,7 @@ async function sendResendEmail(input: CreateEmailOptions) {
   }
 }
 
-async function sendMemberWelcomeEmail(payload: InquiryPayload) {
-  const from = readEnv("RESEND_FROM_EMAIL");
-  const templateIdOrAlias = process.env.RESEND_GOENNER_TEMPLATE_ID?.trim() || "welcome";
-  const label = membershipLabel(payload.membership_id);
-  const address =
-    payload.street || payload.postal_code || payload.city
-      ? `${payload.street || "-"}, ${payload.postal_code || "-"} ${payload.city || "-"}`.trim()
-      : "-";
-
-  await sendResendEmail({
-    from,
-    to: [payload.email],
-    template: {
-      id: templateIdOrAlias,
-      variables: {
-        NAME: payload.name,
-        EMAIL_ADDRESS: payload.email,
-        MEMBERSHIP_OPTION: label,
-        PHONE: payload.phone || "",
-        ADDRESS: address,
-        MESSAGE: payload.message || "",
-      },
-    },
-  });
-}
-
-async function sendClub100MemberEmail(payload: InquiryPayload) {
-  const from = readEnv("RESEND_FROM_EMAIL");
-
-  await sendResendEmail({
-    from,
-    to: [payload.email],
-    replyTo: siteContent.contact.email,
-    subject: "100er Club — Zahlung 100 CHF per TWINT",
-    text: [
-      `Hallo ${payload.name},`,
-      "",
-      "Danke für deinen Beitritt zum 100er Club.",
-      "",
-      "Bitte schliesse die Zahlung von 100 CHF im TWINT-Tab ab (falls das Fenster nicht aufgegangen ist: https://pay.raisenow.io/pjczf).",
-      "",
-      "Du bist für den monatlichen Newsletter vorgemerkt. Den WhatsApp-Supporterchat und die Erwähnung auf der Website folgen, sobald die Zahlung bei mir eingetroffen ist.",
-      "",
-      "Fragen? Einfach auf diese Mail antworten.",
-      "",
-      "Sportliche Grüsse",
-      "Mauro Gilardi",
-    ].join("\n"),
-  });
-}
-
-async function sendAdminNotifyEmail(payload: InquiryPayload, extras?: { beehiivNote?: string }) {
+async function sendAdminNotifyEmail(payload: InquiryPayload, extras: { beehiivNote: string }) {
   const from = readEnv("RESEND_FROM_EMAIL");
   const adminNotify = process.env.GOENNER_INQUIRY_ADMIN_NOTIFY_EMAIL?.trim() || siteContent.contact.email;
   const label = membershipLabel(payload.membership_id);
@@ -127,10 +76,10 @@ async function sendAdminNotifyEmail(payload: InquiryPayload, extras?: { beehiivN
       `Name: ${payload.name}`,
       `E-Mail: ${payload.email}`,
       `Telefon: ${payload.phone || "-"}`,
+      `Newsletter (beehiiv): ${extras?.beehiivNote || "Status unbekannt"}`,
       ...(isLite
         ? [
-            "Hinweis: Beim 100er Club entfällt die Adresse. Bestätigung geht an den Member (TWINT 100 CHF).",
-            extras?.beehiivNote ? `Beehiiv: ${extras.beehiivNote}` : "Beehiiv: Status unbekannt",
+            "Hinweis: Beim 100er Club entfällt die Adresse. Die Eingangsbestätigung an den Member enthält den TWINT-Link.",
             "TWINT-Zahlung (100 CHF) im Admin als bezahlt markieren.",
           ]
         : [
@@ -253,25 +202,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Speichern fehlgeschlagen." }, { status: 500 });
     }
 
-    let beehiivNote = "";
-    if (lite) {
-      const newsletter = await runNewsletterSubscribe(email, "https://www.maurogilardi.ch/sponsoring", {
-        sendWelcomeEmail: false,
-        utmCampaign: "hundert_club",
-      });
-      beehiivNote = newsletter.ok
-        ? newsletter.message.includes("schon dabei")
-          ? "bereits abonniert"
-          : "automatisch hinzugefügt (ohne Beehiiv-Welcome-Mail)"
-        : `Fehler — ${newsletter.error}`;
-    }
+    // Newsletter: jede Anfrage über das Gönner-/Sponsoring-Formular, bei allen Optionen
+    const newsletter = await runNewsletterSubscribe(email, "https://www.maurogilardi.ch/sponsoring", {
+      sendWelcomeEmail: false,
+      utmCampaign: lite ? "hundert_club" : "goenner",
+    });
+    const beehiivNote = newsletter.ok
+      ? newsletter.message.includes("schon dabei")
+        ? "bereits abonniert"
+        : "automatisch hinzugefügt (ohne Beehiiv-Welcome-Mail)"
+      : `Fehler — ${newsletter.error}`;
 
     try {
-      await sendAdminNotifyEmail(payload, lite ? { beehiivNote } : undefined);
-      if (lite) {
-        await sendClub100MemberEmail(payload);
-      } else {
-        await sendMemberWelcomeEmail(payload);
+      await sendAdminNotifyEmail(payload, { beehiivNote });
+      // Eingangsbestätigung mit den ausgefüllten Angaben, bei jeder Anfrage
+      // Bei Rechnung entfällt sie: die Dank-Mail mit Zahlungsdaten ist die Bestätigung.
+      if (paymentMethod !== "rechnung") {
+        await sendReceiptMail(payload);
       }
     } catch (mailError) {
       console.error("goenner-inquiry email failed", mailError);
