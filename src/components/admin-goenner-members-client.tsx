@@ -21,50 +21,54 @@ import {
   type GoennerMemberRow,
   type GoennerPaymentRow,
 } from "@/lib/goenner-finance";
-import { IconArrowRight, IconCheck, IconDownload, IconPlus, IconSearch, IconSort, IconTrash } from "@/components/admin/admin-icons";
-import { AdminRowMenu } from "@/components/admin/admin-row-menu";
 import {
-  AdminPageHeader,
+  IconArrowRight,
+  IconCheck,
+  IconMail,
+  IconPlus,
+  IconSearch,
+  IconSort,
+  IconTrash,
+} from "@/components/admin/admin-icons";
+import { AdminRowMenu, type RowMenuItem } from "@/components/admin/admin-row-menu";
+import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
+import {
   CategoryTabs,
   ContributionTag,
-  ProgressBar,
   StatusBadge,
   TierTag,
   categoryOf,
   chf,
-  chfCompact,
   type CategoryFilter,
 } from "@/components/admin/admin-ui";
 
 type Props = {
   members: GoennerMemberRow[];
   payments: GoennerPaymentRow[];
-  schemaMissing?: boolean;
-  initialYear?: number;
+  /** Saison, für die Status und Beträge gelten (von der Übersicht gesteuert) */
+  year: number;
   initialStatus?: StatusFilter;
   initialCategory?: CategoryFilter;
 };
 
-type StatusFilter = "all" | "open" | "paid";
-type SortKey = "name" | "tier" | "amount" | "status" | "total";
+export type StatusFilter = "all" | "open" | "paid";
+type SortKey = "name" | "tier" | "contribution" | "amount" | "status" | "total";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
 
 const tierOrder = new Map(adminMembershipOptions.map((t, i) => [t.id, i]));
 
-export function AdminGoennerMembersClient({
-  members,
-  payments,
-  schemaMissing,
-  initialYear,
-  initialStatus,
-  initialCategory,
-}: Props) {
+/** Aufsteigend: offen → bezahlt → ohne Betrag → inaktiv */
+function statusRank(m: { isPaid: boolean; billable: boolean; active: boolean }) {
+  if (!m.active && !m.isPaid) return 3;
+  if (m.isPaid) return 1;
+  return m.billable ? 0 : 2;
+}
+
+/** Liste aller Gönner, Sponsoren und Partner: Suche, Filter, Sortierung. Teil der Übersicht. */
+export function AdminGoennerMembersClient({ members, payments, year, initialStatus, initialCategory }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(
-    initialYear && initialYear >= GOENNER_FINANCE_START_YEAR && initialYear <= currentYear ? initialYear : currentYear,
-  );
   const [query, setQuery] = useState("");
   const [onlyActive, setOnlyActive] = useState(true);
   const [status, setStatus] = useState<StatusFilter>(initialStatus ?? "all");
@@ -75,13 +79,7 @@ export function AdminGoennerMembersClient({
   const [busy, setBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Jahre nur bis zum laufenden Jahr — ein neues Jahr erscheint automatisch ab dem 1. Januar
-  const years = useMemo(() => {
-    const list: number[] = [];
-    for (let y = currentYear; y >= GOENNER_FINANCE_START_YEAR; y--) list.push(y);
-    return list;
-  }, [currentYear]);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const enriched = useMemo(
     () =>
@@ -155,23 +153,17 @@ export function AdminGoennerMembersClient({
     return [...list].sort((a, b) => {
       let diff = 0;
       if (sort.key === "tier") diff = (tierOrder.get(a.membership_id) ?? 99) - (tierOrder.get(b.membership_id) ?? 99);
+      else if (sort.key === "contribution")
+        diff = contributionTypeLabel(a.contribution_type).localeCompare(contributionTypeLabel(b.contribution_type), "de-CH");
       else if (sort.key === "amount") diff = a.expected - b.expected;
       else if (sort.key === "total") diff = a.total_chf - b.total_chf;
-      else if (sort.key === "status") diff = Number(a.isPaid) - Number(b.isPaid);
+      else if (sort.key === "status") diff = statusRank(a) - statusRank(b);
       else diff = byName(a, b);
       return diff * dir || byName(a, b);
     });
   }, [base, status, sort]);
 
   // Kennzahlen im gewählten Bereich
-  const scope = category === "all" ? enriched : enriched.filter((m) => m.cat === category);
-  const activeRows = scope.filter((m) => m.active);
-  const billableRows = activeRows.filter((m) => m.billable);
-  const soll = billableRows.reduce((s, m) => s + m.expected, 0);
-  const ist = scope.reduce((s, m) => s + m.paidInYear, 0);
-  const paidCount = billableRows.filter((m) => m.isPaid).length;
-  const offen = billableRows.filter((m) => !m.isPaid).reduce((s, m) => s + m.expected, 0);
-  const inKindCount = activeRows.length - billableRows.length;
   const allActive = enriched.filter((m) => m.active).length;
 
   function toggleSort(key: SortKey) {
@@ -231,6 +223,31 @@ export function AdminGoennerMembersClient({
     }
   }
 
+  async function sendMail(member: GoennerMemberRow, type: StandardMailType) {
+    setError(null);
+    setNotice(null);
+    setBusyId(member.id);
+    try {
+      const msg = await sendStandardMail({ source: "member", id: member.id, type, name: member.name, email: member.email });
+      if (msg) setNotice(msg);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Mail konnte nicht gesendet werden.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  function mailItems(m: GoennerMemberRow & { billable: boolean }): RowMenuItem[] {
+    if (!m.billable || !m.email?.includes("@")) return [];
+    return (["rechnung", "twint"] as const).map((type) => ({
+      kind: "action" as const,
+      label: type === "rechnung" ? "Rechnungs-Mail senden" : "TWINT-Mail senden",
+      icon: <IconMail size={14} />,
+      disabled: busyId === m.id,
+      onSelect: () => void sendMail(m, type),
+    }));
+  }
+
   async function onAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -286,56 +303,28 @@ export function AdminGoennerMembersClient({
     }
   }
 
-  const header = (
-    <AdminPageHeader
-      eyebrow="Verwaltung"
-      title="Gönner & Partner"
-      description={`${allActive} aktive Einträge · Gönner, Sponsoren und Partner mit Beiträgen, Kontakten und Zahlungen seit ${GOENNER_FINANCE_START_YEAR}.`}
-      actions={
-        <>
-          <a
-            className="ap-btn ap-btn--secondary"
-            href={`/api/admin/goenner-report?year=${currentYear - 1}`}
-            title={`Stand 31.12.${currentYear - 1} als CSV (Excel)`}
-          >
-            <IconDownload />
-            Jahresreport {currentYear - 1}
-          </a>
-          {year !== currentYear - 1 ? (
-            <a className="ap-btn ap-btn--secondary" href={`/api/admin/goenner-report?year=${year}`}>
-              <IconDownload />
-              Report {year}
-            </a>
-          ) : null}
-          <button
-            type="button"
-            className="ap-btn ap-btn--primary"
-            aria-expanded={showAdd}
-            aria-controls="ap-add-member"
-            onClick={() => setShowAdd((v) => !v)}
-          >
-            {showAdd ? null : <IconPlus />}
-            {showAdd ? "Abbrechen" : "Eintrag hinzufügen"}
-          </button>
-        </>
-      }
-    />
-  );
-
-  if (schemaMissing) {
-    return (
-      <div className="ap-page">
-        {header}
-        <p className="ap-banner ap-banner--warn">
-          Ledger-Tabellen fehlen. In Supabase ausführen: <code>supabase/010_goenner_finance.sql</code>
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="ap-page">
-      {header}
+    <section id="liste" className="ap-section" aria-labelledby="liste-heading">
+      <div className="ap-section-head">
+        <div>
+          <h2 id="liste-heading" className="ap-h2">
+            Alle Gönner, Sponsoren &amp; Partner
+          </h2>
+          <p className="ap-muted-sm">
+            {allActive} aktiv · Status und Beträge für {year} · Spaltenköpfe anklicken zum Sortieren
+          </p>
+        </div>
+        <button
+          type="button"
+          className="ap-btn ap-btn--primary"
+          aria-expanded={showAdd}
+          aria-controls="ap-add-member"
+          onClick={() => setShowAdd((v) => !v)}
+        >
+          {showAdd ? null : <IconPlus />}
+          {showAdd ? "Abbrechen" : "Eintrag hinzufügen"}
+        </button>
+      </div>
 
       {showAdd ? (
         <form id="ap-add-member" className="ap-card ap-form" onSubmit={onAdd}>
@@ -427,42 +416,14 @@ export function AdminGoennerMembersClient({
 
       <CategoryTabs value={category} counts={categoryCounts} onChange={setCategory} />
 
-      <section className="ap-summary" aria-label={`Stand ${year}`}>
-        <div className="ap-summary-progress">
-          <div className="ap-summary-row">
-            <span className="ap-kpi-label">Bezahlt {year}</span>
-            <strong className="ap-summary-value">
-              {paidCount}
-              <span className="ap-kpi-of"> / {billableRows.length}</span>
-            </strong>
-          </div>
-          <ProgressBar value={paidCount} max={billableRows.length} label={`Bezahlt ${year}`} />
-        </div>
-        <dl className="ap-summary-figures">
-          <div>
-            <dt>Soll</dt>
-            <dd>{chfCompact(soll)}</dd>
-          </div>
-          <div>
-            <dt>Eingegangen</dt>
-            <dd>{chfCompact(ist)}</dd>
-          </div>
-          <div className={offen > 0 ? "is-alert" : undefined}>
-            <dt>Offen</dt>
-            <dd>{chfCompact(offen)}</dd>
-          </div>
-          {inKindCount > 0 ? (
-            <div>
-              <dt>Ohne CHF-Soll</dt>
-              <dd>{inKindCount}</dd>
-            </div>
-          ) : null}
-        </dl>
-      </section>
-
       {error ? (
         <p className="ap-banner ap-banner--error" role="alert">
           {error}
+        </p>
+      ) : null}
+      {notice ? (
+        <p className="ap-banner ap-banner--ok" role="status">
+          {notice}
         </p>
       ) : null}
 
@@ -500,16 +461,6 @@ export function AdminGoennerMembersClient({
         </label>
         <div className="ap-toolbar-filters">
           <label className="ap-field-inline">
-            <span>Jahr</span>
-            <select className="ap-select" value={year} onChange={(e) => setYear(Number(e.target.value))}>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="ap-field-inline">
             <span>Stufe</span>
             <select className="ap-select" value={tier} onChange={(e) => setTier(e.target.value)}>
               <option value="all">Alle</option>
@@ -518,6 +469,25 @@ export function AdminGoennerMembersClient({
                   {inquiryTierShort(t.id)}
                 </option>
               ))}
+            </select>
+          </label>
+          <label className="ap-field-inline ap-sort-select">
+            <span>Sortieren</span>
+            <select
+              className="ap-select"
+              value={`${sort.key}:${sort.dir}`}
+              onChange={(e) => {
+                const [key, dir] = e.target.value.split(":") as [SortKey, "asc" | "desc"];
+                setSort({ key, dir });
+              }}
+            >
+              <option value="name:asc">Name A–Z</option>
+              <option value="name:desc">Name Z–A</option>
+              <option value="status:asc">Offene zuerst</option>
+              <option value="amount:desc">Jahresbetrag hoch → tief</option>
+              <option value="total:desc">Total hoch → tief</option>
+              <option value="tier:asc">Stufe</option>
+              <option value="contribution:asc">Leistung</option>
             </select>
           </label>
           <label className="ap-switch">
@@ -536,10 +506,10 @@ export function AdminGoennerMembersClient({
             <tr>
               {sortHeader("name", "Name")}
               {sortHeader("tier", "Stufe")}
-              <th scope="col">Leistung</th>
+              {sortHeader("contribution", "Leistung")}
               {sortHeader("amount", "Jahresbetrag", "end")}
               {sortHeader("status", `Status ${year}`)}
-              {sortHeader("total", `Total seit ${GOENNER_FINANCE_START_YEAR}`, "end")}
+              {sortHeader("total", "Total", "end")}
               <th scope="col" className="ap-col-actions">
                 <span className="sr-only">Aktionen</span>
               </th>
@@ -586,7 +556,10 @@ export function AdminGoennerMembersClient({
                   </td>
                   <td data-label={`Status ${year}`}>
                     {m.isPaid ? (
-                      <StatusBadge state="paid">Bezahlt · {chf(m.paidInYear)}</StatusBadge>
+                      <StatusBadge state="paid">
+                        {/* Betrag nur zeigen, wenn er vom Jahresbetrag abweicht */}
+                        {Math.abs(m.paidInYear - m.expected) < 0.005 ? "Bezahlt" : `Bezahlt · ${chf(m.paidInYear)}`}
+                      </StatusBadge>
                     ) : !m.billable ? (
                       <StatusBadge state="none">
                         {m.contribution_type === "material" ? "Sachleistung" : "Ohne Betrag"}
@@ -611,7 +584,7 @@ export function AdminGoennerMembersClient({
                           aria-label={`${m.name}: Bezahlt ${year} erfassen`}
                         >
                           <IconCheck size={14} />
-                          {busyId === m.id ? "…" : `Bezahlt ${year}`}
+                          {busyId === m.id ? "…" : "Bezahlt"}
                         </button>
                       ) : null}
                       <AdminRowMenu
@@ -623,6 +596,7 @@ export function AdminGoennerMembersClient({
                             href: `/admin/goenner/${m.id}`,
                             icon: <IconArrowRight size={14} />,
                           },
+                          ...mailItems(m),
                           {
                             kind: "action",
                             label: "Löschen…",
@@ -642,9 +616,9 @@ export function AdminGoennerMembersClient({
         </table>
       </div>
       <p className="ap-footnote">
-        Rechnungen und E-Mails löst du selbst aus — diese Liste versendet nichts. «Bezahlt {year}» verbucht den
+        Rechnungs- und TWINT-Mails sendest du über «…» pro Person — sonst versendet diese Liste nichts. «Bezahlt {year}» verbucht den
         Jahresbetrag mit Datum {year === currentYear ? "heute" : `31.12.${year}`}.
       </p>
-    </div>
+    </section>
   );
 }

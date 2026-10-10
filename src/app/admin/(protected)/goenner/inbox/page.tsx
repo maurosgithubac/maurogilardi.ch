@@ -1,9 +1,16 @@
-import { AdminGoennerInquiriesClient } from "@/components/admin-goenner-inquiries-client";
+import { AdminGoennerInquiriesClient, type InboxFilter } from "@/components/admin-goenner-inquiries-client";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryRow } from "@/types/content";
 
-export default async function AdminGoennerInboxPage() {
+const FILTERS: InboxFilter[] = ["new", "open", "paid", "exited", "hundert", "all"];
+
+type SearchParams = Promise<{ filter?: string }>;
+
+export default async function AdminGoennerInboxPage({ searchParams }: { searchParams: SearchParams }) {
+  const sp = await searchParams;
+  const initialFilter = FILTERS.find((f) => f === sp.filter);
+
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase
     .from("goenner_inquiries")
@@ -17,7 +24,7 @@ export default async function AdminGoennerInboxPage() {
       <AdminPageHeader
         eyebrow="Formular-Anfragen"
         title="Eingänge"
-        description="E-Mail, Telefon, Betrag, Status und Eingangsdatum direkt in der Zeile bearbeiten und speichern. Name anklicken für Formular-Kommentar und eigenen Vermerk. Status «Bezahlt» legt Gönner und Zahlung an."
+        description="Neue Anfragen sind rot markiert, bis du sie öffnest oder bearbeitest. E-Mail, Telefon, Betrag, Status und Datum direkt in der Zeile ändern und speichern. Status «Bezahlt» legt Gönner und Zahlung an."
       />
       {error ? (
         <p className="ap-banner ap-banner--warn">Anfragen konnten nicht geladen werden.</p>
@@ -27,7 +34,7 @@ export default async function AdminGoennerInboxPage() {
           <p className="ap-muted-sm">Neue Anfragen aus dem Gönner-Formular erscheinen hier.</p>
         </div>
       ) : (
-        <AdminGoennerInquiriesClient rows={rows} />
+        <AdminGoennerInquiriesClient key={initialFilter ?? "default"} rows={rows} initialFilter={initialFilter} />
       )}
     </div>
   );

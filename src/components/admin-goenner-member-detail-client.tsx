@@ -23,7 +23,8 @@ import {
   type GoennerPaymentMethod,
   type GoennerPaymentRow,
 } from "@/lib/goenner-finance";
-import { IconArrowLeft, IconFile, IconTrash } from "@/components/admin/admin-icons";
+import { IconArrowLeft, IconFile, IconMail, IconTrash } from "@/components/admin/admin-icons";
+import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
 import { ContributionTag, StatusBadge, TierTag, categoryOf, chf, chfCompact, dateCh } from "@/components/admin/admin-ui";
 
 type Props = {
@@ -47,6 +48,8 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState(member);
   const [invoiceBusy, setInvoiceBusy] = useState(false);
+  const [mailBusy, setMailBusy] = useState<StandardMailType | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const year = new Date().getFullYear();
   const lastYear = year - 1;
@@ -175,15 +178,36 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
     }
   }
 
+  async function sendMail(type: StandardMailType) {
+    setError(null);
+    setNotice(null);
+    setMailBusy(type);
+    try {
+      const msg = await sendStandardMail({ source: "member", id: member.id, type, name: member.name, email: member.email });
+      if (msg) setNotice(msg);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Mail konnte nicht gesendet werden.");
+    } finally {
+      setMailBusy(null);
+    }
+  }
+
+  const canMail = Boolean(member.email?.includes("@")) && billable;
+  const mailTitle = !member.email?.includes("@")
+    ? "Zuerst E-Mail-Adresse speichern"
+    : !billable
+      ? "Zuerst Stufe oder Jahresbetrag setzen"
+      : undefined;
+
   const set = <K extends keyof GoennerMemberRow>(key: K, value: GoennerMemberRow[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
 
   return (
     <div className="ap-page">
       <nav aria-label="Brotkrumen" className="ap-crumbs">
-        <Link href="/admin/goenner" className="ap-back">
+        <Link href="/admin#liste" className="ap-back">
           <IconArrowLeft size={14} />
-          Alle Gönner
+          Übersicht
         </Link>
       </nav>
 
@@ -218,6 +242,26 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
           </div>
         </div>
         <div className="ap-page-actions">
+          <button
+            type="button"
+            className="ap-btn ap-btn--secondary"
+            disabled={!canMail || mailBusy !== null}
+            onClick={() => void sendMail("rechnung")}
+            title={mailTitle ?? `Rechnungs-Mail mit QR-Code über ${chf(expected)} an ${member.email}`}
+          >
+            <IconMail />
+            {mailBusy === "rechnung" ? "Sende…" : "Rechnungs-Mail"}
+          </button>
+          <button
+            type="button"
+            className="ap-btn ap-btn--secondary"
+            disabled={!canMail || mailBusy !== null}
+            onClick={() => void sendMail("twint")}
+            title={mailTitle ?? `TWINT-Mail mit Paylink über ${chf(expected)} an ${member.email}`}
+          >
+            <IconMail />
+            {mailBusy === "twint" ? "Sende…" : "TWINT-Mail"}
+          </button>
           <button
             type="button"
             className="ap-btn ap-btn--secondary"
@@ -259,6 +303,11 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
       {error ? (
         <p className="ap-banner ap-banner--error" role="alert">
           {error}
+        </p>
+      ) : null}
+      {notice ? (
+        <p className="ap-banner ap-banner--ok" role="status">
+          {notice}
         </p>
       ) : null}
 

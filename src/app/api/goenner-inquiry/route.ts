@@ -246,8 +246,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message: lite
-          ? "Danke! Deine Daten sind gespeichert — bitte schliesse die Zahlung von 100 CHF im TWINT-Tab ab."
-          : "Vielen Dank! Ich melde mich bei dir.",
+          ? "Danke! Deine Daten sind gespeichert — bitte schliesse die Zahlung von 100 CHF im TWINT-Tab ab. Eine Bestätigung per E-Mail ist unterwegs."
+          : membership_id === "sponsoring"
+            ? "Danke für die Anfrage! Du erhältst in Kürze eine Bestätigung per E-Mail — ich melde mich innert weniger Tage."
+            : "Vielen Dank! Du erhältst in Kürze eine E-Mail von mir.",
       },
       { status: 200 },
     );

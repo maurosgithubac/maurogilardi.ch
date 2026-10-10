@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { MG_EASE } from "@/components/motion/motion-provider";
+import { MailSentHint } from "@/components/goenner/mail-sent-hint";
 import { Portal } from "@/components/portal";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import { trackEvent } from "@/components/analytics-events";
@@ -73,7 +74,7 @@ export function Club100JoinModal({ open, onClose }: Props) {
       openTwintInNewTab();
       setStatus(
         data.message ||
-          "Danke! Deine Daten sind gespeichert — bitte schliesse die Zahlung von 100 CHF im TWINT-Tab ab.",
+          "Danke! Deine Daten sind gespeichert — bitte schliesse die Zahlung von 100 CHF im TWINT-Tab ab. Eine Bestätigung per E-Mail ist unterwegs.",
       );
       setStep("done");
     } catch {
@@ -211,6 +212,7 @@ export function Club100JoinModal({ open, onClose }: Props) {
                   <p className="mg-body" role="status">
                     {status}
                   </p>
+                  <MailSentHint />
                   <p className="mg-modal__hint">
                     Falls kein Tab geöffnet wurde, starte TWINT hier. Betrag:{" "}
                     <strong>100 CHF</strong>.

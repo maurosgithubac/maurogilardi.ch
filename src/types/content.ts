@@ -38,4 +38,8 @@ export type GoennerInquiryRow = {
   status?: GoennerInquiryStatus;
   completed_at?: string | null;
   amount_chf?: number | null;
+  /** Migration 019 */
+  payment_method?: "rechnung" | "twint" | null;
+  /** Im Admin geöffnet; null = neu/ungelesen (Migration 020) */
+  seen_at?: string | null;
 };

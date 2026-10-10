@@ -245,6 +245,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     }
   }
 
+  if (body.seen !== undefined) {
+    if (typeof body.seen !== "boolean") {
+      return NextResponse.json({ error: "seen muss true oder false sein." }, { status: 400 });
+    }
+    patch.seen_at = body.seen ? new Date().toISOString() : null;
+  } else if (Object.keys(patch).length > 0 && "seen_at" in existing && !existing.seen_at) {
+    // Wer eine Anfrage bearbeitet, hat sie gelesen
+    patch.seen_at = new Date().toISOString();
+  }
+
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: "Keine Änderungen." }, { status: 400 });
   }
@@ -283,6 +293,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   if (error) {
     const needsMigration =
+      error.message.includes("seen_at") ||
       error.message.includes("column") ||
       error.message.includes("admin_note") ||
       error.message.includes("exited") ||
@@ -290,7 +301,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     return NextResponse.json(
       {
         error: needsMigration
-          ? "Datenbank: Migration ausführen (supabase/011_goenner_inquiries_inbox_fields.sql)."
+          ? error.message.includes("seen_at")
+            ? "Datenbank: Migration ausführen (supabase/020_admin_inbox_seen_prize_money.sql)."
+            : "Datenbank: Migration ausführen (supabase/011_goenner_inquiries_inbox_fields.sql)."
           : error.message,
       },
       { status: 500 },

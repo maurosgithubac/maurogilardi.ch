@@ -1445,12 +1445,12 @@ html:has(.admin-app) {
   }
 
   .ap-segment {
-    overflow-x: auto;
-    scrollbar-width: none;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .ap-segment-btn {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     justify-content: center;
     height: 36px;
   }
@@ -1707,8 +1707,8 @@ a.ap-row-title:hover {
   cursor: not-allowed;
 }
 
-/* Mobile: Tabellen werden zu Karten-Listen */
-@media (max-width: 759.98px) {
+/* Mobile, Tablet und kleine Laptops: Tabellen werden zu Karten-Listen (kein seitliches Scrollen) */
+@media (max-width: 1279.98px) {
   .ap-table,
   .ap-table tbody,
   .ap-table tr,
@@ -1790,6 +1790,16 @@ a.ap-row-title:hover {
 
   .ap-cell-note {
     max-width: none;
+  }
+
+  .ap-table td.ap-cell-name[data-label] {
+    grid-column: 1;
+    display: block;
+    text-align: left;
+  }
+
+  .ap-table td.ap-cell-name[data-label]::before {
+    content: none;
   }
 }
 
@@ -2228,7 +2238,7 @@ a.ap-row-title:hover {
   overflow: auto;
 }
 
-@media (max-width: 759.98px) {
+@media (max-width: 1279.98px) {
   .ap-table--inbox tbody td,
   .ap-table--inbox :is(th, td):first-child,
   .ap-table--inbox :is(th, td):last-child {
@@ -2415,7 +2425,9 @@ a.ap-row-title:hover {
   .ap-page-actions .ap-field-inline {
     flex: none;
   }
+}
 
+@media (max-width: 1279.98px) {
   /* Gönner-Karten: Name + Aktionen, dann Stufe | Status, dann Beträge */
   .ap-table--members tbody tr {
     position: relative;
@@ -2509,10 +2521,9 @@ a.ap-row-title:hover {
 
 .ap-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
   border-bottom: 1px solid var(--ap-hair);
-  overflow-x: auto;
-  scrollbar-width: none;
 }
 
 .ap-tab {
@@ -2655,4 +2666,491 @@ a.ap-row-title:hover {
 
 .ap-cat--inline {
   margin-left: 0;
+}
+
+/* ——— Übersicht: Saison-Einnahmen, neue Anfragen, Liste ——— */
+
+.ap-nav-badge--open {
+  background: var(--ap-hair-strong);
+  color: var(--ap-ink);
+}
+
+.ap-alert-new {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--ap-err-line);
+  border-left: 4px solid var(--ap-red);
+  border-radius: var(--ap-r-lg);
+  background: var(--ap-err-bg);
+  color: var(--ap-ink);
+  text-decoration: none;
+  transition: background-color var(--ap-dur);
+}
+
+.ap-alert-new:hover {
+  background: #fbe3e4;
+}
+
+.ap-alert-new-count {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--ap-red);
+  color: #fff;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-alert-new-text {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+}
+
+.ap-alert-new-text > span {
+  font-size: 0.8125rem;
+  color: var(--ap-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ap-alert-new-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  color: var(--ap-red-text);
+}
+
+.ap-income {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-hair);
+  border-radius: var(--ap-r-lg);
+}
+
+.ap-income-main {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1.4rem 1.5rem;
+  min-width: 0;
+}
+
+.ap-income-value {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink);
+}
+
+.ap-income-compare {
+  font-size: 0.8125rem;
+  color: var(--ap-muted);
+}
+
+.ap-income-compare .is-up {
+  font-weight: 650;
+  color: var(--ap-ok);
+}
+
+.ap-income-compare .is-down {
+  font-weight: 650;
+  color: var(--ap-warn);
+}
+
+.ap-mix {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  margin-top: 0.6rem;
+  border-radius: 999px;
+  background: #ebe8e1;
+  overflow: hidden;
+}
+
+.ap-mix-seg {
+  flex-basis: 0;
+  min-width: 4px;
+}
+
+.ap-mix--goenner {
+  background: var(--ap-ink);
+}
+
+.ap-mix--sponsor {
+  background: #3f6a94;
+}
+
+.ap-mix--partner {
+  background: #8a6a3b;
+}
+
+.ap-mix--prize {
+  background: var(--ap-red);
+}
+
+.ap-mix-legend {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin-top: 0.4rem;
+}
+
+.ap-mix-legend dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--ap-muted);
+}
+
+.ap-mix-legend dd {
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-mix-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.ap-income-side {
+  display: grid;
+  border-left: 1px solid var(--ap-hair);
+}
+
+.ap-income-stat {
+  display: grid;
+  align-content: center;
+  gap: 0.3rem;
+  padding: 0.9rem 1.25rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ap-income-stat + .ap-income-stat {
+  border-top: 1px solid var(--ap-hair);
+}
+
+.ap-income-stat .ap-progress {
+  margin-top: 0.2rem;
+}
+
+.ap-income-stat.is-alert .ap-kpi-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #d98a1c;
+}
+
+.ap-income-stat--link {
+  transition: background-color var(--ap-dur);
+}
+
+.ap-income-stat--link:hover {
+  background: var(--ap-hover);
+}
+
+.ap-income-stat--link:last-child {
+  border-bottom-right-radius: var(--ap-r-lg);
+}
+
+@media (max-width: 899.98px) {
+  .ap-income {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ap-income-side {
+    border-left: 0;
+    border-top: 1px solid var(--ap-hair);
+  }
+
+  .ap-mix-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ap-alert-new-cta {
+    display: none;
+  }
+}
+
+.ap-card-head:has(> svg) {
+  justify-content: flex-start;
+}
+
+.ap-card-head > svg {
+  flex: none;
+  color: var(--ap-muted);
+}
+
+.ap-card-head:has(> svg) .ap-h2 {
+  flex: 1;
+}
+
+.ap-pill-new,
+.ap-tag-new {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--ap-red);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ap-new-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 0.45rem;
+  border-radius: 999px;
+  background: var(--ap-red);
+  vertical-align: 0.05em;
+}
+
+.ap-todo-row.is-new .ap-todo-name {
+  font-weight: 700;
+}
+
+.ap-section {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  scroll-margin-top: calc(var(--ap-sticky-top) + 1rem);
+}
+
+.ap-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-top: 0.5rem;
+}
+
+.ap-section-head .ap-h2 {
+  font-size: 1.125rem;
+}
+
+/* ——— Eingänge: neue Anfragen ——— */
+
+.ap-inbox-row.is-new td {
+  background: rgb(215 25 32 / 3.5%);
+}
+
+.ap-inbox-row.is-new td:first-child {
+  box-shadow: inset 3px 0 0 var(--ap-red);
+}
+
+.ap-inbox-row.is-new.is-dirty td:first-child {
+  box-shadow: inset 3px 0 0 #d98a1c;
+}
+
+.ap-inbox-row.is-new .ap-inbox-name {
+  font-weight: 750;
+}
+
+.ap-tag-new {
+  margin-right: 0.45rem;
+  border: 0;
+  cursor: pointer;
+  vertical-align: 0.1em;
+}
+
+.ap-tag-new:hover {
+  background: var(--ap-red-hover);
+}
+
+.ap-tag-new:focus-visible {
+  outline: 2px solid var(--ap-ring);
+  outline-offset: 2px;
+}
+
+.ap-statline .is-new dt::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--ap-red);
+}
+
+.ap-statline .is-new dd {
+  color: var(--ap-red-text);
+}
+
+/* ——— Preisgelder ——— */
+
+.ap-nowrap {
+  white-space: nowrap;
+}
+
+.ap-table--prize tfoot th,
+.ap-table--prize tfoot td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--ap-hair-strong);
+  font-weight: 650;
+  text-align: left;
+}
+
+.ap-table--prize tfoot td.ap-num {
+  text-align: right;
+}
+
+.ap-table--prize tr.is-editing td {
+  background: var(--ap-hover);
+}
+
+.ap-empty > svg {
+  color: var(--ap-muted);
+}
+
+.ap-menu-toggle {
+  position: relative;
+}
+
+.ap-menu-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--ap-red);
+  box-shadow: 0 0 0 2px var(--ap-surface);
+}
+
+.ap-mix--proam {
+  background: #e98a8e;
+}
+
+.ap-prize-kind {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ap-prize-kind--prize {
+  background: var(--ap-red-soft);
+  color: var(--ap-red-text);
+}
+
+.ap-prize-kind--proam {
+  background: var(--ap-sunken);
+  color: var(--ap-ink-2);
+  box-shadow: inset 0 0 0 1px var(--ap-hair);
+}
+/* Sortier-Auswahl nur in der Karten-Ansicht (Spaltenköpfe sind dort ausgeblendet) */
+.ap-sort-select {
+  display: none;
+}
+
+@media (max-width: 1279.98px) {
+  .ap-sort-select {
+    display: flex;
+  }
+
+  .ap-table--prize tfoot,
+  .ap-table--prize tfoot tr {
+    display: block;
+  }
+
+  .ap-table--prize tfoot tr {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--ap-hair-strong);
+  }
+
+  .ap-table--prize tfoot :is(th, td) {
+    border-top: 0;
+  }
+
+  .ap-table--prize tfoot td:empty {
+    display: none;
+  }
+}
+
+@media (max-width: 759.98px) {
+  .ap-sort-select {
+    justify-content: space-between;
+  }
+
+  .ap-sort-select .ap-select {
+    flex: 1;
+    max-width: 16rem;
+  }
+
+  .ap-tab {
+    padding: 0 0.6rem;
+  }
+}
+/* Gönner-Tabelle ab 1280px: kompakt genug, damit sie ohne seitliches Scrollen passt */
+@media (min-width: 1280px) {
+  .ap-table--members thead th,
+  .ap-table--members tbody td {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .ap-table--members .ap-cell-name {
+    min-width: 0;
+  }
+
+  .ap-table--members .ap-row-sub {
+    max-width: 15rem;
+  }
+
+  .ap-table--members .ap-status {
+    height: auto;
+    min-height: 24px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    white-space: normal;
+  }
+}
+@media (min-width: 1280px) {
+  .ap-table--inbox thead th,
+  .ap-table--inbox tbody td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .ap-table--inbox td[data-label="E-Mail"] .ap-cell-input {
+    min-width: 9rem;
+  }
+
+  .ap-table--inbox td[data-label="Telefon"] .ap-cell-input {
+    min-width: 6.5rem;
+  }
+
+  .ap-table--inbox .ap-cell-input--date {
+    min-width: 7.5rem;
+  }
+
+  .ap-table--inbox .ap-cell-name {
+    min-width: 9rem;
+  }
 }

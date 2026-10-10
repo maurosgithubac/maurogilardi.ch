@@ -2,30 +2,20 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import {
-  adminMembershipOptions,
-  contributionTypeLabel,
-  inquiryTierLabel,
-  inquiryTierShort,
-} from "@/content/goennerMemberships";
+import { contributionTypeLabel, inquiryTierShort } from "@/content/goennerMemberships";
 import {
   GOENNER_FINANCE_START_YEAR,
   expectedAnnualChf,
-  sumPaymentsTotal,
   type GoennerMemberRow,
   type GoennerPaymentRow,
 } from "@/lib/goenner-finance";
+import { isNewInquiry } from "@/lib/admin-inbox";
+import { prizeKindOf, type PrizeMoneyRow } from "@/lib/prize-money";
 import type { GoennerInquiryRow } from "@/types/content";
-import {
-  IconArrowRight,
-  IconDownload,
-  IconInbox,
-  IconUsers,
-} from "@/components/admin/admin-icons";
+import { AdminGoennerMembersClient, type StatusFilter } from "@/components/admin-goenner-members-client";
+import { IconArrowRight, IconDownload, IconInbox, IconTrophy, IconUsers } from "@/components/admin/admin-icons";
 import {
   AdminPageHeader,
-  CATEGORY_TABS,
-  CategoryTabs,
   ProgressBar,
   TierTag,
   categoryOf,
@@ -33,159 +23,135 @@ import {
   chfCompact,
   dateCh,
   type CategoryFilter,
-  type CategoryId,
 } from "@/components/admin/admin-ui";
 
 type Props = {
   members: GoennerMemberRow[];
   payments: GoennerPaymentRow[];
-  openInquiries: GoennerInquiryRow[];
-  schemaMissing?: boolean;
+  /** Offene und neue (ungelesene) Anfragen */
+  inquiries: GoennerInquiryRow[];
+  prizes: PrizeMoneyRow[];
+  ledgerMissing?: boolean;
+  migration020Missing?: boolean;
+  initialYear: number;
+  initialStatus?: StatusFilter;
+  initialCategory?: CategoryFilter;
 };
 
-const TODO_LIMIT = 6;
+const LIST_LIMIT = 5;
+
+type SourceId = "goenner" | "sponsor" | "partner" | "prize" | "proam";
+
+const SOURCES: { id: SourceId; label: string }[] = [
+  { id: "goenner", label: "Gönner" },
+  { id: "sponsor", label: "Sponsoren" },
+  { id: "partner", label: "Partner" },
+  { id: "prize", label: "Preisgelder" },
+  { id: "proam", label: "ProAms" },
+];
+
+/** "MM-DD" eines ISO-Datums, für den Vergleich «Vorjahr bis heute» */
+function monthDay(iso: string) {
+  return iso.slice(5, 10);
+}
+
+function todayMonthDay() {
+  const d = new Date();
+  return `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 export function AdminOverview({
   members,
   payments,
-  openInquiries,
-  schemaMissing,
+  inquiries,
+  prizes,
+  ledgerMissing,
+  migration020Missing,
+  initialYear,
+  initialStatus,
+  initialCategory,
 }: Props) {
   const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
-  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [year, setYear] = useState(initialYear);
 
   const years = useMemo(() => {
     const list: number[] = [];
-    for (let y = currentYear; y >= GOENNER_FINANCE_START_YEAR; y--)
-      list.push(y);
+    for (let y = currentYear; y >= GOENNER_FINANCE_START_YEAR; y--) list.push(y);
     return list;
   }, [currentYear]);
 
-  // Pro Eintrag: Soll und bezahlt im gewählten Jahr
-  const rowsAll = useMemo(() => {
-    const paidByMember = new Map<string, number>();
+  const income = useMemo(() => {
+    const catByMember = new Map(members.map((m) => [m.id, categoryOf(m)]));
+    const bySource: Record<SourceId, number> = { goenner: 0, sponsor: 0, partner: 0, prize: 0, proam: 0 };
     for (const p of payments) {
       if (p.year !== year) continue;
-      paidByMember.set(
-        p.member_id,
-        (paidByMember.get(p.member_id) || 0) + Number(p.amount_chf || 0),
-      );
+      bySource[catByMember.get(p.member_id) ?? "goenner"] += Number(p.amount_chf || 0);
     }
-    return members.map((m) => {
-      const expected = expectedAnnualChf(m);
-      return {
-        ...m,
-        cat: categoryOf(m),
-        expected,
-        billable: expected > 0,
-        paid: paidByMember.get(m.id) || 0,
-        isPaid: paidByMember.has(m.id),
-      };
-    });
-  }, [members, payments, year]);
-
-  // Aufteilung nach Bereich (immer alle Bereiche, unabhängig vom Tab)
-  const byCategory = useMemo(() => {
-    return (["goenner", "sponsor", "partner"] as CategoryId[]).map((id) => {
-      const inCat = rowsAll.filter((m) => m.cat === id);
-      const active = inCat.filter((m) => m.active);
-      const billable = active.filter((m) => m.billable);
-      return {
-        id,
-        label: CATEGORY_TABS.find((t) => t.id === id)?.label ?? id,
-        active: active.length,
-        billable: billable.length,
-        paid: billable.filter((m) => m.isPaid).length,
-        inKind: active.length - billable.length,
-        soll: billable.reduce((s, m) => s + m.expected, 0),
-        ist: inCat.reduce((s, m) => s + m.paid, 0),
-      };
-    });
-  }, [rowsAll]);
-
-  const categoryCounts: Record<CategoryFilter, number> = {
-    all: rowsAll.filter((m) => m.active).length,
-    goenner: byCategory[0].active,
-    sponsor: byCategory[1].active,
-    partner: byCategory[2].active,
-  };
-
-  const stats = useMemo(() => {
-    const scope =
-      category === "all" ? rowsAll : rowsAll.filter((m) => m.cat === category);
-    const ist = scope.reduce((s, m) => s + m.paid, 0);
-    const rows = scope.filter((m) => m.active);
-    const billable = rows.filter((m) => m.billable);
-    const soll = billable.reduce((s, m) => s + m.expected, 0);
-    const unpaid = billable
-      .filter((m) => !m.isPaid)
-      .sort(
-        (a, b) =>
-          b.expected - a.expected || a.name.localeCompare(b.name, "de-CH"),
-      );
-    const offen = unpaid.reduce((s, m) => s + m.expected, 0);
-
-    const tiers = adminMembershipOptions
-      .map((t) => {
-        const inTier = rows.filter((m) => m.membership_id === t.id);
-        return {
-          id: t.id,
-          label: inquiryTierLabel(t.id).replace(/\s*\(.*\)$/, ""),
-          count: inTier.length,
-          paid: inTier.filter((m) => m.isPaid).length,
-          soll: inTier.reduce((s, m) => s + m.expected, 0),
-        };
-      })
-      .filter((t) => t.count > 0);
-    const known = new Set(adminMembershipOptions.map((t) => t.id));
-    const other = rows.filter((m) => !known.has(m.membership_id));
-    if (other.length) {
-      tiers.push({
-        id: "other",
-        label: "Andere",
-        count: other.length,
-        paid: other.filter((m) => m.isPaid).length,
-        soll: other.reduce((s, m) => s + m.expected, 0),
-      });
+    for (const r of prizes) {
+      if (r.year === year) bySource[prizeKindOf(r)] += Number(r.amount_chf || 0);
     }
-    const maxTierSoll = Math.max(1, ...tiers.map((t) => t.soll));
+    const total = Object.values(bySource).reduce((s, v) => s + v, 0);
+    const prizeYear = prizes.filter((r) => r.year === year);
+
+    // Vergleich: laufende Saison mit dem Vorjahr bis zum gleichen Tag, sonst ganzes Vorjahr
+    const partial = year === currentYear;
+    const cutoff = todayMonthDay();
+    const inPrev = (iso: string, y: number) => y === year - 1 && (!partial || monthDay(iso) <= cutoff);
+    const prev =
+      payments.filter((p) => inPrev(p.paid_on, p.year)).reduce((s, p) => s + Number(p.amount_chf || 0), 0) +
+      prizes.filter((r) => inPrev(r.event_date, r.year)).reduce((s, r) => s + Number(r.amount_chf || 0), 0);
 
     return {
-      active: rows,
-      billable,
-      soll,
-      ist,
-      unpaid,
-      offen,
-      paidCount: billable.length - unpaid.length,
-      tiers,
-      maxTierSoll,
+      bySource,
+      total,
+      prev,
+      partial,
+      prizeCount: prizeYear.filter((r) => prizeKindOf(r) === "prize").length,
+      proamCount: prizeYear.filter((r) => prizeKindOf(r) === "proam").length,
     };
-  }, [rowsAll, category]);
+  }, [members, payments, prizes, year, currentYear]);
 
-  const totalSince = useMemo(() => sumPaymentsTotal(payments), [payments]);
+  const dues = useMemo(() => {
+    const paidIds = new Set(payments.filter((p) => p.year === year).map((p) => p.member_id));
+    const billable = members
+      .filter((m) => m.active)
+      .map((m) => ({ ...m, expected: expectedAnnualChf(m) }))
+      .filter((m) => m.expected > 0);
+    const unpaid = billable
+      .filter((m) => !paidIds.has(m.id))
+      .sort((a, b) => b.expected - a.expected || a.name.localeCompare(b.name, "de-CH"));
+    return {
+      billable: billable.length,
+      paid: billable.length - unpaid.length,
+      unpaid,
+      openSum: unpaid.reduce((s, m) => s + m.expected, 0),
+    };
+  }, [members, payments, year]);
+
+  const inbox = useMemo(() => {
+    const isOpen = (q: GoennerInquiryRow) => !q.status || q.status === "open";
+    const fresh = inquiries.filter(isNewInquiry);
+    const open = inquiries.filter(isOpen);
+    // Neue zuerst, dann übrige offene — jeweils neueste oben
+    const list = [...fresh, ...open.filter((q) => !isNewInquiry(q))];
+    return { fresh, open, list };
+  }, [inquiries]);
 
   const reportYear = currentYear - 1;
-  const openHref = `/admin/goenner?status=open${year !== currentYear ? `&year=${year}` : ""}${
-    category !== "all" ? `&bereich=${category}` : ""
-  }`;
+  const diff = income.total - income.prev;
+  const diffPct = income.prev > 0 ? Math.round((diff / income.prev) * 100) : null;
 
   return (
     <div className="ap-page">
       <AdminPageHeader
-        eyebrow="Cockpit"
-        title="Übersicht"
-        description={`Stand Beiträge ${year} · Total seit ${GOENNER_FINANCE_START_YEAR}: ${chfCompact(totalSince)}`}
+        eyebrow="Übersicht"
+        title={`Saison ${year}`}
+        description="Einnahmen, neue Anfragen und alle Gönner, Sponsoren und Partner auf einen Blick."
         actions={
           <>
             <label className="ap-field-inline">
-              <span>Jahr</span>
-              <select
-                className="ap-select"
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
-              >
+              <span>Saison</span>
+              <select className="ap-select" value={year} onChange={(e) => setYear(Number(e.target.value))}>
                 {years.map((y) => (
                   <option key={y} value={y}>
                     {y}
@@ -205,318 +171,213 @@ export function AdminOverview({
         }
       />
 
-      {schemaMissing ? (
+      {ledgerMissing ? (
         <p className="ap-banner ap-banner--warn" role="status">
-          Bitte in Supabase ausführen:{" "}
-          <code>supabase/010_goenner_finance.sql</code> (und bei Bedarf{" "}
-          <code>009_goenner_inquiries_membership_hundert.sql</code>).
+          Ledger-Tabellen fehlen. In Supabase ausführen: <code>supabase/010_goenner_finance.sql</code>
+        </p>
+      ) : null}
+      {migration020Missing ? (
+        <p className="ap-banner ap-banner--warn" role="status">
+          Für Preisgelder und die «Neu»-Markierung bei Anfragen bitte in Supabase ausführen:{" "}
+          <code>supabase/020_admin_inbox_seen_prize_money.sql</code>
         </p>
       ) : null}
 
-      <CategoryTabs
-        value={category}
-        counts={categoryCounts}
-        onChange={setCategory}
-      />
+      {inbox.fresh.length > 0 ? (
+        <Link href="/admin/goenner/inbox?filter=new" className="ap-alert-new">
+          <span className="ap-alert-new-count" aria-hidden="true">
+            {inbox.fresh.length}
+          </span>
+          <span className="ap-alert-new-text">
+            <strong>
+              {inbox.fresh.length === 1 ? "1 neue Anfrage" : `${inbox.fresh.length} neue Anfragen`}
+            </strong>
+            <span>
+              {inbox.fresh
+                .slice(0, 3)
+                .map((q) => `${q.name} (${inquiryTierShort(q.membership_id)})`)
+                .join(" · ")}
+              {inbox.fresh.length > 3 ? " …" : ""}
+            </span>
+          </span>
+          <span className="ap-alert-new-cta">
+            Ansehen <IconArrowRight size={14} />
+          </span>
+        </Link>
+      ) : null}
 
-      <section className="ap-kpis" aria-label={`Kennzahlen ${year}`}>
-        <div className="ap-kpi ap-kpi--wide">
-          <div className="ap-kpi-top">
-            <span className="ap-kpi-label">Bezahlt {year}</span>
-            <span className="ap-kpi-hint">
-              {stats.billable.length > 0
-                ? Math.round((stats.paidCount / stats.billable.length) * 100)
-                : 0}{" "}
-              %
+      <section className="ap-income" aria-labelledby="income-heading">
+        <div className="ap-income-main">
+          <p id="income-heading" className="ap-kpi-label">
+            Einnahmen Saison {year}
+          </p>
+          <strong className="ap-income-value">{chfCompact(income.total)}</strong>
+          <p className="ap-income-compare">
+            {income.prev > 0 ? (
+              <>
+                <span className={diff >= 0 ? "is-up" : "is-down"}>
+                  {diff >= 0 ? "+" : "−"}
+                  {chfCompact(Math.abs(diff))}
+                  {diffPct !== null ? ` (${diff >= 0 ? "+" : "−"}${Math.abs(diffPct)} %)` : ""}
+                </span>{" "}
+                gegenüber {year - 1}
+                {income.partial ? " zum gleichen Zeitpunkt" : ""}
+              </>
+            ) : (
+              <>Keine Vergleichswerte aus {year - 1}</>
+            )}
+          </p>
+          <div className="ap-mix" role="img" aria-label="Aufteilung der Einnahmen nach Quelle">
+            {SOURCES.map((s) =>
+              income.bySource[s.id] > 0 ? (
+                <span
+                  key={s.id}
+                  className={`ap-mix-seg ap-mix--${s.id}`}
+                  style={{ flexGrow: income.bySource[s.id] }}
+                />
+              ) : null,
+            )}
+          </div>
+          <dl className="ap-mix-legend">
+            {SOURCES.map((s) => (
+              <div key={s.id}>
+                <dt>
+                  <span className={`ap-mix-dot ap-mix--${s.id}`} aria-hidden="true" />
+                  {s.label}
+                </dt>
+                <dd>{income.bySource[s.id] > 0 ? chfCompact(income.bySource[s.id]) : "—"}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="ap-income-side">
+          <div className="ap-income-stat">
+            <span className="ap-kpi-label">Beiträge bezahlt</span>
+            <strong className="ap-kpi-value">
+              {dues.paid}
+              <span className="ap-kpi-of"> / {dues.billable}</span>
+            </strong>
+            <ProgressBar value={dues.paid} max={dues.billable} label={`Beiträge bezahlt ${year}`} />
+          </div>
+          <div className={`ap-income-stat${dues.openSum > 0 ? " is-alert" : ""}`}>
+            <span className="ap-kpi-label">Noch offen</span>
+            <strong className="ap-kpi-value">{chfCompact(dues.openSum)}</strong>
+            <span className="ap-kpi-foot">
+              {dues.unpaid.length === 1 ? "1 Beitrag" : `${dues.unpaid.length} Beiträge`}
             </span>
           </div>
-          <strong className="ap-kpi-value">
-            {stats.paidCount}
-            <span className="ap-kpi-of"> / {stats.billable.length}</span>
-          </strong>
-          <ProgressBar
-            value={stats.paidCount}
-            max={stats.billable.length}
-            label={`Bezahlt ${year}`}
-          />
-        </div>
-        <div className="ap-kpi">
-          <span className="ap-kpi-label">Aktive Einträge</span>
-          <strong className="ap-kpi-value">{stats.active.length}</strong>
-          {stats.active.length > stats.billable.length ? (
-            <span className="ap-kpi-foot">
-              davon {stats.active.length - stats.billable.length} ohne CHF
+          <Link href="/admin/preisgelder" className="ap-income-stat ap-income-stat--link">
+            <span className="ap-kpi-label">
+              <IconTrophy size={14} /> Preisgelder
             </span>
-          ) : null}
-        </div>
-        <div className="ap-kpi">
-          <span className="ap-kpi-label">Soll {year}</span>
-          <strong className="ap-kpi-value">{chfCompact(stats.soll)}</strong>
-        </div>
-        <div className="ap-kpi">
-          <span className="ap-kpi-label">Eingegangen</span>
-          <strong className="ap-kpi-value">{chfCompact(stats.ist)}</strong>
-        </div>
-        <div className={`ap-kpi${stats.offen > 0 ? " ap-kpi--alert" : ""}`}>
-          <span className="ap-kpi-label">Offen</span>
-          <strong className="ap-kpi-value">{chfCompact(stats.offen)}</strong>
+            <strong className="ap-kpi-value">{chfCompact(income.bySource.prize + income.bySource.proam)}</strong>
+            <span className="ap-kpi-foot">
+              {income.prizeCount + income.proamCount === 0
+                ? "Noch keine erfasst — jetzt erfassen"
+                : `${income.prizeCount} ${income.prizeCount === 1 ? "Turnier" : "Turniere"} · ${income.proamCount} ${
+                    income.proamCount === 1 ? "ProAm" : "ProAms"
+                  } (${chfCompact(income.bySource.proam)})`}
+            </span>
+          </Link>
         </div>
       </section>
 
       <div className="ap-grid-2">
-        <section className="ap-card" aria-labelledby="todo-heading">
+        <section className="ap-card" aria-labelledby="inbox-heading">
           <div className="ap-card-head">
-            <h2 id="todo-heading" className="ap-h2">
-              Zu erledigen
+            <IconInbox />
+            <h2 id="inbox-heading" className="ap-h2">
+              Offene Anfragen
             </h2>
-            <span className="ap-count">
-              {stats.unpaid.length + openInquiries.length}
-            </span>
+            {inbox.fresh.length > 0 ? <span className="ap-pill-new">{inbox.fresh.length} neu</span> : null}
+            <span className="ap-count">{inbox.list.length}</span>
           </div>
-
-          <div className="ap-todo-group">
-            <div className="ap-todo-group-head">
-              <IconUsers />
-              <h3 className="ap-h3">Offene Beiträge {year}</h3>
-              <span className="ap-todo-sum">{chfCompact(stats.offen)}</span>
-            </div>
-            {stats.unpaid.length === 0 ? (
-              <p className="ap-empty-inline">
-                Alle Beiträge mit Betrag sind für {year} bezahlt.
-              </p>
-            ) : (
-              <ul className="ap-todo-list">
-                {stats.unpaid.slice(0, TODO_LIMIT).map((m) => (
-                  <li key={m.id}>
+          {inbox.list.length === 0 ? (
+            <p className="ap-empty-inline">Keine offenen Anfragen — alles erledigt.</p>
+          ) : (
+            <ul className="ap-todo-list">
+              {inbox.list.slice(0, LIST_LIMIT).map((q) => {
+                const fresh = isNewInquiry(q);
+                return (
+                  <li key={q.id}>
                     <Link
-                      href={`/admin/goenner/${m.id}`}
-                      className="ap-todo-row"
+                      href={`/admin/goenner/inbox?filter=${fresh ? "new" : "open"}`}
+                      className={`ap-todo-row${fresh ? " is-new" : ""}`}
                     >
                       <span className="ap-todo-main">
-                        <span className="ap-todo-name">{m.name}</span>
-                        <span className="ap-todo-meta">
-                          {m.organization ? `${m.organization} · ` : ""}
-                          {inquiryTierShort(m.membership_id)}
-                          {m.contribution_type && m.contribution_type !== "geld"
-                            ? ` · ${contributionTypeLabel(m.contribution_type)}`
-                            : ""}
+                        <span className="ap-todo-name">
+                          {fresh ? <span className="ap-new-dot" aria-label="Neu" /> : null}
+                          {q.name}
                         </span>
-                      </span>
-                      <span className="ap-num">{chf(m.expected)}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {stats.unpaid.length > 0 ? (
-              <Link href={openHref} className="ap-link-more">
-                {stats.unpaid.length > TODO_LIMIT
-                  ? `Alle ${stats.unpaid.length} offenen Beiträge erfassen`
-                  : "In der Gönner-Liste erfassen"}
-                <IconArrowRight size={14} />
-              </Link>
-            ) : null}
-          </div>
-
-          <div className="ap-todo-group">
-            <div className="ap-todo-group-head">
-              <IconInbox />
-              <h3 className="ap-h3">Offene Eingänge</h3>
-              <span className="ap-todo-sum">{openInquiries.length}</span>
-            </div>
-            {openInquiries.length === 0 ? (
-              <p className="ap-empty-inline">
-                Keine offenen Formular-Anfragen.
-              </p>
-            ) : (
-              <ul className="ap-todo-list">
-                {openInquiries.slice(0, TODO_LIMIT).map((q) => (
-                  <li key={q.id}>
-                    <Link href="/admin/goenner/inbox" className="ap-todo-row">
-                      <span className="ap-todo-main">
-                        <span className="ap-todo-name">{q.name}</span>
                         <span className="ap-todo-meta">
                           Eingang {dateCh(q.created_at)}
+                          {q.payment_method ? ` · ${q.payment_method === "twint" ? "TWINT" : "Rechnung"}` : ""}
                         </span>
                       </span>
-                      <TierTag id={q.membership_id}>
-                        {inquiryTierShort(q.membership_id)}
-                      </TierTag>
+                      <TierTag id={q.membership_id}>{inquiryTierShort(q.membership_id)}</TierTag>
                     </Link>
                   </li>
-                ))}
-              </ul>
-            )}
-            {openInquiries.length > 0 ? (
-              <Link href="/admin/goenner/inbox" className="ap-link-more">
-                Eingänge bearbeiten
-                <IconArrowRight size={14} />
-              </Link>
-            ) : null}
-          </div>
+                );
+              })}
+            </ul>
+          )}
+          <Link href="/admin/goenner/inbox" className="ap-link-more">
+            {inbox.list.length > LIST_LIMIT ? `Alle ${inbox.list.length} Anfragen bearbeiten` : "Zu den Eingängen"}
+            <IconArrowRight size={14} />
+          </Link>
         </section>
 
-        <div className="ap-stack">
-          <section className="ap-card" aria-labelledby="cat-heading">
-            <div className="ap-card-head">
-              <h2 id="cat-heading" className="ap-h2">
-                Nach Bereich
-              </h2>
-              <span className="ap-card-sub">{year}</span>
-            </div>
-            <table className="ap-tier-table ap-cat-table">
-              <thead>
-                <tr>
-                  <th scope="col">Bereich</th>
-                  <th scope="col" className="ap-num">
-                    Aktiv
-                  </th>
-                  <th scope="col" className="ap-num">
-                    Bezahlt
-                  </th>
-                  <th scope="col" className="ap-num">
-                    Soll
-                  </th>
-                  <th scope="col" className="ap-num">
-                    Eingegangen
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {byCategory.map((c) => (
-                  <tr key={c.id}>
-                    <th scope="row">
-                      <span className="ap-tier-label">{c.label}</span>
-                      {c.inKind > 0 ? (
-                        <span className="ap-todo-meta">
-                          {c.inKind}{" "}
-                          {c.id === "partner"
-                            ? "mit Sachleistung"
-                            : "ohne CHF-Betrag"}
-                        </span>
-                      ) : null}
-                    </th>
-                    <td className="ap-num">{c.active}</td>
-                    <td className="ap-num">
-                      {c.billable > 0 ? (
-                        `${c.paid}/${c.billable}`
-                      ) : (
-                        <span className="ap-dim">—</span>
-                      )}
-                    </td>
-                    <td className="ap-num">
-                      {c.soll > 0 ? (
-                        chfCompact(c.soll)
-                      ) : (
-                        <span className="ap-dim">—</span>
-                      )}
-                    </td>
-                    <td className="ap-num">
-                      {c.ist > 0 ? (
-                        chfCompact(c.ist)
-                      ) : (
-                        <span className="ap-dim">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-
-          <section className="ap-card" aria-labelledby="tier-heading">
-            <div className="ap-card-head">
-              <h2 id="tier-heading" className="ap-h2">
-                Verteilung nach Stufe
-              </h2>
-              <span className="ap-card-sub">
-                {category === "all"
-                  ? "alle Bereiche"
-                  : CATEGORY_TABS.find((t) => t.id === category)?.label}{" "}
-                · aktiv
-              </span>
-            </div>
-            {stats.tiers.length === 0 ? (
-              <p className="ap-empty-inline">
-                Keine aktiven Einträge in diesem Bereich.
-              </p>
-            ) : (
-              <table className="ap-tier-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Stufe</th>
-                    <th scope="col" className="ap-num">
-                      Anzahl
-                    </th>
-                    <th scope="col" className="ap-num">
-                      Bezahlt
-                    </th>
-                    <th scope="col" className="ap-num">
-                      Soll
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.tiers.map((t) => (
-                    <tr key={t.id}>
-                      <th scope="row">
-                        <span className="ap-tier-label">{t.label}</span>
-                        <span className="ap-bar" aria-hidden="true">
-                          <span
-                            style={{
-                              width: `${Math.max(2, (t.soll / stats.maxTierSoll) * 100)}%`,
-                            }}
-                          />
-                        </span>
-                      </th>
-                      <td className="ap-num">{t.count}</td>
-                      <td className="ap-num">
-                        {t.paid}/{t.count}
-                      </td>
-                      <td className="ap-num">{chfCompact(t.soll)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th scope="row">Total</th>
-                    <td className="ap-num">{stats.active.length}</td>
-                    <td className="ap-num">
-                      {stats.paidCount}/{stats.billable.length}
-                    </td>
-                    <td className="ap-num">{chfCompact(stats.soll)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            )}
-
-            <div className="ap-card-foot">
-              <div>
-                <p className="ap-h3">Reports</p>
-                <p className="ap-muted-sm">CSV für Excel, Stand Jahresende.</p>
-              </div>
-              <div className="ap-btn-row">
-                <a
-                  className="ap-btn ap-btn--secondary ap-btn--sm"
-                  href={`/api/admin/goenner-report?year=${reportYear}`}
-                >
-                  <IconDownload size={14} />
-                  {reportYear}
-                </a>
-                {year !== reportYear ? (
-                  <a
-                    className="ap-btn ap-btn--secondary ap-btn--sm"
-                    href={`/api/admin/goenner-report?year=${year}`}
-                  >
-                    <IconDownload size={14} />
-                    {year}
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          </section>
-        </div>
+        <section className="ap-card" aria-labelledby="dues-heading">
+          <div className="ap-card-head">
+            <IconUsers />
+            <h2 id="dues-heading" className="ap-h2">
+              Offene Beiträge {year}
+            </h2>
+            <span className="ap-count">{dues.unpaid.length}</span>
+          </div>
+          {dues.unpaid.length === 0 ? (
+            <p className="ap-empty-inline">Alle Beiträge mit Betrag sind für {year} bezahlt.</p>
+          ) : (
+            <ul className="ap-todo-list">
+              {dues.unpaid.slice(0, LIST_LIMIT).map((m) => (
+                <li key={m.id}>
+                  <Link href={`/admin/goenner/${m.id}`} className="ap-todo-row">
+                    <span className="ap-todo-main">
+                      <span className="ap-todo-name">{m.name}</span>
+                      <span className="ap-todo-meta">
+                        {m.organization ? `${m.organization} · ` : ""}
+                        {inquiryTierShort(m.membership_id)}
+                        {m.contribution_type && m.contribution_type !== "geld"
+                          ? ` · ${contributionTypeLabel(m.contribution_type)}`
+                          : ""}
+                      </span>
+                    </span>
+                    <span className="ap-num">{chf(m.expected)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          {dues.unpaid.length > 0 ? (
+            <Link href={`/admin?status=open${year !== currentYear ? `&year=${year}` : ""}#liste`} className="ap-link-more">
+              {dues.unpaid.length > LIST_LIMIT ? `Alle ${dues.unpaid.length} in der Liste zeigen` : "In der Liste zeigen"}
+              <IconArrowRight size={14} />
+            </Link>
+          ) : null}
+        </section>
       </div>
+
+      {ledgerMissing ? null : (
+        <AdminGoennerMembersClient
+          key={`${initialStatus ?? "all"}-${initialCategory ?? "all"}`}
+          members={members}
+          payments={payments}
+          year={year}
+          initialStatus={initialStatus}
+          initialCategory={initialCategory}
+        />
+      )}
     </div>
   );
 }

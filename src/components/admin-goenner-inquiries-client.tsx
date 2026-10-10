@@ -9,8 +9,11 @@ import {
   membershipPriceChf,
 } from "@/content/goennerMemberships";
 import type { GoennerInquiryRow, GoennerInquiryStatus } from "@/types/content";
-import { IconNote, IconSearch, IconTrash } from "@/components/admin/admin-icons";
+import { isNewInquiry } from "@/lib/admin-inbox";
+import { IconCheck, IconMail, IconNote, IconSearch, IconSort, IconTrash } from "@/components/admin/admin-icons";
+import { AdminRowMenu } from "@/components/admin/admin-row-menu";
 import { TierTag } from "@/components/admin/admin-ui";
+import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
 
 function chfFmt(n: number) {
   // Node-ICU (') und Browser (’) unterscheiden sich — vereinheitlichen gegen Hydration-Fehler
@@ -44,7 +47,13 @@ function toDateInput(iso: string) {
   return `${y}-${m}-${day}`;
 }
 
-type Filter = "all" | "open" | "paid" | "exited" | "hundert";
+export type InboxFilter = "new" | "all" | "open" | "paid" | "exited" | "hundert";
+type Filter = InboxFilter;
+
+type SortKey = "name" | "tier" | "amount" | "status" | "created";
+type SortState = { key: SortKey; dir: "asc" | "desc" } | null;
+
+const STATUS_ORDER = { open: 0, completed: 1, exited: 2 } as const;
 
 type Draft = {
   email: string;
@@ -53,6 +62,10 @@ type Draft = {
   status: GoennerInquiryStatus;
   created: string;
 };
+
+function amountOf(row: GoennerInquiryRow) {
+  return row.amount_chf != null ? Number(row.amount_chf) : membershipPriceChf(row.membership_id);
+}
 
 function draftFrom(row: GoennerInquiryRow): Draft {
   const amount =
@@ -68,14 +81,32 @@ function draftFrom(row: GoennerInquiryRow): Draft {
   };
 }
 
-export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[] }) {
+export function AdminGoennerInquiriesClient({
+  rows,
+  initialFilter,
+}: {
+  rows: GoennerInquiryRow[];
+  initialFilter?: InboxFilter;
+}) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formWarning, setFormWarning] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>("open");
+  const [formOk, setFormOk] = useState<string | null>(null);
+  const newRows = rows.filter(isNewInquiry);
+  const [filter, setFilter] = useState<Filter>(initialFilter ?? (newRows.length > 0 ? "new" : "open"));
   const [query, setQuery] = useState("");
+  // null = Standard: neue zuerst, dann offen → bezahlt → ausgetreten, jeweils neueste oben
+  const [sort, setSort] = useState<SortState>(null);
+  const [markingAll, setMarkingAll] = useState(false);
+  // Im Filter «Neu» bleiben Zeilen sichtbar, die erst in dieser Sitzung gelesen wurden
+  const [seenNow, setSeenNow] = useState<ReadonlySet<string>>(() => new Set());
+
+  function markSeen(row: GoennerInquiryRow) {
+    setSeenNow((prev) => new Set(prev).add(row.id));
+    void patch(row.id, { seen: true });
+  }
   const [drafts, setDrafts] = useState<Record<string, Draft>>(() =>
     Object.fromEntries(rows.map((r) => [r.id, draftFrom(r)])),
   );
@@ -109,6 +140,7 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
     return rows
       .filter((row) => {
         const st = statusOf(row);
+        if (filter === "new") return isNewInquiry(row) || seenNow.has(row.id);
         if (filter === "open") return st === "open";
         if (filter === "paid") return st === "completed";
         if (filter === "exited") return st === "exited";
@@ -123,12 +155,61 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
         return hay.includes(q);
       })
       .sort((a, b) => {
-        const order = { open: 0, completed: 1, exited: 2 } as const;
-        const diff = order[statusOf(a)] - order[statusOf(b)];
-        if (diff !== 0) return diff;
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        const newest = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        if (!sort) {
+          const fresh = Number(isNewInquiry(b)) - Number(isNewInquiry(a));
+          return fresh || STATUS_ORDER[statusOf(a)] - STATUS_ORDER[statusOf(b)] || newest;
+        }
+        let diff = 0;
+        if (sort.key === "name") diff = a.name.localeCompare(b.name, "de-CH");
+        else if (sort.key === "tier") diff = inquiryTierShort(a.membership_id).localeCompare(inquiryTierShort(b.membership_id), "de-CH");
+        else if (sort.key === "amount") diff = amountOf(a) - amountOf(b);
+        else if (sort.key === "status") diff = STATUS_ORDER[statusOf(a)] - STATUS_ORDER[statusOf(b)];
+        else diff = -newest;
+        return (sort.dir === "asc" ? diff : -diff) || newest;
       });
-  }, [rows, filter, query]);
+  }, [rows, filter, query, sort, seenNow]);
+
+  function toggleSort(key: SortKey) {
+    setSort((prev) =>
+      prev?.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: key === "amount" || key === "created" ? "desc" : "asc" },
+    );
+  }
+
+  function sortHeader(key: SortKey, label: string, align?: "end") {
+    const active = sort?.key === key;
+    return (
+      <th
+        scope="col"
+        className={align === "end" ? "ap-num" : undefined}
+        aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
+      >
+        <button type="button" className={`ap-sort${active ? " is-active" : ""}`} onClick={() => toggleSort(key)}>
+          {label}
+          <IconSort dir={active ? sort.dir : null} />
+        </button>
+      </th>
+    );
+  }
+
+  async function markAllSeen() {
+    setMarkingAll(true);
+    setFormError(null);
+    try {
+      const res = await fetch("/api/admin/goenner-inquiries/seen", { method: "POST" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setFormError(data.error || "Aktion fehlgeschlagen.");
+        return;
+      }
+      if (filter === "new") setFilter("open");
+      startTransition(() => router.refresh());
+    } finally {
+      setMarkingAll(false);
+    }
+  }
 
   function setDraft(id: string, partial: Partial<Draft>) {
     setDrafts((prev) => ({ ...prev, [id]: { ...prev[id], ...partial } }));
@@ -204,11 +285,31 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
   function openNote(row: GoennerInquiryRow) {
     setNoteOpenId(row.id);
     setNoteDraft(row.admin_note || "");
+    if (isNewInquiry(row)) markSeen(row);
   }
 
   async function saveNote(row: GoennerInquiryRow) {
     const ok = await patch(row.id, { admin_note: noteDraft.trim() || null });
     if (ok) setNoteOpenId(null);
+  }
+
+  async function sendMail(row: GoennerInquiryRow, type: StandardMailType) {
+    setFormError(null);
+    setFormWarning(null);
+    setFormOk(null);
+    setBusyId(row.id);
+    try {
+      const msg = await sendStandardMail({ source: "inquiry", id: row.id, type, name: row.name, email: row.email });
+      if (msg) {
+        setFormOk(msg);
+        if (isNewInquiry(row)) markSeen(row);
+        startTransition(() => router.refresh());
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "Mail konnte nicht gesendet werden.");
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function deleteRow(row: GoennerInquiryRow) {
@@ -235,6 +336,7 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
   }
 
   const counts: Record<Filter, number> = {
+    new: newRows.length,
     open: openRows.length,
     paid: paidRows.length,
     exited: exitedRows.length,
@@ -245,6 +347,10 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
   return (
     <>
       <dl className="ap-statline" aria-label="Eingänge in Zahlen">
+        <div className={newRows.length > 0 ? "is-new" : undefined}>
+          <dt>Neu</dt>
+          <dd>{newRows.length}</dd>
+        </div>
         <div className={openRows.length > 0 ? "is-alert" : undefined}>
           <dt>Offen</dt>
           <dd>{openRows.length}</dd>
@@ -271,6 +377,7 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
         <div className="ap-segment" role="group" aria-label="Liste filtern">
           {(
             [
+              ["new", "Neu"],
               ["open", "Offen"],
               ["paid", "Bezahlt"],
               ["exited", "Ausgetreten"],
@@ -301,6 +408,36 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
             placeholder="Name, E-Mail, Telefon…"
           />
         </label>
+        <label className="ap-field-inline ap-sort-select">
+          <span>Sortieren</span>
+          <select
+            className="ap-select"
+            value={sort ? `${sort.key}:${sort.dir}` : "default"}
+            onChange={(e) => {
+              if (e.target.value === "default") return setSort(null);
+              const [key, dir] = e.target.value.split(":") as [SortKey, "asc" | "desc"];
+              setSort({ key, dir });
+            }}
+          >
+            <option value="default">Neue &amp; offene zuerst</option>
+            <option value="created:desc">Eingang neueste</option>
+            <option value="created:asc">Eingang älteste</option>
+            <option value="name:asc">Name A–Z</option>
+            <option value="amount:desc">Betrag hoch → tief</option>
+            <option value="tier:asc">Stufe</option>
+          </select>
+        </label>
+        {newRows.length > 0 ? (
+          <button
+            type="button"
+            className="ap-btn ap-btn--secondary ap-btn--sm"
+            disabled={markingAll}
+            onClick={() => void markAllSeen()}
+          >
+            <IconCheck size={14} />
+            {markingAll ? "…" : "Alle als gelesen markieren"}
+          </button>
+        ) : null}
       </div>
 
       {formError ? (
@@ -311,6 +448,11 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
       {formWarning ? (
         <p className="ap-banner ap-banner--warn" role="status">
           {formWarning}
+        </p>
+      ) : null}
+      {formOk ? (
+        <p className="ap-banner ap-banner--ok" role="status">
+          {formOk}
         </p>
       ) : null}
 
@@ -325,15 +467,13 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
             <caption className="sr-only">Eingänge, {visible.length} Einträge</caption>
             <thead>
               <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Stufe</th>
+                {sortHeader("name", "Name")}
+                {sortHeader("tier", "Stufe")}
                 <th scope="col">E-Mail</th>
                 <th scope="col">Telefon</th>
-                <th scope="col" className="ap-num">
-                  Betrag CHF
-                </th>
-                <th scope="col">Status</th>
-                <th scope="col">Eingang</th>
+                {sortHeader("amount", "Betrag CHF", "end")}
+                {sortHeader("status", "Status")}
+                {sortHeader("created", "Eingang")}
                 <th scope="col" className="ap-col-actions">
                   <span className="sr-only">Aktionen</span>
                 </th>
@@ -348,15 +488,33 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                 const dirty = isDirty(row);
                 const tip = commentPreview(row);
                 const hasComment = Boolean(row.message?.trim() || row.admin_note?.trim());
+                const fresh = isNewInquiry(row);
 
                 return (
                   <tr
                     key={row.id}
-                    className={["ap-inbox-row", `is-${st}`, isHundert ? "is-hundert" : "", dirty ? "is-dirty" : ""]
+                    className={[
+                      "ap-inbox-row",
+                      `is-${st}`,
+                      fresh ? "is-new" : "",
+                      isHundert ? "is-hundert" : "",
+                      dirty ? "is-dirty" : "",
+                    ]
                       .filter(Boolean)
                       .join(" ")}
                   >
                     <td className="ap-cell-name">
+                      {fresh ? (
+                        <button
+                          type="button"
+                          className="ap-tag-new"
+                          disabled={busy}
+                          onClick={() => markSeen(row)}
+                          title="Als gelesen markieren"
+                        >
+                          Neu
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         className="ap-inbox-name"
@@ -483,16 +641,28 @@ export function AdminGoennerInquiriesClient({ rows }: { rows: GoennerInquiryRow[
                         >
                           {busy ? "…" : "Speichern"}
                         </button>
-                        <button
-                          type="button"
-                          className="ap-icon-btn ap-icon-btn--danger"
-                          disabled={busy}
-                          onClick={() => void deleteRow(row)}
-                          title="Löschen"
-                          aria-label={`Anfrage von ${row.name} löschen`}
-                        >
-                          <IconTrash />
-                        </button>
+                        <AdminRowMenu
+                          label={`Aktionen für ${row.name}`}
+                          items={[
+                            ...(row.membership_id !== "sponsoring"
+                              ? (["rechnung", "twint"] as const).map((type) => ({
+                                  kind: "action" as const,
+                                  label: type === "rechnung" ? "Rechnungs-Mail senden" : "TWINT-Mail senden",
+                                  icon: <IconMail size={14} />,
+                                  disabled: busy,
+                                  onSelect: () => void sendMail(row, type),
+                                }))
+                              : []),
+                            {
+                              kind: "action",
+                              label: "Löschen…",
+                              danger: true,
+                              disabled: busy,
+                              icon: <IconTrash size={14} />,
+                              onSelect: () => void deleteRow(row),
+                            },
+                          ]}
+                        />
                       </div>
                     </td>
                   </tr>

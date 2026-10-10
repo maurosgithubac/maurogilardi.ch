@@ -20,6 +20,8 @@ export type GoennerMailRow = {
   city: string | null;
   payment_method: "rechnung" | "twint" | null;
   invoice_number: string | null;
+  /** Abweichender Betrag (manuell erfasst); sonst Listenpreis der Stufe. */
+  amount_chf?: number | null;
 };
 
 const QR_CID = "goenner-zahlteil-qr";
@@ -40,8 +42,16 @@ function tierTitle(membershipId: string): string {
   return goennerMembershipTiers.find((t) => t.id === membershipId)?.title ?? membershipId;
 }
 
-export function invoicePurpose(row: Pick<GoennerMailRow, "invoice_number" | "membership_id">): string {
-  return `${row.invoice_number ?? ""} · ${tierTitle(row.membership_id)}`.trim();
+export function mailAmountChf(row: { membership_id: string; amount_chf?: number | null }): number {
+  const own = Number(row.amount_chf);
+  return row.amount_chf != null && Number.isFinite(own) && own > 0 ? own : membershipPriceChf(row.membership_id);
+}
+
+/** Zahlungszweck: mit Rechnungsnummer (Rechnung) oder mit Namen (TWINT-Alternative per Bank). */
+export function invoicePurpose(row: Pick<GoennerMailRow, "invoice_number" | "membership_id" | "name">): string {
+  return row.invoice_number
+    ? `${row.invoice_number} · ${tierTitle(row.membership_id)}`
+    : `${tierTitle(row.membership_id)} · ${row.name.trim()}`;
 }
 
 /** Nächste freie Rechnungsnummer, z. B. GG-2027-0007. */
@@ -65,7 +75,7 @@ export async function buildInvoiceQrPng(row: GoennerMailRow): Promise<Buffer> {
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
   const payload = buildSwissQrPayload({
     bank,
-    amountChf: membershipPriceChf(row.membership_id),
+    amountChf: mailAmountChf(row),
     debtorName: row.name,
     debtorStreet: row.street ?? "",
     debtorPostalCode: row.postal_code ?? "",
@@ -80,31 +90,29 @@ type MailContent = { subject: string; html: string; text: string };
 const P_THANKS = `DANKE für deine Unterstützung. Du unterstützt mich mit deinem Beitrag und begleitest mich auf meinen Weg auf die DP World Tour, und das schätze ich sehr. In den kommenden Tagen werde ich dich zum E-Mail-Newsletter (monatlich +-) und zum WhatsApp-Chat hinzufügen, damit du schon mal auf dem Laufenden bleibst und keine News verpasst ;)`;
 const P_WELCOME = `Ich freue mich, dich in meinem Gönnerverein willkommen zu heissen, und hoffe, wir sehen uns bald mal auf dem Golfplatz oder spätestens nächsten Sommer an meinem Gönnerturnier in Domat/Ems.`;
 const P_INVOICE_HINT = `Die Zahlungsdaten findest du unten.`;
+const P_TWINT_BANK = `Sollte mit TWINT etwas nicht funktionieren, kannst du den Betrag alternativ auf folgendes Bankkonto überweisen:`;
 const P_PAID = `Zahlung eingegangen. Danke, für deinen Support`;
 const P_CLOSING = `Freundliche Grüsse und danke für den Support.`;
 const SIGNATURE = ["Mauro Gilardi", "SwissPGA Professional", "maurogilardi.ch", "Bleikenstrasse 6d, 9630 Wattwil"];
 
-/** Dank-Mail bei Rechnung (sofort, mit Zahlungsblock und QR-Code). */
-export function invoiceMailContent(row: GoennerMailRow): MailContent {
-  const first = firstName(row.name);
-  const amount = membershipPriceChf(row.membership_id).toFixed(2);
-  const purpose = invoicePurpose(row);
+/** Zahlungsdaten (Bank) mit Swiss-QR-Code — in der Rechnungs-Mail und als TWINT-Alternative. */
+function bankPayment(row: Pick<GoennerMailRow, "invoice_number" | "membership_id" | "name" | "amount_chf">) {
+  const amount = mailAmountChf(row).toFixed(2);
   const bank = readInvoiceBankConfig();
-  const iban = bank?.iban ?? "";
   const creditorLines = [
     bank?.creditorName ?? "Mauro Gilardi",
     bank?.creditorStreet ?? "",
     `${bank?.creditorPostalCode ?? ""} ${bank?.creditorCity ?? ""}`.trim(),
   ].filter(Boolean);
-  const ibanFormatted = iban.replace(/(.{4})/g, "$1 ").trim();
+  const ibanFormatted = (bank?.iban ?? "").replace(/(.{4})/g, "$1 ").trim();
 
   const rows: [string, string][] = [
     ["Modell", tierTitle(row.membership_id)],
     ["Betrag", `CHF ${amount}`],
-    ["Rechnung", row.invoice_number ?? ""],
+    ...(row.invoice_number ? [["Rechnung", row.invoice_number] as [string, string]] : []),
     ["Empfänger", creditorLines.join(", ")],
     ["IBAN", ibanFormatted],
-    ["Zahlungszweck", purpose],
+    ["Zahlungszweck", invoicePurpose(row)],
   ];
 
   const htmlValue = (k: string, v: string) =>
@@ -121,6 +129,27 @@ export function invoiceMailContent(row: GoennerMailRow): MailContent {
     .join("");
 
   const html = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px;border:1px solid #e4e1da;border-top:3px solid #0b0b0b;">
+        <tr>
+          <td style="padding:20px 16px 20px 22px;vertical-align:top;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${detailRows}</table>
+          </td>
+          <td style="padding:20px 22px 20px 0;width:160px;vertical-align:top;text-align:center;">
+            <img src="cid:${QR_CID}" width="140" height="140" alt="Swiss QR-Code zum Bezahlen" style="display:block;width:140px;height:140px;margin:0 auto;">
+            <div style="margin-top:10px;font-size:12px;line-height:1.45;color:#66625b;">Mit dem E-Banking scannen.<br>Betrag und Empfänger sind vorausgefüllt.</div>
+          </td>
+        </tr>
+      </table>`;
+
+  return { html, textLines: rows.map(([k, v]) => `${k}: ${v}`), configured: Boolean(bank) };
+}
+
+/** Dank-Mail bei Rechnung (sofort, mit Zahlungsblock und QR-Code). */
+export function invoiceMailContent(row: GoennerMailRow): MailContent {
+  const first = firstName(row.name);
+  const payment = bankPayment(row);
+
+  const html = `
 <div style="background:#f1efea;padding:24px 12px;font-family:Georgia,'Playfair Display','Times New Roman',serif;color:#0b0b0b;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e4e1da;">
     <tr><td style="padding:28px 40px 22px;border-bottom:1px solid #e4e1da;">
@@ -135,17 +164,7 @@ export function invoiceMailContent(row: GoennerMailRow): MailContent {
       <p style="margin:0 0 14px;">${escapeHtml(P_THANKS)}</p>
       <p style="margin:0 0 14px;">${escapeHtml(P_WELCOME)}</p>
       <p style="margin:0 0 14px;">${escapeHtml(P_INVOICE_HINT)}</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 6px;border:1px solid #e4e1da;border-top:3px solid #0b0b0b;">
-        <tr>
-          <td style="padding:20px 16px 20px 22px;vertical-align:top;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${detailRows}</table>
-          </td>
-          <td style="padding:20px 22px 20px 0;width:160px;vertical-align:top;text-align:center;">
-            <img src="cid:${QR_CID}" width="140" height="140" alt="Swiss QR-Code zum Bezahlen" style="display:block;width:140px;height:140px;margin:0 auto;">
-            <div style="margin-top:10px;font-size:12px;line-height:1.45;color:#66625b;">Mit dem E-Banking scannen.<br>Betrag und Empfänger sind vorausgefüllt.</div>
-          </td>
-        </tr>
-      </table>
+      ${payment.html}
       <p style="margin:22px 0 0;">${escapeHtml(P_CLOSING)}</p>
       <p style="margin:22px 0 0;font-weight:700;">${escapeHtml(SIGNATURE[0])}</p>
       <p style="margin:0;font-size:13px;color:#66625b;line-height:1.5;">${SIGNATURE.slice(1).map(escapeHtml).join("<br>")}</p>
@@ -162,7 +181,7 @@ export function invoiceMailContent(row: GoennerMailRow): MailContent {
     "",
     P_INVOICE_HINT,
     "",
-    ...rows.map(([k, v]) => `${k}: ${v}`),
+    ...payment.textLines,
     "",
     P_CLOSING,
     "",
@@ -260,12 +279,15 @@ export type ReceiptInput = {
   city: string | null;
   payment_method: "rechnung" | "twint" | null;
   message: string | null;
+  amount_chf?: number | null;
 };
 
-function receiptModelLabel(id: string): string {
+function receiptModelLabel(input: Pick<ReceiptInput, "membership_id" | "amount_chf">): string {
+  const id = input.membership_id;
   if (id === "sponsoring") return "Sponsoring";
-  if (id === "hundert") return "100er Club (100 CHF)";
-  return `${tierTitle(id)} (CHF ${membershipPriceChf(id).toFixed(2)} / Jahr)`;
+  const amount = mailAmountChf(input);
+  if (id === "hundert") return `100er Club (${amount} CHF)`;
+  return `${tierTitle(id)} (CHF ${amount.toFixed(2)} / Jahr)`;
 }
 
 export function receiptMailContent(input: ReceiptInput): MailContent {
@@ -277,7 +299,7 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
     input.payment_method === "rechnung" ? "Rechnung" : input.payment_method === "twint" ? "TWINT" : "";
 
   const rows: [string, string][] = [
-    ["Modell", receiptModelLabel(input.membership_id)],
+    ["Modell", receiptModelLabel(input)],
     ["Name", input.name],
     ["E-Mail", input.email],
     ["Telefon", input.phone ?? ""],
@@ -293,25 +315,34 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
     )
     .join("");
 
-  // 100er Club: TWINT-Link steht in der Eingangsbestätigung, Zahlung läuft meist direkt über die Webseite.
-  const isHundert = input.membership_id === "hundert";
-  const twintHtml = isHundert
+  // TWINT (100er Club und Gönner-Modelle): Paylink, falls noch nicht über die Webseite bezahlt,
+  // darunter die Bank-Alternative mit QR-Code.
+  const isTwint = input.payment_method === "twint" && input.membership_id !== "sponsoring";
+  const amountLabel = `CHF ${mailAmountChf(input).toFixed(2)}`;
+  const bank = isTwint ? bankPayment({ ...input, invoice_number: null }) : null;
+  const bankHtml = bank?.configured
+    ? `
+          <p style="margin:18px 0 0;">${escapeHtml(P_TWINT_BANK)}</p>
+          ${bank.html}`
+    : "";
+  const twintHtml = isTwint
     ? `
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0;border:1px solid #e4e1da;">
         <tr><td style="padding:18px 22px;">
           <div style="font-size:11px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#d71920;margin-bottom:10px;">Zahlung per TWINT</div>
-          <p style="margin:0 0 14px;">Die 100 CHF kannst du hier direkt per TWINT bezahlen:</p>
+          <p style="margin:0 0 14px;">Die ${escapeHtml(amountLabel)} kannst du hier direkt per TWINT bezahlen:</p>
           <a href="${TWINT_PAYLINK_URL}" style="display:inline-block;background:#0b0b0b;color:#faf9f6;text-decoration:none;padding:11px 20px;font-size:14px;font-weight:700;">Mit TWINT bezahlen</a>
           <p style="margin:14px 0 0;font-size:13px;color:#66625b;">Hast du bereits über diese Webseite bezahlt, kannst du diesen Link ignorieren.</p>
         </td></tr>
-      </table>`
+      </table>${bankHtml}`
     : "";
-  const twintText = isHundert
+  const twintText = isTwint
     ? [
         "",
-        "Zahlung per TWINT: 100 CHF",
+        `Zahlung per TWINT: ${amountLabel}`,
         `Direkt bezahlen: ${TWINT_PAYLINK_URL}`,
         "Hast du bereits über diese Webseite bezahlt, kannst du diesen Link ignorieren.",
+        ...(bank?.configured ? ["", P_TWINT_BANK, "", ...bank.textLines] : []),
       ]
     : [];
 
@@ -360,6 +391,9 @@ export function receiptMailContent(input: ReceiptInput): MailContent {
 /** Eingangsbestätigung an die Person, sofort bei jeder Anfrage. */
 export async function sendReceiptMail(input: ReceiptInput): Promise<void> {
   const content = receiptMailContent(input);
+  // QR-Code nur, wenn die Bank-Alternative im Mail steht (TWINT + IBAN konfiguriert)
+  const withQr = content.html.includes(`cid:${QR_CID}`);
+  const qr = withQr ? await buildInvoiceQrPng({ ...input, id: "", invoice_number: null }) : null;
   await sendMail({
     from: readEnv("RESEND_FROM_EMAIL"),
     to: [input.email],
@@ -367,6 +401,9 @@ export async function sendReceiptMail(input: ReceiptInput): Promise<void> {
     subject: content.subject,
     html: content.html,
     text: content.text,
+    attachments: qr
+      ? [{ filename: "zahlteil-qr.png", content: qr, contentType: "image/png", contentId: QR_CID }]
+      : undefined,
   });
 }
 

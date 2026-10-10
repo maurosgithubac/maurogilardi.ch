@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { MailSentHint } from "@/components/goenner/mail-sent-hint";
 
 /** Sponsoring-Anfrage für Firmen: keine Postadresse, dafür Firma und Ziele. */
 export function PartnerInquiryForm() {
@@ -34,7 +35,7 @@ export function PartnerInquiryForm() {
         setStatus({ kind: "error", text: data.error || "Etwas ist schiefgelaufen." });
         return;
       }
-      setStatus({ kind: "ok", text: data.message || "Danke für die Anfrage — ich melde mich innert weniger Tage." });
+      setStatus({ kind: "ok", text: data.message || "Danke für die Anfrage! Du erhältst in Kürze eine Bestätigung per E-Mail — ich melde mich innert weniger Tage." });
       form.reset();
     } catch {
       setStatus({ kind: "error", text: "Verbindung fehlgeschlagen. Bitte versuch es nochmals." });
@@ -93,6 +94,7 @@ export function PartnerInquiryForm() {
       >
         {status.text}
       </p>
+      {status.kind === "ok" ? <MailSentHint /> : null}
     </form>
   );
 }

@@ -7,6 +7,7 @@ import { useState, type FormEvent } from "react";
 import { Club100JoinModal } from "@/components/club100-join-modal";
 import { MG_EASE } from "@/components/motion/motion-provider";
 import { trackEvent } from "@/components/analytics-events";
+import { MailSentHint } from "@/components/goenner/mail-sent-hint";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import {
   goennerMembershipTiers,
@@ -75,8 +76,8 @@ export function GoennerInquiryForm() {
         kind: "ok",
         text:
           payment === "twint"
-            ? "Danke, du bist dabei! Ich melde mich persönlich — den Betrag kannst du direkt per TWINT senden."
-            : "Danke, du bist dabei! Ich melde mich persönlich und schicke dir die Rechnung.",
+            ? "Danke, du bist dabei! In Kürze erhältst du eine Bestätigung per E-Mail — den Betrag kannst du direkt per TWINT senden."
+            : "Danke, du bist dabei! In den nächsten Minuten erhältst du eine E-Mail mit der Rechnung und dem QR-Code.",
       });
       form.reset();
       setTier("");
@@ -185,6 +186,7 @@ export function GoennerInquiryForm() {
               </motion.p>
             ) : null}
           </AnimatePresence>
+          {status.kind === "ok" ? <MailSentHint /> : null}
           {status.kind === "ok" && payment === "twint" ? (
             <a
               href={TWINT_PAYLINK_URL}
