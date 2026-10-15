@@ -148,29 +148,28 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   }
 
   async function downloadInvoice() {
-    if (!lastPayment) {
-      setError("Keine Zahlung vorhanden — zuerst eine Einzahlung erfassen.");
+    if (!member.inquiry_id) {
+      setError("Kein Anmeldedatensatz verknüpft — PDF-Rechnung nicht verfügbar.");
       return;
     }
     setInvoiceBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice`);
+      const res = await fetch(`/api/admin/goenner-inquiries/${member.inquiry_id}/invoice-pdf`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(data.error || "Rechnung konnte nicht erstellt werden.");
+        setError(data.error || "PDF-Rechnung konnte nicht erstellt werden.");
         return;
       }
       const blob = await res.blob();
-      const disposition = res.headers.get("Content-Disposition") || "";
-      const match = /filename="([^"]+)"/.exec(disposition);
-      const filename = match?.[1] || `Rechnung_${member.name}.docx`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = `Rechnung-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.pdf`;
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch {
       setError("Download fehlgeschlagen.");
     } finally {
@@ -265,12 +264,12 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
           <button
             type="button"
             className="ap-btn ap-btn--secondary"
-            disabled={invoiceBusy || !lastPayment}
+            disabled={invoiceBusy || !member.inquiry_id}
             onClick={() => void downloadInvoice()}
-            title={lastPayment ? `Rechnung über ${chf(Number(lastPayment.amount_chf))}` : "Zuerst Zahlung erfassen"}
+            title={member.inquiry_id ? "PDF-Rechnung herunterladen" : "Kein Anmeldedatensatz verknüpft"}
           >
             <IconFile />
-            {invoiceBusy ? "Erstelle…" : "Rechnung (Word)"}
+            {invoiceBusy ? "Erstelle…" : "Rechnung (PDF)"}
           </button>
         </div>
       </header>

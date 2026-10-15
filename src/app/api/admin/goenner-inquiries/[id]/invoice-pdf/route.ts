@@ -3,6 +3,8 @@ import { isAdminSession } from "@/lib/admin-auth";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import { buildGoennerInvoicePdf, type InvoicePdfRow } from "@/lib/goenner-invoice-pdf";
 
+export const maxDuration = 60;
+
 function validId(id: string) {
   return /^[0-9a-f-]{36}$/i.test(id);
 }

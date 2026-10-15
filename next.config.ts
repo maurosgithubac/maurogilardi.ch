@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Chromium für die PDF-Rechnung läuft als externes Paket (nicht bündeln).
+  serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
   experimental: {
     optimizePackageImports: ["motion"],
   },
