@@ -40,6 +40,8 @@ export type GoennerInquiryRow = {
   amount_chf?: number | null;
   /** Migration 019 */
   payment_method?: "rechnung" | "twint" | null;
+  /** Migration 019: Rechnungsnummer, z. B. GG-2027-0001 */
+  invoice_number?: string | null;
   /** Im Admin geöffnet; null = neu/ungelesen (Migration 020) */
   seen_at?: string | null;
 };

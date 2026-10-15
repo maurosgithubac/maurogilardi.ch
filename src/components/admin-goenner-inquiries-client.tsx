@@ -10,7 +10,7 @@ import {
 } from "@/content/goennerMemberships";
 import type { GoennerInquiryRow, GoennerInquiryStatus } from "@/types/content";
 import { isNewInquiry } from "@/lib/admin-inbox";
-import { IconCheck, IconMail, IconNote, IconSearch, IconSort, IconTrash } from "@/components/admin/admin-icons";
+import { IconCheck, IconDownload, IconMail, IconNote, IconSearch, IconSort, IconTrash } from "@/components/admin/admin-icons";
 import { AdminRowMenu } from "@/components/admin/admin-row-menu";
 import { TierTag } from "@/components/admin/admin-ui";
 import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
@@ -307,6 +307,34 @@ export function AdminGoennerInquiriesClient({
       }
     } catch (e) {
       setFormError(e instanceof Error ? e.message : "Mail konnte nicht gesendet werden.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function downloadInvoicePdf(row: GoennerInquiryRow) {
+    setFormError(null);
+    setFormWarning(null);
+    setFormOk(null);
+    setBusyId(row.id);
+    try {
+      const res = await fetch(`/api/admin/goenner-inquiries/${row.id}/invoice-pdf`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(typeof data.error === "string" ? data.error : "PDF-Rechnung konnte nicht erstellt werden.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rechnung-${row.invoice_number ?? row.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setFormOk(`PDF-Rechnung ${row.invoice_number} heruntergeladen.`);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "PDF-Rechnung konnte nicht erstellt werden.");
     } finally {
       setBusyId(null);
     }
@@ -652,6 +680,17 @@ export function AdminGoennerInquiriesClient({
                                   disabled: busy,
                                   onSelect: () => void sendMail(row, type),
                                 }))
+                              : []),
+                            ...(row.payment_method === "rechnung" && row.invoice_number
+                              ? [
+                                  {
+                                    kind: "action" as const,
+                                    label: "PDF-Rechnung herunterladen",
+                                    icon: <IconDownload size={14} />,
+                                    disabled: busy,
+                                    onSelect: () => void downloadInvoicePdf(row),
+                                  },
+                                ]
                               : []),
                             {
                               kind: "action",

@@ -1,7 +1,7 @@
 import QRCode from "qrcode";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CreateEmailOptions } from "resend";
-import { goennerMembershipTiers, membershipPriceChf } from "@/content/goennerMemberships";
+import { goennerMembershipTiers, inquiryTierShort, membershipPriceChf } from "@/content/goennerMemberships";
 import { readEnv } from "@/lib/env";
 import { createResendClient } from "@/lib/resend";
 import { buildSwissQrPayload, readInvoiceBankConfig } from "@/lib/invoice-config";
@@ -50,7 +50,7 @@ export function mailAmountChf(row: { membership_id: string; amount_chf?: number 
 /** Zahlungszweck: mit Rechnungsnummer (Rechnung) oder mit Namen (TWINT-Alternative per Bank). */
 export function invoicePurpose(row: Pick<GoennerMailRow, "invoice_number" | "membership_id" | "name">): string {
   return row.invoice_number
-    ? `${row.invoice_number} · ${tierTitle(row.membership_id)}`
+    ? `${row.invoice_number} · MG-${inquiryTierShort(row.membership_id)}`
     : `${tierTitle(row.membership_id)} · ${row.name.trim()}`;
 }
 
