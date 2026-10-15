@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/seo/constants";
  * Nicht-öffentliche Bereiche — für alle Crawler gesperrt.
  * `/_next/` bewusst NICHT gesperrt: Google braucht JS/CSS zum Rendern und `/_next/image` für die Bildersuche.
  */
-const PRIVATE_PATHS = ["/admin", "/api/"];
+const PRIVATE_PATHS = ["/admin", "/api/", "/e/"];
 
 /**
  * Such- und KI-Crawler, die ausdrücklich zugelassen sind (Sichtbarkeit in Google, Bing,

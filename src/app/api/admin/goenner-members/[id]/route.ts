@@ -60,6 +60,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if ("city" in body) patch.city = String(body.city || "").trim() || null;
   if ("notes" in body) patch.notes = String(body.notes || "").trim() || null;
   if ("active" in body) patch.active = Boolean(body.active);
+  if ("wall_visible" in body) patch.wall_visible = Boolean(body.wall_visible);
   if ("category" in body && body.category != null) {
     if (!isMemberCategory(body.category)) return NextResponse.json({ error: "Ungültige Kategorie." }, { status: 400 });
     patch.category = body.category;
@@ -89,7 +90,17 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase.from("goenner_members").update(patch).eq("id", id).select("*").maybeSingle();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    const missingWall = /wall_visible/i.test(error.message);
+    return NextResponse.json(
+      {
+        error: missingWall
+          ? "Website-Schalter fehlt noch — supabase/022_member_wall_visible.sql in Supabase ausführen."
+          : error.message,
+      },
+      { status: 500 },
+    );
+  }
   if (!data) return NextResponse.json({ error: "Nicht gefunden." }, { status: 404 });
   return NextResponse.json({ member: data });
 }

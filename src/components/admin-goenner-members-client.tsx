@@ -80,6 +80,7 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [wallOverride, setWallOverride] = useState<Record<string, boolean>>({});
 
   const enriched = useMemo(
     () =>
@@ -223,6 +224,43 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
     }
   }
 
+  const wallReady = members.some((m) => typeof m.wall_visible === "boolean");
+
+  function wallOn(member: GoennerMemberRow) {
+    return wallOverride[member.id] ?? Boolean(member.wall_visible);
+  }
+
+  async function toggleWall(member: GoennerMemberRow) {
+    const next = !wallOn(member);
+    setWallOverride((prev) => ({ ...prev, [member.id]: next }));
+    setError(null);
+    setNotice(null);
+    setBusyId(member.id);
+    try {
+      const res = await fetch(`/api/admin/goenner-members/${member.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wall_visible: next }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setWallOverride((prev) => {
+          const copy = { ...prev };
+          delete copy[member.id];
+          return copy;
+        });
+        setError(data.error || "Website-Anzeige konnte nicht gespeichert werden.");
+        return;
+      }
+      setNotice(
+        next ? `«${member.name}» wird auf der Website gezeigt.` : `«${member.name}» ist auf der Website ausgeblendet.`,
+      );
+      startTransition(() => router.refresh());
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function sendMail(member: GoennerMemberRow, type: StandardMailType) {
     setError(null);
     setNotice(null);
@@ -311,7 +349,9 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
             Alle Gönner, Sponsoren &amp; Partner
           </h2>
           <p className="ap-muted-sm">
-            {allActive} aktiv · Status und Beträge für {year} · Spaltenköpfe anklicken zum Sortieren
+            {allActive} aktiv
+            {wallReady ? ` · ${members.filter((m) => wallOn(m)).length} auf der Website` : ""}
+            {" · "}Status und Beträge für {year}
           </p>
         </div>
         <button
@@ -416,6 +456,12 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
 
       <CategoryTabs value={category} counts={categoryCounts} onChange={setCategory} />
 
+      {!wallReady && members.length > 0 ? (
+        <p className="ap-banner ap-banner--warn" role="status">
+          Der Schalter «Auf Website» fehlt noch. In Supabase ausführen:{" "}
+          <code>supabase/022_member_wall_visible.sql</code>
+        </p>
+      ) : null}
       {error ? (
         <p className="ap-banner ap-banner--error" role="alert">
           {error}
@@ -544,6 +590,17 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
                       {m.phone ? <a href={`tel:${m.phone.replace(/\s/g, "")}`}>{m.phone}</a> : null}
                       {!m.email && !m.phone ? <span>Kein Kontakt</span> : null}
                     </span>
+                    {wallReady ? (
+                      <button
+                        type="button"
+                        className={`ap-wall${wallOn(m) ? " is-on" : ""}`}
+                        aria-pressed={wallOn(m)}
+                        disabled={busyId === m.id}
+                        onClick={() => void toggleWall(m)}
+                      >
+                        {wallOn(m) ? "Auf Website" : "Nicht auf Website"}
+                      </button>
+                    ) : null}
                   </td>
                   <td data-label="Stufe">
                     <TierTag id={m.membership_id}>{inquiryTierShort(m.membership_id)}</TierTag>
@@ -556,10 +613,12 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
                   </td>
                   <td data-label={`Status ${year}`}>
                     {m.isPaid ? (
-                      <StatusBadge state="paid">
-                        {/* Betrag nur zeigen, wenn er vom Jahresbetrag abweicht */}
-                        {Math.abs(m.paidInYear - m.expected) < 0.005 ? "Bezahlt" : `Bezahlt · ${chf(m.paidInYear)}`}
-                      </StatusBadge>
+                      <>
+                        <StatusBadge state="paid">Bezahlt</StatusBadge>
+                        {Math.abs(m.paidInYear - m.expected) >= 0.005 ? (
+                          <span className="ap-row-sub">{chf(m.paidInYear)}</span>
+                        ) : null}
+                      </>
                     ) : !m.billable ? (
                       <StatusBadge state="none">
                         {m.contribution_type === "material" ? "Sachleistung" : "Ohne Betrag"}

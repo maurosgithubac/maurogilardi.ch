@@ -24,6 +24,8 @@ export type GoennerMemberRow = {
   member_since?: string | null;
   notes: string | null;
   active: boolean;
+  /** Name im öffentlichen Laufband. Fehlt, solange Migration 022 nicht gelaufen ist. */
+  wall_visible?: boolean;
   inquiry_id: string | null;
   created_at: string;
   updated_at: string;

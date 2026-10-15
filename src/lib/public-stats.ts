@@ -27,6 +27,28 @@ async function countMembers(filter: string): Promise<number | null> {
   }
 }
 
+/**
+ * Namen für das öffentliche Laufband. Nur Personen mit wall_visible.
+ * Solange Migration 022 nicht gelaufen ist, bleibt die bisherige feste Liste.
+ */
+export async function getPublicWallNames(): Promise<string[]> {
+  const fallback = goennervereinigungMemberNames.map((n) => n.trim()).filter(Boolean);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return fallback;
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/goenner_members?select=name&wall_visible=eq.true&order=name.asc`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 60 } },
+    );
+    if (!res.ok) return fallback;
+    const rows = (await res.json()) as { name?: string | null }[];
+    return rows.map((r) => (r.name ?? "").trim()).filter(Boolean);
+  } catch {
+    return fallback;
+  }
+}
+
 /** Aktive Gönnerinnen und Gönner (Kategorie Gönner, ohne Sponsoren/Partner) laut Admin-Portal */
 export async function getSupporterCount(): Promise<number> {
   return (await countMembers("active=is.true&category=eq.goenner")) ?? FALLBACK_SUPPORTERS;

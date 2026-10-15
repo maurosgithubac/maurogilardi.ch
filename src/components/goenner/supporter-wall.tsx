@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { Marquee } from "@/components/motion/marquee";
-import { goennervereinigungMemberNames } from "@/content/goennervereinigungMembers";
-import { getSupporterCount } from "@/lib/public-stats";
+import { getPublicWallNames, getSupporterCount } from "@/lib/public-stats";
 
-/** Zwei gegenläufige Laufbänder mit allen Namen der MG Gönnervereinigung. */
+/** Zwei gegenläufige Laufbänder. Namen kommen aus dem Admin (Schalter «Auf Website»). */
 export async function SupporterWall() {
-  // Anzahl aus dem Admin-Portal; die angezeigten Namen bleiben die öffentlich freigegebene Liste
-  const count = await getSupporterCount();
-  const names = goennervereinigungMemberNames
-    .map((n) => n.trim())
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b, "de-CH", { sensitivity: "base" }));
+  const [count, wallNames] = await Promise.all([getSupporterCount(), getPublicWallNames()]);
+  const names = wallNames.sort((a, b) => a.localeCompare(b, "de-CH", { sensitivity: "base" }));
 
   if (names.length === 0) return null;
   const half = Math.ceil(names.length / 2);
@@ -25,15 +20,15 @@ export async function SupporterWall() {
       </div>
       <Marquee speed={1.6} direction={-1} aria-label="Gönnerinnen und Gönner, Teil 1">
         <ul className="mg-names__row">
-          {names.slice(0, half).map((n) => (
-            <li key={n}>{n}</li>
+          {names.slice(0, half).map((n, i) => (
+            <li key={`${n}-${i}`}>{n}</li>
           ))}
         </ul>
       </Marquee>
       <Marquee speed={1.6} direction={1} aria-label="Gönnerinnen und Gönner, Teil 2">
         <ul className="mg-names__row">
-          {names.slice(half).map((n) => (
-            <li key={n}>{n}</li>
+          {names.slice(half).map((n, i) => (
+            <li key={`${n}-${i}`}>{n}</li>
           ))}
         </ul>
       </Marquee>

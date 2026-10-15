@@ -73,7 +73,7 @@ export function getNextQuizQuestion(): EngagementQuizQuestion | null {
 
 export function registerSubpageView(pathname: string): QuizSession {
   const session = readSession();
-  if (pathname === "/" || pathname.startsWith("/admin")) {
+  if (pathname === "/" || pathname.startsWith("/admin") || pathname.startsWith("/e/")) {
     return session;
   }
   session.subpageViews += 1;
@@ -93,7 +93,7 @@ export function getSessionElapsedSeconds(): number {
 }
 
 export function canShowQuizPopup(pathname: string): boolean {
-  if (pathname.startsWith("/admin")) return false;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/e/")) return false;
 
   const session = readSession();
   if (session.popupShown) return false;

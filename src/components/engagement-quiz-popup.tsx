@@ -29,7 +29,7 @@ export function EngagementQuizPopup() {
   const [elapsed, setElapsed] = useState(0);
 
   const tryOpen = useCallback(() => {
-    if (open || pathname.startsWith("/admin")) return;
+    if (open || pathname.startsWith("/admin") || pathname.startsWith("/e/")) return;
     // Nie über ein offenes Menü/Modal (z. B. 100er-Club-Beitritt) legen
     if (isOverlayOpen()) return;
     if (!canShowQuizPopup(pathname)) return;
@@ -49,14 +49,14 @@ export function EngagementQuizPopup() {
   }, []);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
+    if (pathname.startsWith("/admin") || pathname.startsWith("/e/")) return;
     registerSubpageView(pathname);
     setElapsed(getSessionElapsedSeconds());
     tryOpen();
   }, [pathname, tryOpen]);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
+    if (pathname.startsWith("/admin") || pathname.startsWith("/e/")) return;
 
     const tick = window.setInterval(() => {
       setElapsed(getSessionElapsedSeconds());
@@ -66,7 +66,7 @@ export function EngagementQuizPopup() {
   }, [pathname]);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin")) return;
+    if (pathname.startsWith("/admin") || pathname.startsWith("/e/")) return;
     if (elapsed < engagementQuizConfig.minTimeOnSiteSeconds) return;
     tryOpen();
   }, [elapsed, pathname, tryOpen]);
@@ -92,7 +92,7 @@ export function EngagementQuizPopup() {
     setSelected(null);
   }
 
-  if (!open || !question || pathname.startsWith("/admin")) return null;
+  if (!open || !question || pathname.startsWith("/admin") || pathname.startsWith("/e/")) return null;
 
   const correctOption = question.options.find((option) => option.isCorrect);
 

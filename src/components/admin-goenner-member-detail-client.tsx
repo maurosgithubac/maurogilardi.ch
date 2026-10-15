@@ -483,6 +483,21 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
                 <input type="checkbox" checked={draft.active} onChange={(e) => set("active", e.target.checked)} />
                 <span>Aktiv — erscheint in Soll und offenen Beiträgen</span>
               </label>
+              {"wall_visible" in member ? (
+                <label className="ap-switch ap-span-2">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(draft.wall_visible)}
+                    onChange={(e) => set("wall_visible", e.target.checked)}
+                  />
+                  <span>Name auf der Website anzeigen — im Laufband der Gönnervereinigung</span>
+                </label>
+              ) : (
+                <p className="ap-muted-sm ap-span-2">
+                  Website-Anzeige noch nicht verfügbar. In Supabase ausführen:{" "}
+                  <code>supabase/022_member_wall_visible.sql</code>
+                </p>
+              )}
             </div>
           </fieldset>
 

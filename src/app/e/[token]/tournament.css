@@ -1,0 +1,203 @@
+.tn {
+  min-height: 100dvh;
+  background: #f3f4f5;
+  color: #121314;
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+.tn-card {
+  width: min(40rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3.5rem 0 4rem;
+}
+
+.tn-kicker {
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d71920;
+}
+
+.tn h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.tn-when,
+.tn-hello,
+.tn-intro,
+.tn p {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.tn-when {
+  margin: 0.8rem 0 0;
+  color: #5c6168;
+}
+
+.tn-hello {
+  margin: 1.6rem 0 0.4rem;
+  font-size: 1.25rem;
+}
+
+.tn-intro {
+  margin: 0.8rem 0 0;
+  white-space: pre-wrap;
+}
+
+.tn-who {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1.5rem;
+  margin: 1.6rem 0 0;
+  padding: 1rem 0;
+  border-top: 1px solid #e3e5e8;
+  border-bottom: 1px solid #e3e5e8;
+}
+
+.tn-who dt {
+  font-size: 0.75rem;
+  color: #5c6168;
+}
+
+.tn-who dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+}
+
+.tn-choices {
+  margin: 1.4rem 0 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tn-choices legend {
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
+}
+
+.tn-choice {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d0d3d8;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tn-choice.is-on {
+  border-color: #121314;
+}
+
+.tn-choice input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  accent-color: #121314;
+}
+
+.tn-choice strong,
+.tn-choice span span {
+  display: block;
+}
+
+.tn-choice span span {
+  margin-top: 0.15rem;
+  color: #5c6168;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tn-note {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.tn-note textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d0d3d8;
+  border-radius: 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.tn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.tn-primary,
+.tn-quiet {
+  height: 44px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.tn-primary {
+  border: 0;
+  background: #121314;
+  color: #f7f6f3;
+  font-weight: 650;
+}
+
+.tn-quiet {
+  border: 0;
+  background: transparent;
+  color: #5c6168;
+}
+
+.tn-primary:disabled,
+.tn-quiet:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.tn-banner {
+  margin: 1rem 0 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: 8px;
+  background: #eef0f2;
+}
+
+.tn-banner--error {
+  background: #fdeeee;
+  color: #8e0f15;
+}
+
+.tn-banner--ok {
+  background: #eaf5ee;
+  color: #135c33;
+}
+
+@media (max-width: 640px) {
+  .tn-card {
+    padding-top: 2rem;
+  }
+
+  .tn h1 {
+    font-size: 2rem;
+  }
+
+  .tn-who {
+    grid-template-columns: 1fr;
+  }
+}

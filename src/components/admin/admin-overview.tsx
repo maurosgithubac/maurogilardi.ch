@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { contributionTypeLabel, inquiryTierShort } from "@/content/goennerMemberships";
 import {
   GOENNER_FINANCE_START_YEAR,
@@ -39,6 +39,65 @@ type Props = {
 };
 
 const LIST_LIMIT = 5;
+const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+function SeasonChart({
+  months,
+  year,
+  through,
+}: {
+  months: { pay: number; prize: number }[];
+  year: number;
+  through: number;
+}) {
+  const w = 360;
+  const h = 72;
+  const gap = 8;
+  const barW = (w - gap * 11) / 12;
+  const max = Math.max(...months.map((m) => m.pay + m.prize), 1);
+  // <title> im SVG wertet der Browser beim ersten HTML als Seitentitel und leert ihn.
+  const [tips, setTips] = useState(false);
+  useEffect(() => {
+    setTips(true);
+  }, []);
+  return (
+    <figure className="ap-chart">
+      <figcaption className="ap-kpi-label">Monatsverlauf {year}</figcaption>
+      <svg viewBox={`0 0 ${w} ${h + 18}`} role="img" aria-label={`Einnahmen pro Monat ${year}`}>
+        {months.map((m, i) => {
+          const total = m.pay + m.prize;
+          const full = Math.max(total > 0 ? 3 : 0, (total / max) * h);
+          const prizeH = total > 0 ? (m.prize / total) * full : 0;
+          const x = i * (barW + gap);
+          const future = i >= through;
+          return (
+            <g key={i}>
+              {tips ? (
+                <title>
+                  {MONTHS[i]} {year}: {total > 0 ? `CHF ${Math.round(total).toLocaleString("de-CH")}` : "keine Einnahmen"}
+                </title>
+              ) : null}
+              {future ? (
+                <rect className="ap-chart-future" x={x} y={h - 2} width={barW} height={2} rx={1} />
+              ) : (
+                <>
+                  <rect className="ap-chart-pay" x={x} y={h - full} width={barW} height={Math.max(full - prizeH, 0)} rx={1} />
+                  {prizeH > 0 ? (
+                    <rect className="ap-chart-prize" x={x} y={h - prizeH} width={barW} height={prizeH} rx={1} />
+                  ) : null}
+                  {total === 0 ? <rect className="ap-chart-empty" x={x} y={h - 2} width={barW} height={2} rx={1} /> : null}
+                </>
+              )}
+              <text x={x + barW / 2} y={h + 14} textAnchor="middle">
+                {MONTHS[i]}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </figure>
+  );
+}
 
 type SourceId = "goenner" | "sponsor" | "partner" | "prize" | "proam";
 
@@ -137,6 +196,22 @@ export function AdminOverview({
     return { fresh, open, list };
   }, [inquiries]);
 
+  const months = useMemo(() => {
+    const rows = Array.from({ length: 12 }, () => ({ pay: 0, prize: 0 }));
+    for (const p of payments) {
+      if (p.year !== year) continue;
+      const i = Number(p.paid_on.slice(5, 7)) - 1;
+      if (i >= 0 && i < 12) rows[i].pay += Number(p.amount_chf || 0);
+    }
+    for (const r of prizes) {
+      if (r.year !== year) continue;
+      const i = Number(String(r.event_date).slice(5, 7)) - 1;
+      if (i >= 0 && i < 12) rows[i].prize += Number(r.amount_chf || 0);
+    }
+    return rows;
+  }, [payments, prizes, year]);
+  const through = year === currentYear ? new Date().getMonth() + 1 : 12;
+
   const reportYear = currentYear - 1;
   const diff = income.total - income.prev;
   const diffPct = income.prev > 0 ? Math.round((diff / income.prev) * 100) : null;
@@ -227,6 +302,7 @@ export function AdminOverview({
               <>Keine Vergleichswerte aus {year - 1}</>
             )}
           </p>
+          <SeasonChart months={months} year={year} through={through} />
           <div className="ap-mix" role="img" aria-label="Aufteilung der Einnahmen nach Quelle">
             {SOURCES.map((s) =>
               income.bySource[s.id] > 0 ? (

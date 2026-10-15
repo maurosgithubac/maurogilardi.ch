@@ -17,18 +17,18 @@ html:has(.admin-app) {
   --ap-font-brand: var(--mg-font-display, Georgia, serif);
   --ap-font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
-  --ap-bg: #faf9f6;
-  --ap-sidebar: #f3f1ec;
+  --ap-bg: #f3f4f5;
+  --ap-sidebar: #121314;
   --ap-surface: #ffffff;
-  --ap-sunken: #f4f2ed;
-  --ap-head: #f8f7f3;
-  --ap-hover: #f5f3ee;
-  --ap-ink: #0b0b0b;
-  --ap-ink-2: #34322e;
-  --ap-muted: #66625b;
-  --ap-subtle: #8c8880; /* nur Deko */
-  --ap-hair: #e4e1da;
-  --ap-hair-strong: #d3cfc6;
+  --ap-sunken: #eef0f2;
+  --ap-head: #f7f8f9;
+  --ap-hover: #f4f5f6;
+  --ap-ink: #121314;
+  --ap-ink-2: #2c2e31;
+  --ap-muted: #5c6168;
+  --ap-subtle: #7a8088; /* nur Deko */
+  --ap-hair: #e3e5e8;
+  --ap-hair-strong: #d0d3d8;
 
   --ap-red: #d71920;
   --ap-red-hover: #b8141a;
@@ -61,7 +61,7 @@ html:has(.admin-app) {
   font-size: 0.875rem;
   line-height: 1.45;
   font-feature-settings: normal;
-  font-variant-numeric: normal;
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -126,7 +126,8 @@ html:has(.admin-app) {
   flex-direction: column;
   padding: 1rem 0.75rem 0.75rem;
   background: var(--ap-sidebar);
-  border-right: 1px solid var(--ap-hair);
+  color: #f4f3f0;
+  border-right: 1px solid #1c1e21;
   overflow-y: auto;
 }
 
@@ -153,10 +154,19 @@ html:has(.admin-app) {
 }
 
 .ap-brand-name {
-  font-family: var(--ap-font-brand);
-  font-size: 0.98rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.ap-sidebar .ap-brand,
+.ap-sidebar .ap-brand-name {
+  color: #f7f6f3;
+}
+
+.ap-sidebar .ap-brand-sub,
+.ap-sidebar .ap-nav-heading {
+  color: #b7b4ad;
 }
 
 .ap-brand-sub {
@@ -203,7 +213,7 @@ html:has(.admin-app) {
   border: 0;
   border-radius: var(--ap-r);
   background: transparent;
-  color: var(--ap-ink-2);
+  color: #e6e4df;
   font-size: 0.875rem;
   font-weight: 500;
   text-align: left;
@@ -213,22 +223,19 @@ html:has(.admin-app) {
 }
 
 .ap-nav-item:hover {
-  background: rgb(11 11 11 / 5%);
-  color: var(--ap-ink);
+  background: rgb(255 255 255 / 7%);
+  color: #fff;
 }
 
 .ap-nav-item.is-active {
-  background: var(--ap-surface);
+  background: #f7f6f3;
   color: var(--ap-ink);
   font-weight: 600;
-  box-shadow:
-    0 0 0 1px var(--ap-hair),
-    0 1px 2px rgb(11 11 11 / 5%);
 }
 
 .ap-nav-icon {
   display: inline-flex;
-  color: var(--ap-muted);
+  color: #b7b4ad;
 }
 
 .ap-nav-item.is-active .ap-nav-icon {
@@ -251,14 +258,14 @@ html:has(.admin-app) {
 }
 
 .ap-nav-item--quiet {
-  color: var(--ap-muted);
+  color: #c8c5be;
   font-size: 0.84rem;
 }
 
 .ap-sidebar-foot {
   margin-top: auto;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--ap-hair);
+  border-top: 1px solid rgb(255 255 255 / 12%);
   display: grid;
   gap: 2px;
 }
@@ -301,7 +308,7 @@ html:has(.admin-app) {
     justify-content: space-between;
     height: 56px;
     padding: 0 0.5rem 0 1rem;
-    background: rgb(250 249 246 / 92%);
+    background: rgb(243 244 245 / 94%);
     backdrop-filter: saturate(1.4) blur(10px);
     border-bottom: 1px solid var(--ap-hair);
   }
@@ -369,7 +376,9 @@ html:has(.admin-app) {
 
 .ap-page {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.5rem;
+  container-type: inline-size;
+  container-name: ap;
 }
 
 .ap-page--narrow {
@@ -541,7 +550,6 @@ html:has(.admin-app) {
   background: var(--ap-surface);
   border-color: var(--ap-hair-strong);
   color: var(--ap-ink);
-  box-shadow: 0 1px 1px rgb(11 11 11 / 3%);
 }
 
 .ap-btn--secondary:hover:not(:disabled) {
@@ -860,6 +868,7 @@ html:has(.admin-app) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 0.875rem;
 }
@@ -1498,9 +1507,92 @@ html:has(.admin-app) {
 
 .ap-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
+}
+
+/* Spalten teilen sich die verfügbare Breite. Kartenansicht ignoriert das. */
+.ap-table--members th:nth-child(1) { width: 22%; }
+.ap-table--members th:nth-child(2) { width: 11%; }
+.ap-table--members th:nth-child(3) { width: 13%; }
+.ap-table--members th:nth-child(4) { width: 13%; }
+.ap-table--members th:nth-child(5) { width: 13%; }
+.ap-table--members th:nth-child(6) { width: 12%; }
+.ap-table--members th:nth-child(7) { width: 16%; }
+
+.ap-table--inbox th:nth-child(1) { width: 15%; }
+.ap-table--inbox th:nth-child(2) { width: 8%; }
+.ap-table--inbox th:nth-child(3) { width: 18%; }
+.ap-table--inbox th:nth-child(4) { width: 13%; }
+.ap-table--inbox th:nth-child(5) { width: 10%; }
+.ap-table--inbox th:nth-child(6) { width: 11%; }
+.ap-table--inbox th:nth-child(7) { width: 11%; }
+.ap-table--inbox th:nth-child(8) { width: 14%; }
+
+.ap-table--prize th:nth-child(1) { width: 14%; }
+.ap-table--prize th:nth-child(2) { width: 32%; }
+.ap-table--prize th:nth-child(3) { width: 14%; }
+.ap-table--prize th:nth-child(4) { width: 12%; }
+.ap-table--prize th:nth-child(5) { width: 16%; }
+.ap-table--prize th:nth-child(6) { width: 12%; }
+
+.ap-table--payments th:nth-child(1) { width: 16%; }
+.ap-table--payments th:nth-child(2) { width: 16%; }
+.ap-table--payments th:nth-child(3) { width: 14%; }
+.ap-table--payments th:nth-child(4) { width: 16%; }
+.ap-table--payments th:nth-child(5) { width: 30%; }
+.ap-table--payments th:nth-child(6) { width: 8%; }
+
+.ap-table--tournament th:nth-child(1) { width: 30%; }
+.ap-table--tournament th:nth-child(2) { width: 14%; }
+.ap-table--tournament th:nth-child(3) { width: 12%; }
+.ap-table--tournament th:nth-child(4) { width: 12%; }
+.ap-table--tournament th:nth-child(5) { width: 12%; }
+.ap-table--tournament th:nth-child(6) { width: 20%; }
+
+.ap-row-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--ap-muted);
+}
+
+.ap-pick {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  max-height: 22rem;
+  overflow: auto;
+  border-top: 1px solid var(--ap-hair);
+}
+
+.ap-pick-row {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.55rem 0.15rem;
+  border-bottom: 1px solid var(--ap-hair);
+  cursor: pointer;
+}
+
+.ap-pick-row strong,
+.ap-pick-row span span {
+  display: block;
+}
+
+.ap-pick-row span span {
+  color: var(--ap-muted);
+  font-size: 0.78rem;
+}
+
+.ap-pick-row input {
+  margin-top: 0.2rem;
+  accent-color: var(--ap-ink);
 }
 
 .ap-table thead th {
@@ -1515,7 +1607,7 @@ html:has(.admin-app) {
   font-weight: 600;
   color: var(--ap-muted);
   text-align: left;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .ap-table thead th:first-child {
@@ -1583,12 +1675,12 @@ html:has(.admin-app) {
 }
 
 .ap-table tbody tr:not(.ap-empty-row):hover td {
-  background: #fbfaf8;
+  background: var(--ap-hover);
 }
 
 .ap-cell-name {
   position: relative;
-  min-width: 12rem;
+  min-width: 0;
 }
 
 .ap-row-title {
@@ -1610,7 +1702,7 @@ a.ap-row-title:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 22rem;
+  max-width: 100%;
 }
 
 .ap-row-sub a {
@@ -1628,7 +1720,6 @@ a.ap-row-title:hover {
 }
 
 .ap-col-actions {
-  width: 1%;
   white-space: nowrap;
   text-align: right;
 }
@@ -1707,8 +1798,8 @@ a.ap-row-title:hover {
   cursor: not-allowed;
 }
 
-/* Mobile, Tablet und kleine Laptops: Tabellen werden zu Karten-Listen (kein seitliches Scrollen) */
-@media (max-width: 1279.98px) {
+/* Schmale Fläche: Zeilen werden zu Karten. Ab ca. 760px Inhaltsbreite bleibt die Tabelle. */
+@container ap (max-width: 760px) {
   .ap-table,
   .ap-table tbody,
   .ap-table tr,
@@ -2080,7 +2171,7 @@ a.ap-row-title:hover {
 }
 
 .ap-table--inbox .ap-cell-name {
-  min-width: 11.5rem;
+  min-width: 0;
 }
 
 .ap-inbox-name {
@@ -2114,8 +2205,8 @@ a.ap-row-title:hover {
   color: var(--ap-warn);
 }
 
-.ap-inbox-row.is-dirty td:first-child {
-  box-shadow: inset 3px 0 0 #d98a1c;
+.ap-inbox-row.is-dirty td {
+  background: var(--ap-warn-bg);
 }
 
 .ap-inbox-row.is-exited .ap-inbox-name {
@@ -2139,7 +2230,7 @@ a.ap-row-title:hover {
 }
 
 .ap-cell-input::placeholder {
-  color: #8f8a81;
+  color: var(--ap-muted);
 }
 
 .ap-cell-input:hover:not(:disabled) {
@@ -2154,25 +2245,19 @@ a.ap-row-title:hover {
   box-shadow: 0 0 0 3px var(--ap-ring);
 }
 
-.ap-table--inbox td[data-label="E-Mail"] .ap-cell-input {
-  min-width: 11rem;
-}
-
-.ap-table--inbox td[data-label="Telefon"] .ap-cell-input {
-  min-width: 7.5rem;
+.ap-table--inbox .ap-cell-input,
+.ap-table--inbox .ap-status-select {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
 }
 
 .ap-cell-input--num {
-  min-width: 4.5rem;
-  max-width: 6rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  margin-left: auto;
-  display: block;
 }
 
 .ap-cell-input--date {
-  min-width: 8.25rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -2238,7 +2323,7 @@ a.ap-row-title:hover {
   overflow: auto;
 }
 
-@media (max-width: 1279.98px) {
+@container ap (max-width: 760px) {
   .ap-table--inbox tbody td,
   .ap-table--inbox :is(th, td):first-child,
   .ap-table--inbox :is(th, td):last-child {
@@ -2427,7 +2512,7 @@ a.ap-row-title:hover {
   }
 }
 
-@media (max-width: 1279.98px) {
+@container ap (max-width: 760px) {
   /* Gönner-Karten: Name + Aktionen, dann Stufe | Status, dann Beträge */
   .ap-table--members tbody tr {
     position: relative;
@@ -2681,7 +2766,6 @@ a.ap-row-title:hover {
   gap: 0.9rem;
   padding: 0.85rem 1.1rem;
   border: 1px solid var(--ap-err-line);
-  border-left: 4px solid var(--ap-red);
   border-radius: var(--ap-r-lg);
   background: var(--ap-err-bg);
   color: var(--ap-ink);
@@ -2747,7 +2831,7 @@ a.ap-row-title:hover {
 }
 
 .ap-income-value {
-  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -2790,11 +2874,11 @@ a.ap-row-title:hover {
 }
 
 .ap-mix--sponsor {
-  background: #3f6a94;
+  background: #5c6168;
 }
 
 .ap-mix--partner {
-  background: #8a6a3b;
+  background: #9aa0a6;
 }
 
 .ap-mix--prize {
@@ -2826,6 +2910,78 @@ a.ap-row-title:hover {
   width: 8px;
   height: 8px;
   border-radius: 999px;
+}
+
+.ap-chart {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.ap-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ap-chart text {
+  fill: var(--ap-muted);
+  font-size: 9px;
+  font-family: inherit;
+}
+
+.ap-chart-pay {
+  fill: var(--ap-ink);
+}
+
+.ap-chart-prize {
+  fill: var(--ap-red);
+}
+
+.ap-chart-empty,
+.ap-chart-future {
+  fill: var(--ap-hair-strong);
+}
+
+.ap-wall {
+  justify-self: start;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.5rem 0.15rem 1.15rem;
+  border: 1px solid var(--ap-hair-strong);
+  border-radius: 999px;
+  background: var(--ap-sunken);
+  color: var(--ap-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  position: relative;
+}
+
+.ap-wall::before {
+  content: "";
+  position: absolute;
+  left: 0.4rem;
+  top: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--ap-hair-strong);
+  transform: translateY(-50%);
+}
+
+.ap-wall.is-on {
+  border-color: var(--ap-ok-line);
+  background: var(--ap-ok-bg);
+  color: var(--ap-ok);
+}
+
+.ap-wall.is-on::before {
+  background: var(--ap-ok);
+}
+
+.ap-wall:disabled {
+  cursor: progress;
 }
 
 .ap-income-side {
@@ -3039,7 +3195,7 @@ a.ap-row-title:hover {
 }
 
 .ap-mix--proam {
-  background: #e98a8e;
+  background: #e7a3a6;
 }
 
 .ap-prize-kind {
@@ -3068,7 +3224,7 @@ a.ap-row-title:hover {
   display: none;
 }
 
-@media (max-width: 1279.98px) {
+@container ap (max-width: 760px) {
   .ap-sort-select {
     display: flex;
   }
@@ -3108,49 +3264,3 @@ a.ap-row-title:hover {
   }
 }
 /* Gönner-Tabelle ab 1280px: kompakt genug, damit sie ohne seitliches Scrollen passt */
-@media (min-width: 1280px) {
-  .ap-table--members thead th,
-  .ap-table--members tbody td {
-    padding-left: 0.6rem;
-    padding-right: 0.6rem;
-  }
-
-  .ap-table--members .ap-cell-name {
-    min-width: 0;
-  }
-
-  .ap-table--members .ap-row-sub {
-    max-width: 15rem;
-  }
-
-  .ap-table--members .ap-status {
-    height: auto;
-    min-height: 24px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    white-space: normal;
-  }
-}
-@media (min-width: 1280px) {
-  .ap-table--inbox thead th,
-  .ap-table--inbox tbody td {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-
-  .ap-table--inbox td[data-label="E-Mail"] .ap-cell-input {
-    min-width: 9rem;
-  }
-
-  .ap-table--inbox td[data-label="Telefon"] .ap-cell-input {
-    min-width: 6.5rem;
-  }
-
-  .ap-table--inbox .ap-cell-input--date {
-    min-width: 7.5rem;
-  }
-
-  .ap-table--inbox .ap-cell-name {
-    min-width: 9rem;
-  }
-}

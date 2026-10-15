@@ -9,6 +9,7 @@ import {
   IconAccount,
   IconClose,
   IconExternal,
+  IconFlag,
   IconInbox,
   IconMenu,
   IconOverview,
@@ -112,6 +113,12 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
       label: "Preisgelder",
       icon: <IconTrophy />,
       match: (p) => p.startsWith("/admin/preisgelder"),
+    },
+    {
+      href: "/admin/turnier",
+      label: "Turnier",
+      icon: <IconFlag />,
+      match: (p) => p.startsWith("/admin/turnier"),
     },
   ];
 
