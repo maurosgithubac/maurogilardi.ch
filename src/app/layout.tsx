@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import { Playfair_Display } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { AnalyticsEvents } from "@/components/analytics-events";
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
-import { EngagementQuizPopup } from "@/components/engagement-quiz-popup";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
@@ -19,6 +16,17 @@ import "@/styles/mg-video.css";
  * Markenschrift Gilardi Golf: Playfair Display für Titel UND Fliesstext
  * (verbindlich laut Brand-System des Sponsoring-Dossiers). Variable Font inkl. Kursiv.
  */
+const Analytics = dynamic(() => import("@vercel/analytics/next").then((mod) => mod.Analytics));
+const AnalyticsEvents = dynamic(() =>
+  import("@/components/analytics-events").then((mod) => mod.AnalyticsEvents),
+);
+const CookieConsentBanner = dynamic(() =>
+  import("@/components/cookie-consent-banner").then((mod) => mod.CookieConsentBanner),
+);
+const EngagementQuizPopup = dynamic(() =>
+  import("@/components/engagement-quiz-popup").then((mod) => mod.EngagementQuizPopup),
+);
+
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],

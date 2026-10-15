@@ -16,6 +16,7 @@ const PRIVATE_PATHS = ["/admin", "/api/", "/e/"];
 const ALLOWED_BOTS = [
   "Googlebot",
   "Googlebot-Image",
+  "GoogleOther",
   "Bingbot",
   "DuckDuckBot",
   "Applebot",

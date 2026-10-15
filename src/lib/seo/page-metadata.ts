@@ -43,7 +43,10 @@ export function buildPageMetadata({
     title: { absolute: title },
     description,
     ...(keywords ? { keywords } : {}),
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      languages: { "de-CH": url, "x-default": url },
+    },
     openGraph: {
       type: "website",
       locale: "de_CH",
@@ -257,7 +260,10 @@ export function buildBlogPostMetadata(post: {
     title: { absolute: title },
     description,
     keywords: [post.title, "Mauro Gilardi", "Schweizer Golfprofi", "Pro Golf Tour", "HotelPlanner Tour"],
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      languages: { "de-CH": url, "x-default": url },
+    },
     openGraph: {
       type: "article",
       locale: "de_CH",

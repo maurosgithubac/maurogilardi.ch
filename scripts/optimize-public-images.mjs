@@ -10,9 +10,9 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 
-const MAX_EDGE = 1920;
-const JPEG_QUALITY = 82;
-const WEBP_QUALITY = 82;
+const MAX_EDGE = 2560;
+const JPEG_QUALITY = 86;
+const WEBP_QUALITY = 86;
 const ROOTS = [
   path.join("public", "brand-assets", "gallerie"),
   path.join("public", "brand-assets", "images"),
@@ -22,6 +22,7 @@ const EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".JPG", ".JPEG", ".PNG",
 function walk(dir, files = []) {
   if (!fs.existsSync(dir)) return files;
   for (const name of fs.readdirSync(dir)) {
+    if (name === "Goennerverein") continue;
     const full = path.join(dir, name);
     const st = fs.statSync(full);
     if (st.isDirectory()) walk(full, files);
@@ -40,9 +41,10 @@ async function optimizeFile(filePath) {
     return { filePath, skipped: true, reason: "no-dimensions" };
   }
 
+  const format = (meta.format || path.extname(filePath).slice(1).toLowerCase()).toLowerCase();
   const needsResize = width > MAX_EDGE || height > MAX_EDGE;
-  // Recompress very heavy files even if already within edge limit
-  const needsRecompress = beforeBytes > 900 * 1024;
+  // PNG: lossless recompress. JPEG/WebP only when the file is still heavy inside the size cap.
+  const needsRecompress = format === "png" ? beforeBytes > 180 * 1024 : beforeBytes > 1200 * 1024;
   if (!needsResize && !needsRecompress) {
     return { filePath, skipped: true, reason: "already-ok", width, height, beforeBytes };
   }
@@ -57,11 +59,10 @@ async function optimizeFile(filePath) {
     });
   }
 
-  const format = (meta.format || path.extname(filePath).slice(1).toLowerCase()).toLowerCase();
   const tmpPath = `${filePath}.__opt.tmp`;
 
   if (format === "png") {
-    await pipeline.png({ compressionLevel: 9, palette: false }).toFile(tmpPath);
+    await pipeline.png({ compressionLevel: 9, effort: 10, palette: false }).toFile(tmpPath);
   } else if (format === "webp") {
     await pipeline.webp({ quality: WEBP_QUALITY }).toFile(tmpPath);
   } else {
