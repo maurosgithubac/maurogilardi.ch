@@ -27,6 +27,7 @@ import {
   IconMail,
   IconPlus,
   IconSearch,
+  IconDownload,
   IconSort,
   IconTrash,
 } from "@/components/admin/admin-icons";
@@ -261,6 +262,34 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
     }
   }
 
+  async function downloadInvoicePdf(member: GoennerMemberRow) {
+    if (!member.inquiry_id) return;
+    setError(null);
+    setNotice(null);
+    setBusyId(member.id);
+    try {
+      const res = await fetch(`/api/admin/goenner-inquiries/${member.inquiry_id}/invoice-pdf`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(typeof data.error === "string" ? data.error : "PDF-Rechnung konnte nicht erstellt werden.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rechnung-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice(`PDF-Rechnung für ${member.name} heruntergeladen.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "PDF-Rechnung konnte nicht erstellt werden.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function sendMail(member: GoennerMemberRow, type: StandardMailType) {
     setError(null);
     setNotice(null);
@@ -284,6 +313,19 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
       disabled: busyId === m.id,
       onSelect: () => void sendMail(m, type),
     }));
+  }
+
+  function invoicePdfItems(m: GoennerMemberRow): RowMenuItem[] {
+    if (!m.inquiry_id) return [];
+    return [
+      {
+        kind: "action" as const,
+        label: "PDF-Rechnung herunterladen",
+        icon: <IconDownload size={14} />,
+        disabled: busyId === m.id,
+        onSelect: () => void downloadInvoicePdf(m),
+      },
+    ];
   }
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {
@@ -656,6 +698,7 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
                             icon: <IconArrowRight size={14} />,
                           },
                           ...mailItems(m),
+                          ...invoicePdfItems(m),
                           {
                             kind: "action",
                             label: "Löschen…",
