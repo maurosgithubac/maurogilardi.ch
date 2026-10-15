@@ -148,14 +148,10 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   }
 
   async function downloadInvoice() {
-    if (!member.inquiry_id) {
-      setError("Kein Anmeldedatensatz verknüpft — PDF-Rechnung nicht verfügbar.");
-      return;
-    }
     setInvoiceBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/goenner-inquiries/${member.inquiry_id}/invoice-pdf`);
+      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-pdf`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         setError(data.error || "PDF-Rechnung konnte nicht erstellt werden.");
@@ -264,9 +260,9 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
           <button
             type="button"
             className="ap-btn ap-btn--secondary"
-            disabled={invoiceBusy || !member.inquiry_id}
+            disabled={invoiceBusy}
             onClick={() => void downloadInvoice()}
-            title={member.inquiry_id ? "PDF-Rechnung herunterladen" : "Kein Anmeldedatensatz verknüpft"}
+            title="PDF-Rechnung herunterladen"
           >
             <IconFile />
             {invoiceBusy ? "Erstelle…" : "Rechnung (PDF)"}

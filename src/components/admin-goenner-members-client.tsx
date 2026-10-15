@@ -263,12 +263,11 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   async function downloadInvoicePdf(member: GoennerMemberRow) {
-    if (!member.inquiry_id) return;
     setError(null);
     setNotice(null);
     setBusyId(member.id);
     try {
-      const res = await fetch(`/api/admin/goenner-inquiries/${member.inquiry_id}/invoice-pdf`);
+      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-pdf`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(typeof data.error === "string" ? data.error : "PDF-Rechnung konnte nicht erstellt werden.");
@@ -316,7 +315,6 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   function invoicePdfItems(m: GoennerMemberRow): RowMenuItem[] {
-    if (!m.inquiry_id) return [];
     return [
       {
         kind: "action" as const,
