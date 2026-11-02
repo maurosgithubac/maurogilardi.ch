@@ -25,7 +25,7 @@ import { ReadingProgress } from "@/components/motion/reading-progress";
 import { Reveal } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 // Keine Beiträge beim Build vorrendern, aber neue Slugs beim ersten Aufruf rendern und cachen (ISR).
 export const dynamicParams = true;
 

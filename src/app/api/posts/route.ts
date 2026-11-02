@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
+export const revalidate = 3600;
+
 export async function GET() {
   try {
     const supabase = createSupabaseServerClient();

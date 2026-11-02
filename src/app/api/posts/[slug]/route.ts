@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
+export const revalidate = 3600;
+// Keine Beiträge beim Build vorrendern, neue Slugs beim ersten Aufruf rendern und cachen (ISR).
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
   try {

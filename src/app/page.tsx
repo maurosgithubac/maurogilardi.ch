@@ -19,8 +19,8 @@ import { homeWebPageJsonLd } from "@/lib/seo/webpage-jsonld";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import type { PostRow } from "@/types/content";
 
-/** Homepage inkl. nächster Termine — kurz cachen, damit geplante Posts pünktlich live gehen */
-export const revalidate = 60;
+/** Homepage inkl. nächster Termine — 1 h Cache: Beiträge erscheinen spätestens nach 1 h */
+export const revalidate = 3600;
 
 export const metadata = homePageMetadata;
 

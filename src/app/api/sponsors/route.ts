@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
+export const revalidate = 300;
+
 export async function GET() {
   try {
     const supabase = createSupabaseServerClient();

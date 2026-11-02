@@ -14,7 +14,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/reveal";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = blogIndexMetadata;
 
