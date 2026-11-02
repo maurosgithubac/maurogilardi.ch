@@ -13,6 +13,7 @@ import type { HomePost } from "@/components/home/types";
 import { visibleDemoPosts } from "@/content/demoPosts";
 import { publishedAtOrBeforeIso } from "@/lib/blog/visible-posts";
 import { getUpcomingPgtSeasonEvents } from "@/content/pgtSeasonEvents";
+import { LiveBanner } from "@/components/home/live-banner";
 import { blogImageUrl } from "@/lib/storage-public-url";
 import { HOME_PAGE_DESCRIPTION, homePageMetadata } from "@/lib/seo/page-metadata";
 import { homeWebPageJsonLd } from "@/lib/seo/webpage-jsonld";
@@ -65,6 +66,7 @@ export default async function Home() {
     <div className="mg-page">
       <SeoPageJsonLd schema={homeWebPageJsonLd(HOME_PAGE_DESCRIPTION)} />
       <SiteHeader variant="overlay" />
+      <LiveBanner />
       <main id="inhalt">
         <HomeHero />
         <ProofBand />

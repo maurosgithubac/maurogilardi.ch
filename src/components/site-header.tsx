@@ -7,7 +7,7 @@ import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { MgLogo } from "@/components/brand/mg-logo";
 import { Magnetic } from "@/components/motion/magnetic";
 import { MG_EASE } from "@/components/motion/motion-provider";
-import { getPgtEventLiveOnDate, livescoringLinkForEvent, pgtSeasonEvents2026 } from "@/content/pgtSeasonEvents";
+import { hotelplanner2027Events, HOTELPLANNER_TOUR_URL, liveHotelplannerEvent } from "@/content/hotelplanner2027";
 import { useFocusTrap, useOverlayLock } from "@/lib/ui/use-overlay";
 
 type NavSublink = { href: string; label: string };
@@ -25,6 +25,7 @@ const NAV: NavItem[] = [
   { href: "/", label: "Home", match: (p) => p === "/", mobileOnly: true },
   { href: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") },
   { href: "/erfolge", label: "Erfolge", match: (p) => p.startsWith("/erfolge") },
+  { href: "/kalender", label: "Kalender", match: (p) => p.startsWith("/kalender") },
   { href: "/sponsoring", label: "Gönner", match: (p) => p.startsWith("/sponsoring") },
   { href: "/partner", label: "Partner", match: (p) => p.startsWith("/partner") },
   {
@@ -68,8 +69,8 @@ export function SiteHeader({ variant }: Props) {
   const scrolled = useSyncExternalStore(subscribeScroll, () => window.scrollY > 32, () => false);
 
   // Live-Turnier nur im Browser bestimmen (Datum), ID als stabiler Snapshot
-  const liveEventId = useSyncExternalStore(noopSubscribe, () => getPgtEventLiveOnDate(new Date())?.id ?? null, () => null);
-  const liveEvent = liveEventId ? (pgtSeasonEvents2026.find((ev) => ev.id === liveEventId) ?? null) : null;
+  const liveEventId = useSyncExternalStore(noopSubscribe, () => liveHotelplannerEvent(new Date())?.id ?? null, () => null);
+  const liveEvent = liveEventId ? (hotelplanner2027Events.find((ev) => ev.id === liveEventId) ?? null) : null;
 
   // Menü bei Seitenwechsel schliessen (während des Renderns statt per Effect)
   if (menuPath !== pathname) {
@@ -155,11 +156,11 @@ export function SiteHeader({ variant }: Props) {
           <div className="mg-header__actions">
             {liveEvent ? (
               <a
-                href={livescoringLinkForEvent(liveEvent)}
+                href={liveEvent.tourPageUrl ?? HOTELPLANNER_TOUR_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mg-live-pill"
-                aria-label={`Livescoring: ${liveEvent.name}`}
+                aria-label={`Live: ${liveEvent.name}`}
                 title={liveEvent.name}
               >
                 <span className="mg-live-pill__dot" aria-hidden="true" />

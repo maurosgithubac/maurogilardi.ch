@@ -1,0 +1,82 @@
+/* Live-Banner auf der Startseite: nur sichtbar, wenn ein Turnier läuft. */
+
+.live-banner {
+  background: var(--mg-ink);
+  color: var(--mg-paper);
+  border-bottom: 1px solid rgb(250 249 246 / 10%);
+}
+
+.live-banner__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding-block: 10px;
+  font-size: 14px;
+}
+
+.live-banner__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--mg-red);
+  color: var(--mg-on-red);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.live-banner__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mg-on-red);
+  animation: live-banner-pulse 1.6s ease-in-out infinite;
+}
+
+.live-banner__text {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 260px;
+}
+
+.live-banner__text strong {
+  font-weight: 600;
+}
+
+.live-banner__meta {
+  color: rgb(250 249 246 / 65%);
+  font-size: 13px;
+}
+
+.live-banner__link {
+  color: var(--mg-paper);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.live-banner__link:focus-visible {
+  outline: 2px solid var(--mg-red-on-dark);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@keyframes live-banner-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-banner__dot {
+    animation: none;
+  }
+}
