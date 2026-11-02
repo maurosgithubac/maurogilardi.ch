@@ -1,4 +1,6 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { GOENNER_PUBLIC_TAG } from "@/lib/public-stats";
 import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import { parseAmountOrNull, parseDateOrNull } from "@/lib/goenner-finance";
@@ -104,5 +106,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidateTag(GOENNER_PUBLIC_TAG, "max");
   return NextResponse.json({ member: data }, { status: 201 });
 }

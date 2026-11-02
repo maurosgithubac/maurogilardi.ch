@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -25,36 +26,38 @@ import { Reveal } from "@/components/motion/reveal";
 import { SplitText } from "@/components/motion/split-text";
 
 export const revalidate = 60;
+// Keine Beiträge beim Build vorrendern, aber neue Slugs beim ersten Aufruf rendern und cachen (ISR).
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return [];
+}
 
 type Props = { params: Promise<{ slug: string }> };
+type BlogPost = Pick<PostRow, "slug" | "title" | "description" | "body" | "image_path" | "created_at">;
+
+// Eine Abfrage pro Slug und Render: generateMetadata und Seite teilen sich das Ergebnis.
+const loadPost = cache(async (slug: string): Promise<BlogPost | null> => {
+  const demo = findDemoPostBySlug(slug);
+  if (demo) return demo;
+  try {
+    const supabase = createSupabaseServerClient();
+    const { data } = await supabase
+      .from("posts")
+      .select("slug, title, description, body, image_path, created_at")
+      .eq("slug", slug)
+      .eq("published", true)
+      .lte("created_at", publishedAtOrBeforeIso())
+      .maybeSingle();
+    return (data as BlogPost | null) ?? null;
+  } catch {
+    return null;
+  }
+});
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const demoPost = findDemoPostBySlug(slug);
-  let post: Pick<PostRow, "title" | "description" | "created_at" | "image_path"> | null = demoPost
-    ? {
-        title: demoPost.title,
-        description: demoPost.description,
-        created_at: demoPost.created_at,
-        image_path: demoPost.image_path,
-      }
-    : null;
-
-  if (!post) {
-    try {
-      const supabase = createSupabaseServerClient();
-      const { data } = await supabase
-        .from("posts")
-        .select("title, description, created_at, image_path")
-        .eq("slug", slug)
-        .eq("published", true)
-        .lte("created_at", publishedAtOrBeforeIso())
-        .maybeSingle();
-      post = data as typeof post;
-    } catch {
-      /* ignore */
-    }
-  }
+  const post = await loadPost(slug);
 
   if (!post) return blogPostNotFoundMetadata;
 
@@ -69,23 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  let post: Pick<PostRow, "slug" | "title" | "description" | "body" | "image_path" | "created_at"> | null =
-    findDemoPostBySlug(slug);
-  try {
-    if (!post) {
-      const supabase = createSupabaseServerClient();
-      const { data } = await supabase
-        .from("posts")
-        .select("slug, title, description, body, image_path, created_at")
-        .eq("slug", slug)
-        .eq("published", true)
-        .lte("created_at", publishedAtOrBeforeIso())
-        .maybeSingle();
-      post = data as Pick<PostRow, "slug" | "title" | "description" | "body" | "image_path" | "created_at"> | null;
-    }
-  } catch {
-    notFound();
-  }
+  const post = await loadPost(slug);
   if (!post) notFound();
 
   const img = blogImageUrl(post.image_path);

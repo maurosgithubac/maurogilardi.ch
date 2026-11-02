@@ -35,6 +35,8 @@ const STATIC_ROUTES: {
   { path: "/datenschutz", changeFrequency: "yearly", priority: 0.2, lastModified: LEGAL_CONTENT_UPDATED },
 ];
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let posts: { slug: string; created_at: string }[] = [];
   try {

@@ -1,6 +1,8 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { GOENNER_SPONSORING_MIN_CHF, membershipPriceChf } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
+import { GOENNER_PUBLIC_TAG } from "@/lib/public-stats";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryStatus } from "@/types/content";
 import { sendPaidMail, type GoennerMailRow } from "@/lib/goenner-mails";
@@ -97,6 +99,7 @@ async function ensureMemberAndPayment(
       })
       .eq("id", memberId);
   }
+  revalidateTag(GOENNER_PUBLIC_TAG, "max");
 
   const { data: existingPay } = await supabase
     .from("goenner_payments")
@@ -137,6 +140,7 @@ async function setMemberActiveByInquiry(
     .from("goenner_members")
     .update({ active, updated_at: new Date().toISOString() })
     .eq("inquiry_id", inquiryId);
+  revalidateTag(GOENNER_PUBLIC_TAG, "max");
 }
 
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {

@@ -1,7 +1,9 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminMembershipId, isContributionType, isMemberCategory } from "@/content/goennerMemberships";
 import { isAdminSession } from "@/lib/admin-auth";
 import { parseAmountOrNull, parseDateOrNull } from "@/lib/goenner-finance";
+import { GOENNER_PUBLIC_TAG } from "@/lib/public-stats";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 function validId(id: string) {
@@ -102,6 +104,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     );
   }
   if (!data) return NextResponse.json({ error: "Nicht gefunden." }, { status: 404 });
+  revalidateTag(GOENNER_PUBLIC_TAG, "max");
   return NextResponse.json({ member: data });
 }
 
@@ -116,5 +119,6 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
   const supabase = await createSupabaseUserServerClient();
   const { error } = await supabase.from("goenner_members").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  revalidateTag(GOENNER_PUBLIC_TAG, "max");
   return NextResponse.json({ ok: true });
 }

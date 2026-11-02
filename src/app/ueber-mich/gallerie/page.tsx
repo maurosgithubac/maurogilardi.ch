@@ -13,7 +13,7 @@ import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import { galleryPageGraph } from "@/lib/seo/webpage-jsonld";
 import "@/styles/pages/gallery.css";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 const GALLERY_DESCRIPTION =
   "Impressionen von der Tour, Training und Events — Bilder aus meinem Alltag als Profigolfer.";

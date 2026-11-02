@@ -7,6 +7,9 @@ import { expectedAnnualChf, type GoennerMemberRow } from "@/lib/goenner-finance"
 
 const FALLBACK_SUPPORTERS = goennervereinigungMemberNames.filter((n) => n.trim()).length;
 
+/** Wird von den Admin-Routen nach Änderungen an Gönnern, Zahlungen oder Anfragen per revalidateTag geleert. */
+export const GOENNER_PUBLIC_TAG = "goenner-public";
+
 async function countMembers(filter: string): Promise<number | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -16,7 +19,7 @@ async function countMembers(filter: string): Promise<number | null> {
       method: "HEAD",
       headers: { apikey: key, Authorization: `Bearer ${key}`, Prefer: "count=exact" },
       // Kennzahl darf kurz gecacht sein — die Seiten revalidieren stündlich
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: [GOENNER_PUBLIC_TAG] },
     });
     if (!res.ok) return null;
     const total = res.headers.get("content-range")?.split("/")[1];
@@ -39,7 +42,7 @@ export async function getPublicWallNames(): Promise<string[]> {
   try {
     const res = await fetch(
       `${url}/rest/v1/goenner_members?select=name&wall_visible=eq.true&order=name.asc`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 60 } },
+      { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 3600, tags: [GOENNER_PUBLIC_TAG] } },
     );
     if (!res.ok) return fallback;
     const rows = (await res.json()) as { name?: string | null }[];
@@ -71,7 +74,7 @@ export async function getCommittedAnnualChf(): Promise<number | null> {
   try {
     const res = await fetch(
       `${url}/rest/v1/goenner_members?select=annual_amount_chf,membership_id,contribution_type&active=is.true&category=eq.goenner`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 3600 } },
+      { headers: { apikey: key, Authorization: `Bearer ${key}` }, next: { revalidate: 3600, tags: [GOENNER_PUBLIC_TAG] } },
     );
     if (!res.ok) return null;
     const rows = (await res.json()) as Pick<GoennerMemberRow, "annual_amount_chf" | "membership_id" | "contribution_type">[];
