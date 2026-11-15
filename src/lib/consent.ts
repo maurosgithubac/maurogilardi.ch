@@ -3,7 +3,7 @@
  * Standard ist „verweigert“, bis der Besucher aktiv zustimmt (Consent Mode v2).
  */
 
-export const GTM_ID = "GTM-P427Q62L";
+export const GTM_ID = "GTM-K93FFR45";
 
 export const CONSENT_KEY = "mg-consent-v2";
 export const CONSENT_EVENT = "mg-consent-change";
