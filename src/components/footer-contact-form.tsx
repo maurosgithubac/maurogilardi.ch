@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { trackEvent } from "@/components/analytics-events";
 
 export function FooterContactForm() {
   const [name, setName] = useState("");
@@ -29,6 +30,7 @@ export function FooterContactForm() {
       }
 
       setStatus("success");
+      trackEvent("contact_sent");
       setFeedback(data.message || "Vielen Dank! Ich melde mich bei dir.");
       setName("");
       setEmail("");
