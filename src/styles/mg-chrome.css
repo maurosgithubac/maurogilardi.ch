@@ -825,3 +825,10 @@ html[data-mg-overlays] .mg-cookie {
   border-radius: var(--mg-r-xl) !important;
   font-family: var(--mg-font-body);
 }
+
+/* Cookie-Hinweis: zwei gleichwertige Wahlmöglichkeiten */
+.mg-cookie__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

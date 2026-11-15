@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Playfair_Display } from "next/font/google";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SeoRootJsonLd } from "@/components/seo-root-json-ld";
+import { TagManager, consentDefaultScript } from "@/components/tag-manager";
 import { siteRootMetadata } from "@/lib/seo/site-metadata";
 import "./globals.css";
 import "./site-refresh.css";
@@ -49,6 +50,9 @@ export default function RootLayout({
     // Font-Variablen auf <html>, damit :root-Tokens sie auflösen können
     <html lang="de-CH" className={playfair.variable}>
       <body className="antialiased">
+        {/* Consent Mode v2: Standard „verweigert“, vor dem Tag Manager */}
+        <script dangerouslySetInnerHTML={{ __html: consentDefaultScript }} />
+        <TagManager />
         <SeoRootJsonLd />
         <MotionProvider>
           {children}

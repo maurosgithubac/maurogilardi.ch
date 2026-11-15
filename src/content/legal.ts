@@ -132,11 +132,13 @@ export const datenschutzSections: LegalSection[] = [
     title: "Cookies & lokale Speicherung",
     paragraphs: [
       "Diese Website setzt primär technisch notwendige Cookies ein (z. B. für den Admin-Bereich oder Session-Verwaltung).",
-      "Deine Cookie-Einstellung wird lokal im Browser gespeichert (localStorage), damit der Hinweis nicht bei jedem Besuch erneut erscheint.",
-      "Es werden keine Marketing- oder Tracking-Cookies von Drittanbietern (z. B. Google Analytics) ohne deine Einwilligung eingesetzt.",
+      "Deine Wahl («Nur notwendige» oder «Analyse erlauben») wird lokal im Browser gespeichert (localStorage), damit der Hinweis nicht bei jedem Besuch erneut erscheint.",
+      "Google Tag Manager und Google Analytics laden erst, wenn du «Analyse erlauben» wählst. Google setzt dann Analyse-Cookies und wertet Seitenaufrufe, Klicks und Anfragen aus. Dabei können technische Daten wie deine IP-Adresse an Google in den USA übermittelt werden. Ohne Zustimmung werden diese Dienste nicht geladen.",
+      "Deine Wahl kannst du jederzeit widerrufen, indem du den lokalen Speicher dieser Website im Browser leerst. Danach erscheint der Hinweis erneut.",
     ],
     bullets: [
-      "mg-cookie-consent — Speichert deine Cookie-Auswahl (lokal, kein Tracking)",
+      "mg-consent-v2 — Speichert deine Cookie-Wahl (lokal, kein Tracking)",
+      "Google Analytics (_ga, _ga_…) — nur nach deiner Zustimmung",
       "Supabase-Auth-Cookies — nur im geschützten Admin-Bereich",
     ],
   },

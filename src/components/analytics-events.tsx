@@ -2,6 +2,7 @@
 
 import { track } from "@vercel/analytics";
 import { useEffect } from "react";
+import { pushAnalytics } from "@/lib/consent";
 
 /**
  * Cookiefreie Ereignis-Messung (Vercel Analytics): Klicks auf Elemente mit
@@ -17,6 +18,7 @@ export function AnalyticsEvents() {
       if (!name) return;
       const label = el.dataset.trackLabel;
       track(name, { path: window.location.pathname, ...(label ? { label } : {}) });
+      pushAnalytics(name, { path: window.location.pathname, label });
     }
     document.addEventListener("click", onClick, { capture: true });
     return () => document.removeEventListener("click", onClick, { capture: true });
@@ -32,4 +34,6 @@ export function trackEvent(name: string, props?: Record<string, string | number>
   } catch {
     /* Analytics nicht verfügbar — still ignorieren */
   }
+  // Erfolgreich abgesendete Anfragen (generate_lead) nur mit Einwilligung an den Tag Manager
+  pushAnalytics(name, props);
 }
