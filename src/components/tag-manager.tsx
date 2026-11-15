@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { GTM_ID, readConsent, subscribeConsent, type Consent } from "@/lib/consent";
+import { CONSENT_KEY, GTM_ID, readConsent, subscribeConsent, type Consent } from "@/lib/consent";
 
 /** Lädt den Google Tag Manager erst nach Einwilligung und meldet Widerruf an Consent Mode. */
 export function TagManager() {
@@ -35,5 +35,8 @@ export function TagManager() {
   return null;
 }
 
-/** Standard „verweigert“ vor jedem Skript setzen (Consent Mode v2). Muss im HTML vor GTM stehen. */
-export const consentDefaultScript = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`;
+/**
+ * Consent Mode v2 vor GTM: Standard „verweigert“, außer die Einwilligung ist schon gespeichert.
+ * Nur so entscheidet GTM beim Start richtig und die GA4-Tags feuern bei späteren Besuchen.
+ */
+export const consentDefaultScript = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}var s=null;try{s=localStorage.getItem('${CONSENT_KEY}')}catch(e){}var a=s==='granted'?'granted':'denied';gtag('consent','default',{analytics_storage:a,ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});`;
