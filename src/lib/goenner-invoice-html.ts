@@ -1,5 +1,5 @@
 /**
- * HTML-Vorlage der Rechnung (gleiches Layout wie die freigegebene Vorschau).
+ * HTML-Vorlage der Rechnung: einseitig, A4, ruhiges Layout.
  * Wird serverseitig mit Chromium zu PDF gedruckt, siehe goenner-invoice-pdf.ts.
  */
 
@@ -30,10 +30,10 @@ function esc(value: string): string {
 }
 
 export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): string {
-  const addressLines = [d.recipient.street, d.recipient.cityLine, d.recipient.email]
+  const recipientLines = [d.recipient.street, d.recipient.cityLine, d.recipient.email]
     .filter((x): x is string => Boolean(x && x.trim()))
-    .map((x) => `<div class="to-addr">${esc(x)}</div>`)
-    .join("\n    ");
+    .map((x) => `<div>${esc(x)}</div>`)
+    .join("\n        ");
 
   return `<!doctype html>
 <html lang="de">
@@ -45,126 +45,106 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
   @font-face { font-family: "Playfair Display"; font-weight: 700; src: url(${a.playfairBoldDataUri}) format("truetype"); }
 
   :root {
-    --paper: #faf9f6;
-    --white: #ffffff;
-    --ink: #0b0b0b;
-    --ink-2: #34322e;
-    --muted: #66625b;
-    --hair: #e4e1da;
-    --red: #d71920;
+    --ink: #111111;
+    --ink-2: #3a3a3a;
+    --muted: #6b6b6b;
+    --line: #d9d9d9;
+    --accent: #d71920;
     color-scheme: light;
   }
+  @page { size: A4; margin: 18mm 18mm 16mm 18mm; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--white); }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
   body {
     color: var(--ink);
-    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-    font-size: 14px;
+    font-family: Helvetica, Arial, "Liberation Sans", sans-serif;
+    font-size: 10pt;
     line-height: 1.5;
   }
-  .sans { font-family: Helvetica, Arial, "Liberation Sans", sans-serif; }
-  .sheet { max-width: 720px; margin: 0 auto; padding: 0; }
+  .page { width: 100%; }
 
+  /* Kopf: Logo links, Dokumentangaben rechts */
   .head {
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;
-    padding-bottom: 26px; border-bottom: 1px solid var(--ink);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 8mm;
   }
-  .brand { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
-  .logo { display: block; height: 46px; width: auto; max-width: 150px; flex: none; }
-  .brand-sub { font-size: 12px; color: var(--muted); }
+  .logo { display: block; height: 14mm; width: auto; }
   .doc { text-align: right; }
-  .eyebrow {
-    display: block; font-family: Helvetica, Arial, sans-serif;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--red); margin-bottom: 6px;
-  }
-  .title { font-size: 40px; font-weight: 700; line-height: 1; margin: 0; letter-spacing: -0.01em; }
-  .meta { margin-top: 12px; font-size: 13px; color: var(--ink-2); }
-  .meta div { display: flex; justify-content: flex-end; gap: 14px; }
-  .meta span:first-child { color: var(--muted); }
+  .doc-title { font-family: "Playfair Display", Georgia, serif; font-size: 22pt; font-weight: 700; line-height: 1; margin: 0 0 3mm; }
+  .doc-meta { font-size: 9.5pt; color: var(--muted); }
+  .doc-meta div { margin-top: 0.6mm; }
 
-  .to { margin-top: 30px; }
-  .label {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 6px;
-  }
-  .to-name { font-size: 17px; font-weight: 600; }
-  .to-addr { color: var(--ink-2); }
+  /* Empfänger */
+  .recipient { margin-bottom: 7mm; }
+  .recipient .name { font-weight: 700; font-size: 11pt; margin-bottom: 1mm; }
+  .recipient div { color: var(--ink-2); }
 
-  .intro { margin: 26px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.6; }
+  .subject { font-weight: 700; font-size: 12pt; margin: 0 0 4mm; }
+  .intro { margin: 0 0 6mm; color: var(--ink-2); }
 
-  table.items { width: 100%; border-collapse: collapse; margin-top: 30px; }
-  table.items th {
-    text-align: left; font-family: Helvetica, Arial, sans-serif;
-    font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--muted); padding: 0 0 8px; border-bottom: 1px solid var(--hair);
+  /* Leistung */
+  table.item { width: 100%; border-collapse: collapse; }
+  table.item th {
+    text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); padding: 0 0 2mm; border-bottom: 1px solid var(--ink);
   }
-  table.items th.num, table.items td.num { text-align: right; white-space: nowrap; }
-  table.items td { padding: 16px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
-  .item-title { font-weight: 600; font-size: 16px; }
-  .item-sub { font-size: 13px; color: var(--muted); }
-  .total-row td { border-bottom: none; padding-top: 14px; }
-  .total-row .total-label { font-family: Helvetica, Arial, sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
-  .total-row .total-amount { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+  table.item th.num, table.item td.num { text-align: right; white-space: nowrap; }
+  table.item td { padding: 3.5mm 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .item-title { font-weight: 700; }
+  .item-sub { color: var(--muted); font-size: 9.5pt; }
+  .amount-total { font-weight: 700; font-size: 12pt; }
 
-  .pay {
-    margin-top: 34px; border-top: 1px solid var(--ink); padding-top: 22px;
-    display: flex; gap: 28px; align-items: flex-start;
-  }
-  .pay-qr { flex: none; width: 168px; }
-  .pay-qr img { display: block; width: 168px; height: 168px; }
-  .pay-qr .qr-cap { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  /* Zahlung: Angaben links, QR-Code rechts */
+  .pay { margin-top: 7mm; display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; }
   .pay-info { flex: 1; min-width: 0; }
-  .pay-info dl { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 9px 14px; margin: 0; }
-  .pay-info dt { color: var(--muted); font-size: 13px; }
-  .pay-info dd { margin: 0; font-size: 14px; color: var(--ink); overflow-wrap: anywhere; }
-  .pay-info dd.iban { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; font-family: Helvetica, Arial, sans-serif; font-weight: 700; font-size: 13px; }
-  .pay-info dd.amount { font-weight: 700; font-variant-numeric: tabular-nums; }
-  .pay-info .red { color: var(--red); }
+  .section-label { font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3mm; }
+  dl.details { display: grid; grid-template-columns: 34mm minmax(0, 1fr); gap: 2.2mm 4mm; margin: 0; }
+  dl.details dt { color: var(--muted); font-size: 9.5pt; }
+  dl.details dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+  dl.details dd.iban { font-weight: 700; letter-spacing: 0.02em; }
+  dl.details dd.purpose { color: var(--accent); font-weight: 700; }
+  .qr { flex: none; width: 40mm; text-align: center; }
+  .qr img { display: block; width: 40mm; height: 40mm; margin: 0 auto; }
+  .qr-cap { margin-top: 2.5mm; font-size: 8.5pt; color: var(--muted); line-height: 1.35; }
 
-  .thanks { margin: 30px 0 0; font-size: 14px; color: var(--ink-2); }
+  /* Hinweis */
+  .notice { margin-top: 6mm; padding: 4mm 5mm; background: #f5f5f3; font-size: 9pt; color: var(--ink-2); line-height: 1.5; }
+  .notice .section-label { margin-bottom: 2mm; }
+  .notice ul { margin: 0; padding-left: 4mm; }
+  .notice li { margin-bottom: 1.2mm; }
+  .notice strong { color: var(--ink); }
+
+  .thanks { margin: 8mm 0 0; color: var(--ink-2); }
+
+  /* Fuss: eine Zeile */
   .foot {
-    margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--hair);
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 18px;
-  }
-
-  @page { size: A4; margin: 16mm 18mm 14mm; }
-  @media print {
-    html, body { background: var(--white); }
+    margin-top: 6mm; padding-top: 3mm; border-top: 1px solid var(--line);
+    font-size: 8.5pt; color: var(--muted); display: flex; justify-content: space-between; gap: 6mm;
   }
 </style>
 </head>
 <body>
-<main class="sheet">
+<main class="page">
   <header class="head">
-    <div class="brand">
-      <img class="logo" alt="Mauro Gilardi Golf" src="${a.logoDataUri}">
-      <div>
-        <div class="brand-sub">SwissPGA Professional</div>
-        <div class="brand-sub">maurogilardi.ch</div>
-      </div>
-    </div>
+    <img class="logo" alt="Mauro Gilardi Golf" src="${a.logoDataUri}">
     <div class="doc">
-      <span class="eyebrow">Gönnerverein GilardiGolf</span>
-      <h1 class="title">Rechnung</h1>
-      <div class="meta sans">
-        <div><span>Rechnungsnummer</span><span>${esc(d.invoiceNumber)}</span></div>
-        <div><span>Rechnungsdatum</span><span>${esc(d.invoiceDate)}</span></div>
+      <h1 class="doc-title">Rechnung</h1>
+      <div class="doc-meta">
+        <div>Nr. ${esc(d.invoiceNumber)}</div>
+        <div>${esc(d.invoiceDate)}</div>
       </div>
     </div>
   </header>
 
-  <section class="to">
-    <div class="label">Rechnung an</div>
-    <div class="to-name">${esc(d.recipient.name)}</div>
-    ${addressLines}
+  <section class="recipient">
+    <div class="name">${esc(d.recipient.name)}</div>
+        ${recipientLines}
   </section>
 
-  <p class="intro">Danke für deine Unterstützung auf meinem Weg auf die DP World Tour. Ich freue mich, dich bald mal auf oder neben dem Golf zu sehen. Es freut mich sehr, dich in meiner Gönnervereinigung aufnehmen zu dürfen.<br><br>Untenstehend findest du die Angaben und Zahlungsdaten für die Überweisung.</p>
+  <p class="subject">Gönner-Mitgliedschaft ${esc(d.membershipLabel)} · Saison ${d.seasonYear}</p>
+  <p class="intro">Danke für deine Unterstützung auf meinem Weg auf die DP World Tour. Es freut mich sehr, dich in meiner Gönnervereinigung aufnehmen zu dürfen.</p>
 
-  <table class="items">
+  <table class="item">
     <thead>
       <tr><th>Leistung</th><th class="num">Betrag</th></tr>
     </thead>
@@ -174,36 +154,42 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
           <div class="item-title">Gönner-Mitgliedschaft ${esc(d.membershipLabel)}</div>
           <div class="item-sub">Saison ${d.seasonYear}</div>
         </td>
-        <td class="num">${esc(d.amountLabel)}</td>
-      </tr>
-      <tr class="total-row">
-        <td class="total-label sans">Total</td>
-        <td class="num total-amount">${esc(d.amountLabel)}</td>
+        <td class="num amount-total">${esc(d.amountLabel)}</td>
       </tr>
     </tbody>
   </table>
 
   <section class="pay">
-    <div class="pay-qr">
-      <img alt="QR-Code zur Zahlung" src="${a.qrDataUri}">
-      <div class="qr-cap">Mit der Banking-App scannen. Betrag und Zweck sind schon eingetragen.</div>
-    </div>
     <div class="pay-info">
-      <div class="label">Zahlungsinformationen</div>
-      <dl>
+      <div class="section-label">Zahlungsinformationen</div>
+      <dl class="details">
         <dt>Zahlbar an</dt>
         <dd>${esc(d.bank.creditorName)}<br>${esc(d.bank.street)}<br>${esc(d.bank.cityLine)}</dd>
         <dt>IBAN</dt>
         <dd class="iban">${esc(d.bank.iban)}</dd>
         <dt>Betrag</dt>
-        <dd class="amount">${esc(d.amountLabel)}</dd>
+        <dd>${esc(d.amountLabel)}</dd>
         <dt>Zahlungszweck</dt>
-        <dd class="red">${esc(d.purpose)}</dd>
+        <dd class="purpose">${esc(d.purpose)}</dd>
       </dl>
+    </div>
+    <div class="qr">
+      <img alt="QR-Code zur Zahlung" src="${a.qrDataUri}">
+      <div class="qr-cap">Mit der Banking-App scannen.<br>Betrag und Zweck sind eingetragen.</div>
     </div>
   </section>
 
-  <p class="thanks">Danke für deine Unterstützung.</p>
+  <section class="notice">
+    <div class="section-label">Hinweis zu deiner Mitgliedschaft</div>
+    <ul>
+      <li>Für deine Mitgliedschaft gelten die Gönner-Bedingungen: https://www.maurogilardi.ch/goenner-bedingungen</li>
+      <li><strong>Automatische Verlängerung:</strong> Die Mitgliedschaft verlängert sich für die folgende Saison, solange kein Austritt mitgeteilt wurde.</li>
+      <li><strong>Keine Rückerstattung:</strong> Bezahlte Beiträge werden nicht zurückerstattet. Die Unterstützung erfolgt jeweils zu Saisonbeginn bzw. beim Beitritt für die laufende Saison.</li>
+      <li>Mit der Zahlung dieser Rechnung bestätigst du die Gönner-Bedingungen.</li>
+    </ul>
+    <p style="margin:2mm 0 0">Fragen an: mauro.gilardi@hotmail.com</p>
+  </section>
+
 
   <footer class="foot">
     <span>${esc(d.bank.creditorName)} · ${esc(d.bank.street)} · ${esc(d.bank.cityLine)}</span>

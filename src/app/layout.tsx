@@ -24,9 +24,6 @@ const AnalyticsEvents = dynamic(() =>
 const CookieConsentBanner = dynamic(() =>
   import("@/components/cookie-consent-banner").then((mod) => mod.CookieConsentBanner),
 );
-const EngagementQuizPopup = dynamic(() =>
-  import("@/components/engagement-quiz-popup").then((mod) => mod.EngagementQuizPopup),
-);
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -57,7 +54,6 @@ export default function RootLayout({
         <MotionProvider>
           {children}
           <CookieConsentBanner />
-          <EngagementQuizPopup />
         </MotionProvider>
         <AnalyticsEvents />
         <Analytics />

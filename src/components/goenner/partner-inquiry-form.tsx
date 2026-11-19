@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { MailSentHint } from "@/components/goenner/mail-sent-hint";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
 
 /** Sponsoring-Anfrage für Firmen: keine Postadresse, dafür Firma und Ziele. */
 export function PartnerInquiryForm() {
@@ -77,6 +79,10 @@ export function PartnerInquiryForm() {
           />
         </label>
       </div>
+      <ConsentCheckbox id="partner-inquiry-consent" name="consent">
+        Ich habe die <Link href="/goenner-bedingungen">Gönner-Bedingungen</Link> und die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen und akzeptiere sie.
+      </ConsentCheckbox>
+
       <div className="mg-inquiry__submit">
         <button type="submit" className="mg-btn mg-btn--primary mg-btn--lg" disabled={isSubmitting}>
           {isSubmitting ? "Wird gesendet…" : "Gespräch vereinbaren"}

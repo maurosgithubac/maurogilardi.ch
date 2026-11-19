@@ -37,6 +37,16 @@ export function subscribeConsent(onChange: () => void) {
   };
 }
 
+/** Wahl zurücksetzen: danach erscheint der Hinweis erneut (nach Neuladen). */
+export function resetConsent() {
+  try {
+    localStorage.removeItem(CONSENT_KEY);
+  } catch {
+    /* Speicher blockiert: nichts zu löschen */
+  }
+  window.dispatchEvent(new Event(CONSENT_EVENT));
+}
+
 /** Ereignis nur ins dataLayer, wenn Analyse erlaubt ist. Vorher nichts senden. */
 export function pushAnalytics(event: string, props?: Record<string, string | number | undefined>) {
   if (readConsent() !== "granted") return;

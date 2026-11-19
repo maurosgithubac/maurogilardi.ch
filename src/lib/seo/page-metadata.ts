@@ -213,6 +213,22 @@ export const datenschutzMetadata: Metadata = buildPageMetadata({
   image: "heroPrimary",
 });
 
+export const nutzungsbedingungenMetadata: Metadata = buildPageMetadata({
+  path: "/nutzungsbedingungen",
+  title: seoPageTitles.nutzungsbedingungen,
+  description:
+    "Nutzungsbedingungen von maurogilardi.ch: Geltungsbereich, Inhalte, externe Links, Urheberrecht und Gerichtsstand Wattwil.",
+  image: "heroPrimary",
+});
+
+export const goennerBedingungenMetadata: Metadata = buildPageMetadata({
+  path: "/goenner-bedingungen",
+  title: seoPageTitles.goennerBedingungen,
+  description:
+    "Gönner-, Partner- und 100er-Club-Bedingungen von Mauro Gilardi: Gegenleistungen, Beitrag, Verlängerung, Kündigung und Fotonutzung.",
+  image: "heroPrimary",
+});
+
 /** Blog-Beitrag: Fallback, wenn kein Beitrag gefunden wird (Seite rendert 404) */
 export const blogPostNotFoundMetadata: Metadata = {
   title: { absolute: seoPageTitles.blogFallback },

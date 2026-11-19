@@ -147,6 +147,33 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
     }
   }
 
+  /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
+  async function downloadOutlookDraft() {
+    setInvoiceBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-eml`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(data.error || "Outlook-Entwurf konnte nicht erstellt werden.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Entwurf-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.eml`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setError("Download fehlgeschlagen.");
+    } finally {
+      setInvoiceBusy(false);
+    }
+  }
+
   async function downloadInvoice() {
     setInvoiceBusy(true);
     setError(null);
@@ -266,6 +293,16 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
           >
             <IconFile />
             {invoiceBusy ? "Erstelle…" : "Rechnung (PDF)"}
+          </button>
+          <button
+            type="button"
+            className="ap-btn ap-btn--secondary"
+            disabled={invoiceBusy}
+            onClick={() => void downloadOutlookDraft()}
+            title="Outlook-Entwurf mit Dankesnachricht und Rechnung im Anhang"
+          >
+            <IconFile />
+            Outlook-Entwurf
           </button>
         </div>
       </header>

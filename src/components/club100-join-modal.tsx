@@ -8,6 +8,8 @@ import { Portal } from "@/components/portal";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import { trackEvent } from "@/components/analytics-events";
 import { useFocusTrap, useOverlayLock } from "@/lib/ui/use-overlay";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
+import Link from "next/link";
 
 type Step = "contact" | "done";
 
@@ -185,6 +187,9 @@ export function Club100JoinModal({ open, onClose }: Props) {
                       onChange={(event) => setPhone(event.target.value)}
                     />
                   </label>
+                  <ConsentCheckbox id="club100-consent" name="consent">
+                    Ich habe die <Link href="/goenner-bedingungen">Gönner-Bedingungen</Link> und die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen und akzeptiere sie.
+                  </ConsentCheckbox>
                   <button
                     type="submit"
                     className="mg-btn mg-btn--primary mg-btn--lg"

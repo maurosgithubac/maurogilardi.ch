@@ -169,7 +169,7 @@ export function SiteHeader({ variant }: Props) {
               </a>
             ) : null}
             <Magnetic className="mg-header__cta">
-              <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--sm" data-track="header_cta">
+              <Link href="/sponsoring#anfrage" className="mg-btn mg-btn--accent mg-btn--sm" data-track="header_cta">
                 Gönner werden
               </Link>
             </Magnetic>
@@ -241,7 +241,7 @@ export function SiteHeader({ variant }: Props) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, transition: { delay: 0.45 } }}
               >
-                <Link href="/sponsoring" className="mg-btn mg-btn--accent mg-btn--lg" onClick={closeMenu}>
+                <Link href="/sponsoring#anfrage" className="mg-btn mg-btn--accent mg-btn--lg" onClick={closeMenu}>
                   Gönner werden <span className="mg-btn__arrow" aria-hidden="true">→</span>
                 </Link>
                 <Link href="/#newsletter" className="mg-btn mg-btn--glass mg-btn--lg" onClick={closeMenu}>

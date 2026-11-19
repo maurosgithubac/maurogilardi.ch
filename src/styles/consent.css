@@ -1,0 +1,37 @@
+/* Einwilligungs-Häkchen in Formularen und Cookie-Einstellungen im Footer */
+
+.mg-consent {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.mg-consent input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.3rem;
+  accent-color: currentColor;
+  cursor: pointer;
+}
+
+.mg-consent label {
+  cursor: pointer;
+}
+
+.mg-consent a {
+  text-decoration: underline;
+}
+
+.mg-consent-reset {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

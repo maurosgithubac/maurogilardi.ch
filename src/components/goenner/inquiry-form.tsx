@@ -8,6 +8,7 @@ import { Club100JoinModal } from "@/components/club100-join-modal";
 import { MG_EASE } from "@/components/motion/motion-provider";
 import { trackEvent } from "@/components/analytics-events";
 import { MailSentHint } from "@/components/goenner/mail-sent-hint";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
 import { TWINT_PAYLINK_URL } from "@/lib/twint";
 import {
   goennerMembershipTiers,
@@ -160,6 +161,10 @@ export function GoennerInquiryForm() {
             </label>
           </div>
         </fieldset>
+
+        <ConsentCheckbox id="goenner-inquiry-consent" name="consent">
+          Ich habe die <Link href="/goenner-bedingungen">Gönner-Bedingungen</Link> und die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen und akzeptiere sie.
+        </ConsentCheckbox>
 
         <div className="mg-inquiry__submit">
           <button type="submit" className="mg-btn mg-btn--primary mg-btn--lg" disabled={isSubmitting}>

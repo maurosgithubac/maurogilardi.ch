@@ -41,6 +41,10 @@ export const seoPageTitles = {
 
   datenschutz: buildSeoTitle("Datenschutzerklärung"),
 
+  nutzungsbedingungen: buildSeoTitle("Nutzungsbedingungen"),
+
+  goennerBedingungen: buildSeoTitle("Gönner-Bedingungen"),
+
   blogFallback: buildSeoTitle("Golf-Blog"),
 } as const;
 

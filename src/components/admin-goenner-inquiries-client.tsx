@@ -312,6 +312,35 @@ export function AdminGoennerInquiriesClient({
     }
   }
 
+  /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
+  async function openOutlookDraft(row: GoennerInquiryRow) {
+    setFormError(null);
+    setFormWarning(null);
+    setFormOk(null);
+    setBusyId(row.id);
+    try {
+      const res = await fetch(`/api/admin/goenner-inquiries/${row.id}/invoice-eml`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(typeof data.error === "string" ? data.error : "Outlook-Entwurf konnte nicht erstellt werden.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Entwurf-${row.invoice_number ?? row.id}.eml`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setFormOk(`Outlook-Entwurf ${row.invoice_number} erstellt. Datei öffnen, anpassen, senden.`);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "Outlook-Entwurf konnte nicht erstellt werden.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function downloadInvoicePdf(row: GoennerInquiryRow) {
     setFormError(null);
     setFormWarning(null);
@@ -689,6 +718,13 @@ export function AdminGoennerInquiriesClient({
                                     icon: <IconDownload size={14} />,
                                     disabled: busy,
                                     onSelect: () => void downloadInvoicePdf(row),
+                                  },
+                                  {
+                                    kind: "action" as const,
+                                    label: "Outlook-Entwurf mit Rechnung",
+                                    icon: <IconMail size={14} />,
+                                    disabled: busy,
+                                    onSelect: () => void openOutlookDraft(row),
                                   },
                                 ]
                               : []),

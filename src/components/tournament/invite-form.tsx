@@ -141,6 +141,10 @@ export function InviteForm({
             <textarea value={note} maxLength={500} rows={3} onChange={(event) => setNote(event.target.value)} />
           </label>
 
+          <p style={{ fontSize: "0.9rem", opacity: 0.8 }}>
+            Deine Angaben werden nur für die Turnierplanung genutzt. Details in der <a href="/datenschutz">Datenschutzerklärung</a>.
+          </p>
+
           {error ? (
             <p className="tn-banner tn-banner--error" role="alert">
               {error}

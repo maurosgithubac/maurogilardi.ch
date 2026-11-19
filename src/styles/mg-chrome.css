@@ -815,17 +815,6 @@ html[data-mg-overlays] .mg-cookie {
   flex: none;
 }
 
-/* ——— Quiz-Popup im neuen Look ——— */
-.engagement-quiz-kicker {
-  color: var(--mg-red) !important;
-  letter-spacing: 0.22em !important;
-}
-
-.engagement-quiz-dialog {
-  border-radius: var(--mg-r-xl) !important;
-  font-family: var(--mg-font-body);
-}
-
 /* Cookie-Hinweis: zwei gleichwertige Wahlmöglichkeiten */
 .mg-cookie__actions {
   display: flex;

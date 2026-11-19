@@ -3,7 +3,9 @@
 import { useActionState, useEffect, useId, useRef } from "react";
 import { newsletterSubscribeAction } from "@/app/actions/newsletter-subscribe";
 import { initialNewsletterFormState } from "@/lib/newsletter-form-state";
+import Link from "next/link";
 import { trackEvent } from "@/components/analytics-events";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
 
 type Props = {
   /** "light" = Button hell (auf dunklem/rotem Grund) */
@@ -41,6 +43,9 @@ export function NewsletterForm({ tone = "light" }: Props) {
           {pending ? "…" : "Anmelden"}
         </button>
       </div>
+      <ConsentCheckbox id={`${inputId}-consent`} name="consent">
+        Ich möchte den Newsletter erhalten und habe die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen.
+      </ConsentCheckbox>
       <p className={`mg-form-status${state.error ? " mg-form-status--error" : ""}`} role="status" aria-live="polite">
         {state.message || state.error}
       </p>

@@ -12,6 +12,10 @@ export async function newsletterSubscribeAction(
   formData: FormData,
 ): Promise<NewsletterFormState> {
   const email = String(formData.get("email") || "");
+  // Einwilligung zur Datenschutzerklärung ist Pflicht (serverseitig geprüft)
+  if (formData.get("consent") !== "on") {
+    return { message: "", error: "Bitte bestätige, dass du die Datenschutzerklärung gelesen hast." };
+  }
   const h = await headers();
   const referer = h.get("referer");
 

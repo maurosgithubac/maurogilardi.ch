@@ -1,17 +1,25 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { trackEvent } from "@/components/analytics-events";
+import { ConsentCheckbox } from "@/components/consent-checkbox";
 
 export function FooterContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!consent) {
+      setStatus("error");
+      setFeedback("Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.");
+      return;
+    }
     setStatus("loading");
     setFeedback("");
 
@@ -35,6 +43,7 @@ export function FooterContactForm() {
       setName("");
       setEmail("");
       setMessage("");
+      setConsent(false);
     } catch {
       setStatus("error");
       setFeedback("Senden fehlgeschlagen. Bitte versuch es später nochmals.");
@@ -97,6 +106,10 @@ export function FooterContactForm() {
             placeholder="Worum geht’s?"
           />
         </label>
+
+        <ConsentCheckbox id="footer-contact-consent" name="consent" checked={consent} onChange={setConsent}>
+          Ich habe die <Link href="/datenschutz">Datenschutzerklärung</Link> gelesen und bin einverstanden, dass meine Angaben zur Beantwortung bearbeitet werden.
+        </ConsentCheckbox>
 
         <div className="mg-contact__actions">
           <button type="submit" className="mg-btn mg-btn--light" disabled={status === "loading"}>

@@ -33,6 +33,8 @@ const STATIC_ROUTES: {
   { path: "/ueber-mich/gallerie", changeFrequency: "monthly", priority: 0.5, lastModified: STATIC_CONTENT_UPDATED },
   { path: "/impressum", changeFrequency: "yearly", priority: 0.2, lastModified: LEGAL_CONTENT_UPDATED },
   { path: "/datenschutz", changeFrequency: "yearly", priority: 0.2, lastModified: LEGAL_CONTENT_UPDATED },
+  { path: "/nutzungsbedingungen", changeFrequency: "yearly", priority: 0.2, lastModified: LEGAL_CONTENT_UPDATED },
+  { path: "/goenner-bedingungen", changeFrequency: "yearly", priority: 0.3, lastModified: LEGAL_CONTENT_UPDATED },
 ];
 
 export const revalidate = 3600;
