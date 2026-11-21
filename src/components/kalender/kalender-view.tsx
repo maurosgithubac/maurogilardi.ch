@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { KalenderScrollFx } from "@/components/kalender/kalender-scroll";
 import { GlobeArcs, type GlobeFocus, type GlobeItem } from "@/components/globe/globe-arcs";
 import { classifySeason, daysBetween, todayIso, type EventStatus, type SeasonStatus } from "@/lib/season-status";
 
@@ -105,6 +106,15 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
     return map;
   }, [globeItems]);
 
+  const handleActive = useCallback(
+    (id: string) => {
+      const index = globeIndexById.get(id);
+      if (index === undefined) return;
+      setFocus((prev) => (prev?.index === index ? prev : { index, n: (prev?.n ?? 0) + 1 }));
+    },
+    [globeIndexById],
+  );
+
   const focusEvent = (id: string) => {
     const index = globeIndexById.get(id);
     if (index === undefined) return;
@@ -119,6 +129,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
 
   return (
     <>
+      <KalenderScrollFx onActive={handleActive} />
       <section className="kal-live" aria-live="polite" aria-label="Aktueller Stand">
         <LiveStatus status={status} today={today} seasonLabel={seasonLabel} />
       </section>
@@ -131,6 +142,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
         </section>
       ) : null}
 
+      <div className="kal-story">
       <section className="kal-globe" id="kal-globe" aria-label="Globus mit allen Turnieren">
         <div className="mg-container kal-globe__grid">
           <GlobeArcs items={globeItems} focus={focus} onSelect={(i) => setFocus({ index: i, n: Date.now() })} />
@@ -197,7 +209,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
 
           {byMonth.map((month) => (
             <section key={month.name} className="kal-month" aria-labelledby={`kal-m-${month.name}`}>
-              <header className="kal-month__head">
+              <header className="kal-month__head" data-reveal>
                 <h2 id={`kal-m-${month.name}`}>{month.name}</h2>
                 <span>
                   {month.events.length} {month.events.length === 1 ? "Turnier" : "Turniere"}
@@ -209,7 +221,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
                   const s = status?.byId[ev.id] ?? "upcoming";
                   const clickable = globeIndexById.has(ev.id);
                   return (
-                    <li key={ev.id} className="kal-card" data-status={s}>
+                    <li key={ev.id} className="kal-card" data-status={s} data-id={ev.id} data-focus data-reveal>
                       <button
                         type="button"
                         className="kal-card__main"
@@ -251,6 +263,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
           ))}
         </div>
       </section>
+      </div>
     </>
   );
 }

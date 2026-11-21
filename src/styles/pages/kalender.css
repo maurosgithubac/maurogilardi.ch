@@ -480,3 +480,60 @@
     transition: none;
   }
 }
+
+/* ——— Scroll-Erlebnis ——— */
+.kal-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 200;
+  background: var(--mg-red);
+  transform-origin: 0 50%;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Globus bleibt beim Scrollen im Bild, die Karten scrollen daneben */
+@media (min-width: 1100px) {
+  .kal-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: start;
+  }
+
+  .kal-story > .kal-globe {
+    position: sticky;
+    top: 84px;
+    height: calc(100vh - 108px);
+    overflow: hidden;
+    padding-block: 20px;
+  }
+
+  .kal-story > .kal-globe .kal-globe__grid {
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .kal-progress {
+    display: none;
+  }
+}
