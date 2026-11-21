@@ -49,7 +49,7 @@ export function variantTexts(params: {
   if (art === "partner") {
     return {
       subject: `Zusammenarbeit ${season} · ${first}`,
-      itemTitle: `MG-Partnerschaft · Saison ${season}`,
+      itemTitle: `MG-Unterstützung · Saison ${season}`,
       intro: neu
         ? "Vielen Dank für dein Interesse an einer Partnerschaft mit mir. Ich freue mich sehr auf die Zusammenarbeit und darauf, gemeinsam etwas aufzubauen."
         : "Schön, dass du mich auch in der kommenden Saison wieder unterstützt und mich auf meinem Weg begleitest. Deine Treue bedeutet mir sehr viel, gerade in den immer intensiver werdenden Turnierwochen.",
