@@ -230,18 +230,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Rechnung: Dank-Mail mit Zahlungsdaten und QR-Code, sofort nach Einreichung
-    if (paymentMethod === "rechnung") {
-      try {
-        await sendInvoiceMail(inserted as GoennerMailRow);
-        await supabase
-          .from("goenner_inquiries")
-          .update({ invoice_mail_sent_at: new Date().toISOString() })
-          .eq("id", inserted.id);
-      } catch (invoiceError) {
-        console.error("goenner-inquiry invoice mail failed", invoiceError);
-      }
-    }
+    // Rechnung wird nie automatisch versendet: Der Admin öffnet sie als Outlook-Entwurf
+    // (siehe Admin > Gönner > „Outlook-Entwurf mit Rechnung“) und sendet selbst.
 
     return NextResponse.json(
       {

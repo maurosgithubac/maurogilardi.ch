@@ -1,5 +1,6 @@
 "use client";
 
+import { openInvoiceMail } from "@/lib/admin-invoice-mail";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -313,13 +314,30 @@ export function AdminGoennerInquiriesClient({
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function openOutlookDraft(row: GoennerInquiryRow) {
+  async function openOutlookDraft(row: GoennerInquiryRow, type: "invoice" | "twint" = "invoice") {
+    if (type === "invoice") {
+      setFormError(null);
+      setFormWarning(null);
+      setFormOk(null);
+      setBusyId(row.id);
+      try {
+        await openInvoiceMail({
+          mailUrl: `/api/admin/goenner-inquiries/${row.id}/invoice-eml`,
+        });
+        setFormOk(`Mail-Entwurf für ${row.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
+      } catch (e) {
+        setFormError(e instanceof Error ? e.message : "Mail-Entwurf konnte nicht erstellt werden.");
+      } finally {
+        setBusyId(null);
+      }
+      return;
+    }
     setFormError(null);
     setFormWarning(null);
     setFormOk(null);
     setBusyId(row.id);
     try {
-      const res = await fetch(`/api/admin/goenner-inquiries/${row.id}/invoice-eml`);
+      const res = await fetch(`/api/admin/goenner-inquiries/${row.id}/invoice-eml${type === "twint" ? "?type=twint" : ""}`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(typeof data.error === "string" ? data.error : "Outlook-Entwurf konnte nicht erstellt werden.");
@@ -328,7 +346,7 @@ export function AdminGoennerInquiriesClient({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Entwurf-${row.invoice_number ?? row.id}.eml`;
+      a.download = `${type === "twint" ? "TWINT" : "Entwurf"}-${row.invoice_number ?? row.id}.eml`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -702,26 +720,19 @@ export function AdminGoennerInquiriesClient({
                           label={`Aktionen für ${row.name}`}
                           items={[
                             ...(row.membership_id !== "sponsoring"
-                              ? (["rechnung", "twint"] as const).map((type) => ({
+                              ? (["twint"] as const).map((type) => ({
                                   kind: "action" as const,
-                                  label: type === "rechnung" ? "Rechnungs-Mail senden" : "TWINT-Mail senden",
+                                  label: "TWINT-Entwurf",
                                   icon: <IconMail size={14} />,
                                   disabled: busy,
-                                  onSelect: () => void sendMail(row, type),
+                                  onSelect: () => void openOutlookDraft(row, type),
                                 }))
                               : []),
                             ...(row.payment_method === "rechnung" && row.invoice_number
                               ? [
                                   {
                                     kind: "action" as const,
-                                    label: "PDF-Rechnung herunterladen",
-                                    icon: <IconDownload size={14} />,
-                                    disabled: busy,
-                                    onSelect: () => void downloadInvoicePdf(row),
-                                  },
-                                  {
-                                    kind: "action" as const,
-                                    label: "Outlook-Entwurf mit Rechnung",
+                                    label: "Rechnung (Mail-Entwurf)",
                                     icon: <IconMail size={14} />,
                                     disabled: busy,
                                     onSelect: () => void openOutlookDraft(row),

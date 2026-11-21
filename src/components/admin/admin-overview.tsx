@@ -13,17 +13,8 @@ import { isNewInquiry } from "@/lib/admin-inbox";
 import { prizeKindOf, type PrizeMoneyRow } from "@/lib/prize-money";
 import type { GoennerInquiryRow } from "@/types/content";
 import { AdminGoennerMembersClient, type StatusFilter } from "@/components/admin-goenner-members-client";
-import { IconArrowRight, IconDownload, IconInbox, IconTrophy, IconUsers } from "@/components/admin/admin-icons";
-import {
-  AdminPageHeader,
-  ProgressBar,
-  TierTag,
-  categoryOf,
-  chf,
-  chfCompact,
-  dateCh,
-  type CategoryFilter,
-} from "@/components/admin/admin-ui";
+import { IconDownload, IconTrophy } from "@/components/admin/admin-icons";
+import { chf, chfCompact, dateCh, categoryOf, type CategoryFilter } from "@/components/admin/admin-ui";
 
 type Props = {
   members: GoennerMemberRow[];
@@ -217,34 +208,33 @@ export function AdminOverview({
   const diffPct = income.prev > 0 ? Math.round((diff / income.prev) * 100) : null;
 
   return (
-    <div className="ap-page">
-      <AdminPageHeader
-        eyebrow="Übersicht"
-        title={`Saison ${year}`}
-        description="Einnahmen, neue Anfragen und alle Gönner, Sponsoren und Partner auf einen Blick."
-        actions={
-          <>
-            <label className="ap-field-inline">
-              <span>Saison</span>
-              <select className="ap-select" value={year} onChange={(e) => setYear(Number(e.target.value))}>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <a
-              className="ap-btn ap-btn--secondary"
-              href={`/api/admin/goenner-report?year=${reportYear}`}
-              title={`Stand 31.12.${reportYear} als CSV (Excel)`}
-            >
-              <IconDownload />
-              Jahresreport {reportYear}
-            </a>
-          </>
-        }
-      />
+    <div className="ov">
+      <header className="ov-head">
+        <div>
+          <p className="ov-eyebrow">Übersicht</p>
+          <h1 className="ov-title">Saison {year}</h1>
+        </div>
+        <div className="ov-head-actions">
+          <label className="ov-season">
+            <span className="sr-only">Saison wählen</span>
+            <select className="ap-select" value={year} onChange={(e) => setYear(Number(e.target.value))}>
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </label>
+          <a
+            className="ov-icon-btn"
+            href={`/api/admin/goenner-report?year=${reportYear}`}
+            title={`Stand 31.12.${reportYear} als CSV (Excel)`}
+          >
+            <IconDownload />
+            <span className="sr-only">Jahresreport {reportYear} herunterladen</span>
+          </a>
+        </div>
+      </header>
 
       {ledgerMissing ? (
         <p className="ap-banner ap-banner--warn" role="status">
@@ -258,193 +248,127 @@ export function AdminOverview({
         </p>
       ) : null}
 
-      {inbox.fresh.length > 0 ? (
-        <Link href="/admin/goenner/inbox?filter=new" className="ap-alert-new">
-          <span className="ap-alert-new-count" aria-hidden="true">
-            {inbox.fresh.length}
-          </span>
-          <span className="ap-alert-new-text">
-            <strong>
-              {inbox.fresh.length === 1 ? "1 neue Anfrage" : `${inbox.fresh.length} neue Anfragen`}
-            </strong>
-            <span>
-              {inbox.fresh
-                .slice(0, 3)
-                .map((q) => `${q.name} (${inquiryTierShort(q.membership_id)})`)
-                .join(" · ")}
-              {inbox.fresh.length > 3 ? " …" : ""}
-            </span>
-          </span>
-          <span className="ap-alert-new-cta">
-            Ansehen <IconArrowRight size={14} />
-          </span>
-        </Link>
-      ) : null}
-
-      <section className="ap-income" aria-labelledby="income-heading">
-        <div className="ap-income-main">
-          <p id="income-heading" className="ap-kpi-label">
-            Einnahmen Saison {year}
-          </p>
-          <strong className="ap-income-value">{chfCompact(income.total)}</strong>
-          <p className="ap-income-compare">
-            {income.prev > 0 ? (
-              <>
-                <span className={diff >= 0 ? "is-up" : "is-down"}>
-                  {diff >= 0 ? "+" : "−"}
-                  {chfCompact(Math.abs(diff))}
-                  {diffPct !== null ? ` (${diff >= 0 ? "+" : "−"}${Math.abs(diffPct)} %)` : ""}
-                </span>{" "}
-                gegenüber {year - 1}
-                {income.partial ? " zum gleichen Zeitpunkt" : ""}
-              </>
-            ) : (
-              <>Keine Vergleichswerte aus {year - 1}</>
-            )}
-          </p>
-          <SeasonChart months={months} year={year} through={through} />
-          <div className="ap-mix" role="img" aria-label="Aufteilung der Einnahmen nach Quelle">
-            {SOURCES.map((s) =>
-              income.bySource[s.id] > 0 ? (
-                <span
-                  key={s.id}
-                  className={`ap-mix-seg ap-mix--${s.id}`}
-                  style={{ flexGrow: income.bySource[s.id] }}
-                />
-              ) : null,
-            )}
-          </div>
-          <dl className="ap-mix-legend">
-            {SOURCES.map((s) => (
-              <div key={s.id}>
-                <dt>
-                  <span className={`ap-mix-dot ap-mix--${s.id}`} aria-hidden="true" />
-                  {s.label}
-                </dt>
-                <dd>{income.bySource[s.id] > 0 ? chfCompact(income.bySource[s.id]) : "—"}</dd>
-              </div>
-            ))}
-          </dl>
+      {/* Heute: alles, was Aufmerksamkeit braucht, mit einem Tipp erreichbar */}
+      <section className="ov-card ov-today" aria-labelledby="today-heading">
+        <div className="ov-card-head">
+          <h2 id="today-heading" className="ov-h2">
+            Heute zu tun
+          </h2>
+          <span className="ov-badge">{inbox.list.length + dues.unpaid.length}</span>
         </div>
 
-        <div className="ap-income-side">
-          <div className="ap-income-stat">
-            <span className="ap-kpi-label">Beiträge bezahlt</span>
-            <strong className="ap-kpi-value">
-              {dues.paid}
-              <span className="ap-kpi-of"> / {dues.billable}</span>
-            </strong>
-            <ProgressBar value={dues.paid} max={dues.billable} label={`Beiträge bezahlt ${year}`} />
-          </div>
-          <div className={`ap-income-stat${dues.openSum > 0 ? " is-alert" : ""}`}>
-            <span className="ap-kpi-label">Noch offen</span>
-            <strong className="ap-kpi-value">{chfCompact(dues.openSum)}</strong>
-            <span className="ap-kpi-foot">
-              {dues.unpaid.length === 1 ? "1 Beitrag" : `${dues.unpaid.length} Beiträge`}
-            </span>
-          </div>
-          <Link href="/admin/preisgelder" className="ap-income-stat ap-income-stat--link">
-            <span className="ap-kpi-label">
-              <IconTrophy size={14} /> Preisgelder
-            </span>
-            <strong className="ap-kpi-value">{chfCompact(income.bySource.prize + income.bySource.proam)}</strong>
-            <span className="ap-kpi-foot">
-              {income.prizeCount + income.proamCount === 0
-                ? "Noch keine erfasst — jetzt erfassen"
-                : `${income.prizeCount} ${income.prizeCount === 1 ? "Turnier" : "Turniere"} · ${income.proamCount} ${
-                    income.proamCount === 1 ? "ProAm" : "ProAms"
-                  } (${chfCompact(income.bySource.proam)})`}
-            </span>
-          </Link>
-        </div>
-      </section>
-
-      <div className="ap-grid-2">
-        <section className="ap-card" aria-labelledby="inbox-heading">
-          <div className="ap-card-head">
-            <IconInbox />
-            <h2 id="inbox-heading" className="ap-h2">
-              Offene Anfragen
-            </h2>
-            {inbox.fresh.length > 0 ? <span className="ap-pill-new">{inbox.fresh.length} neu</span> : null}
-            <span className="ap-count">{inbox.list.length}</span>
-          </div>
-          {inbox.list.length === 0 ? (
-            <p className="ap-empty-inline">Keine offenen Anfragen — alles erledigt.</p>
-          ) : (
-            <ul className="ap-todo-list">
-              {inbox.list.slice(0, LIST_LIMIT).map((q) => {
-                const fresh = isNewInquiry(q);
-                return (
-                  <li key={q.id}>
-                    <Link
-                      href={`/admin/goenner/inbox?filter=${fresh ? "new" : "open"}`}
-                      className={`ap-todo-row${fresh ? " is-new" : ""}`}
-                    >
-                      <span className="ap-todo-main">
-                        <span className="ap-todo-name">
-                          {fresh ? <span className="ap-new-dot" aria-label="Neu" /> : null}
-                          {q.name}
-                        </span>
-                        <span className="ap-todo-meta">
-                          Eingang {dateCh(q.created_at)}
-                          {q.payment_method ? ` · ${q.payment_method === "twint" ? "TWINT" : "Rechnung"}` : ""}
-                        </span>
-                      </span>
-                      <TierTag id={q.membership_id}>{inquiryTierShort(q.membership_id)}</TierTag>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          <Link href="/admin/goenner/inbox" className="ap-link-more">
-            {inbox.list.length > LIST_LIMIT ? `Alle ${inbox.list.length} Anfragen bearbeiten` : "Zu den Eingängen"}
-            <IconArrowRight size={14} />
-          </Link>
-        </section>
-
-        <section className="ap-card" aria-labelledby="dues-heading">
-          <div className="ap-card-head">
-            <IconUsers />
-            <h2 id="dues-heading" className="ap-h2">
-              Offene Beiträge {year}
-            </h2>
-            <span className="ap-count">{dues.unpaid.length}</span>
-          </div>
-          {dues.unpaid.length === 0 ? (
-            <p className="ap-empty-inline">Alle Beiträge mit Betrag sind für {year} bezahlt.</p>
-          ) : (
-            <ul className="ap-todo-list">
-              {dues.unpaid.slice(0, LIST_LIMIT).map((m) => (
-                <li key={m.id}>
-                  <Link href={`/admin/goenner/${m.id}`} className="ap-todo-row">
-                    <span className="ap-todo-main">
-                      <span className="ap-todo-name">{m.name}</span>
-                      <span className="ap-todo-meta">
-                        {m.organization ? `${m.organization} · ` : ""}
-                        {inquiryTierShort(m.membership_id)}
-                        {m.contribution_type && m.contribution_type !== "geld"
-                          ? ` · ${contributionTypeLabel(m.contribution_type)}`
-                          : ""}
+        {inbox.list.length + dues.unpaid.length === 0 ? (
+          <p className="ov-done">Alles erledigt.</p>
+        ) : (
+          <ul className="ov-actions">
+            {inbox.list.slice(0, 3).map((q) => {
+              const fresh = isNewInquiry(q);
+              return (
+                <li key={`q-${q.id}`}>
+                  <Link href={`/admin/goenner/inbox?filter=${fresh ? "new" : "open"}`} className="ov-action">
+                    <span className={`ov-kind${fresh ? " is-new" : ""}`}>{fresh ? "Neu" : "Anfrage"}</span>
+                    <span className="ov-action-main">
+                      <span className="ov-action-name">{q.name}</span>
+                      <span className="ov-action-meta">
+                        {inquiryTierShort(q.membership_id)} · {dateCh(q.created_at)}
                       </span>
                     </span>
-                    <span className="ap-num">{chf(m.expected)}</span>
+                    <span className="ov-action-cta">Öffnen</span>
                   </Link>
                 </li>
-              ))}
-            </ul>
-          )}
-          {dues.unpaid.length > 0 ? (
-            <Link href={`/admin?status=open${year !== currentYear ? `&year=${year}` : ""}#liste`} className="ap-link-more">
-              {dues.unpaid.length > LIST_LIMIT ? `Alle ${dues.unpaid.length} in der Liste zeigen` : "In der Liste zeigen"}
-              <IconArrowRight size={14} />
-            </Link>
-          ) : null}
-        </section>
-      </div>
+              );
+            })}
+            {dues.unpaid.slice(0, 3).map((m) => (
+              <li key={`d-${m.id}`}>
+                <Link href={`/admin/goenner/${m.id}`} className="ov-action">
+                  <span className="ov-kind">Beitrag</span>
+                  <span className="ov-action-main">
+                    <span className="ov-action-name">{m.name}</span>
+                    <span className="ov-action-meta">
+                      {inquiryTierShort(m.membership_id)} · {chf(m.expected)}
+                      {m.contribution_type && m.contribution_type !== "geld"
+                        ? ` · ${contributionTypeLabel(m.contribution_type)}`
+                        : ""}
+                    </span>
+                  </span>
+                  <span className="ov-action-cta">Rechnung</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      {ledgerMissing ? null : (
+        {inbox.list.length + dues.unpaid.length > 6 ? (
+          <Link href="/admin/goenner/inbox" className="ov-more">
+            Alle anzeigen
+          </Link>
+        ) : null}
+      </section>
+
+      {/* Einnahmen */}
+      <section className="ov-card ov-revenue" aria-labelledby="income-heading">
+        <p id="income-heading" className="ov-kicker">
+          Einnahmen {year}
+        </p>
+        <p className="ov-amount">{chfCompact(income.total)}</p>
+        <p className="ap-income-compare">
+          {income.prev > 0 ? (
+            <>
+              <span className={diff >= 0 ? "is-up" : "is-down"}>
+                {diff >= 0 ? "+" : "−"}
+                {chfCompact(Math.abs(diff))}
+                {diffPct !== null ? ` (${diff >= 0 ? "+" : "−"}${Math.abs(diffPct)} %)` : ""}
+              </span>{" "}
+              gegenüber {year - 1}
+              {income.partial ? " zum gleichen Zeitpunkt" : ""}
+            </>
+          ) : (
+            <>Keine Vergleichswerte aus {year - 1}</>
+          )}
+        </p>
+        <SeasonChart months={months} year={year} through={through} />
+        <div className="ap-mix" role="img" aria-label="Aufteilung der Einnahmen nach Quelle">
+          {SOURCES.map((s) =>
+            income.bySource[s.id] > 0 ? (
+              <span key={s.id} className={`ap-mix-seg ap-mix--${s.id}`} style={{ flexGrow: income.bySource[s.id] }} />
+            ) : null,
+          )}
+        </div>
+        <dl className="ap-mix-legend">
+          {SOURCES.map((s) => (
+            <div key={s.id}>
+              <dt>
+                <span className={`ap-mix-dot ap-mix--${s.id}`} aria-hidden="true" />
+                {s.label}
+              </dt>
+              <dd>{income.bySource[s.id] > 0 ? chfCompact(income.bySource[s.id]) : "—"}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {/* Kennzahlen: drei Kacheln, ein Blick */}
+      <section className="ov-kpis" aria-label="Kennzahlen">
+        <div className="ov-kpi">
+          <span className="ov-kpi-label">Bezahlt</span>
+          <strong className="ov-kpi-value">
+            {dues.paid}
+            <span className="ov-kpi-of"> / {dues.billable}</span>
+          </strong>
+        </div>
+        <div className={`ov-kpi${dues.openSum > 0 ? " is-alert" : ""}`}>
+          <span className="ov-kpi-label">Noch offen</span>
+          <strong className="ov-kpi-value">{chfCompact(dues.openSum)}</strong>
+        </div>
+        <Link href="/admin/preisgelder" className="ov-kpi ov-kpi--link">
+          <span className="ov-kpi-label">
+            <IconTrophy size={14} /> Preisgelder
+          </span>
+          <strong className="ov-kpi-value">{chfCompact(income.bySource.prize + income.bySource.proam)}</strong>
+        </Link>
+      </section>
+
+      <div className="ov-full">{ledgerMissing ? null : (
         <AdminGoennerMembersClient
           key={`${initialStatus ?? "all"}-${initialCategory ?? "all"}`}
           members={members}
@@ -453,7 +377,7 @@ export function AdminOverview({
           initialStatus={initialStatus}
           initialCategory={initialCategory}
         />
-      )}
+      )}</div>
     </div>
   );
 }

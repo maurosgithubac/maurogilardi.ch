@@ -1,0 +1,14 @@
+{
+  "name": "Gönner-Admin · Mauro Gilardi",
+  "short_name": "Gönner-Admin",
+  "description": "Verwaltung der Gönner, Anfragen und Rechnungen",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f4f5",
+  "theme_color": "#121314",
+  "icons": [
+    { "src": "/brand-assets/logos/mauro-gilardi-golf-logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

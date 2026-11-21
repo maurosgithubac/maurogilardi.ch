@@ -96,25 +96,16 @@ export async function POST(request: Request) {
     );
   }
 
+  // Rechnungen werden nie direkt versendet, nur als Outlook-Entwurf (…/invoice-eml).
+  if (type === "rechnung" || type === "twint") {
+    return NextResponse.json(
+      { error: "Rechnungen und TWINT-Mails werden nicht direkt versendet. Bitte als Mail-Entwurf öffnen." },
+      { status: 400 },
+    );
+  }
+
   try {
-    if (type === "rechnung") {
-      if (source === "inquiry" && !recipient.invoice_number) {
-        recipient.invoice_number = await nextInvoiceNumber(supabase);
-        await supabase
-          .from("goenner_inquiries")
-          .update({ invoice_number: recipient.invoice_number, payment_method: "rechnung" })
-          .eq("id", id);
-      }
-      await sendInvoiceMail(recipient);
-      if (source === "inquiry") {
-        await supabase
-          .from("goenner_inquiries")
-          .update({ invoice_mail_sent_at: new Date().toISOString() })
-          .eq("id", id);
-      }
-    } else {
-      await sendReceiptMail(recipient);
-    }
+    await sendReceiptMail(recipient);
   } catch (mailError) {
     console.error("admin goenner mail failed", mailError);
     return NextResponse.json(

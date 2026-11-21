@@ -214,6 +214,36 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
       <main id="ap-main" className="ap-main" tabIndex={-1}>
         <div className="ap-content">{children}</div>
       </main>
+
+      {/* Untere Tab-Leiste: nur auf dem Handy sichtbar */}
+      <nav className="ap-tabbar" aria-label="Schnellnavigation">
+        <ul>
+          {[...items, ...accountItems].map((item) => {
+            const active = item.match(path);
+            const label = item.href === "/admin/settings" ? "Konto" : item.label;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`ap-tab${active ? " is-active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <span className="ap-tab-icon">{item.icon}</span>
+                  <span className="ap-tab-label">{label}</span>
+                  {item.badge ? (
+                    <span
+                      className={`ap-tab-badge${item.badge.tone === "open" ? " ap-tab-badge--open" : ""}`}
+                      aria-label={item.badge.tone === "new" ? `${item.badge.count} neu` : `${item.badge.count} offen`}
+                    >
+                      {item.badge.count}
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </div>
   );
 }

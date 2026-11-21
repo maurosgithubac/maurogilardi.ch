@@ -1,5 +1,6 @@
 "use client";
 
+import { openInvoiceMail } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
@@ -148,11 +149,25 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function downloadOutlookDraft() {
+  async function downloadOutlookDraft(type: "invoice" | "twint" = "invoice") {
+    if (type === "invoice") {
+      setInvoiceBusy(true);
+      setError(null);
+      try {
+        await openInvoiceMail({
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml`,
+        });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Mail-Entwurf konnte nicht erstellt werden.");
+      } finally {
+        setInvoiceBusy(false);
+      }
+      return;
+    }
     setInvoiceBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-eml`);
+      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-eml${type === "twint" ? "?type=twint" : ""}`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         setError(data.error || "Outlook-Entwurf konnte nicht erstellt werden.");
@@ -162,7 +177,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Entwurf-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.eml`;
+      a.download = `${type === "twint" ? "TWINT" : "Entwurf"}-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.eml`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -268,41 +283,21 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             type="button"
             className="ap-btn ap-btn--secondary"
             disabled={!canMail || mailBusy !== null}
-            onClick={() => void sendMail("rechnung")}
-            title={mailTitle ?? `Rechnungs-Mail mit QR-Code über ${chf(expected)} an ${member.email}`}
-          >
-            <IconMail />
-            {mailBusy === "rechnung" ? "Sende…" : "Rechnungs-Mail"}
-          </button>
-          <button
-            type="button"
-            className="ap-btn ap-btn--secondary"
-            disabled={!canMail || mailBusy !== null}
-            onClick={() => void sendMail("twint")}
+            onClick={() => void downloadOutlookDraft("twint")}
             title={mailTitle ?? `TWINT-Mail mit Paylink über ${chf(expected)} an ${member.email}`}
           >
             <IconMail />
-            {mailBusy === "twint" ? "Sende…" : "TWINT-Mail"}
+            TWINT-Entwurf
           </button>
           <button
             type="button"
-            className="ap-btn ap-btn--secondary"
-            disabled={invoiceBusy}
-            onClick={() => void downloadInvoice()}
-            title="PDF-Rechnung herunterladen"
-          >
-            <IconFile />
-            {invoiceBusy ? "Erstelle…" : "Rechnung (PDF)"}
-          </button>
-          <button
-            type="button"
-            className="ap-btn ap-btn--secondary"
+            className="ap-btn ap-btn--primary"
             disabled={invoiceBusy}
             onClick={() => void downloadOutlookDraft()}
-            title="Outlook-Entwurf mit Dankesnachricht und Rechnung im Anhang"
+            title="Mail-Entwurf mit Rechnung als PDF im Anhang"
           >
             <IconFile />
-            Outlook-Entwurf
+            Rechnung (Mail-Entwurf)
           </button>
         </div>
       </header>

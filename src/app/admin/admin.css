@@ -3264,3 +3264,502 @@ a.ap-row-title:hover {
   }
 }
 /* Gönner-Tabelle ab 1280px: kompakt genug, damit sie ohne seitliches Scrollen passt */
+/* ——— Untere Tab-Leiste (Handy) ——— */
+.ap-tabbar {
+  display: none;
+}
+
+@media (max-width: 759.98px) {
+  .ap-tabbar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--ap-surface);
+    border-top: 1px solid var(--ap-hair);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -6px 18px rgb(0 0 0 / 6%);
+  }
+
+  .ap-tabbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .ap-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    padding: 6px 2px;
+    border-radius: 12px;
+    color: var(--ap-muted);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.1;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ap-tab:focus-visible {
+    outline: 2px solid var(--ap-ring);
+    outline-offset: 2px;
+  }
+
+  .ap-tab-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+  }
+
+  .ap-tab-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ap-tab.is-active {
+    color: var(--ap-red-text);
+    background: var(--ap-red-soft);
+  }
+
+  .ap-tab-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ap-tab-badge {
+    position: absolute;
+    top: 4px;
+    left: calc(50% + 6px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--ap-red);
+    color: #fff;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  .ap-tab-badge--open {
+    background: var(--ap-ink-2);
+  }
+
+  /* Platz für die Leiste, damit der Inhalt nicht darunter verschwindet */
+  .ap-main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Monatsdiagramm auf dem Handy: Monatsbuchstaben grösser und besser lesbar */
+@media (max-width: 759.98px) {
+  .ap-chart text {
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+}
+
+/* ——— „Heute“ auf dem Handy: drei grosse Tippflächen oben ——— */
+.ap-today {
+  display: none;
+}
+
+@media (max-width: 759.98px) {
+  .ap-today {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+
+  .ap-today-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-height: 96px;
+    padding: 14px 12px;
+    border-radius: 18px;
+    background: var(--ap-surface);
+    color: var(--ap-ink);
+    text-decoration: none;
+    box-shadow: 0 1px 0 var(--ap-hair);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ap-today-tile:active {
+    transform: scale(0.98);
+  }
+
+  .ap-today-tile.is-alert {
+    background: var(--ap-ink);
+    color: #fff;
+  }
+
+  .ap-today-count {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .ap-today-label {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ap-muted);
+  }
+
+  .ap-today-tile.is-alert .ap-today-label,
+  .ap-today-tile.is-alert .ap-today-hint {
+    color: rgb(255 255 255 / 80%);
+  }
+
+  .ap-today-hint {
+    font-size: 11px;
+    color: var(--ap-muted);
+  }
+}
+
+/* ================================================================
+   Übersicht (Neubau): mobil zuerst, auf dem Desktop zwei Spalten
+   ================================================================ */
+.ov {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.ov-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ov-eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ap-red-text);
+}
+
+.ov-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ap-ink);
+}
+
+.ov-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ov-season .ap-select {
+  height: 40px;
+  border-radius: 12px;
+}
+
+.ov-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  box-shadow: 0 1px 0 var(--ap-hair);
+}
+
+.ov-card {
+  background: var(--ap-surface);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 1px 0 var(--ap-hair);
+}
+
+.ov-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ov-h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ap-ink);
+}
+
+.ov-badge {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 13px;
+  background: var(--ap-ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ov-done {
+  margin: 0;
+  padding: 14px 0;
+  color: var(--ap-muted);
+  font-size: 14px;
+}
+
+.ov-actions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.ov-action {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--ap-sunken);
+  color: var(--ap-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ov-action:active {
+  transform: scale(0.99);
+}
+
+.ov-kind {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--ap-hair);
+  color: var(--ap-ink-2);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ov-kind.is-new {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ov-action-main {
+  display: grid;
+  min-width: 0;
+}
+
+.ov-action-name {
+  font-weight: 600;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ov-action-meta {
+  font-size: 12px;
+  color: var(--ap-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ov-action-cta {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ap-red-text);
+  white-space: nowrap;
+}
+
+.ov-more {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ap-ink-2);
+}
+
+.ov-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-muted);
+}
+
+.ov-amount {
+  margin: 6px 0 2px;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink);
+}
+
+.ov-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ov-kpi {
+  display: grid;
+  gap: 6px;
+  min-height: 84px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--ap-surface);
+  color: var(--ap-ink);
+  text-decoration: none;
+  box-shadow: 0 1px 0 var(--ap-hair);
+}
+
+.ov-kpi.is-alert {
+  background: var(--ap-ink);
+  color: #fff;
+}
+
+.ov-kpi.is-alert .ov-kpi-label,
+.ov-kpi.is-alert .ov-kpi-of {
+  color: rgb(255 255 255 / 75%);
+}
+
+.ov-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.ov-kpi-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ov-kpi-of {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ap-muted);
+}
+
+/* Desktop: Heute und Einnahmen nebeneinander */
+@media (min-width: 760px) {
+  .ov {
+    gap: 20px;
+  }
+
+  .ov-title {
+    font-size: 34px;
+  }
+
+  .ov-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ov-kpi-value {
+    font-size: 24px;
+  }
+
+  .ov-amount {
+    font-size: 44px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .ov {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: start;
+  }
+
+  .ov-head,
+  .ov-kpis,
+  .ov > .ap-card,
+  .ov > .ap-table-wrap,
+  .ov > .ap-card--flush {
+    grid-column: 1 / -1;
+  }
+
+  .ov > .ov-revenue {
+    grid-row: span 1;
+  }
+}
+
+.ov-full {
+  min-width: 0;
+}
+
+@media (min-width: 1100px) {
+  .ov-full {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Kennzahlen auf dem Handy: Beträge passen in die drei Kacheln */
+@media (max-width: 759.98px) {
+  .ov-kpi {
+    min-width: 0;
+    padding: 10px;
+  }
+
+  .ov-kpi-value {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Gönner-Karten auf dem Handy: Aktionen bleiben innerhalb der Karte */
+@media (max-width: 759.98px) {
+  .ap-table--members td.ap-col-actions,
+  .ap-table--members .ap-row-actions {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 759.98px) {
+  .ap-table--members .ap-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ap-table--members .ap-row-actions .ap-btn--pay {
+    max-width: 100%;
+    white-space: normal;
+  }
+}

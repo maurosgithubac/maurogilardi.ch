@@ -1,5 +1,6 @@
 "use client";
 
+import { openInvoiceMail } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -262,6 +263,50 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
     }
   }
 
+  /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
+  async function openOutlookDraft(member: GoennerMemberRow, type: "invoice" | "twint" = "invoice") {
+    if (type === "invoice") {
+      setError(null);
+      setNotice(null);
+      setBusyId(member.id);
+      try {
+        await openInvoiceMail({
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml`,
+        });
+        setNotice(`Mail-Entwurf für ${member.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Mail-Entwurf konnte nicht erstellt werden.");
+      } finally {
+        setBusyId(null);
+      }
+      return;
+    }
+    setError(null);
+    setNotice(null);
+    setBusyId(member.id);
+    try {
+      const res = await fetch(`/api/admin/goenner-members/${member.id}/invoice-eml${type === "twint" ? "?type=twint" : ""}`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(typeof data.error === "string" ? data.error : "Outlook-Entwurf konnte nicht erstellt werden.");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${type === "twint" ? "TWINT" : "Entwurf"}-${member.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.eml`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setNotice(`Outlook-Entwurf für ${member.name} erstellt. Datei öffnen, prüfen, senden.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Outlook-Entwurf konnte nicht erstellt werden.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function downloadInvoicePdf(member: GoennerMemberRow) {
     setError(null);
     setNotice(null);
@@ -305,12 +350,12 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
 
   function mailItems(m: GoennerMemberRow & { billable: boolean }): RowMenuItem[] {
     if (!m.billable || !m.email?.includes("@")) return [];
-    return (["rechnung", "twint"] as const).map((type) => ({
+    return (["twint"] as const).map((type) => ({
       kind: "action" as const,
-      label: type === "rechnung" ? "Rechnungs-Mail senden" : "TWINT-Mail senden",
+      label: "TWINT-Entwurf",
       icon: <IconMail size={14} />,
       disabled: busyId === m.id,
-      onSelect: () => void sendMail(m, type),
+      onSelect: () => void openOutlookDraft(m, type),
     }));
   }
 
@@ -318,10 +363,10 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
     return [
       {
         kind: "action" as const,
-        label: "PDF-Rechnung herunterladen",
-        icon: <IconDownload size={14} />,
+        label: "Rechnung (Mail-Entwurf)",
+        icon: <IconMail size={14} />,
         disabled: busyId === m.id,
-        onSelect: () => void downloadInvoicePdf(m),
+        onSelect: () => void openOutlookDraft(m),
       },
     ];
   }
