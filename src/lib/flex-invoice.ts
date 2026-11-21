@@ -11,7 +11,10 @@ import { buildSwissQrPayload, readInvoiceBankConfig } from "@/lib/invoice-config
 
 export const MAX_ITEMS = 5;
 
-export type FlexItem = { description: string; amountChf: number };
+export type FlexItem = { description: string; quantity: number; unitPriceChf: number };
+
+/** Betrag einer Position: Anzahl mal Preis pro Einheit. */
+export const lineTotal = (it: FlexItem) => (Number(it.quantity) || 0) * (Number(it.unitPriceChf) || 0);
 
 export type FlexInvoiceInput = {
   title: string;
@@ -54,7 +57,7 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   const assets = flexAssets();
 
   const items = d.items.slice(0, MAX_ITEMS);
-  const total = items.reduce((s, it) => s + (Number(it.amountChf) || 0), 0);
+  const total = items.reduce((s, it) => s + lineTotal(it), 0);
   const slots = Array.from({ length: MAX_ITEMS }, (_, i) => items[i] ?? null);
 
   const payload = buildSwissQrPayload({
@@ -77,8 +80,8 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   const rows = slots
     .map((it) =>
       `<tr class="${it ? "" : "is-empty"}">
-        <td class="desc">${it ? esc(it.description) : "&nbsp;"}</td>
-        <td class="num">${it ? esc(chf(it.amountChf)) : "&nbsp;"}</td>
+        <td class="desc">${it ? esc(it.description) + (it.quantity !== 1 ? `<div class="unit">${it.quantity} × ${esc(chf(it.unitPriceChf))}</div>` : "") : "&nbsp;"}</td>
+        <td class="num">${it ? esc(chf(lineTotal(it))) : "&nbsp;"}</td>
       </tr>`,
     )
     .join("");
@@ -111,6 +114,7 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   table.items { width: 100%; border-collapse: collapse; }
   table.items th { text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; padding: 0 0 2mm; border-bottom: 1px solid ${C.ink}; }
   table.items th.num, table.items td.num { text-align: right; white-space: nowrap; }
+  .unit { font-size: 9pt; color: ${C.muted}; margin-top: 0.5mm; }
   table.items td { height: 11mm; padding: 2mm 0; border-bottom: 1px solid ${C.hair}; vertical-align: middle; }
   table.items tr.is-empty td { border-bottom-color: ${C.hair}; }
   table.items td.num { font-weight: 700; }
@@ -212,8 +216,12 @@ export function parseFlexInput(body: Record<string, unknown>, lenient = false): 
   const rawItems = Array.isArray(body.items) ? (body.items as Record<string, unknown>[]) : [];
   const items: FlexItem[] = rawItems
     .slice(0, MAX_ITEMS)
-    .map((it) => ({ description: str(it.description, 200), amountChf: Number(it.amountChf) || 0 }))
-    .filter((it) => it.description || it.amountChf);
+    .map((it) => ({
+      description: str(it.description, 200),
+      quantity: Math.min(Math.max(Math.round(Number(it.quantity) || 1), 1), 999),
+      unitPriceChf: Number(it.unitPriceChf) || 0,
+    }))
+    .filter((it) => it.description || it.unitPriceChf);
   if (!lenient && items.length === 0) return { ok: false, error: "Mindestens eine Position angeben." };
   if (!lenient && items.some((it) => !it.description)) return { ok: false, error: "Jede Position braucht eine Beschreibung." };
 

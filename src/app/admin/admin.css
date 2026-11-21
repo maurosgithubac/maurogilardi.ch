@@ -3958,7 +3958,7 @@ a.ap-row-title:hover {
 
 .ar-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 130px 36px;
+  grid-template-columns: minmax(0, 1fr) 64px 150px 36px;
   gap: 8px;
   align-items: center;
 }
@@ -4041,4 +4041,9 @@ a.ap-row-title:hover {
   .ar-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.ar-qty {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
