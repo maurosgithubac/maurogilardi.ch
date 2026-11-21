@@ -2472,7 +2472,7 @@ a.ap-row-title:hover {
 
 /* ——— Feinschliff Mobile ——— */
 
-@media (max-width: 759.98px) {
+@media (max-width: 1023.98px) {
   .ap-tier-table tbody th {
     width: auto;
   }
