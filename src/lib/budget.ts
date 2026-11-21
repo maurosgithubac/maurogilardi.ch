@@ -105,11 +105,11 @@ export function monthlyAmounts(entries: BudgetEntryRow[], year: number): { entry
       if (e.frequency === "einmalig") {
         return e.entry_date.startsWith(`${year}-`) && Number(e.entry_date.slice(5, 7)) - 1 === m ? amount : 0;
       }
-      if (!activeIn(e, year, m)) return 0;
-      if (e.frequency === "monatlich") return amount;
-      // jährlich: Jahresbetrag gleichmässig auf 12 Monate
+      if (e.frequency === "monatlich") return activeIn(e, year, m) ? amount : 0;
+      // jährlich: Jahresbetrag gleichmässig auf alle 12 Monate der Laufzeitjahre (egal in welchem Monat er anfällt)
       const startYear = Number(e.entry_date.slice(0, 4));
-      return startYear <= year ? amount / 12 : 0;
+      const endYear = e.ends_on ? Number(e.ends_on.slice(0, 4)) : Infinity;
+      return year >= startYear && year <= endYear ? amount / 12 : 0;
     });
     return { entry: e, months };
   });
