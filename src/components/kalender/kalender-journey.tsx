@@ -23,7 +23,7 @@ const C = {
 const SAMPLES = 90;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-/** Ein Stopp pro Ort: Wattwil, jedes Turnier, zurück nach Wattwil. */
+/** Ein Stopp pro Ort: Wattwil, jedes Turnier, zurÃ¼ck nach Wattwil. */
 function buildStops(events: KalenderEvent[]): Stop[] {
   const venues = events.filter((e) => e.lat != null && e.lon != null);
   const home: Stop = { lon: HOME_BASE.lon, lat: HOME_BASE.lat, name: HOME_BASE.name, place: HOME_BASE.name, dates: "", kind: "home", legKm: null };
@@ -108,18 +108,20 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       const center = interp(e);
       projection.rotate([-center[0], -center[1]]);
       // Zoom: nah am Turnier hinein, in der Flugphase heraus
-      // Zoom: Wattwil-Turnier nahe Strecken kaum heraus, lange Flüge weiter heraus. Weich über die ganze Etappe.
+      // Zoom: Wattwil-Turnier nahe Strecken kaum heraus, lange FlÃ¼ge weiter heraus. Weich Ã¼ber die ganze Etappe.
       const legKm = stops[k + 1]?.legKm ?? 0;
-      // Standard ist die weite Ansicht; an den Turnieren zoomt er deutlich näher heran.
+      // Standard ist die weite Ansicht; an den Turnieren zoomt er deutlich nÃ¤her heran.
       const farZoom = legKm > 0 ? Math.max(0.82, 1 - Math.min(0.18, legKm / 9000)) : 0.95;
       const nearZoom = 1.4;
-      const zoom = farZoom + (nearZoom - farZoom) * (1 - Math.pow(Math.sin(Math.PI * t), 2));
+      // Strecken auf demselben Kontinent (unter ca. 2 500 km): fester Zoom, kein Herein- und Herauszoomen.
+      const sameContinent = legKm > 0 && legKm < 2500;
+      const zoom = sameContinent ? 1.2 : farZoom + (nearZoom - farZoom) * (1 - Math.pow(Math.sin(Math.PI * t), 2));
       projection.scale(baseScale * zoom);
       const R = projection.scale();
       const cx = sizeRef.current.w / 2;
       const cy = sizeRef.current.h / 2;
 
-      // Atmosphäre: weicher Lichtrand um den Globus
+      // AtmosphÃ¤re: weicher Lichtrand um den Globus
       const halo = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.22);
       halo.addColorStop(0, "rgba(250,249,246,0.16)");
       halo.addColorStop(0.45, "rgba(250,249,246,0.035)");
@@ -153,7 +155,7 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
         ctx.stroke();
       }
 
-      // Strecken: bereits gespielt (durchgezogen), aktuelle (wächst), kommend (gestrichelt)
+      // Strecken: bereits gespielt (durchgezogen), aktuelle (wÃ¤chst), kommend (gestrichelt)
       for (let j = 0; j < legs; j++) {
         const a = [stops[j].lon, stops[j].lat] as [number, number];
         const b = [stops[j + 1].lon, stops[j + 1].lat] as [number, number];
@@ -230,7 +232,7 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       setReached((r) => (r === reachedNow ? r : reachedNow));
     };
 
-    // Sanft nachgleiten statt springen: die Ansicht folgt dem Scroll mit weicher Dämpfung.
+    // Sanft nachgleiten statt springen: die Ansicht folgt dem Scroll mit weicher DÃ¤mpfung.
     let cur = progress();
     let target = cur;
     let frame = 0;
@@ -289,14 +291,14 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
         <aside className="kj__card" aria-live="polite">
           {active === 0 || active === stops.length - 1 ? (
             <div className="kj__panel" key={`home-${active}`}>
-              <p className="kal-eyebrow">{active === 0 ? "Start" : "Zurück zuhause"}</p>
+              <p className="kal-eyebrow">{active === 0 ? "Start" : "ZurÃ¼ck zuhause"}</p>
               <h2 className="kj__title">{homeName}</h2>
               <p className="kj__meta">Gesamtstrecke: {Math.round(totals.totalKm).toLocaleString("de-CH")} km</p>
             </div>
           ) : (
             <div className="kj__panel" key={`ev-${active}`}>
               <p className="kal-eyebrow">
-                {current.kind === "camp" ? "Trainingscamp" : "Turnier"} · {active} von {stops.length - 2}
+                {current.kind === "camp" ? "Trainingscamp" : "Turnier"} Â· {active} von {stops.length - 2}
               </p>
               <h2 className="kj__title">{current.name}</h2>
               <p className="kj__meta">{current.dates}</p>
