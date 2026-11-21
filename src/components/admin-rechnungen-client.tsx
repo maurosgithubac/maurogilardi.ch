@@ -84,7 +84,7 @@ export function AdminRechnungenClient({
         : { name: "", organization: "", street: "", postalCode: "", city: "", email: "" },
       items: items
         .slice(0, MAX_ITEMS)
-        .map((it) => ({ description: it.description, quantity: Math.max(1, Math.round(Number(it.qty) || 1)), unitPriceChf: Number(String(it.unit).replace(/[’'s]/g, "").replace(",", ".")) || 0 })),
+        .map((it) => ({ description: it.description, quantity: Math.max(1, Math.round(Number(it.qty) || 1)), unitPriceChf: Number(String(it.unit).replace(/[’'\s]/g, "").replace(",", ".")) || 0 })),
     }),
     [title, invoiceNumber, invoiceDate, dueDate, note, recipient, items],
   );
