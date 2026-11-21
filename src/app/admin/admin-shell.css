@@ -1,0 +1,501 @@
+/*
+ * Admin-Shell, neues Layout (ersetzt die alte Seitenleiste).
+ * Desktop: schwebende dunkle Seitenkarte links, helle Arbeitsfläche rechts.
+ * Handy/Tablet (< 1024px): schlanke Kopfzeile oben, schwebendes Dock unten, „Mehr“-Blatt.
+ * Farben bleiben Mauro-Stil: Off-White, Near-Black, Swiss-PGA-Rot als Akzent.
+ */
+
+.admin-app {
+  --ap-sidebar-w: 268px;
+  --ap-dock-h: 68px;
+  --ap-radius-card: 20px;
+}
+
+/* Grundlayout */
+.ap-shell {
+  display: grid;
+  grid-template-columns: var(--ap-sidebar-w) minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--ap-bg);
+}
+
+.ap-skip {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--ap-r);
+  background: var(--ap-ink);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ap-skip:focus {
+  top: 0.5rem;
+}
+
+.ap-main {
+  min-width: 0;
+}
+
+.ap-main:focus {
+  outline: none;
+}
+
+.ap-content {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 2.25rem 2.5rem 4rem;
+  box-sizing: border-box;
+}
+
+/* ——— Seitenleiste (Desktop) ——— */
+.ap-sidebar {
+  position: sticky;
+  top: 14px;
+  margin: 14px 0 14px 14px;
+  height: calc(100dvh - 28px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 0.85rem 0.85rem;
+  border-radius: 26px;
+  background: var(--ap-sidebar);
+  color: #f4f3f0;
+  box-shadow: 0 24px 48px -20px rgb(11 11 11 / 45%);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.ap-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem 1.1rem;
+  margin-bottom: 0.25rem;
+  text-decoration: none;
+  color: #f7f6f3;
+  border-radius: var(--ap-r);
+}
+
+.ap-brand-mark {
+  height: 24px;
+  width: auto;
+  flex: none;
+}
+
+.ap-brand-text {
+  display: grid;
+  line-height: 1.15;
+}
+
+.ap-brand-name {
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: #f7f6f3;
+}
+
+.ap-brand-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #a9a6a0;
+  letter-spacing: 0.01em;
+}
+
+.ap-nav {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.ap-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.ap-nav-heading {
+  padding: 0 0.7rem;
+  margin: 1rem 0 0.4rem !important;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8f8c86;
+}
+
+.ap-nav-heading:first-child {
+  margin-top: 0.25rem !important;
+}
+
+.ap-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #d9d6cf;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  box-sizing: border-box;
+}
+
+.ap-nav-item:hover {
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+}
+
+.ap-nav-item.is-active {
+  background: var(--ap-red);
+  color: #fff;
+  font-weight: 650;
+  box-shadow: 0 8px 20px -10px rgb(215 25 32 / 80%);
+}
+
+.ap-nav-icon {
+  display: inline-flex;
+  color: #a9a6a0;
+}
+
+.ap-nav-item.is-active .ap-nav-icon {
+  color: #fff;
+}
+
+.ap-nav-label {
+  min-width: 0;
+}
+
+.ap-nav-badge {
+  margin-left: auto;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ap-red-text);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-nav-item.is-active .ap-nav-badge {
+  background: #fff;
+  color: var(--ap-red-text);
+}
+
+.ap-nav-item--quiet {
+  color: #bdbab3;
+  font-size: 0.84rem;
+}
+
+.ap-sidebar-foot {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  display: grid;
+  gap: 4px;
+}
+
+/* ——— Kopfzeile (Handy/Tablet) ——— */
+.ap-mobilebar {
+  display: none;
+}
+
+/* ——— Dock (Handy/Tablet) ——— */
+.ap-dock {
+  display: none;
+}
+
+/* ——— Mehr-Blatt (Handy/Tablet) ——— */
+.ap-sheet-wrap {
+  display: none;
+}
+
+@media (max-width: 1023.98px) {
+  .ap-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ap-sidebar {
+    display: none;
+  }
+
+  .ap-mobilebar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 0.75rem 0 1rem;
+    background: rgb(243 244 245 / 92%);
+    backdrop-filter: saturate(1.4) blur(12px);
+    border-bottom: 1px solid var(--ap-hair);
+  }
+
+  .ap-mobilebar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--ap-ink);
+    font-weight: 650;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+  }
+
+  .ap-mobilebar-brand .ap-brand-mark {
+    height: 18px;
+  }
+
+  .ap-mobilebar-ext {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: var(--ap-ink-2);
+    text-decoration: none;
+  }
+
+  .ap-mobilebar-ext:hover {
+    background: var(--ap-sunken);
+  }
+
+  .ap-content {
+    padding: 1.25rem 1rem calc(var(--ap-dock-h) + 48px);
+  }
+
+  .ap-dock {
+    display: block;
+    position: fixed;
+    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 45;
+    width: min(560px, calc(100% - 24px));
+    padding: 6px;
+    border-radius: 999px;
+    background: rgb(18 19 20 / 96%);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 18px 40px -12px rgb(0 0 0 / 55%);
+    box-sizing: border-box;
+  }
+
+  .ap-dock ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .ap-dock-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 100%;
+    min-height: var(--ap-dock-h);
+    padding: 6px 2px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #a9a6a0;
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+
+  .ap-dock-item.is-active {
+    background: var(--ap-red);
+    color: #fff;
+  }
+
+  .ap-dock-item:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+
+  .ap-dock-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 24px;
+  }
+
+  .ap-dock-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .ap-dock-dots {
+    font-size: 15px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .ap-dock-badge {
+    position: absolute;
+    top: -6px;
+    right: -12px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ap-red-text);
+    font-size: 10px;
+    font-weight: 800;
+    box-shadow: 0 0 0 2px rgb(18 19 20 / 96%);
+  }
+
+  .ap-dock-badge--open {
+    background: #5c6168;
+    color: #fff;
+  }
+
+  .ap-dock-label {
+    white-space: nowrap;
+  }
+
+  .ap-sheet-wrap {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgb(11 11 11 / 36%);
+  }
+
+  .ap-sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 80dvh;
+    overflow-y: auto;
+    padding: 14px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+    border-radius: 26px 26px 0 0;
+    background: var(--ap-surface);
+    box-shadow: var(--ap-shadow-pop);
+    box-sizing: border-box;
+  }
+
+  .ap-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 6px 12px;
+  }
+
+  .ap-sheet-title {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .ap-sheet-close {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ap-sunken);
+    color: var(--ap-ink-2);
+    cursor: pointer;
+  }
+
+  .ap-sheet-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .ap-sheet-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 0 14px;
+    border-radius: 16px;
+    background: var(--ap-sunken);
+    color: var(--ap-ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .ap-sheet-link .ap-nav-icon {
+    color: var(--ap-ink-2);
+  }
+
+  .ap-sheet-link.is-active {
+    background: var(--ap-red);
+    color: #fff;
+  }
+
+  .ap-sheet-link.is-active .ap-nav-icon {
+    color: #fff;
+  }
+
+  .ap-sheet-foot {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ap-hair);
+  }
+
+  .ap-sheet-foot .ap-nav-item--quiet {
+    color: var(--ap-ink-2);
+  }
+
+  .ap-sheet-foot .ap-nav-item--quiet:hover {
+    background: var(--ap-sunken);
+    color: var(--ap-ink);
+  }
+
+  .ap-sheet-foot .ap-nav-icon {
+    color: var(--ap-ink-2);
+  }
+}
+
+/* ——— Karten & Oberfläche: weicher, grosszügiger ——— */
+.ap-card {
+  border-radius: var(--ap-radius-card);
+  box-shadow: 0 1px 2px rgb(11 11 11 / 4%), 0 8px 24px -16px rgb(11 11 11 / 18%);
+}
+
+@media (max-width: 759.98px) {
+  .ap-content {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}
