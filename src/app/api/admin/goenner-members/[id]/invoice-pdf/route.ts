@@ -1,3 +1,5 @@
+import { artFor } from "@/lib/goenner-mail-variants";
+import { parseSeason } from "@/lib/goenner-invoice-mail";
 import { NextResponse } from "next/server";
 import { isAdminSession } from "@/lib/admin-auth";
 import { buildGoennerInvoicePdf, type InvoicePdfRow } from "@/lib/goenner-invoice-pdf";
@@ -14,7 +16,7 @@ function validId(id: string) {
  * PDF-Rechnung eines Gönners. Funktioniert mit und ohne Anmeldedatensatz:
  * Mit Anmeldung wird deren Rechnungsnummer verwendet, ohne Anmeldung die nächste freie.
  */
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   if (!(await isAdminSession())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -74,7 +76,12 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   };
 
   try {
-    const { buffer, filename } = await buildGoennerInvoicePdf(row);
+    const u = new URL(request.url);
+    const variant = {
+      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, (row as { category?: string | null }).category),
+      status: u.searchParams.get("status") === "bestand" ? ("bestand" as const) : ("neu" as const),
+    };
+    const { buffer, filename } = await buildGoennerInvoicePdf(row, parseSeason(request.url), variant);
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
