@@ -108,7 +108,10 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       const center = interp(e);
       projection.rotate([-center[0], -center[1]]);
       // Zoom: nah am Turnier hinein, in der Flugphase heraus
-      const zoom = 1 + 0.42 * Math.pow(Math.abs(2 * t - 1), 4);
+      // Zoom: Wattwil-Turnier nahe Strecken kaum heraus, lange Flüge weiter heraus. Weich über die ganze Etappe.
+      const legKm = stops[k + 1]?.legKm ?? 0;
+      const outAmt = legKm > 0 ? Math.min(0.42, Math.max(0.05, legKm / 10000)) : 0.1;
+      const zoom = 1.1 - outAmt * Math.pow(Math.sin(Math.PI * t), 2);
       projection.scale(baseScale * zoom);
       const R = projection.scale();
       const cx = sizeRef.current.w / 2;
@@ -225,10 +228,18 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       setReached((r) => (r === reachedNow ? r : reachedNow));
     };
 
+    // Sanft nachgleiten statt springen: die Ansicht folgt dem Scroll mit weicher Dämpfung.
+    let cur = progress();
+    let target = cur;
     let frame = 0;
+    const tick = () => {
+      cur += (target - cur) * 0.08;
+      draw(cur);
+      frame = Math.abs(target - cur) > 0.0008 ? requestAnimationFrame(tick) : 0;
+    };
     const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => draw(progress()));
+      target = progress();
+      if (!frame) frame = requestAnimationFrame(tick);
     };
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
