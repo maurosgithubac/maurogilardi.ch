@@ -17,6 +17,7 @@ import {
   IconTrophy,
 } from "@/components/admin/admin-icons";
 import type { InboxCounts } from "@/lib/admin-inbox";
+import type { UpcomingEvent } from "@/lib/kalender-upcoming";
 
 type NavItem = {
   href: string;
@@ -31,6 +32,8 @@ type Props = {
   children: React.ReactNode;
   /** Zähler für das Eingänge-Badge (vom Server; wird danach regelmässig aktualisiert) */
   inbox?: InboxCounts;
+  /** Nächstes Turnier für die rote Karte in der Seitenleiste */
+  next?: UpcomingEvent | null;
   /** Aktiven Pfad überschreiben (z. B. für Vorschauen); Standard: usePathname() */
   currentPath?: string;
 };
@@ -39,6 +42,13 @@ const INBOX_POLL_MS = 60_000;
 
 /** Diese Bereiche liegen im Handy-Dock. Alles andere steckt unter „Mehr“. */
 const DOCK_HREFS = ["/admin", "/admin/goenner/inbox", "/admin/kalender", "/admin/rechnungen", "/admin/budget"];
+
+const MONTHS_SHORT = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+
+function shortDate(iso: string) {
+  const [, m, d] = iso.split("-");
+  return `${Number(d)} ${MONTHS_SHORT[Number(m) - 1] ?? ""}`;
+}
 
 function useInboxCounts(initial: InboxCounts | undefined) {
   const [counts, setCounts] = useState(initial);
@@ -73,7 +83,7 @@ function useInboxCounts(initial: InboxCounts | undefined) {
   return counts;
 }
 
-export function AdminShell({ children, inbox, currentPath }: Props) {
+export function AdminShell({ children, inbox, next, currentPath }: Props) {
   const routerPath = usePathname();
   const path = currentPath ?? routerPath ?? "";
   const [moreOpen, setMoreOpen] = useState(false);
@@ -127,11 +137,7 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
     const active = item.match(path);
     return (
       <li key={item.href}>
-        <Link
-          href={item.href}
-          className={`ap-nav-item${active ? " is-active" : ""}`}
-          aria-current={active ? "page" : undefined}
-        >
+        <Link href={item.href} className={`ap-nav-item${active ? " is-active" : ""}`} aria-current={active ? "page" : undefined}>
           <span className="ap-nav-icon">{item.icon}</span>
           <span className="ap-nav-label">{item.label}</span>
           {item.badge ? (
@@ -154,25 +160,65 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
         Zum Inhalt springen
       </a>
 
-      {/* Seitenleiste (Desktop): schwebende Karte */}
+      {/* Seitenleiste (Desktop): gestapelte Karten */}
       <aside id="ap-sidebar" className="ap-sidebar" aria-label="Admin Navigation">
-        <Link href="/admin" className="ap-brand">
-          <MgLogo withName={false} className="ap-brand-mark" title="MG" />
-          <span className="ap-brand-text">
-            <span className="ap-brand-name">Mauro Gilardi</span>
-            <span className="ap-brand-sub">Gönner-Admin</span>
+        <Link href="/admin" className="ap-side-profile">
+          <span className="ap-side-avatar">
+            <MgLogo withName={false} className="ap-brand-mark" title="MG" />
+          </span>
+          <span className="ap-side-hello">
+            Willkommen zurück,
+            <strong>Mauro!</strong>
           </span>
         </Link>
 
-        <nav className="ap-nav" aria-label="Bereiche">
-          <p className="ap-nav-heading">Verwaltung</p>
+        <Link href="/admin/settings" className="ap-side-card ap-side-switch">
+          <span className="ap-side-initials" aria-hidden="true">
+            MG
+          </span>
+          <span className="ap-side-switch-text">
+            <span>Gönner-Admin</span>
+            <strong>Mauro Gilardi Golf</strong>
+          </span>
+          <span className="ap-side-chevron" aria-hidden="true">
+            ›
+          </span>
+        </Link>
+
+        <nav className="ap-side-card ap-nav" aria-label="Bereiche">
           <ul>{items.map(renderItem)}</ul>
-          <p className="ap-nav-heading">Einstellungen</p>
-          <ul>{accountItems.map(renderItem)}</ul>
         </nav>
 
-        <div className="ap-sidebar-foot">
-          <a href="/" className="ap-nav-item ap-nav-item--quiet" target="_blank" rel="noopener noreferrer">
+        {next ? (
+          <Link href="/admin/kalender" className="ap-side-next">
+            <span className="ap-side-next-top">
+              <span className="ap-side-next-title">
+                Nächstes
+                <br />
+                Turnier
+              </span>
+              <span className="ap-side-next-date">{shortDate(next.start_date)}</span>
+            </span>
+            <span className="ap-side-next-pills">
+              <span className="is-on">{next.days === 0 ? "läuft jetzt" : `in ${next.days} Tagen`}</span>
+              <span>{next.country || next.location}</span>
+            </span>
+            <span className="ap-side-next-foot">
+              <strong>{next.location}</strong>
+              <span>{next.name}</span>
+            </span>
+          </Link>
+        ) : null}
+
+        <Link href="/admin/rechnungen" className="ap-side-new">
+          <span className="ap-side-new-plus" aria-hidden="true">
+            +
+          </span>
+          <span>Neue Rechnung</span>
+        </Link>
+
+        <div className="ap-side-foot">
+          <a href="/" target="_blank" rel="noopener noreferrer" className="ap-nav-item ap-nav-item--quiet">
             <span className="ap-nav-icon">
               <IconExternal />
             </span>
@@ -225,7 +271,9 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
           <li>
             <button type="button" className={`ap-dock-item${moreActive && !moreOpen ? " is-active" : ""}`} aria-expanded={moreOpen} onClick={() => setMoreOpen(true)}>
               <span className="ap-dock-icon">
-                <span className="ap-dock-dots" aria-hidden="true">•••</span>
+                <span className="ap-dock-dots" aria-hidden="true">
+                  •••
+                </span>
               </span>
               <span className="ap-dock-label">Mehr</span>
             </button>

@@ -1,51 +1,173 @@
 /*
- * Admin, Desktop-Upgrade: volle Bildschirmbreite, Bento-Raster, helle Seitenkarte,
- * rote Hero-Karte, Schrift der Website (--mg-font-display) für Zahlen und Titel.
- * Animationen sind kurz und dezent; mit prefers-reduced-motion werden sie abgeschaltet.
+ * Admin-Design (Desktop): warmgraue Fläche, flache weisse Karten mit grossen Radien,
+ * gestapelte Seitenleiste mit roter Turnier-Karte, rote Akzente, Saison-Route als Hero.
+ * Farben und Schrift (--mg-font-display) kommen von der Website.
+ * Animationen sind kurz; mit prefers-reduced-motion werden sie abgeschaltet.
  */
 
 .admin-app {
   --ap-display: var(--mg-font-display, Georgia, serif);
-  --ap-card-lift: 0 2px 4px rgb(11 11 11 / 4%), 0 18px 40px -22px rgb(11 11 11 / 26%);
+  --ap-bg: #efeeea;
+  --ap-surface: #ffffff;
+  --ap-sunken: #f3f2ee;
+  --ap-hair: #e6e4df;
+  --ap-sidebar-w: 312px;
+  --ap-radius-card: 26px;
 }
 
-/* ——— Volle Breite ——— */
+/* ——— Fläche und volle Breite ——— */
+.ap-shell {
+  background: var(--ap-bg);
+}
+
 .ap-content {
   max-width: none;
-  padding: 1.75rem clamp(1.25rem, 2.2vw, 2.5rem) 3rem;
+  padding: 1.5rem clamp(1.25rem, 2.2vw, 2.5rem) 3rem 1rem;
 }
 
-/* ——— Seitenleiste: helle Karte, Rot als Akzent ——— */
+/* ——— Flache Karten ——— */
+.ap-card,
+.ap-card--flush,
+.ov-card,
+.ov-kpi,
+.bx-card,
+.bx-hero {
+  background: var(--ap-surface);
+  border: 0;
+  box-shadow: none;
+  border-radius: var(--ap-radius-card);
+}
+
+/* ——— Seitenleiste: gestapelte Karten ——— */
 .ap-sidebar {
-  background: #fff;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  margin: 0;
+  padding: 18px 6px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   color: var(--ap-ink);
-  border: 1px solid var(--ap-hair);
-  box-shadow: var(--ap-card-lift);
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
-.ap-brand {
+.ap-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.ap-side-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 6px;
+  text-decoration: none;
   color: var(--ap-ink);
 }
 
-.ap-brand-name,
-.ap-sidebar .ap-brand-name {
-  color: var(--ap-ink);
-  font-family: var(--ap-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0;
+.ap-side-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--ap-ink);
+  color: #fff;
 }
 
-.ap-brand-sub {
+.ap-side-avatar .ap-brand-mark {
+  height: 18px;
+  width: auto;
+}
+
+.ap-side-hello {
+  display: grid;
+  font-size: 0.8rem;
+  line-height: 1.25;
   color: var(--ap-muted);
 }
 
-.ap-nav-heading {
-  color: var(--ap-subtle);
+.ap-side-hello strong {
+  font-family: var(--ap-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ap-ink);
+}
+
+.ap-side-card {
+  background: var(--ap-surface);
+  border-radius: 24px;
+}
+
+.ap-side-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  text-decoration: none;
+  color: var(--ap-ink);
+  transition: transform 180ms ease;
+}
+
+.ap-side-switch:hover {
+  transform: translateY(-2px);
+}
+
+.ap-side-initials {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 999px;
+  background: #dedcd6;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ap-ink-2);
+}
+
+.ap-side-switch-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.ap-side-switch-text span {
+  font-size: 0.7rem;
+  color: var(--ap-muted);
+}
+
+.ap-side-switch-text strong {
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.ap-side-chevron {
+  margin-left: auto;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--ap-muted);
+}
+
+.ap-nav.ap-side-card {
+  padding: 8px;
+}
+
+.ap-nav ul {
+  gap: 2px;
 }
 
 .ap-nav-item {
+  min-height: 46px;
+  border-radius: 16px;
   color: var(--ap-ink-2);
+  font-size: 0.92rem;
 }
 
 .ap-nav-item:hover {
@@ -53,8 +175,18 @@
   color: var(--ap-ink);
 }
 
+.ap-nav-item.is-active {
+  background: var(--ap-red);
+  color: #fff;
+  box-shadow: none;
+}
+
 .ap-nav-icon {
   color: var(--ap-muted);
+}
+
+.ap-nav-item.is-active .ap-nav-icon {
+  color: #fff;
 }
 
 .ap-nav-badge {
@@ -67,12 +199,147 @@
   color: var(--ap-red-text);
 }
 
-.ap-sidebar-foot {
-  border-top: 1px solid var(--ap-hair);
+/* Rote Karte: nächstes Turnier */
+.ap-side-next {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 26px;
+  background: var(--ap-red);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 200ms ease;
 }
 
-.ap-nav-item--quiet {
+.ap-side-next:hover {
+  transform: translateY(-3px);
+}
+
+.ap-side-next-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ap-side-next-title {
+  font-family: var(--ap-display);
+  font-size: 1.7rem;
+  line-height: 1.02;
+  font-weight: 400;
+}
+
+.ap-side-next-date {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.ap-side-next-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ap-side-next-pills span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ap-side-next-pills span.is-on {
+  background: #fff;
+  border-color: #fff;
+  color: var(--ap-red-text);
+}
+
+.ap-side-next-foot {
+  display: grid;
+  line-height: 1.2;
+}
+
+.ap-side-next-foot strong {
+  font-family: var(--ap-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.ap-side-next-foot span {
+  font-size: 0.74rem;
+  opacity: 0.8;
+}
+
+/* Gestrichelte Aktionskarte */
+.ap-side-new {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 16px;
+  border: 1.5px dashed rgb(215 25 32 / 45%);
+  border-radius: 26px;
+  color: var(--ap-red-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 180ms ease;
+}
+
+.ap-side-new:hover {
+  background: rgb(215 25 32 / 6%);
+}
+
+.ap-side-new-plus {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--ap-red);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform 220ms ease;
+}
+
+.ap-side-new:hover .ap-side-new-plus {
+  transform: rotate(90deg);
+}
+
+.ap-side-foot {
+  margin-top: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.ap-side-foot .ap-nav-item {
+  min-height: 38px;
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
   color: var(--ap-muted);
+  width: auto;
+  flex: 1;
+}
+
+@media (max-width: 1023.98px) {
+  .ap-sidebar {
+    display: none;
+  }
+
+  .ap-content {
+    padding: 1.25rem 1rem calc(var(--ap-dock-h) + 48px);
+  }
+}
+
+/* ——— Seitenköpfe: gross und leicht ——— */
+.ap-page-head h1,
+.ov-title {
+  font-family: var(--ap-display);
+  font-size: clamp(2rem, 3.2vw, 2.9rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
 }
 
 /* ——— Animationen ——— */
@@ -102,32 +369,229 @@
   }
 }
 
+@keyframes ap-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ap-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .ov-card,
 .ov-kpi,
+.ov-route,
 .bx-card,
-.bx-hero {
+.bx-hero,
+.ap-side-next,
+.ap-side-new,
+.ap-side-card {
   animation: ap-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .ov-kpi:nth-child(2) {
-  animation-delay: 60ms;
+  animation-delay: 70ms;
 }
 
 .ov-kpi:nth-child(3) {
-  animation-delay: 120ms;
-}
-
-.bx-card:nth-of-type(2) {
-  animation-delay: 60ms;
+  animation-delay: 140ms;
 }
 
 .bx-bar-fill {
+  background: rgb(215 25 32 / 22%);
   transform-origin: bottom;
   animation: ap-grow 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .bx-meter > span {
   animation: ap-meter 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ——— Saison-Route (Hero) ——— */
+.ov-route {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--ap-radius-card);
+  background: #fbfaf8;
+  overflow: hidden;
+}
+
+.ov-route-map {
+  width: 100%;
+  height: 210px;
+  border-radius: 18px;
+  background: #fbfaf8;
+}
+
+.ov-route-blobs ellipse {
+  fill: rgb(215 25 32 / 7%);
+}
+
+.ov-route-contours path {
+  fill: none;
+  stroke: #e6e3dd;
+  stroke-width: 1.3;
+}
+
+.ov-route-line {
+  fill: none;
+  stroke: var(--ap-red);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: ap-draw 1.7s cubic-bezier(0.4, 0.1, 0.2, 1) 0.2s forwards;
+}
+
+.ov-route-stop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ap-pop 420ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.ov-route-halo {
+  fill: rgb(215 25 32 / 18%);
+}
+
+.ov-route-dot {
+  fill: var(--ap-red);
+}
+
+.ov-route-num {
+  fill: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--ap-font);
+}
+
+.ov-route-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgb(255 255 255 / 86%);
+  backdrop-filter: blur(10px);
+}
+
+.ov-route-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ov-route-chips span {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ap-red);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-red-text);
+}
+
+.ov-route-chips span.is-on {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ov-route-stat {
+  display: grid;
+  gap: 4px;
+}
+
+.ov-route-label {
+  font-size: 0.8rem;
+  color: var(--ap-muted);
+}
+
+.ov-route-big,
+.ov-route-pct {
+  font-family: var(--ap-display);
+  font-size: clamp(2.2rem, 3.4vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ap-red);
+}
+
+.ov-route-big small,
+.ov-route-pct small {
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.ov-route-sub {
+  font-size: 0.8rem;
+  color: var(--ap-muted);
+}
+
+.ov-route-bar {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--ap-hair);
+  overflow: hidden;
+}
+
+.ov-route-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--ap-red);
+  animation: ap-meter 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ov-route-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ov-route-actions a {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ap-red);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ap-red-text);
+  text-decoration: none;
+}
+
+.ov-route-actions a.is-fill {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ov-route-alert {
+  display: grid;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--ap-ink);
+}
+
+.ov-route-alert strong {
+  font-size: 1rem;
+}
+
+.ov-route-alert span {
+  font-size: 0.78rem;
+  color: var(--ap-muted);
+}
+
+.ov-route-new {
+  justify-self: start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ap-red);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 /* ——— Bento-Raster ab 1100px ——— */
@@ -142,98 +606,97 @@
     min-width: 0;
   }
 
-  .ov > .ov-head {
+  .ov > .ov-head,
+  .ov > .ap-banner,
+  .ov > .ov-route,
+  .ov > .ov-full {
     grid-column: 1 / -1;
   }
 
-  .ov-revenue {
-    grid-column: span 7;
-    background: var(--ap-red);
-    color: #fff;
-    border-color: transparent;
-    min-height: 260px;
-    position: relative;
-    overflow: hidden;
+  .ov-route {
+    display: block;
+    min-height: 400px;
+    padding: 0;
+    background: #fbfaf8;
   }
 
-  .ov-revenue::after {
-    content: "";
+  .ov-route-map {
     position: absolute;
-    right: -60px;
-    top: -60px;
-    width: 220px;
-    height: 220px;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 10%);
-    pointer-events: none;
+    inset: 0;
+    height: 100%;
+    border-radius: 0;
   }
 
-  .ov-revenue .ov-kicker,
-  .ov-revenue .ap-kpi-label,
-  .ov-revenue .ov-amount {
-    color: #fff;
+  .ov-route-panel {
+    position: absolute;
   }
 
-  .ov-revenue .ap-chart rect {
-    fill: rgb(255 255 255 / 85%);
+  .ov-route-panel--left {
+    left: 18px;
+    top: 18px;
+    width: min(340px, 36%);
   }
 
-  .ov-revenue .ap-chart figcaption,
-  .ov-revenue .ap-chart text {
-    fill: rgb(255 255 255 / 85%);
-    color: rgb(255 255 255 / 85%);
-  }
-
-  .ov-revenue .ov-amount {
-    font-family: var(--ap-display);
-    font-size: clamp(44px, 5vw, 68px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-  }
-
-  .ov-kpis {
-    grid-column: span 5;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    align-content: start;
+  .ov-route-panel--right {
+    right: 18px;
+    bottom: 18px;
+    width: min(300px, 28%);
   }
 
   .ov-today {
+    grid-column: span 4;
+  }
+
+  .ov-revenue {
     grid-column: span 5;
   }
 
-  .ov-season,
-  .ov-full {
-    grid-column: 1 / -1;
+  .ov-kpis {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 16px;
   }
 
   .ov-kpi {
-    border-radius: var(--ap-radius-card);
-    transition: transform 200ms ease, box-shadow 200ms ease;
+    min-width: 0;
+    transition: transform 200ms ease;
   }
 
   .ov-kpi:hover {
     transform: translateY(-2px);
-    box-shadow: var(--ap-card-lift);
   }
 
   .ov-kpi-value {
     font-family: var(--ap-display);
-    font-size: clamp(26px, 2.6vw, 34px);
+    font-size: clamp(30px, 3vw, 44px);
+    font-weight: 400;
     line-height: 1.05;
   }
 
-  .ov-title {
+  /* Erste Kachel: rote Akzent-Karte mit Punktraster */
+  .ov-kpis .ov-kpi:first-child {
+    background-color: var(--ap-red);
+    background-image: radial-gradient(rgb(255 255 255 / 24%) 1.3px, transparent 1.4px);
+    background-size: 13px 13px;
+    color: #fff;
+  }
+
+  .ov-kpis .ov-kpi:first-child .ov-kpi-label,
+  .ov-kpis .ov-kpi:first-child .ov-kpi-of {
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .ov-amount {
     font-family: var(--ap-display);
-    letter-spacing: -0.01em;
+    font-size: clamp(40px, 4.4vw, 60px);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
   }
 
-  .ov-card:hover {
-    box-shadow: var(--ap-card-lift);
-  }
-
-  /* Budget: Bento */
+  /* Budget */
   .bx {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -261,60 +724,20 @@
   }
 
   .bx-hero {
-    background: var(--ap-red);
-    color: #fff;
     min-height: 300px;
     align-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .bx-hero .bx-label,
-  .bx-hero .bx-sub,
-  .bx-hero .bx-hint {
-    color: rgb(255 255 255 / 82%);
-  }
-
-  .bx-hero .bx-sub .is-good,
-  .bx-hero .bx-sub .is-bad {
-    color: #fff;
   }
 
   .bx-hero .bx-big {
     font-family: var(--ap-display);
-    font-size: clamp(44px, 5vw, 68px);
+    font-size: clamp(44px, 5vw, 66px);
+    font-weight: 400;
     line-height: 1;
-    color: #fff;
+    letter-spacing: -0.02em;
   }
 
   .bx-hero .bx-bars {
     height: 170px;
-  }
-
-  .bx-hero .bx-bar-fill {
-    background: rgb(255 255 255 / 30%);
-  }
-
-  .bx-hero .bx-bar:hover .bx-bar-fill,
-  .bx-hero .bx-bar.is-on .bx-bar-fill {
-    background: #fff;
-    box-shadow: none;
-  }
-
-  .bx-hero .bx-bar-label {
-    color: rgb(255 255 255 / 75%);
-  }
-
-  .bx-hero .bx-bar.is-on .bx-bar-label {
-    color: #fff;
-  }
-
-  .bx-card:hover {
-    box-shadow: var(--ap-card-lift);
-  }
-
-  .bx-cats {
-    gap: 6px;
   }
 
   .bx-cat {
@@ -329,16 +752,29 @@
 @media (prefers-reduced-motion: reduce) {
   .ov-card,
   .ov-kpi,
+  .ov-route,
   .bx-card,
   .bx-hero,
+  .ap-side-next,
+  .ap-side-new,
+  .ap-side-card,
   .bx-bar-fill,
-  .bx-meter > span {
+  .bx-meter > span,
+  .ov-route-stop,
+  .ov-route-bar > span {
     animation: none;
+  }
+
+  .ov-route-line {
+    animation: none;
+    stroke-dashoffset: 0;
   }
 
   .ov-kpi,
   .bx-cat,
-  .ov-card {
+  .ap-side-next,
+  .ap-side-switch,
+  .ap-side-new-plus {
     transition: none;
   }
 }

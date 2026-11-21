@@ -3,6 +3,7 @@ import type { StatusFilter } from "@/components/admin-goenner-members-client";
 import type { CategoryFilter } from "@/components/admin/admin-ui";
 import { GOENNER_FINANCE_START_YEAR, type GoennerMemberRow, type GoennerPaymentRow } from "@/lib/goenner-finance";
 import { isMissingTableError, type PrizeMoneyRow } from "@/lib/prize-money";
+import { loadUpcomingEvents } from "@/lib/kalender-upcoming";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryRow } from "@/types/content";
 
@@ -20,7 +21,8 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
     sp.bereich === "goenner" || sp.bereich === "sponsor" || sp.bereich === "partner" ? sp.bereich : undefined;
 
   const supabase = await createSupabaseUserServerClient();
-  const [membersRes, paymentsRes, inquiriesRes, prizeRes] = await Promise.all([
+  const [events, membersRes, paymentsRes, inquiriesRes, prizeRes] = await Promise.all([
+    loadUpcomingEvents(6),
     supabase.from("goenner_members").select("*").order("name", { ascending: true }),
     supabase.from("goenner_payments").select("*"),
     supabase
@@ -43,6 +45,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       payments={(paymentsRes.data as GoennerPaymentRow[]) ?? []}
       inquiries={inquiries ?? []}
       prizes={(prizeRes.data as PrizeMoneyRow[]) ?? []}
+      events={events}
       ledgerMissing={isMissingTableError(membersRes.error?.message) || isMissingTableError(paymentsRes.error?.message)}
       migration020Missing={isMissingTableError(prizeRes.error?.message) || Boolean(inquiriesRes.error)}
       initialYear={initialYear}

@@ -15,6 +15,8 @@ import type { GoennerInquiryRow } from "@/types/content";
 import { AdminGoennerMembersClient, type StatusFilter } from "@/components/admin-goenner-members-client";
 import { IconDownload, IconTrophy } from "@/components/admin/admin-icons";
 import { chf, chfCompact, dateCh, categoryOf, type CategoryFilter } from "@/components/admin/admin-ui";
+import { AdminRoutePanel } from "@/components/admin/admin-route-panel";
+import type { UpcomingEvent } from "@/lib/kalender-upcoming";
 
 type Props = {
   members: GoennerMemberRow[];
@@ -22,6 +24,8 @@ type Props = {
   /** Offene und neue (ungelesene) Anfragen */
   inquiries: GoennerInquiryRow[];
   prizes: PrizeMoneyRow[];
+  /** Kommende Turniere für die Saison-Route */
+  events?: UpcomingEvent[];
   ledgerMissing?: boolean;
   migration020Missing?: boolean;
   initialYear: number;
@@ -115,6 +119,7 @@ export function AdminOverview({
   payments,
   inquiries,
   prizes,
+  events = [],
   ledgerMissing,
   migration020Missing,
   initialYear,
@@ -247,6 +252,24 @@ export function AdminOverview({
           <code>supabase/020_admin_inbox_seen_prize_money.sql</code>
         </p>
       ) : null}
+
+      <AdminRoutePanel
+        year={year}
+        events={events}
+        paid={dues.paid}
+        billable={dues.billable}
+        openSum={dues.openSum}
+        alert={
+          inbox.list[0]
+            ? {
+                title: inbox.list[0].name,
+                meta: `${inquiryTierShort(inbox.list[0].membership_id)} · ${dateCh(inbox.list[0].created_at)}`,
+                href: `/admin/goenner/inbox?filter=${isNewInquiry(inbox.list[0]) ? "new" : "open"}`,
+                fresh: isNewInquiry(inbox.list[0]),
+              }
+            : null
+        }
+      />
 
       {/* Heute: alles, was Aufmerksamkeit braucht, mit einem Tipp erreichbar */}
       <section className="ov-card ov-today" aria-labelledby="today-heading">
