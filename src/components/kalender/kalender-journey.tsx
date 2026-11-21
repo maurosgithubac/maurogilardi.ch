@@ -110,8 +110,10 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       // Zoom: nah am Turnier hinein, in der Flugphase heraus
       // Zoom: Wattwil-Turnier nahe Strecken kaum heraus, lange Flüge weiter heraus. Weich über die ganze Etappe.
       const legKm = stops[k + 1]?.legKm ?? 0;
-      const outAmt = legKm > 0 ? Math.min(0.42, Math.max(0.05, legKm / 10000)) : 0.1;
-      const zoom = 1.1 - outAmt * Math.pow(Math.sin(Math.PI * t), 2);
+      // Standard ist die weite Ansicht; an den Turnieren zoomt er deutlich näher heran.
+      const farZoom = legKm > 0 ? Math.max(0.82, 1 - Math.min(0.18, legKm / 9000)) : 0.95;
+      const nearZoom = 1.4;
+      const zoom = farZoom + (nearZoom - farZoom) * (1 - Math.pow(Math.sin(Math.PI * t), 2));
       projection.scale(baseScale * zoom);
       const R = projection.scale();
       const cx = sizeRef.current.w / 2;
