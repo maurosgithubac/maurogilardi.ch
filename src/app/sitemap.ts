@@ -21,6 +21,7 @@ const STATIC_ROUTES: {
 }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1, lastModified: "posts" },
   { path: "/2027", changeFrequency: "weekly", priority: 0.9, lastModified: STATIC_CONTENT_UPDATED },
+  { path: "/kalender", changeFrequency: "weekly", priority: 0.8, lastModified: STATIC_CONTENT_UPDATED },
   { path: "/sponsoring", changeFrequency: "monthly", priority: 0.9, lastModified: STATIC_CONTENT_UPDATED },
   { path: "/partner", changeFrequency: "monthly", priority: 0.8, lastModified: STATIC_CONTENT_UPDATED },
   { path: "/blog", changeFrequency: "weekly", priority: 0.8, lastModified: "posts" },

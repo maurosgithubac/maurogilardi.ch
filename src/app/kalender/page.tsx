@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { KalenderView } from "@/components/kalender/kalender-view";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,12 +7,16 @@ import { HOME_BASE } from "@/content/pgtVenueCoordinates";
 import { buildSeason, fallbackRows, type KalenderEventRow } from "@/lib/kalender-events";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 import "@/styles/pages/kalender.css";
 
-export const metadata: Metadata = {
+/** Eigenes canonical und Sprachangabe, damit die Seite in der Sitemap und bei Google sauber zugeordnet ist. */
+export const metadata = buildPageMetadata({
+  path: "/kalender",
   title: "Kalender · HotelPlanner Tour 2027",
   description: `Alle Turniere der HotelPlanner Tour 2027 auf einem Globus und im Kalender. Die Reise startet in ${HOME_BASE.name}.`,
-};
+  image: "progolfTour",
+});
 
 /** Wird nach jeder Änderung im Admin sofort neu erzeugt (revalidatePath). Zusätzlich alle 5 Minuten. */
 export const revalidate = 300;
