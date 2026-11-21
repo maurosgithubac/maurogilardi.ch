@@ -134,6 +134,12 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
       icon: <IconCopy />,
       match: (p) => p.startsWith("/admin/rechnungen"),
     },
+    {
+      href: "/admin/budget",
+      label: "Budget",
+      icon: <IconFlag />,
+      match: (p) => p.startsWith("/admin/budget"),
+    },
   ];
 
   const accountItems: NavItem[] = [
