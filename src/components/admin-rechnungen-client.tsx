@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 /** Maximale Positionen; wie MAX_ITEMS in lib/flex-invoice.ts (dort wird nicht im Browser geladen). */
 const MAX_ITEMS = 5;
@@ -50,6 +50,17 @@ export function AdminRechnungenClient({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [newContact, setNewContact] = useState(ContactEmpty);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  // Vorschau passt sich der Breite an: das ganze A4-Blatt, nur das PDF-Layout
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(Math.min(1, el.clientWidth / 794)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const list = source === "members" ? members : contacts;
   const recipient = list.find((r) => r.key === recipientKey) ?? null;
@@ -286,11 +297,16 @@ export function AdminRechnungenClient({
           </div>
         </div>
         {previewError ? <p className="ar-empty">{previewError}</p> : null}
-        {html ? (
-          <div className={`ar-frame ar-frame--${device}`}>
-            <iframe title="Rechnungsvorschau" srcDoc={html} className="ar-iframe" />
-          </div>
-        ) : null}
+        <div ref={frameRef} className={`ar-frame ar-frame--${device}`} style={{ height: 1123 * scale }}>
+          {html ? (
+            <iframe
+              title="Rechnungsvorschau"
+              srcDoc={html}
+              className="ar-iframe"
+              style={{ width: 794, height: 1123, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+            />
+          ) : null}
+        </div>
       </section>
     </div>
   );

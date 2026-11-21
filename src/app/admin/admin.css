@@ -3994,12 +3994,11 @@ a.ap-row-title:hover {
 }
 
 .ar-frame {
+  position: relative;
   margin: 0 auto;
   max-width: 100%;
-  border-radius: 14px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 1px 0 var(--ap-hair), 0 12px 30px rgb(0 0 0 / 6%);
 }
 
 .ar-frame--desktop {
@@ -4014,21 +4013,10 @@ a.ap-row-title:hover {
 
 .ar-iframe {
   display: block;
-  width: 100%;
-  height: 1123px;
   border: 0;
+  background: #fff;
 }
 
-.ar-frame--mobile {
-  height: 552px;
-}
-
-.ar-frame--mobile .ar-iframe {
-  width: 210mm;
-  height: 297mm;
-  transform: scale(0.49);
-  transform-origin: 0 0;
-}
 
 .ar-empty {
   padding: 40px 16px;
