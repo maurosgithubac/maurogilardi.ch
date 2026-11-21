@@ -92,11 +92,13 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
 <style>
   @font-face { font-family: "Playfair Display"; font-weight: 400; src: url(${assets.fontRegular}) format("truetype"); }
   @font-face { font-family: "Playfair Display"; font-weight: 700; src: url(${assets.fontBold}) format("truetype"); }
-  @page { size: A4; margin: 18mm 18mm 16mm 18mm; }
+  @page { size: A4; margin: 0; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; }
   body { color: ${C.ink}; font-family: Helvetica, Arial, "Liberation Sans", sans-serif; font-size: 10pt; line-height: 1.5; }
-  .page { width: 100%; max-width: 720px; margin: 0 auto; padding: 24px; min-height: 297mm; display: flex; flex-direction: column; }
+  .page { width: 210mm; height: 297mm; margin: 0 auto; padding: 16mm 20mm 14mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+  body { background: #e9e8e4; }
+  @media print { body { background: #fff; } .page { margin: 0; } }
   .head { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 8mm; }
   .logo { height: 14mm; width: auto; }
   .doc { text-align: right; }
