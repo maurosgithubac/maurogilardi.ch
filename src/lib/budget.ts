@@ -1,33 +1,50 @@
 /**
  * Budget im Admin: Golf (Geschäft) und Privat getrennt.
  * Reine Daten und Hilfsfunktionen, ohne Server-Abhängigkeiten.
+ *
+ * Häufigkeit:
+ * - einmalig: nur im Monat der Buchung
+ * - monatlich: jeden Monat ab dem Startmonat (bis zum Ende, falls gesetzt)
+ * - jährlich: der Jahresbetrag wird auf alle 12 Monate verteilt (Betrag / 12)
  */
 
 export type BudgetScope = "golf" | "privat";
+export type BudgetFrequency = "einmalig" | "monatlich" | "jaehrlich";
 
 export type BudgetCategory = { id: string; label: string; icon: string; keywords: string[] };
 
+export const FREQUENCY_LABEL: Record<BudgetFrequency, string> = {
+  einmalig: "Einmalig",
+  monatlich: "Monatlich",
+  jaehrlich: "Jährlich (auf 12 Monate verteilt)",
+};
+
 export const GOLF_CATEGORIES: BudgetCategory[] = [
-  { id: "turniere", label: "Turniere", icon: "🏌️", keywords: ["turnier", "tour", "open", "startgeld", "entry", "greenfee", "green fee"] },
-  { id: "reisen", label: "Reisen", icon: "✈️", keywords: ["flug", "flight", "airline", "hotel", "booking", "reise", "bahn", "sbb", "mietwagen", "unterkunft"] },
-  { id: "caddie", label: "Caddie", icon: "🎒", keywords: ["caddie", "caddy", "caddi"] },
-  { id: "technik", label: "Technik & Material", icon: "🏷️", keywords: ["titleist", "callaway", "ping", "schläger", "ball", "bag", "equipment", "jlindeberg", "footjoy", "taylormade"] },
-  { id: "abos", label: "Abos & Software", icon: "🔁", keywords: ["abo", "abonnement", "software", "google", "apple", "adobe", "canva", "notion", "hosting", "domain", "vercel", "supabase", "resend", "openai", "anthropic"] },
-  { id: "coaching", label: "Coaching & Training", icon: "🎯", keywords: ["coach", "trainer", "training", "physio", "fitness", "lektion", "pro "] },
-  { id: "club", label: "Club & Verband", icon: "⛳", keywords: ["club", "verband", "mitgliederbeitrag", "swiss golf", "swisspga", "lizenz"] },
-  { id: "versicherung", label: "Versicherung", icon: "🛡️", keywords: ["versicherung", "axa", "helvetia", "mobiliar", "zurich", "allianz"] },
+  { id: "turniere", label: "Turniere & Startgelder", icon: "🏌️", keywords: ["entry", "tour", "membership", "challenge", "golfsolutions", "epdt", "open", "startgeld", "greenfee", "range fee", "tournament", "parkos"] },
+  { id: "flug", label: "Flüge", icon: "✈️", keywords: ["flug", "flight", "air", "easyjet", "pegasus", "sunexpress", "turkish", "swiss air", "swissintern", "lufthansa", "ryanair"] },
+  { id: "unterkunft", label: "Unterkunft", icon: "🏨", keywords: ["hotel", "airbnb", "booking", "agoda", "accor", "best western", "pension", "leicester", "fletcher", "bkg", "unterkunft", "ibis"] },
+  { id: "transport", label: "Transport & Parken", icon: "🚆", keywords: ["sbb", "taxi", "rentalcars", "parking", "parkingpay", "oebb", "shuttle", "bahn", "transfer", "mietauto", "tanken"] },
+  { id: "training", label: "Training & Coaching", icon: "🎯", keywords: ["coach", "mental", "putting", "trainingstag", "harryshome", "physio", "schweisstest", "sportmedizin", "physis", "trainer", "lektion", "training", "ausdauer"] },
+  { id: "ausruestung", label: "Ausrüstung & Schuhe", icon: "👟", keywords: ["on schuh", "schuhe", "golftees", "handschuh", "joggingschuh", "polar", "sportuhr", "yardage", "schläger", "golfball", "golbälle", "golfbälle", "titleist", "callaway", "ping", "bag"] },
+  { id: "ernaehrung", label: "Sportnahrung", icon: "🥤", keywords: ["sponser", "sport food", "sportnahrung", "nahrung", "nutrition"] },
+  { id: "verbaende", label: "Verbände & Mitgliedschaften", icon: "🏛️", keywords: ["swisspga", "swiss pga", "swissgolf", "verband", "mitgliedschaft", "membership"] },
+  { id: "events", label: "Gönnerturnier & Events", icon: "🎉", keywords: ["gönnerturnier", "goenner", "fotograf", "event", "apero"] },
+  { id: "spesen", label: "Verpflegung unterwegs", icon: "🍽️", keywords: ["verpflegung", "spesen", "essen", "restaurant", "kaffee"] },
+  { id: "fahrzeug", label: "Auto & Versicherung", icon: "🚗", keywords: ["auto", "skoda", "axa", "garage", "kilometer", "fahrtenbuch", "fahrzeug", "versicherung"] },
+  { id: "buero", label: "Büro & Technik", icon: "💻", keywords: ["büro", "buero", "kabel", "dockingstation", "steckleiste", "hdmi", "pixel", "laptop", "drucker", "ordner"] },
+  { id: "abos", label: "Abos & Software", icon: "🔁", keywords: ["abo", "subscri", "chatgpt", "openai", "anthropic", "google", "domain", "webseite", "vpn", "sim", "salt", "phone", "fiver", "cloud", "notion", "canva", "adobe", "apple", "hosting", "vercel", "supabase", "resend"] },
   { id: "sonst_golf", label: "Sonstiges Golf", icon: "📦", keywords: [] },
 ];
 
 export const PRIVAT_CATEGORIES: BudgetCategory[] = [
   { id: "miete", label: "Miete", icon: "🏠", keywords: ["miete", "mietzins", "wohnung", "immobilien", "verwaltung"] },
-  { id: "verpflegung", label: "Verpflegung", icon: "🍽️", keywords: ["migros", "coop", "denner", "aldi", "lidl", "restaurant", "bäcker", "volg", "lebensmittel", "pizza"] },
+  { id: "verpflegung", label: "Verpflegung zuhause", icon: "🍽️", keywords: ["migros", "coop", "denner", "aldi", "lidl", "volg", "lebensmittel", "pizza", "bäcker"] },
   { id: "strom", label: "Strom", icon: "⚡", keywords: ["strom", "ew ", "elektri", "energie"] },
   { id: "heizung", label: "Heizung", icon: "🔥", keywords: ["heizung", "heizöl", "gas", "wärme"] },
-  { id: "internet", label: "Internet & Handy", icon: "📱", keywords: ["swisscom", "salt", "sunrise", "internet", "handy", "mobile"] },
-  { id: "kreditkarte", label: "Kreditkarte", icon: "💳", keywords: ["kreditkarte", "visa", "mastercard", "cembra", "amex"] },
+  { id: "internet", label: "Internet & Handy", icon: "📱", keywords: ["swisscom", "internet", "handy", "mobile"] },
+  { id: "kreditkarte", label: "Gemeinsame Kreditkarte", icon: "💳", keywords: ["kreditkarte", "visa", "mastercard", "cembra", "amex"] },
   { id: "moebel", label: "Möbel & Haushalt", icon: "🛋️", keywords: ["ikea", "möbel", "moebel", "brocki", "haushalt"] },
-  { id: "versicherung_privat", label: "Versicherung", icon: "🛡️", keywords: ["krankenkasse", "helsana", "css", "sanitas", "versicherung"] },
+  { id: "versicherung_privat", label: "Krankenkasse & Versicherung", icon: "🛡️", keywords: ["krankenkasse", "helsana", "css", "sanitas", "versicherung"] },
   { id: "sonst_privat", label: "Sonstiges privat", icon: "📦", keywords: [] },
 ];
 
@@ -43,13 +60,23 @@ export function suggestCategory(description: string, scope: BudgetScope): string
   return hit ? hit.id : list[list.length - 1].id;
 }
 
+/** Häufigkeit aus der Beschreibung vorschlagen (Abos monatlich, Domain und Versicherungen jährlich). */
+export function suggestFrequency(description: string): BudgetFrequency {
+  const text = description.toLowerCase();
+  if (/(abo|subscri|salt|phone|chatgpt|google cloud)/.test(text)) return "monatlich";
+  if (/(domain|webseite|axa|versicherung|auto versicherung)/.test(text)) return "jaehrlich";
+  return "einmalig";
+}
+
 export type BudgetEntryRow = {
   id: string;
-  entry_date: string; // YYYY-MM-DD
-  amount_chf: number; // positiv = Ausgabe
+  entry_date: string; // YYYY-MM-DD (Startdatum)
+  amount_chf: number;
   scope: BudgetScope;
   category: string;
   label: string;
+  frequency: BudgetFrequency;
+  ends_on: string | null; // YYYY-MM-DD, nur bei wiederkehrenden Kosten
 };
 
 /** Betrag im Schweizer Format ohne Währungszeichen. */
@@ -58,9 +85,39 @@ export function fmt(amount: number): string {
   return `${int.replace(/\B(?=(\d{3})+(?!\d))/g, "’")}.${dec}`;
 }
 
+/** Ist ein wiederkehrender Eintrag in diesem Monat aktiv? */
+function activeIn(e: BudgetEntryRow, year: number, month: number): boolean {
+  const start = e.entry_date.slice(0, 7);
+  const ym = `${year}-${String(month + 1).padStart(2, "0")}`;
+  if (ym < start) return false;
+  if (e.ends_on && ym > e.ends_on.slice(0, 7)) return false;
+  return true;
+}
+
+/**
+ * Verteilt alle Einträge auf die 12 Monate eines Jahres.
+ * Gibt je Monat den Betrag pro Eintrag zurück (Summe je Kategorie wird im UI gebildet).
+ */
+export function monthlyAmounts(entries: BudgetEntryRow[], year: number): { entry: BudgetEntryRow; months: number[] }[] {
+  return entries.map((e) => {
+    const months = Array.from({ length: 12 }, (_, m) => {
+      const amount = Number(e.amount_chf) || 0;
+      if (e.frequency === "einmalig") {
+        return e.entry_date.startsWith(`${year}-`) && Number(e.entry_date.slice(5, 7)) - 1 === m ? amount : 0;
+      }
+      if (!activeIn(e, year, m)) return 0;
+      if (e.frequency === "monatlich") return amount;
+      // jährlich: Jahresbetrag gleichmässig auf 12 Monate
+      const startYear = Number(e.entry_date.slice(0, 4));
+      return startYear <= year ? amount / 12 : 0;
+    });
+    return { entry: e, months };
+  });
+}
+
 /**
  * Bank-CSV lesen. Erkennt Trennzeichen ; oder , und Datum, Text und Betrag.
- * Negative Beträge sind Ausgaben und werden positiv gespeichert.
+ * Beträge werden positiv gespeichert (Ausgaben).
  */
 export function parseBankCsv(text: string): { date: string; label: string; amount: number }[] {
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);

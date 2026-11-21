@@ -9,6 +9,8 @@ create table if not exists public.budget_entries (
   scope text not null check (scope in ('golf', 'privat')),
   category text not null check (char_length(category) between 2 and 60),
   label text not null default '' check (char_length(label) <= 200),
+  frequency text not null default 'einmalig' check (frequency in ('einmalig', 'monatlich', 'jaehrlich')),
+  ends_on date,
   created_at timestamptz not null default now()
 );
 

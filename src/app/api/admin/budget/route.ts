@@ -12,7 +12,10 @@ function parseEntry(b: Record<string, unknown>) {
   if (!Number.isFinite(amount) || amount <= 0) return { error: "Betrag fehlt." } as const;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Datum fehlt." } as const;
   if (!categoriesFor(scope as BudgetScope).some((c) => c.id === category)) return { error: "Kategorie unbekannt." } as const;
-  return { value: { scope, amount_chf: amount, entry_date: date, category, label: String(b.label ?? "").trim().slice(0, 200) } } as const;
+  const frequency = b.frequency === "monatlich" || b.frequency === "jaehrlich" ? b.frequency : "einmalig";
+  const ends = String(b.ends_on ?? "");
+  const ends_on = frequency !== "einmalig" && /^d{4}-d{2}-d{2}$/.test(ends) ? ends : null;
+  return { value: { scope, amount_chf: amount, entry_date: date, category, label: String(b.label ?? "").trim().slice(0, 200), frequency, ends_on } } as const;
 }
 
 /** Eine Ausgabe anlegen. */

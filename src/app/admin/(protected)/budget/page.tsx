@@ -9,7 +9,7 @@ export default async function AdminBudgetPage() {
   const supabase = await createSupabaseUserServerClient();
   const currentYear = new Date().getFullYear();
   const [entriesRes, paymentsRes, prizesRes] = await Promise.all([
-    supabase.from("budget_entries").select("id,entry_date,amount_chf,scope,category,label").order("entry_date", { ascending: false }),
+    supabase.from("budget_entries").select("id,entry_date,amount_chf,scope,category,label,frequency,ends_on").order("entry_date", { ascending: false }),
     supabase.from("goenner_payments").select("year,amount_chf"),
     supabase.from("prize_money").select("year,amount_chf"),
   ]);

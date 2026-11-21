@@ -2,7 +2,18 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { categoriesFor, fmt, parseBankCsv, suggestCategory, type BudgetEntryRow, type BudgetScope } from "@/lib/budget";
+import {
+  FREQUENCY_LABEL,
+  categoriesFor,
+  fmt,
+  monthlyAmounts,
+  parseBankCsv,
+  suggestCategory,
+  suggestFrequency,
+  type BudgetEntryRow,
+  type BudgetFrequency,
+  type BudgetScope,
+} from "@/lib/budget";
 
 const MONTHS = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
@@ -13,6 +24,8 @@ type Props = {
   defaultYear: number;
 };
 
+type ImportRow = { date: string; label: string; amount: number; include: boolean; scope: BudgetScope; category: string; frequency: BudgetFrequency };
+
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
 export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }: Props) {
@@ -20,34 +33,40 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
   const [year, setYear] = useState(defaultYear);
   const [scope, setScope] = useState<BudgetScope>("golf");
   const [category, setCategory] = useState<string>("");
+  const [frequency, setFrequency] = useState<BudgetFrequency>("einmalig");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(todayIso());
+  const [endsOn, setEndsOn] = useState("");
   const [label, setLabel] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
-  const [importRows, setImportRows] = useState<{ date: string; label: string; amount: number; include: boolean; scope: BudgetScope; category: string }[]>([]);
+  const [importRows, setImportRows] = useState<ImportRow[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const cats = categoriesFor(scope);
-  const yearEntries = useMemo(
-    () => entries.filter((e) => e.entry_date.startsWith(String(year)) && e.scope === scope),
-    [entries, year, scope],
-  );
-  const spent = yearEntries.reduce((s, e) => s + Number(e.amount_chf), 0);
-  const income = scope === "golf" ? incomeByYear[String(year)] ?? 0 : 0;
+  const scopeEntries = useMemo(() => entries.filter((e) => e.scope === scope), [entries, scope]);
+  const expanded = useMemo(() => monthlyAmounts(scopeEntries, year), [scopeEntries, year]);
 
-  // Heatmap: Kategorie x Monat
+  // Summe je Kategorie und Monat
   const grid = useMemo(() => {
     const map: Record<string, number[]> = {};
     for (const c of cats) map[c.id] = Array(12).fill(0);
-    for (const e of yearEntries) {
-      const m = Number(e.entry_date.slice(5, 7)) - 1;
-      if (map[e.category] && m >= 0 && m < 12) map[e.category][m] += Number(e.amount_chf);
+    for (const { entry, months } of expanded) {
+      if (!map[entry.category]) continue;
+      months.forEach((v, m) => (map[entry.category][m] += v));
     }
     return map;
-  }, [yearEntries, cats]);
+  }, [expanded, cats]);
+
+  const monthTotals = useMemo(() => Array.from({ length: 12 }, (_, m) => expanded.reduce((s, x) => s + x.months[m], 0)), [expanded]);
+  const spent = monthTotals.reduce((s, v) => s + v, 0);
   const maxCell = Math.max(1, ...Object.values(grid).flat());
   const catTotal = (id: string) => (grid[id] ?? []).reduce((s, v) => s + v, 0);
+  const income = scope === "golf" ? incomeByYear[String(year)] ?? 0 : 0;
+  const recurring = scopeEntries.filter((e) => e.frequency !== "einmalig" && (!e.ends_on || e.ends_on.slice(0, 4) >= String(year)));
+  const monthlyRun = recurring.reduce((s, e) => s + (e.frequency === "monatlich" ? Number(e.amount_chf) : Number(e.amount_chf) / 12), 0);
+
+  const isRecurring = frequency !== "einmalig";
 
   async function save() {
     if (!category) return setMessage({ kind: "error", text: "Bitte zuerst eine Kategorie wählen." });
@@ -59,13 +78,14 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       const res = await fetch("/api/admin/budget", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scope, category, amount_chf: value, entry_date: date, label }),
+        body: JSON.stringify({ scope, category, amount_chf: value, entry_date: date, label, frequency, ends_on: isRecurring ? endsOn : "" }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Speichern fehlgeschlagen.");
       setAmount("");
       setLabel("");
-      setMessage({ kind: "ok", text: "Gespeichert." });
+      setEndsOn("");
+      setMessage({ kind: "ok", text: isRecurring ? "Wiederkehrende Kosten gespeichert." : "Gespeichert." });
       router.refresh();
     } catch (e) {
       setMessage({ kind: "error", text: e instanceof Error ? e.message : "Fehler." });
@@ -75,20 +95,27 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Diese Ausgabe löschen?")) return;
+    if (!window.confirm("Diesen Eintrag löschen?")) return;
     const res = await fetch(`/api/admin/budget/${id}`, { method: "DELETE" });
     if (res.ok) router.refresh();
   }
 
   async function onFile(file: File) {
-    const text = await file.text();
-    const rows = parseBankCsv(text);
+    const rows = parseBankCsv(await file.text());
     if (rows.length === 0) return setMessage({ kind: "error", text: "Keine Buchungen in der Datei gefunden." });
-    setImportRows(rows.map((r) => ({ ...r, include: true, scope: "golf", category: suggestCategory(r.label, "golf") })));
-    setMessage({ kind: "ok", text: `${rows.length} Buchungen gefunden. Prüfe Kategorie und Bereich, dann speichern.` });
+    setImportRows(
+      rows.map((r) => ({
+        ...r,
+        include: true,
+        scope: "golf",
+        category: suggestCategory(r.label, "golf"),
+        frequency: suggestFrequency(r.label),
+      })),
+    );
+    setMessage({ kind: "ok", text: `${rows.length} Buchungen gefunden. Prüfe Bereich, Kategorie und Häufigkeit, dann speichern.` });
   }
 
-  function updateImport(i: number, patch: Partial<(typeof importRows)[number]>) {
+  function updateImport(i: number, patch: Partial<ImportRow>) {
     setImportRows((prev) =>
       prev.map((r, idx) => {
         if (idx !== i) return r;
@@ -107,7 +134,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       const res = await fetch("/api/admin/budget/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: rows.map((r) => ({ scope: r.scope, category: r.category, amount_chf: r.amount, entry_date: r.date, label: r.label })) }),
+        body: JSON.stringify({ rows: rows.map((r) => ({ scope: r.scope, category: r.category, amount_chf: r.amount, entry_date: r.date, label: r.label, frequency: r.frequency })) }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string; saved?: number };
       if (!res.ok) throw new Error(data.error ?? "Import fehlgeschlagen.");
@@ -145,21 +172,30 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       <section className="bd-summary" aria-label="Übersicht">
         {scope === "golf" ? (
           <>
-            <div className="bd-kpi"><span>Einnahmen</span><strong>CHF {fmt(income)}</strong></div>
-            <div className="bd-kpi"><span>Ausgaben</span><strong>CHF {fmt(spent)}</strong></div>
+            <div className="bd-kpi"><span>Einnahmen {year}</span><strong>CHF {fmt(income)}</strong></div>
+            <div className="bd-kpi"><span>Ausgaben {year}</span><strong>CHF {fmt(spent)}</strong></div>
             <div className={`bd-kpi ${income - spent >= 0 ? "is-good" : "is-bad"}`}><span>Ergebnis</span><strong>CHF {fmt(income - spent)}</strong></div>
           </>
         ) : (
           <>
             <div className="bd-kpi"><span>Ausgaben {year}</span><strong>CHF {fmt(spent)}</strong></div>
             <div className="bd-kpi"><span>Pro Monat (Ø)</span><strong>CHF {fmt(spent / 12)}</strong></div>
-            <div className="bd-kpi"><span>Buchungen</span><strong>{yearEntries.length}</strong></div>
+            <div className="bd-kpi"><span>Wiederkehrend / Monat</span><strong>CHF {fmt(monthlyRun)}</strong></div>
           </>
         )}
       </section>
 
       <section className="ap-card bd-add" aria-labelledby="bd-add-h">
         <h2 id="bd-add-h" className="ap-h2">Ausgabe hinzufügen</h2>
+
+        <div className="bd-freq" role="group" aria-label="Häufigkeit">
+          {(Object.keys(FREQUENCY_LABEL) as BudgetFrequency[]).map((f) => (
+            <button key={f} type="button" className={`bd-freq-btn${frequency === f ? " is-on" : ""}`} aria-pressed={frequency === f} onClick={() => setFrequency(f)}>
+              {f === "einmalig" ? "1× einmalig" : f === "monatlich" ? "🔁 jeden Monat" : "📅 jährlich"}
+            </button>
+          ))}
+        </div>
+
         <div className="bd-cats" role="group" aria-label="Kategorie wählen">
           {cats.map((c) => (
             <button key={c.id} type="button" className={`bd-cat${category === c.id ? " is-on" : ""}`} aria-pressed={category === c.id} onClick={() => setCategory(c.id)}>
@@ -168,20 +204,30 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
             </button>
           ))}
         </div>
+
         <div className="bd-form">
           <label className="ap-field">
-            <span>Betrag (CHF)</span>
+            <span>{frequency === "einmalig" ? "Betrag (CHF)" : frequency === "monatlich" ? "Betrag pro Monat (CHF)" : "Jahresbetrag (CHF)"}</span>
             <input className="ap-input bd-big" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
           </label>
           <label className="ap-field">
-            <span>Datum</span>
+            <span>{isRecurring ? "Ab Datum" : "Datum"}</span>
             <input className="ap-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
+          {isRecurring ? (
+            <label className="ap-field">
+              <span>Endet am (optional)</span>
+              <input className="ap-input" type="date" value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
+            </label>
+          ) : null}
           <label className="ap-field bd-wide">
             <span>Notiz (optional)</span>
-            <input className="ap-input" placeholder="z. B. Turnier Südafrika, Flug" value={label} onChange={(e) => setLabel(e.target.value)} />
+            <input className="ap-input" placeholder="z. B. Salt Abo, Turnier Südafrika, Flug" value={label} onChange={(e) => setLabel(e.target.value)} />
           </label>
         </div>
+        {frequency === "jaehrlich" ? <p className="bd-hint">Jahresbetrag wird gleichmässig auf alle 12 Monate verteilt (CHF {amount ? fmt(Number(amount.replace(/[’'\s]/g, "").replace(",", ".")) / 12) : "0.00"} pro Monat).</p> : null}
+        {frequency === "monatlich" ? <p className="bd-hint">Dieser Betrag wird in jedem Monat ab dem Startdatum berücksichtigt.</p> : null}
+
         <button type="button" className="ap-btn ap-btn--primary bd-save" disabled={busy} onClick={() => void save()}>
           {busy ? "Speichere…" : "Speichern"}
         </button>
@@ -213,25 +259,30 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
               <span role="cell" className="bd-cell bd-cell--sum">{catTotal(c.id) > 0 ? fmt(catTotal(c.id)) : "—"}</span>
             </div>
           ))}
+          <div className="bd-heat-row bd-heat-total" role="row">
+            <span role="rowheader" className="bd-heat-name">Total pro Monat</span>
+            {monthTotals.map((v, i) => <span key={i} role="cell" className="bd-cell bd-cell--total">{v > 0 ? Math.round(v) : ""}</span>)}
+            <span role="cell" className="bd-cell bd-cell--sum">{fmt(spent)}</span>
+          </div>
         </div>
       </section>
 
-      <section className="ap-card" aria-labelledby="bd-list-h">
-        <h2 id="bd-list-h" className="ap-h2">Buchungen {year}</h2>
-        {yearEntries.length === 0 ? (
-          <p className="ap-empty-inline">Noch keine Ausgaben in diesem Bereich.</p>
+      <section className="ap-card" aria-labelledby="bd-rec-h">
+        <h2 id="bd-rec-h" className="ap-h2">Abos & wiederkehrende Kosten</h2>
+        {recurring.length === 0 ? (
+          <p className="ap-empty-inline">Noch keine. Oben „🔁 jeden Monat“ oder „📅 jährlich“ wählen.</p>
         ) : (
           <ul className="bd-list">
-            {[...yearEntries].sort((a, b) => b.entry_date.localeCompare(a.entry_date)).map((e) => {
+            {recurring.map((e) => {
               const c = cats.find((x) => x.id === e.category);
               return (
                 <li key={e.id} className="bd-item">
                   <span className="bd-item-icon" aria-hidden="true">{c?.icon ?? "📦"}</span>
                   <span className="bd-item-main">
-                    <strong>{c?.label ?? e.category}</strong>
-                    <span>{e.label || "—"} · {e.entry_date.split("-").reverse().join(".")}</span>
+                    <strong>{e.label || c?.label || e.category}</strong>
+                    <span>{e.frequency === "monatlich" ? "jeden Monat" : "jährlich, auf 12 Monate verteilt"}{e.ends_on ? ` · bis ${e.ends_on.split("-").reverse().join(".")}` : ""}</span>
                   </span>
-                  <span className="bd-item-amount">CHF {fmt(Number(e.amount_chf))}</span>
+                  <span className="bd-item-amount">CHF {fmt(Number(e.amount_chf))}{e.frequency === "jaehrlich" ? " / Jahr" : " / Monat"}</span>
                   <button type="button" className="ap-icon-btn" aria-label="Löschen" onClick={() => void remove(e.id)}>×</button>
                 </li>
               );
@@ -240,9 +291,35 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
         )}
       </section>
 
+      <section className="ap-card" aria-labelledby="bd-list-h">
+        <h2 id="bd-list-h" className="ap-h2">Einmalige Ausgaben {year}</h2>
+        {(() => {
+          const once = scopeEntries.filter((e) => e.frequency === "einmalig" && e.entry_date.startsWith(String(year)));
+          if (once.length === 0) return <p className="ap-empty-inline">Noch keine einmaligen Ausgaben in diesem Jahr.</p>;
+          return (
+            <ul className="bd-list">
+              {[...once].sort((a, b) => b.entry_date.localeCompare(a.entry_date)).map((e) => {
+                const c = cats.find((x) => x.id === e.category);
+                return (
+                  <li key={e.id} className="bd-item">
+                    <span className="bd-item-icon" aria-hidden="true">{c?.icon ?? "📦"}</span>
+                    <span className="bd-item-main">
+                      <strong>{c?.label ?? e.category}</strong>
+                      <span>{e.label || "—"} · {e.entry_date.split("-").reverse().join(".")}</span>
+                    </span>
+                    <span className="bd-item-amount">CHF {fmt(Number(e.amount_chf))}</span>
+                    <button type="button" className="ap-icon-btn" aria-label="Löschen" onClick={() => void remove(e.id)}>×</button>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
+      </section>
+
       <section className="ap-card" aria-labelledby="bd-imp-h">
         <h2 id="bd-imp-h" className="ap-h2">Bank-Export importieren (CSV)</h2>
-        <p className="bd-hint">Lade den CSV-Export deiner Bank hoch. Die Buchungen erscheinen unten, du prüfst Kategorie und Bereich und speicherst.</p>
+        <p className="bd-hint">Lade den CSV-Export deiner Bank hoch. Die Buchungen erscheinen unten, du prüfst Bereich, Kategorie und Häufigkeit und speicherst.</p>
         <input ref={fileRef} type="file" accept=".csv,text/csv" className="bd-file" onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFile(f); }} />
         {importRows.length > 0 ? (
           <>
@@ -260,6 +337,11 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
                   </select>
                   <select className="ap-select" value={r.category} aria-label="Kategorie" onChange={(e) => updateImport(i, { category: e.target.value })}>
                     {categoriesFor(r.scope).map((c) => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+                  </select>
+                  <select className="ap-select" value={r.frequency} aria-label="Häufigkeit" onChange={(e) => updateImport(i, { frequency: e.target.value as BudgetFrequency })}>
+                    <option value="einmalig">Einmalig</option>
+                    <option value="monatlich">Monatlich</option>
+                    <option value="jaehrlich">Jährlich</option>
                   </select>
                 </li>
               ))}
