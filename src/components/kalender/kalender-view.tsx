@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { KalenderScrollFx } from "@/components/kalender/kalender-scroll";
+import { KalenderJourney } from "@/components/kalender/kalender-journey";
 import { GlobeArcs, type GlobeFocus, type GlobeItem } from "@/components/globe/globe-arcs";
 import { classifySeason, daysBetween, todayIso, type EventStatus, type SeasonStatus } from "@/lib/season-status";
 
@@ -142,65 +143,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
         </section>
       ) : null}
 
-      <div className="kal-story">
-      <section className="kal-globe" id="kal-globe" aria-label="Globus mit allen Turnieren">
-        <div className="mg-container kal-globe__grid">
-          <GlobeArcs items={globeItems} focus={focus} onSelect={(i) => setFocus({ index: i, n: Date.now() })} />
-
-          <div className="kal-globe__panel">
-            <p className="kal-eyebrow">Die Reise</p>
-            <dl className="kal-stats">
-              <div>
-                <dt>Turniere</dt>
-                <dd>{totals.tournaments}</dd>
-              </div>
-              <div>
-                <dt>Länder</dt>
-                <dd>{totals.countries}</dd>
-              </div>
-              <div className="kal-stats__wide">
-                <dt>Gesamtstrecke, Luftlinie</dt>
-                <dd>{formatKm(totals.totalKm)}</dd>
-                <small>
-                  {formatKm(totals.chainKm)} von Turnier zu Turnier, plus {formatKm(totals.returnKm)} zurück nach {homeName}
-                </small>
-              </div>
-              <div className="kal-stats__wide">
-                <dt>Längste Etappe</dt>
-                <dd>{totals.longest ? formatKm(totals.longest.km) : "–"}</dd>
-                {totals.longest ? (
-                  <small>
-                    {totals.longest.from} → {totals.longest.to}
-                  </small>
-                ) : null}
-              </div>
-            </dl>
-
-            <ul className="kal-legend" aria-label="Legende">
-              <li>
-                <span className="kal-legend__dot" data-status="live" /> Live
-              </li>
-              <li>
-                <span className="kal-legend__dot" data-status="next" /> Nächste Reise
-              </li>
-              <li>
-                <span className="kal-legend__dot" data-status="upcoming" /> Kommend
-              </li>
-              <li>
-                <span className="kal-legend__dot" data-status="past" /> Gespielt
-              </li>
-              <li>
-                <span className="kal-legend__dot" data-status="return" /> Rückreise
-              </li>
-            </ul>
-
-            <p className="kal-note">
-              Ziehen zum Drehen. Ein Turnier in der Liste antippen, dann dreht sich der Globus dorthin.
-            </p>
-          </div>
-        </div>
-      </section>
-
+      <KalenderJourney events={events} totals={totals} homeName={homeName} />
       <section className="kal-calendar" aria-label="Turnierkalender">
         <div className="mg-container">
           {events.length === 0 ? (
@@ -263,7 +206,6 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
           ))}
         </div>
       </section>
-      </div>
     </>
   );
 }

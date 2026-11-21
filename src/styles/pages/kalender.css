@@ -537,3 +537,151 @@
     display: none;
   }
 }
+
+/* ——— Reise: Globus, Strecke und Turnier scrollen zusammen ——— */
+.kj {
+  position: relative;
+  background: var(--mg-ink);
+  color: var(--mg-paper);
+}
+
+.kj--empty {
+  padding-block: 64px;
+}
+
+.kj__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 320px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 24px;
+  padding: 92px clamp(16px, 3vw, 40px) 28px;
+  overflow: hidden;
+}
+
+.kj__rail {
+  align-self: center;
+}
+
+.kj__stops {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.kj__stop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(250, 249, 246, 0.35);
+  transition: color 0.4s ease;
+}
+
+.kj__stop.is-done {
+  color: rgba(250, 249, 246, 0.8);
+}
+
+.kj__stop.is-active {
+  color: var(--mg-red-on-dark);
+  font-weight: 700;
+}
+
+.kj__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.kj__globe {
+  position: relative;
+  min-height: 0;
+}
+
+.kj__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.kj__card {
+  align-self: center;
+}
+
+.kj__panel {
+  animation: kjIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes kjIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.kj__title {
+  margin: 8px 0;
+  font-family: var(--mg-font-display);
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  line-height: 1.1;
+  color: var(--mg-paper);
+}
+
+.kj__meta {
+  margin: 4px 0;
+  font-size: 14px;
+  color: rgba(250, 249, 246, 0.7);
+}
+
+.kj__leg {
+  margin-top: 12px;
+  font-weight: 700;
+  color: var(--mg-red-on-dark);
+}
+
+.kj__link {
+  color: var(--mg-red-on-dark);
+  text-decoration: underline;
+}
+
+.kj__hint {
+  margin-top: 28px;
+  font-size: 12px;
+  color: rgba(250, 249, 246, 0.45);
+}
+
+@media (max-width: 899.98px) {
+  .kj__sticky {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 52vh auto;
+    padding: 84px 16px 16px;
+  }
+
+  .kj__rail {
+    display: none;
+  }
+
+  .kj__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kj__panel {
+    animation: none;
+  }
+}
