@@ -92,11 +92,6 @@ export function AdminRechnungenClient({
   // Vorschau mit kurzer Verzögerung neu erzeugen
   useEffect(() => {
     const t = setTimeout(async () => {
-      if (!recipient || payload.items.every((it) => !it.description && !it.amountChf)) {
-        setHtml("");
-        setPreviewError(recipient ? null : "Wähle einen Empfänger, dann erscheint die Rechnung hier.");
-        return;
-      }
       try {
         const res = await fetch("/api/admin/rechnungen/preview", {
           method: "POST",
@@ -297,7 +292,7 @@ export function AdminRechnungenClient({
           </div>
         </div>
         {previewError ? <p className="ar-empty">{previewError}</p> : null}
-        <div ref={frameRef} className={`ar-frame ar-frame--${device}`} style={{ height: html ? 1123 * scale : 0 }}>
+        <div ref={frameRef} className={`ar-frame ar-frame--${device}`} style={{ height: 1123 * scale }}>
           {html ? (
             <iframe
               title="Rechnungsvorschau"

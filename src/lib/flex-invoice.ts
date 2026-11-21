@@ -197,7 +197,7 @@ function str(v: unknown, max: number): string {
 }
 
 /** Eingabe aus dem Formular prüfen und bereinigen. */
-export function parseFlexInput(body: Record<string, unknown>): { ok: true; value: FlexInvoiceInput } | { ok: false; error: string } {
+export function parseFlexInput(body: Record<string, unknown>, lenient = false): { ok: true; value: FlexInvoiceInput } | { ok: false; error: string } {
   const r = (body.recipient ?? {}) as Record<string, unknown>;
   const recipient = {
     name: str(r.name, 160),
@@ -207,18 +207,18 @@ export function parseFlexInput(body: Record<string, unknown>): { ok: true; value
     city: str(r.city, 120),
     email: str(r.email, 200),
   };
-  if (recipient.name.length < 2) return { ok: false, error: "Bitte einen Empfänger wählen." };
+  if (!lenient && recipient.name.length < 2) return { ok: false, error: "Bitte einen Empfänger wählen." };
 
   const rawItems = Array.isArray(body.items) ? (body.items as Record<string, unknown>[]) : [];
   const items: FlexItem[] = rawItems
     .slice(0, MAX_ITEMS)
     .map((it) => ({ description: str(it.description, 200), amountChf: Number(it.amountChf) || 0 }))
     .filter((it) => it.description || it.amountChf);
-  if (items.length === 0) return { ok: false, error: "Mindestens eine Position angeben." };
-  if (items.some((it) => !it.description)) return { ok: false, error: "Jede Position braucht eine Beschreibung." };
+  if (!lenient && items.length === 0) return { ok: false, error: "Mindestens eine Position angeben." };
+  if (!lenient && items.some((it) => !it.description)) return { ok: false, error: "Jede Position braucht eine Beschreibung." };
 
   const invoiceNumber = str(body.invoiceNumber, 60);
-  if (!invoiceNumber) return { ok: false, error: "Rechnungsnummer fehlt." };
+  if (!lenient && !invoiceNumber) return { ok: false, error: "Rechnungsnummer fehlt." };
 
   return {
     ok: true,

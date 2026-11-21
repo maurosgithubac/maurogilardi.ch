@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Ungültige Eingabe." }, { status: 400 });
   }
-  const parsed = parseFlexInput(body);
+  const parsed = parseFlexInput(body, true);
   if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
   try {
     return NextResponse.json({ html: await renderFlexInvoiceHtml(parsed.value) });
