@@ -685,3 +685,82 @@
     animation: none;
   }
 }
+
+/* ——— Banner: die nächsten zwei Turniere ——— */
+.kal-next {
+  padding-block: clamp(32px, 5vw, 56px);
+  background: var(--mg-paper);
+}
+
+.kal-next__eyebrow {
+  margin: 0 0 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mg-red);
+}
+
+.kal-next__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.kal-next__card {
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: var(--mg-surface);
+  border-left: 4px solid var(--mg-red);
+  box-shadow: 0 1px 0 var(--mg-line);
+}
+
+.kal-next__card.is-live {
+  background: var(--mg-ink);
+  color: var(--mg-paper);
+}
+
+.kal-next__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kal-next__kind {
+  color: var(--mg-red);
+}
+
+.kal-next__when {
+  color: var(--mg-muted);
+}
+
+.kal-next__card.is-live .kal-next__when {
+  color: var(--mg-red-on-dark);
+}
+
+.kal-next__name {
+  margin: 10px 0 6px;
+  font-family: var(--mg-font-display);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.kal-next__meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--mg-muted);
+}
+
+.kal-next__card.is-live .kal-next__meta {
+  color: rgba(250, 249, 246, 0.7);
+}
+
+@media (max-width: 640px) {
+  .kal-next__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

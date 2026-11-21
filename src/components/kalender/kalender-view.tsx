@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import { KalenderScrollFx } from "@/components/kalender/kalender-scroll";
 import { KalenderJourney } from "@/components/kalender/kalender-journey";
+import { KalenderNextBanner } from "@/components/kalender/kalender-next";
 import { GlobeArcs, type GlobeFocus, type GlobeItem } from "@/components/globe/globe-arcs";
 import { classifySeason, daysBetween, todayIso, type EventStatus, type SeasonStatus } from "@/lib/season-status";
 
@@ -131,17 +132,7 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
   return (
     <>
       <KalenderScrollFx onActive={handleActive} />
-      <section className="kal-live" aria-live="polite" aria-label="Aktueller Stand">
-        <LiveStatus status={status} today={today} seasonLabel={seasonLabel} />
-      </section>
-
-      {events.length > 0 ? (
-        <section className="kal-timeline" aria-label="Zeitleiste der Saison">
-          <div className="mg-container">
-            <SeasonTimeline events={events} status={status} today={today} />
-          </div>
-        </section>
-      ) : null}
+      <KalenderNextBanner events={events} today={today} />
 
       <KalenderJourney events={events} totals={totals} homeName={homeName} />
       <section className="kal-calendar" aria-label="Turnierkalender">
@@ -207,115 +198,5 @@ export function KalenderView({ events, totals, homeName, seasonLabel }: Props) {
         </div>
       </section>
     </>
-  );
-}
-
-function SeasonTimeline({
-  events,
-  status,
-  today,
-}: {
-  events: KalenderEvent[];
-  status: SeasonStatus<KalenderEvent> | null;
-  today: string | null;
-}) {
-  const first = events[0].start;
-  const last = events[events.length - 1].end;
-  const span = Math.max(daysBetween(first, last), 1);
-  const at = (iso: string) => `${(daysBetween(first, iso) / span) * 100}%`;
-  const todayInRange = today !== null && today >= first && today <= last;
-
-  return (
-    <div className="kal-tl" role="list" aria-label="Turniere in zeitlicher Reihenfolge">
-      <div className="kal-tl__track" aria-hidden="true" />
-      {todayInRange && today ? <div className="kal-tl__today" style={{ left: at(today) }} aria-label="Heute" /> : null}
-      {events.map((ev, i) => {
-        const s = status?.byId[ev.id] ?? "upcoming";
-        return (
-          <div
-            key={ev.id}
-            role="listitem"
-            className="kal-tl__item"
-            data-status={s}
-            data-kind={ev.kind}
-            data-up={i % 2 === 0}
-            style={{ left: `${(daysBetween(first, ev.start) / span) * 100}%` }}
-          >
-            <span className="kal-tl__dot" aria-hidden="true" />
-            <span className="kal-tl__label">
-              <strong>{ev.start.slice(8)}.{ev.start.slice(5, 7)}.</strong>
-              <span>{ev.country}</span>
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function LiveStatus({
-  status,
-  today,
-  seasonLabel,
-}: {
-  status: SeasonStatus<KalenderEvent> | null;
-  today: string | null;
-  seasonLabel: string;
-}) {
-  if (!status || !today) {
-    return (
-      <div className="kal-live__card">
-        <p className="kal-live__eyebrow">Stand wird geladen</p>
-      </div>
-    );
-  }
-
-  const live = status.live[0];
-  const next = status.next;
-
-  return (
-    <div className="kal-live__card">
-      {live ? (
-        <>
-          <p className="kal-live__eyebrow">
-            Jetzt live · Tag {daysBetween(live.start, today) + 1} von {daysBetween(live.start, live.end) + 1}
-          </p>
-          <p className="kal-live__title">{live.name}</p>
-          <p className="kal-live__where">
-            {live.place}, {live.country}
-          </p>
-        </>
-      ) : null}
-
-      {next ? (
-        <>
-          <p className="kal-live__eyebrow">{live ? "Danach" : "Nächste Reise"}</p>
-          <p className="kal-live__title">{next.name}</p>
-          <p className="kal-live__where">
-            {next.dates} · {next.place}, {next.country}
-          </p>
-          <p className="kal-live__when">
-            {daysBetween(today, next.start) === 1 ? "Morgen" : `in ${daysBetween(today, next.start)} Tagen`}
-            {next.legKm !== null ? ` · Etappe ${formatKm(next.legKm)} ab ${next.fromPlace}` : ""}
-          </p>
-        </>
-      ) : null}
-
-      {!live && !next ? (
-        status.lastPast ? (
-          <>
-            <p className="kal-live__eyebrow">Saison beendet</p>
-            <p className="kal-live__title">Letztes Turnier: {status.lastPast.name}</p>
-            <p className="kal-live__where">{status.lastPast.dates}</p>
-            <p className="kal-live__when">Die Termine der nächsten Saison folgen, sobald sie feststehen.</p>
-          </>
-        ) : (
-          <>
-            <p className="kal-live__eyebrow">{seasonLabel}</p>
-            <p className="kal-live__title">Noch keine Termine veröffentlicht</p>
-          </>
-        )
-      ) : null}
-    </div>
   );
 }
