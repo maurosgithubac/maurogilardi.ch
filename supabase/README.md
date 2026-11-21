@@ -5,7 +5,7 @@ Numbered scripts for the Supabase SQL Editor. **Higher number = newer. Newest fi
 ## Convention
 
 - Filename: `NNN_short_snake_name.sql` (3-digit zero-padded)
-- Next new prompt: take the highest existing number + 1 (currently next = `025_…`)
+- Next new prompt: take the highest existing number + 1 (currently next = `028_…`)
 - Prefer additive migrations (`alter` / `create if not exists`) over rewriting older files when the DB may already be live
 - Keep a short header comment: what it does + which earlier number it assumes
 
@@ -37,3 +37,6 @@ Numbered scripts for the Supabase SQL Editor. **Higher number = newer. Newest fi
 | 022 | member_wall_visible |
 | 023 | tournament |
 | 024 | tournament_reminded_at |
+| 025 | kalender_events |
+| 026 | rechnungskontakte |
+| 027 | budget (Häufigkeit und Enddatum) |
