@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Chromium für die PDF-Rechnung läuft als externes Paket (nicht bündeln).
   serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
+  // Chromium-Binärdateien (.br) müssen mit in die Serverfunktion kopiert werden, sonst fehlen sie auf Vercel.
+  outputFileTracingIncludes: {
+    "/api/admin/**": ["./node_modules/@sparticuz/chromium/bin/**"],
+  },
   experimental: {
     optimizePackageImports: ["motion"],
   },
