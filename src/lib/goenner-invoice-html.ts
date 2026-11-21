@@ -186,7 +186,6 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
     <div class="section-label">Hinweis zu deiner Mitgliedschaft</div>
     <ul>
       <li>Für deine Mitgliedschaft gelten die Gönner-Bedingungen: https://www.maurogilardi.ch/goenner-bedingungen</li>
-      <li><strong>Automatische Verlängerung:</strong> Die Mitgliedschaft verlängert sich für die folgende Saison, solange kein Austritt mitgeteilt wurde.</li>
       <li><strong>Keine Rückerstattung:</strong> Bezahlte Beiträge werden nicht zurückerstattet. Die Unterstützung erfolgt jeweils zu Saisonbeginn bzw. beim Beitritt für die laufende Saison.</li>
       <li>Mit der Zahlung dieser Rechnung bestätigst du die Gönner-Bedingungen.</li>
     </ul>
