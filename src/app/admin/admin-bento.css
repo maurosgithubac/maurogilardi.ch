@@ -1,0 +1,344 @@
+/*
+ * Admin, Desktop-Upgrade: volle Bildschirmbreite, Bento-Raster, helle Seitenkarte,
+ * rote Hero-Karte, Schrift der Website (--mg-font-display) für Zahlen und Titel.
+ * Animationen sind kurz und dezent; mit prefers-reduced-motion werden sie abgeschaltet.
+ */
+
+.admin-app {
+  --ap-display: var(--mg-font-display, Georgia, serif);
+  --ap-card-lift: 0 2px 4px rgb(11 11 11 / 4%), 0 18px 40px -22px rgb(11 11 11 / 26%);
+}
+
+/* ——— Volle Breite ——— */
+.ap-content {
+  max-width: none;
+  padding: 1.75rem clamp(1.25rem, 2.2vw, 2.5rem) 3rem;
+}
+
+/* ——— Seitenleiste: helle Karte, Rot als Akzent ——— */
+.ap-sidebar {
+  background: #fff;
+  color: var(--ap-ink);
+  border: 1px solid var(--ap-hair);
+  box-shadow: var(--ap-card-lift);
+}
+
+.ap-brand {
+  color: var(--ap-ink);
+}
+
+.ap-brand-name,
+.ap-sidebar .ap-brand-name {
+  color: var(--ap-ink);
+  font-family: var(--ap-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.ap-brand-sub {
+  color: var(--ap-muted);
+}
+
+.ap-nav-heading {
+  color: var(--ap-subtle);
+}
+
+.ap-nav-item {
+  color: var(--ap-ink-2);
+}
+
+.ap-nav-item:hover {
+  background: var(--ap-sunken);
+  color: var(--ap-ink);
+}
+
+.ap-nav-icon {
+  color: var(--ap-muted);
+}
+
+.ap-nav-badge {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ap-nav-item.is-active .ap-nav-badge {
+  background: #fff;
+  color: var(--ap-red-text);
+}
+
+.ap-sidebar-foot {
+  border-top: 1px solid var(--ap-hair);
+}
+
+.ap-nav-item--quiet {
+  color: var(--ap-muted);
+}
+
+/* ——— Animationen ——— */
+@keyframes ap-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ap-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ap-meter {
+  from {
+    width: 0;
+  }
+}
+
+.ov-card,
+.ov-kpi,
+.bx-card,
+.bx-hero {
+  animation: ap-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ov-kpi:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.ov-kpi:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.bx-card:nth-of-type(2) {
+  animation-delay: 60ms;
+}
+
+.bx-bar-fill {
+  transform-origin: bottom;
+  animation: ap-grow 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.bx-meter > span {
+  animation: ap-meter 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ——— Bento-Raster ab 1100px ——— */
+@media (min-width: 1100px) {
+  .ov {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ov > * {
+    min-width: 0;
+  }
+
+  .ov > .ov-head {
+    grid-column: 1 / -1;
+  }
+
+  .ov-revenue {
+    grid-column: span 7;
+    background: var(--ap-red);
+    color: #fff;
+    border-color: transparent;
+    min-height: 260px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ov-revenue::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 10%);
+    pointer-events: none;
+  }
+
+  .ov-revenue .ov-kicker,
+  .ov-revenue .ap-kpi-label,
+  .ov-revenue .ov-amount {
+    color: #fff;
+  }
+
+  .ov-revenue .ap-chart rect {
+    fill: rgb(255 255 255 / 85%);
+  }
+
+  .ov-revenue .ap-chart figcaption,
+  .ov-revenue .ap-chart text {
+    fill: rgb(255 255 255 / 85%);
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .ov-revenue .ov-amount {
+    font-family: var(--ap-display);
+    font-size: clamp(44px, 5vw, 68px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .ov-kpis {
+    grid-column: span 5;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-content: start;
+  }
+
+  .ov-today {
+    grid-column: span 5;
+  }
+
+  .ov-season,
+  .ov-full {
+    grid-column: 1 / -1;
+  }
+
+  .ov-kpi {
+    border-radius: var(--ap-radius-card);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .ov-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ap-card-lift);
+  }
+
+  .ov-kpi-value {
+    font-family: var(--ap-display);
+    font-size: clamp(26px, 2.6vw, 34px);
+    line-height: 1.05;
+  }
+
+  .ov-title {
+    font-family: var(--ap-display);
+    letter-spacing: -0.01em;
+  }
+
+  .ov-card:hover {
+    box-shadow: var(--ap-card-lift);
+  }
+
+  /* Budget: Bento */
+  .bx {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .bx > .bx-top {
+    grid-column: 1 / -1;
+  }
+
+  .bx-span-7 {
+    grid-column: span 7;
+  }
+
+  .bx-span-5 {
+    grid-column: span 5;
+  }
+
+  .bx-span-6 {
+    grid-column: span 6;
+  }
+
+  .bx-import {
+    grid-column: 1 / -1;
+  }
+
+  .bx-hero {
+    background: var(--ap-red);
+    color: #fff;
+    min-height: 300px;
+    align-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bx-hero .bx-label,
+  .bx-hero .bx-sub,
+  .bx-hero .bx-hint {
+    color: rgb(255 255 255 / 82%);
+  }
+
+  .bx-hero .bx-sub .is-good,
+  .bx-hero .bx-sub .is-bad {
+    color: #fff;
+  }
+
+  .bx-hero .bx-big {
+    font-family: var(--ap-display);
+    font-size: clamp(44px, 5vw, 68px);
+    line-height: 1;
+    color: #fff;
+  }
+
+  .bx-hero .bx-bars {
+    height: 170px;
+  }
+
+  .bx-hero .bx-bar-fill {
+    background: rgb(255 255 255 / 30%);
+  }
+
+  .bx-hero .bx-bar:hover .bx-bar-fill,
+  .bx-hero .bx-bar.is-on .bx-bar-fill {
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .bx-hero .bx-bar-label {
+    color: rgb(255 255 255 / 75%);
+  }
+
+  .bx-hero .bx-bar.is-on .bx-bar-label {
+    color: #fff;
+  }
+
+  .bx-card:hover {
+    box-shadow: var(--ap-card-lift);
+  }
+
+  .bx-cats {
+    gap: 6px;
+  }
+
+  .bx-cat {
+    transition: transform 160ms ease, background-color 160ms ease;
+  }
+
+  .bx-cat:hover {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-card,
+  .ov-kpi,
+  .bx-card,
+  .bx-hero,
+  .bx-bar-fill,
+  .bx-meter > span {
+    animation: none;
+  }
+
+  .ov-kpi,
+  .bx-cat,
+  .ov-card {
+    transition: none;
+  }
+}

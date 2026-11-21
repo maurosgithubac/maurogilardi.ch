@@ -245,7 +245,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       </div>
 
       {/* Hero: Summen und Monatsbalken */}
-      <section className="bx-hero" aria-label="Übersicht">
+      <section className="bx-hero bx-span-7" aria-label="Übersicht">
         <div className="bx-hero-main">
           <span className="bx-label">{headLabel}</span>
           <strong className="bx-big">CHF {fmt(shownSpent)}</strong>
@@ -277,7 +277,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       </section>
 
       {/* Kategorien */}
-      <section className="bx-card" aria-labelledby="bx-cat-h">
+      <section className="bx-card bx-span-5" aria-labelledby="bx-cat-h">
         <div className="bx-card-head">
           <h2 id="bx-cat-h">Kategorien</h2>
           {catFilter ? <button type="button" className="bx-link" onClick={() => setCatFilter(null)}>Alle zeigen</button> : null}
@@ -306,7 +306,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
 
       {/* Abos */}
       {recurring.length > 0 ? (
-        <section className="bx-card" aria-labelledby="bx-rec-h">
+        <section className="bx-card bx-span-6" aria-labelledby="bx-rec-h">
           <div className="bx-card-head">
             <h2 id="bx-rec-h">Abos & Fixkosten</h2>
             <span className="bx-pill">ca. CHF {fmt(fixedPerMonth)} / Monat</span>
@@ -338,7 +338,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       ) : null}
 
       {/* Buchungen */}
-      <section className="bx-card" aria-labelledby="bx-list-h">
+      <section className="bx-card bx-span-6" aria-labelledby="bx-list-h">
         <div className="bx-card-head">
           <h2 id="bx-list-h">Buchungen</h2>
           <span className="bx-pill">{listItems.length}</span>
