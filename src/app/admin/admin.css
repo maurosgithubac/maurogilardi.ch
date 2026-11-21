@@ -4129,7 +4129,7 @@ a.ap-row-title:hover {
 
 /* Einheit schmal, Einheitspreis breit genug für die Zahl */
 .ar-item {
-  grid-template-columns: 64px 64px minmax(140px, 1fr) 110px 32px;
+  grid-template-columns: 60px 60px minmax(120px, 1fr) 100px 30px;
 }
 
 .ar-unit {
