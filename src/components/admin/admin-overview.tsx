@@ -208,7 +208,7 @@ export function AdminOverview({
   const diffPct = income.prev > 0 ? Math.round((diff / income.prev) * 100) : null;
 
   return (
-    <div className="ov">
+    <div className="ov ap-page">
       <header className="ov-head">
         <div>
           <p className="ov-eyebrow">Übersicht</p>
