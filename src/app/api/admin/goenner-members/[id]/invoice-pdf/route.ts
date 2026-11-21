@@ -29,7 +29,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   const supabase = await createSupabaseUserServerClient();
   const { data: member, error: memberError } = await supabase
     .from("goenner_members")
-    .select("id,name,email,street,postal_code,city,membership_id,annual_amount_chf,inquiry_id")
+    .select("id,name,email,street,postal_code,city,membership_id,annual_amount_chf,inquiry_id,category")
     .eq("id", id)
     .maybeSingle();
 
@@ -78,7 +78,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   try {
     const u = new URL(request.url);
     const variant = {
-      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, (row as { category?: string | null }).category),
+      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, member.category),
       status: u.searchParams.get("status") === "bestand" ? ("bestand" as const) : ("neu" as const),
     };
     const { buffer, filename } = await buildGoennerInvoicePdf(row, parseSeason(request.url), variant);

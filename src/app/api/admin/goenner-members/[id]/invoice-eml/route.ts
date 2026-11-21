@@ -77,7 +77,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   try {
     const u = new URL(request.url);
     const variant = {
-      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, (row as { category?: string | null }).category),
+      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, member.category),
       status: u.searchParams.get("status") === "bestand" ? ("bestand" as const) : ("neu" as const),
     };
     const twint = u.searchParams.get("type") === "twint";
