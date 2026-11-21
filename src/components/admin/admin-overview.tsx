@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { contributionTypeLabel, inquiryTierShort } from "@/content/goennerMemberships";
 import {
   GOENNER_FINANCE_START_YEAR,
@@ -13,9 +13,19 @@ import { isNewInquiry } from "@/lib/admin-inbox";
 import { prizeKindOf, type PrizeMoneyRow } from "@/lib/prize-money";
 import type { GoennerInquiryRow } from "@/types/content";
 import { AdminGoennerMembersClient, type StatusFilter } from "@/components/admin-goenner-members-client";
-import { IconDownload, IconTrophy } from "@/components/admin/admin-icons";
+import {
+  IconCalendar,
+  IconCopy,
+  IconDownload,
+  IconFlag,
+  IconInbox,
+  IconPlus,
+  IconTrophy,
+  IconUsers,
+} from "@/components/admin/admin-icons";
+import { AreaChart, Bars, Gauge, Ring } from "@/components/admin/dash-charts";
+import { categoriesFor, monthlyAmounts, type BudgetEntryRow } from "@/lib/budget";
 import { chf, chfCompact, dateCh, categoryOf, type CategoryFilter } from "@/components/admin/admin-ui";
-import { AdminRoutePanel } from "@/components/admin/admin-route-panel";
 import type { UpcomingEvent } from "@/lib/kalender-upcoming";
 
 type Props = {
@@ -24,8 +34,14 @@ type Props = {
   /** Offene und neue (ungelesene) Anfragen */
   inquiries: GoennerInquiryRow[];
   prizes: PrizeMoneyRow[];
-  /** Kommende Turniere für die Saison-Route */
+  /** Kommende Turniere */
   events?: UpcomingEvent[];
+  /** Golf-Ausgaben aus dem Budget (für Verlauf und Ergebnis) */
+  budget?: BudgetEntryRow[];
+  /** Anzahl Newsletter-Abonnenten */
+  newsletter?: number | null;
+  /** Zusammenfassung des neuesten Gönnerturniers */
+  tournament?: TournamentSummary | null;
   ledgerMissing?: boolean;
   migration020Missing?: boolean;
   initialYear: number;
@@ -33,66 +49,19 @@ type Props = {
   initialCategory?: CategoryFilter;
 };
 
-const LIST_LIMIT = 5;
-const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+export type TournamentSummary = {
+  id: string;
+  title: string;
+  event_date: string;
+  status: string;
+  invited: number;
+  responded: number;
+  clinic: number;
+  round: number;
+  dinner: number;
+};
 
-function SeasonChart({
-  months,
-  year,
-  through,
-}: {
-  months: { pay: number; prize: number }[];
-  year: number;
-  through: number;
-}) {
-  const w = 360;
-  const h = 72;
-  const gap = 8;
-  const barW = (w - gap * 11) / 12;
-  const max = Math.max(...months.map((m) => m.pay + m.prize), 1);
-  // <title> im SVG wertet der Browser beim ersten HTML als Seitentitel und leert ihn.
-  const [tips, setTips] = useState(false);
-  useEffect(() => {
-    setTips(true);
-  }, []);
-  return (
-    <figure className="ap-chart">
-      <figcaption className="ap-kpi-label">Monatsverlauf {year}</figcaption>
-      <svg viewBox={`0 0 ${w} ${h + 18}`} role="img" aria-label={`Einnahmen pro Monat ${year}`}>
-        {months.map((m, i) => {
-          const total = m.pay + m.prize;
-          const full = Math.max(total > 0 ? 3 : 0, (total / max) * h);
-          const prizeH = total > 0 ? (m.prize / total) * full : 0;
-          const x = i * (barW + gap);
-          const future = i >= through;
-          return (
-            <g key={i}>
-              {tips ? (
-                <title>
-                  {MONTHS[i]} {year}: {total > 0 ? `CHF ${Math.round(total).toLocaleString("de-CH")}` : "keine Einnahmen"}
-                </title>
-              ) : null}
-              {future ? (
-                <rect className="ap-chart-future" x={x} y={h - 2} width={barW} height={2} rx={1} />
-              ) : (
-                <>
-                  <rect className="ap-chart-pay" x={x} y={h - full} width={barW} height={Math.max(full - prizeH, 0)} rx={1} />
-                  {prizeH > 0 ? (
-                    <rect className="ap-chart-prize" x={x} y={h - prizeH} width={barW} height={prizeH} rx={1} />
-                  ) : null}
-                  {total === 0 ? <rect className="ap-chart-empty" x={x} y={h - 2} width={barW} height={2} rx={1} /> : null}
-                </>
-              )}
-              <text x={x + barW / 2} y={h + 14} textAnchor="middle">
-                {MONTHS[i]}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-    </figure>
-  );
-}
+const MONTH_LABELS = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
 type SourceId = "goenner" | "sponsor" | "partner" | "prize" | "proam";
 
@@ -120,6 +89,9 @@ export function AdminOverview({
   inquiries,
   prizes,
   events = [],
+  budget = [],
+  newsletter = null,
+  tournament = null,
   ledgerMissing,
   migration020Missing,
   initialYear,
@@ -212,30 +184,96 @@ export function AdminOverview({
   const diff = income.total - income.prev;
   const diffPct = income.prev > 0 ? Math.round((diff / income.prev) * 100) : null;
 
+  // Verläufe: kumulierte Einnahmen, Vorjahr und Ausgaben (Budget)
+  const series = useMemo(() => {
+    const cum = (arr: number[]) => {
+      let s = 0;
+      return arr.map((v) => (s += v));
+    };
+    const prevM = Array.from({ length: 12 }, () => 0);
+    for (const p of payments) {
+      if (p.year !== year - 1) continue;
+      const i = Number(p.paid_on.slice(5, 7)) - 1;
+      if (i >= 0 && i < 12) prevM[i] += Number(p.amount_chf || 0);
+    }
+    for (const r of prizes) {
+      if (r.year !== year - 1) continue;
+      const i = Number(String(r.event_date).slice(5, 7)) - 1;
+      if (i >= 0 && i < 12) prevM[i] += Number(r.amount_chf || 0);
+    }
+    const expanded = monthlyAmounts(budget, year);
+    const expM = Array.from({ length: 12 }, (_, m) => expanded.reduce((s, x) => s + x.months[m], 0));
+    const byCat: Record<string, number> = {};
+    for (const x of expanded) {
+      const t = x.months.reduce((s, v) => s + v, 0);
+      if (t > 0) byCat[x.entry.category] = (byCat[x.entry.category] ?? 0) + t;
+    }
+    const goCats = categoriesFor("golf");
+    const topCats = Object.entries(byCat)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([id, v]) => ({ id, v, label: goCats.find((c) => c.id === id)?.label ?? id, icon: goCats.find((c) => c.id === id)?.icon ?? "📦" }));
+    return {
+      income: cum(months.map((m) => m.pay + m.prize)),
+      prev: cum(prevM),
+      exp: cum(expM),
+      expM,
+      expTotal: expM.reduce((s, v) => s + v, 0),
+      topCats,
+    };
+  }, [months, payments, prizes, budget, year]);
+
+  const result = income.total - series.expTotal;
+
+  const memberMix = useMemo(() => {
+    const active = members.filter((m) => m.active);
+    const count = { goenner: 0, sponsor: 0, partner: 0 };
+    for (const m of active) count[categoryOf(m)] += 1;
+    return { ...count, total: active.length };
+  }, [members]);
+
+  const latestPrizes = useMemo(
+    () => [...prizes].sort((a, b) => String(b.event_date).localeCompare(String(a.event_date))).slice(0, 4),
+    [prizes],
+  );
+
+  const respondPct = tournament && tournament.invited > 0 ? Math.round((tournament.responded / tournament.invited) * 100) : 0;
+  const todayCount = inbox.list.length + dues.unpaid.length;
+  const alert = inbox.list[0] ?? null;
+
+  const shortcuts = [
+    { href: "/admin/rechnungen", label: "Neue Rechnung", hint: "Mail-Entwurf mit PDF", icon: <IconCopy size={20} /> },
+    { href: "/admin/budget", label: "Ausgabe erfassen", hint: "Golf oder Privat", icon: <IconFlag size={20} /> },
+    { href: "/admin/kalender", label: "Termin hinzufügen", hint: "Saison-Kalender", icon: <IconCalendar size={20} /> },
+    { href: "/admin/preisgelder", label: "Preisgeld erfassen", hint: "Turniere und ProAms", icon: <IconTrophy size={20} /> },
+    { href: "/admin/goenner/inbox", label: "Eingänge", hint: `${inbox.list.length} offen`, icon: <IconInbox size={20} /> },
+    { href: "/admin/turnier", label: "Gönnerturnier", hint: tournament ? tournament.title : "Anlass anlegen", icon: <IconUsers size={20} /> },
+  ];
+
   return (
-    <div className="ov ap-page">
-      <header className="ov-head">
-        <div>
-          <p className="ov-eyebrow">Übersicht</p>
+    <div className="ov dash ap-page">
+      <header className="dash-head">
+        <div className="dash-head-text">
+          <p className="ov-eyebrow">Dashboard</p>
           <h1 className="ov-title">Saison {year}</h1>
+          <p className="dash-sub">Einnahmen, Beiträge, Turniere und Termine auf einen Blick.</p>
         </div>
-        <div className="ov-head-actions">
-          <label className="ov-season">
-            <span className="sr-only">Saison wählen</span>
-            <select className="ap-select" value={year} onChange={(e) => setYear(Number(e.target.value))}>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </label>
-          <a
-            className="ov-icon-btn"
-            href={`/api/admin/goenner-report?year=${reportYear}`}
-            title={`Stand 31.12.${reportYear} als CSV (Excel)`}
-          >
-            <IconDownload />
+        <div className="dash-head-actions">
+          <div className="dash-chips" role="group" aria-label="Saison wählen">
+            {years.map((y) => (
+              <button key={y} type="button" className={y === year ? "is-on" : ""} aria-pressed={y === year} onClick={() => setYear(y)}>
+                {y}
+              </button>
+            ))}
+          </div>
+          <Link href="/admin/rechnungen" className="dash-btn is-fill">
+            <IconPlus size={16} /> Rechnung
+          </Link>
+          <Link href="/admin/budget" className="dash-btn">
+            <IconPlus size={16} /> Ausgabe
+          </Link>
+          <a className="dash-btn dash-btn--icon" href={`/api/admin/goenner-report?year=${reportYear}`} title={`Stand 31.12.${reportYear} als CSV (Excel)`}>
+            <IconDownload size={16} />
             <span className="sr-only">Jahresreport {reportYear} herunterladen</span>
           </a>
         </div>
@@ -253,154 +291,305 @@ export function AdminOverview({
         </p>
       ) : null}
 
-      <AdminRoutePanel
-        year={year}
-        events={events}
-        paid={dues.paid}
-        billable={dues.billable}
-        openSum={dues.openSum}
-        alert={
-          inbox.list[0]
-            ? {
-                title: inbox.list[0].name,
-                meta: `${inquiryTierShort(inbox.list[0].membership_id)} · ${dateCh(inbox.list[0].created_at)}`,
-                href: `/admin/goenner/inbox?filter=${isNewInquiry(inbox.list[0]) ? "new" : "open"}`,
-                fresh: isNewInquiry(inbox.list[0]),
-              }
-            : null
-        }
-      />
-
-      {/* Heute: alles, was Aufmerksamkeit braucht, mit einem Tipp erreichbar */}
-      <section className="ov-card ov-today" aria-labelledby="today-heading">
-        <div className="ov-card-head">
-          <h2 id="today-heading" className="ov-h2">
-            Heute zu tun
-          </h2>
-          <span className="ov-badge">{inbox.list.length + dues.unpaid.length}</span>
+      {/* Verlauf */}
+      <section className="dash-card dash-hero" aria-labelledby="dash-hero-h">
+        <div className="dash-card-head">
+          <div>
+            <h2 id="dash-hero-h" className="dash-h2">Einnahmen und Ausgaben</h2>
+            <p className="dash-card-sub">Kumuliert über die Saison {year}</p>
+          </div>
+          <ul className="dash-legend">
+            <li><span className="dot is-red" />Einnahmen</li>
+            <li><span className="dot is-dash" />{year - 1}</li>
+            <li><span className="dot is-ink" />Ausgaben</li>
+          </ul>
         </div>
+        <AreaChart values={series.income} compare={series.prev} ghost={series.exp} labels={MONTH_LABELS} through={through} format={(n) => chfCompact(n)} />
+      </section>
 
-        {inbox.list.length + dues.unpaid.length === 0 ? (
-          <p className="ov-done">Alles erledigt.</p>
+      {/* Heute zu tun */}
+      <section className="dash-card dash-todo" aria-labelledby="today-heading">
+        <div className="dash-card-head">
+          <h2 id="today-heading" className="dash-h2">Heute zu tun</h2>
+          <span className="dash-badge">{todayCount}</span>
+        </div>
+        {todayCount === 0 ? (
+          <p className="dash-empty">Alles erledigt.</p>
         ) : (
-          <ul className="ov-actions">
+          <ul className="dash-rows">
             {inbox.list.slice(0, 3).map((q) => {
               const fresh = isNewInquiry(q);
               return (
                 <li key={`q-${q.id}`}>
-                  <Link href={`/admin/goenner/inbox?filter=${fresh ? "new" : "open"}`} className="ov-action">
-                    <span className={`ov-kind${fresh ? " is-new" : ""}`}>{fresh ? "Neu" : "Anfrage"}</span>
-                    <span className="ov-action-main">
-                      <span className="ov-action-name">{q.name}</span>
-                      <span className="ov-action-meta">
-                        {inquiryTierShort(q.membership_id)} · {dateCh(q.created_at)}
-                      </span>
+                  <Link href={`/admin/goenner/inbox?filter=${fresh ? "new" : "open"}`} className="dash-row">
+                    <span className={`dash-tag${fresh ? " is-new" : ""}`}>{fresh ? "Neu" : "Anfrage"}</span>
+                    <span className="dash-row-main">
+                      <strong>{q.name}</strong>
+                      <span>{inquiryTierShort(q.membership_id)} · {dateCh(q.created_at)}</span>
                     </span>
-                    <span className="ov-action-cta">Öffnen</span>
+                    <span className="dash-chevron" aria-hidden="true">›</span>
                   </Link>
                 </li>
               );
             })}
             {dues.unpaid.slice(0, 3).map((m) => (
               <li key={`d-${m.id}`}>
-                <Link href={`/admin/goenner/${m.id}`} className="ov-action">
-                  <span className="ov-kind">Beitrag</span>
-                  <span className="ov-action-main">
-                    <span className="ov-action-name">{m.name}</span>
-                    <span className="ov-action-meta">
+                <Link href={`/admin/goenner/${m.id}`} className="dash-row">
+                  <span className="dash-tag">Beitrag</span>
+                  <span className="dash-row-main">
+                    <strong>{m.name}</strong>
+                    <span>
                       {inquiryTierShort(m.membership_id)} · {chf(m.expected)}
-                      {m.contribution_type && m.contribution_type !== "geld"
-                        ? ` · ${contributionTypeLabel(m.contribution_type)}`
-                        : ""}
+                      {m.contribution_type && m.contribution_type !== "geld" ? ` · ${contributionTypeLabel(m.contribution_type)}` : ""}
                     </span>
                   </span>
-                  <span className="ov-action-cta">Rechnung</span>
+                  <span className="dash-chevron" aria-hidden="true">›</span>
                 </Link>
               </li>
             ))}
           </ul>
         )}
-
-        {inbox.list.length + dues.unpaid.length > 6 ? (
-          <Link href="/admin/goenner/inbox" className="ov-more">
-            Alle anzeigen
-          </Link>
+        {todayCount > 6 ? (
+          <Link href="/admin/goenner/inbox" className="dash-more">Alle anzeigen</Link>
         ) : null}
+        {alert ? null : <Link href="/admin/goenner/inbox" className="dash-more">Eingänge öffnen</Link>}
       </section>
 
-      {/* Einnahmen */}
-      <section className="ov-card ov-revenue" aria-labelledby="income-heading">
-        <p id="income-heading" className="ov-kicker">
-          Einnahmen {year}
-        </p>
-        <p className="ov-amount">{chfCompact(income.total)}</p>
-        <p className="ap-income-compare">
-          {income.prev > 0 ? (
-            <>
-              <span className={diff >= 0 ? "is-up" : "is-down"}>
-                {diff >= 0 ? "+" : "−"}
-                {chfCompact(Math.abs(diff))}
-                {diffPct !== null ? ` (${diff >= 0 ? "+" : "−"}${Math.abs(diffPct)} %)` : ""}
-              </span>{" "}
-              gegenüber {year - 1}
-              {income.partial ? " zum gleichen Zeitpunkt" : ""}
-            </>
-          ) : (
-            <>Keine Vergleichswerte aus {year - 1}</>
-          )}
-        </p>
-        <SeasonChart months={months} year={year} through={through} />
-        <div className="ap-mix" role="img" aria-label="Aufteilung der Einnahmen nach Quelle">
-          {SOURCES.map((s) =>
-            income.bySource[s.id] > 0 ? (
-              <span key={s.id} className={`ap-mix-seg ap-mix--${s.id}`} style={{ flexGrow: income.bySource[s.id] }} />
-            ) : null,
-          )}
-        </div>
-        <dl className="ap-mix-legend">
-          {SOURCES.map((s) => (
-            <div key={s.id}>
-              <dt>
-                <span className={`ap-mix-dot ap-mix--${s.id}`} aria-hidden="true" />
-                {s.label}
-              </dt>
-              <dd>{income.bySource[s.id] > 0 ? chfCompact(income.bySource[s.id]) : "—"}</dd>
-            </div>
-          ))}
-        </dl>
+      {/* Zahlungsquote */}
+      <section className="dash-card dash-ringcard" aria-labelledby="dash-pay-h">
+        <h2 id="dash-pay-h" className="dash-h2">Beiträge bezahlt</h2>
+        <Ring
+          segments={[
+            { value: dues.paid, className: "is-red" },
+            { value: Math.max(0, dues.billable - dues.paid), className: "is-soft" },
+          ]}
+        >
+          <strong>{dues.billable > 0 ? Math.round((dues.paid / dues.billable) * 100) : 0}%</strong>
+          <span>{dues.paid} von {dues.billable}</span>
+        </Ring>
+        <p className="dash-card-sub">Offen: {chfCompact(dues.openSum)}</p>
       </section>
 
-      {/* Kennzahlen: drei Kacheln, ein Blick */}
-      <section className="ov-kpis" aria-label="Kennzahlen">
-        <div className="ov-kpi">
-          <span className="ov-kpi-label">Bezahlt</span>
-          <strong className="ov-kpi-value">
-            {dues.paid}
-            <span className="ov-kpi-of"> / {dues.billable}</span>
-          </strong>
-        </div>
-        <div className={`ov-kpi${dues.openSum > 0 ? " is-alert" : ""}`}>
-          <span className="ov-kpi-label">Noch offen</span>
-          <strong className="ov-kpi-value">{chfCompact(dues.openSum)}</strong>
-        </div>
-        <Link href="/admin/preisgelder" className="ov-kpi ov-kpi--link">
-          <span className="ov-kpi-label">
-            <IconTrophy size={14} /> Preisgelder
+      {/* Drei grosse Kennzahlen */}
+      <section className="dash-card dash-kpis" aria-label="Kennzahlen">
+        <div className="dash-kpi">
+          <span className="dash-kpi-label">Einnahmen {year}</span>
+          <strong className="dash-kpi-value">{chfCompact(income.total)}</strong>
+          <span className={`dash-delta ${diff >= 0 ? "is-up" : "is-down"}`}>
+            {income.prev > 0
+              ? `${diff >= 0 ? "+" : "−"}${chfCompact(Math.abs(diff))}${diffPct !== null ? ` (${Math.abs(diffPct)} %)` : ""} zu ${year - 1}`
+              : `Kein Vergleich ${year - 1}`}
           </span>
-          <strong className="ov-kpi-value">{chfCompact(income.bySource.prize + income.bySource.proam)}</strong>
-        </Link>
+        </div>
+        <div className="dash-kpi">
+          <span className="dash-kpi-label">Ausgaben {year}</span>
+          <strong className="dash-kpi-value">{chfCompact(series.expTotal)}</strong>
+          <span className="dash-delta">{series.topCats[0] ? `Grösster Posten: ${series.topCats[0].label}` : "Noch nichts erfasst"}</span>
+        </div>
+        <div className="dash-kpi">
+          <span className="dash-kpi-label">Ergebnis</span>
+          <strong className={`dash-kpi-value ${result >= 0 ? "is-good" : "is-bad"}`}>{chfCompact(result)}</strong>
+          <span className="dash-delta">Einnahmen minus Golf-Ausgaben</span>
+        </div>
       </section>
 
-      <div className="ov-full">{ledgerMissing ? null : (
-        <AdminGoennerMembersClient
-          key={`${initialStatus ?? "all"}-${initialCategory ?? "all"}`}
-          members={members}
-          payments={payments}
-          year={year}
-          initialStatus={initialStatus}
-          initialCategory={initialCategory}
-        />
-      )}</div>
+      {/* Einnahmen nach Quelle */}
+      <section className="dash-card dash-third" aria-labelledby="dash-src-h">
+        <div className="dash-card-head">
+          <h2 id="dash-src-h" className="dash-h2">Einnahmen nach Quelle</h2>
+          <span className="dash-card-sub">{year}</span>
+        </div>
+        <ul className="dash-bars-list">
+          {SOURCES.map((s) => {
+            const v = income.bySource[s.id];
+            const max = Math.max(1, ...Object.values(income.bySource));
+            return (
+              <li key={s.id}>
+                <span className="dash-bars-row">
+                  <span className="dash-bars-name"><span className={`ap-mix-dot ap-mix--${s.id}`} aria-hidden="true" />{s.label}</span>
+                  <strong>{v > 0 ? chfCompact(v) : "—"}</strong>
+                </span>
+                <span className="dash-meter"><span style={{ width: `${(v / max) * 100}%` }} /></span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* Nächste Turniere */}
+      <section className="dash-card dash-third" aria-labelledby="dash-ev-h">
+        <div className="dash-card-head">
+          <h2 id="dash-ev-h" className="dash-h2">Nächste Turniere</h2>
+          <Link href="/admin/kalender" className="dash-link">Kalender ›</Link>
+        </div>
+        {events.length === 0 ? (
+          <p className="dash-empty">Keine kommenden Termine.</p>
+        ) : (
+          <ul className="dash-rows">
+            {events.slice(0, 4).map((e) => (
+              <li key={e.id}>
+                <Link href="/admin/kalender" className="dash-row">
+                  <span className="dash-date">
+                    <strong>{Number(e.start_date.slice(8, 10))}</strong>
+                    <span>{MONTH_LABELS[Number(e.start_date.slice(5, 7)) - 1]}</span>
+                  </span>
+                  <span className="dash-row-main">
+                    <strong>{e.name}</strong>
+                    <span>{e.location}{e.country ? `, ${e.country}` : ""}</span>
+                  </span>
+                  <span className="dash-pill">{e.days === 0 ? "jetzt" : `in ${e.days} T.`}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Letzte Preisgelder */}
+      <section className="dash-card dash-third" aria-labelledby="dash-pr-h">
+        <div className="dash-card-head">
+          <h2 id="dash-pr-h" className="dash-h2">Letzte Preisgelder</h2>
+          <Link href="/admin/preisgelder" className="dash-link">Alle ›</Link>
+        </div>
+        {latestPrizes.length === 0 ? (
+          <p className="dash-empty">Noch keine Preisgelder erfasst.</p>
+        ) : (
+          <ul className="dash-rows">
+            {latestPrizes.map((r) => (
+              <li key={r.id}>
+                <Link href="/admin/preisgelder" className="dash-row">
+                  <span className="dash-tag">{r.placement || "–"}</span>
+                  <span className="dash-row-main">
+                    <strong>{r.tournament}</strong>
+                    <span>{dateCh(r.event_date)}{r.tour ? ` · ${r.tour}` : ""}</span>
+                  </span>
+                  <span className="dash-amount">{chfCompact(Number(r.amount_chf))}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Gönnerturnier */}
+      <section className="dash-card dash-turnier" aria-labelledby="dash-tn-h">
+        <div className="dash-card-head">
+          <h2 id="dash-tn-h" className="dash-h2">Gönnerturnier</h2>
+          <Link href="/admin/turnier" className="dash-link">Öffnen ›</Link>
+        </div>
+        {tournament ? (
+          <div className="dash-turnier-body">
+            <Gauge value={respondPct}>
+              <strong>{respondPct}%</strong>
+              <span>haben geantwortet</span>
+            </Gauge>
+            <dl className="dash-stats">
+              <div><dt>Anlass</dt><dd>{tournament.title}</dd></div>
+              <div><dt>Datum</dt><dd>{dateCh(tournament.event_date)}</dd></div>
+              <div><dt>Eingeladen</dt><dd>{tournament.invited}</dd></div>
+              <div><dt>Clinic</dt><dd>{tournament.clinic}</dd></div>
+              <div><dt>Runde</dt><dd>{tournament.round}</dd></div>
+              <div><dt>Dinner</dt><dd>{tournament.dinner}</dd></div>
+            </dl>
+          </div>
+        ) : (
+          <p className="dash-empty">Noch kein Turnier angelegt. Unter «Gönnerturnier» ein Jahr starten.</p>
+        )}
+      </section>
+
+      {/* Mitglieder */}
+      <section className="dash-card dash-ringcard" aria-labelledby="dash-mem-h">
+        <div className="dash-card-head">
+          <h2 id="dash-mem-h" className="dash-h2">Mitglieder</h2>
+        </div>
+        <Ring
+          size={130}
+          stroke={15}
+          segments={[
+            { value: memberMix.goenner, className: "is-red" },
+            { value: memberMix.sponsor, className: "is-ink" },
+            { value: memberMix.partner, className: "is-grey" },
+          ]}
+        >
+          <strong>{memberMix.total}</strong>
+          <span>aktiv</span>
+        </Ring>
+        <ul className="dash-ringlegend">
+          <li><span className="dot is-red" />Gönner {memberMix.goenner}</li>
+          <li><span className="dot is-ink" />Sponsoren {memberMix.sponsor}</li>
+          <li><span className="dot is-grey" />Partner {memberMix.partner}</li>
+        </ul>
+      </section>
+
+      {/* Newsletter und offener Betrag */}
+      <div className="dash-stack">
+        <section className="dash-card dash-mini" aria-labelledby="dash-nl-h">
+          <h2 id="dash-nl-h" className="dash-h2">Newsletter</h2>
+          <strong className="dash-mini-value">{newsletter ?? "–"}</strong>
+          <span className="dash-card-sub">Abonnenten auf der Website</span>
+        </section>
+        <section className="dash-card dash-dark" aria-labelledby="dash-open-h">
+          <h2 id="dash-open-h" className="dash-h2">Noch offen</h2>
+          <strong className="dash-mini-value">{chfCompact(dues.openSum)}</strong>
+          <span className="dash-dark-sub">{dues.unpaid.length} Beiträge ausstehend</span>
+          <Link href="/admin/rechnungen" className="dash-btn is-light">Rechnung erstellen</Link>
+        </section>
+      </div>
+
+      {/* Ausgaben pro Monat */}
+      <section className="dash-card dash-bars" aria-labelledby="dash-exp-h">
+        <div className="dash-card-head">
+          <div>
+            <h2 id="dash-exp-h" className="dash-h2">Ausgaben pro Monat</h2>
+            <p className="dash-card-sub">Golf, inklusive auf 12 Monate verteilte Jahreskosten</p>
+          </div>
+          <Link href="/admin/budget" className="dash-link">Budget ›</Link>
+        </div>
+        <div className="dash-bars-wrap">
+          <Bars values={series.expM} labels={MONTH_LABELS} highlight={year === currentYear ? new Date().getMonth() : undefined} format={(n) => chfCompact(n)} />
+          <ul className="dash-topcats">
+            {series.topCats.length === 0 ? <li className="dash-empty">Noch keine Ausgaben.</li> : null}
+            {series.topCats.map((c) => (
+              <li key={c.id}>
+                <span aria-hidden="true">{c.icon}</span>
+                <span className="dash-topcats-name">{c.label}</span>
+                <strong>{chfCompact(c.v)}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Kurzbefehle */}
+      <section className="dash-card dash-shortcuts" aria-labelledby="dash-sc-h">
+        <h2 id="dash-sc-h" className="dash-h2">Kurzbefehle</h2>
+        <ul className="dash-sc-grid">
+          {shortcuts.map((s) => (
+            <li key={s.href}>
+              <Link href={s.href} className="dash-sc">
+                <span className="dash-sc-icon">{s.icon}</span>
+                <span className="dash-sc-text">
+                  <strong>{s.label}</strong>
+                  <span>{s.hint}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="ov-full" id="mitglieder">
+        {ledgerMissing ? null : (
+          <AdminGoennerMembersClient
+            key={`${initialStatus ?? "all"}-${initialCategory ?? "all"}`}
+            members={members}
+            payments={payments}
+            year={year}
+            initialStatus={initialStatus}
+            initialCategory={initialCategory}
+          />
+        )}
+      </div>
     </div>
   );
 }

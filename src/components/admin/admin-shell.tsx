@@ -15,6 +15,7 @@ import {
   IconInbox,
   IconOverview,
   IconTrophy,
+  IconUsers,
 } from "@/components/admin/admin-icons";
 import type { InboxCounts } from "@/lib/admin-inbox";
 import type { UpcomingEvent } from "@/lib/kalender-upcoming";
@@ -107,9 +108,15 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
   const items: NavItem[] = [
     {
       href: "/admin",
-      label: "Übersicht",
+      label: "Dashboard",
       icon: <IconOverview />,
-      match: (p) => p === "/admin" || (p.startsWith("/admin/goenner") && !p.startsWith("/admin/goenner/inbox")),
+      match: (p) => p === "/admin",
+    },
+    {
+      href: "/admin#mitglieder",
+      label: "Mitglieder",
+      icon: <IconUsers />,
+      match: (p) => p.startsWith("/admin/goenner") && !p.startsWith("/admin/goenner/inbox"),
     },
     {
       href: "/admin/goenner/inbox",
@@ -119,7 +126,7 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
       badge: inboxBadge,
     },
     { href: "/admin/preisgelder", label: "Preisgelder", icon: <IconTrophy />, match: (p) => p.startsWith("/admin/preisgelder") },
-    { href: "/admin/turnier", label: "Turnier", icon: <IconFlag />, match: (p) => p.startsWith("/admin/turnier") },
+    { href: "/admin/turnier", label: "Gönnerturnier", icon: <IconFlag />, match: (p) => p.startsWith("/admin/turnier") },
     { href: "/admin/kalender", label: "Kalender", icon: <IconCalendar />, match: (p) => p.startsWith("/admin/kalender") },
     { href: "/admin/rechnungen", label: "Rechnungen", icon: <IconCopy />, match: (p) => p.startsWith("/admin/rechnungen") },
     { href: "/admin/budget", label: "Budget", icon: <IconFlag />, match: (p) => p.startsWith("/admin/budget") },
@@ -127,6 +134,14 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
 
   const accountItems: NavItem[] = [
     { href: "/admin/settings", label: "Konto", icon: <IconAccount />, match: (p) => p.startsWith("/admin/settings") },
+  ];
+
+  /** Bereiche der Seitenleiste: jeder Bereich bündelt seine Unterkapitel. */
+  const groups: { label: string; hrefs: string[] }[] = [
+    { label: "Dashboard", hrefs: ["/admin"] },
+    { label: "Gönner", hrefs: ["/admin#mitglieder", "/admin/goenner/inbox", "/admin/rechnungen"] },
+    { label: "Finanzen", hrefs: ["/admin/preisgelder", "/admin/budget"] },
+    { label: "Turnier und Termine", hrefs: ["/admin/turnier", "/admin/kalender"] },
   ];
 
   const dockItems = items.filter((i) => DOCK_HREFS.includes(i.href));
@@ -186,7 +201,12 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
         </Link>
 
         <nav className="ap-side-card ap-nav" aria-label="Bereiche">
-          <ul>{items.map(renderItem)}</ul>
+          {groups.map((g) => (
+            <div key={g.label} className="ap-nav-group">
+              <p className="ap-nav-heading">{g.label}</p>
+              <ul>{g.hrefs.map((h) => items.find((i) => i.href === h)).filter((i): i is NavItem => Boolean(i)).map(renderItem)}</ul>
+            </div>
+          ))}
         </nav>
 
         {next ? (

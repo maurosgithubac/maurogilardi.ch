@@ -1,9 +1,11 @@
-import { AdminOverview } from "@/components/admin/admin-overview";
+import { AdminOverview, type TournamentSummary } from "@/components/admin/admin-overview";
 import type { StatusFilter } from "@/components/admin-goenner-members-client";
 import type { CategoryFilter } from "@/components/admin/admin-ui";
+import type { BudgetEntryRow } from "@/lib/budget";
 import { GOENNER_FINANCE_START_YEAR, type GoennerMemberRow, type GoennerPaymentRow } from "@/lib/goenner-finance";
-import { isMissingTableError, type PrizeMoneyRow } from "@/lib/prize-money";
 import { loadUpcomingEvents } from "@/lib/kalender-upcoming";
+import { isMissingTableError, type PrizeMoneyRow } from "@/lib/prize-money";
+import type { TournamentInviteRow, TournamentRow } from "@/lib/tournament";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryRow } from "@/types/content";
 
@@ -21,7 +23,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
     sp.bereich === "goenner" || sp.bereich === "sponsor" || sp.bereich === "partner" ? sp.bereich : undefined;
 
   const supabase = await createSupabaseUserServerClient();
-  const [events, membersRes, paymentsRes, inquiriesRes, prizeRes] = await Promise.all([
+  const [events, membersRes, paymentsRes, inquiriesRes, prizeRes, budgetRes, newsletterRes, tournamentRes] = await Promise.all([
     loadUpcomingEvents(6),
     supabase.from("goenner_members").select("*").order("name", { ascending: true }),
     supabase.from("goenner_payments").select("*"),
@@ -31,6 +33,12 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       .or("status.eq.open,status.is.null,seen_at.is.null")
       .order("created_at", { ascending: false }),
     supabase.from("prize_money").select("*").order("event_date", { ascending: false }),
+    supabase
+      .from("budget_entries")
+      .select("id,entry_date,amount_chf,scope,category,label,frequency,ends_on")
+      .eq("scope", "golf"),
+    supabase.from("newsletter_subscribers").select("id", { count: "exact", head: true }),
+    supabase.from("tournaments").select("*").order("event_date", { ascending: false }).limit(1),
   ]);
 
   // Fehlt seen_at (Migration 020), schlägt der Filter fehl → nur offene laden
@@ -39,6 +47,25 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
         .data as GoennerInquiryRow[] | null)
     : (inquiriesRes.data as GoennerInquiryRow[] | null);
 
+  // Gönnerturnier: neuester Anlass mit Antworten
+  let tournament: TournamentSummary | null = null;
+  const latest = (tournamentRes.data?.[0] ?? null) as TournamentRow | null;
+  if (latest) {
+    const invitesRes = await supabase.from("tournament_invites").select("*").eq("tournament_id", latest.id);
+    const invites = ((invitesRes.data ?? []) as TournamentInviteRow[]).filter(Boolean);
+    tournament = {
+      id: latest.id,
+      title: latest.title,
+      event_date: latest.event_date,
+      status: latest.status,
+      invited: invites.length,
+      responded: invites.filter((i) => i.responded_at).length,
+      clinic: invites.filter((i) => i.clinic).length,
+      round: invites.filter((i) => i.golf_round).length,
+      dinner: invites.filter((i) => i.dinner).length,
+    };
+  }
+
   return (
     <AdminOverview
       members={(membersRes.data as GoennerMemberRow[]) ?? []}
@@ -46,6 +73,9 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       inquiries={inquiries ?? []}
       prizes={(prizeRes.data as PrizeMoneyRow[]) ?? []}
       events={events}
+      budget={(budgetRes.error ? [] : (budgetRes.data ?? [])) as BudgetEntryRow[]}
+      newsletter={newsletterRes.error ? null : (newsletterRes.count ?? 0)}
+      tournament={tournament}
       ledgerMissing={isMissingTableError(membersRes.error?.message) || isMissingTableError(paymentsRes.error?.message)}
       migration020Missing={isMissingTableError(prizeRes.error?.message) || Boolean(inquiriesRes.error)}
       initialYear={initialYear}

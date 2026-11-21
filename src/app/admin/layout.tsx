@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./admin.css";
 import "./admin-shell.css";
 import "./admin-bento.css";
+import "./admin-dash.css";
 
 export const metadata: Metadata = {
   robots: {
