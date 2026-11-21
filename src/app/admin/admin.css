@@ -4141,3 +4141,33 @@ a.ap-row-title:hover {
     grid-template-columns: 56px 56px minmax(110px, 1fr) 96px 30px;
   }
 }
+
+/* Rechnungsformular: saubere Innenabstände, nichts ragt über die Karte */
+.ar-form .ap-input,
+.ar-form .ap-select,
+.ar-form textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.ar-form .ap-field {
+  min-width: 0;
+}
+
+.ar-grid > * {
+  min-width: 0;
+}
+
+.ar-block {
+  padding: 22px;
+}
+
+.ar-items {
+  padding: 0;
+}
+
+.ar-item {
+  width: 100%;
+  box-sizing: border-box;
+}
