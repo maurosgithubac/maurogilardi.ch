@@ -1,3 +1,4 @@
+import { variantTexts, type RechnungsArt, type RechnungsStatus } from "@/lib/goenner-mail-variants";
 import { readFileSync } from "fs";
 import path from "path";
 import { inquiryTierShort } from "@/content/goennerMemberships";
@@ -49,6 +50,7 @@ type MailData = {
   purpose: string;
   bank: { creditorName: string; street: string; cityLine: string; iban: string };
   intro: string;
+  body: string;
 };
 
 function line(label: string, value: string): string {
@@ -103,7 +105,7 @@ function renderHtml(d: MailData): string {
 </td></tr>
 
 <tr><td align="left" style="padding:28px 0 0 0;font-family:${SANS};font-size:15px;line-height:1.65;color:${C.ink2};">
-  Die Rechnung als PDF ist dieser Mail angehängt. Ich freue mich, dich bald auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems zu sehen.
+  ${esc(d.body)}
 </td></tr>
 
 <tr><td align="left" style="padding:22px 0 0 0;font-family:${SANS};font-size:15px;line-height:1.65;color:${C.ink2};">
@@ -142,7 +144,7 @@ function renderText(d: MailData): string {
     `IBAN: ${d.bank.iban}`,
     `Zahlungszweck: ${d.purpose}`,
     "",
-    "Die Rechnung als PDF ist dieser Mail angehängt. Ich freue mich, dich bald auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems zu sehen.",
+    d.body,
     "",
     "Herzlichen Dank für deinen Support.",
     "Mauro",
@@ -172,6 +174,7 @@ export async function buildGoennerInvoiceHtmlEml(
     city?: string | null;
   },
   season: number,
+  variant: { art: RechnungsArt; status: RechnungsStatus } = { art: "goenner", status: "neu" },
 ): Promise<{ buffer: Buffer; filename: string }> {
   const bank = readInvoiceBankConfig();
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
@@ -193,13 +196,21 @@ export async function buildGoennerInvoiceHtmlEml(
       created_at: new Date().toISOString(),
     },
     season,
+    variant,
   );
 
   const invoiceNumber = row.invoice_number ?? row.id;
+  const texts = variantTexts({
+    art: variant.art,
+    status: variant.status,
+    season,
+    first: firstName(row.name),
+    tier: inquiryTierShort(row.membership_id),
+  });
   const data: MailData = {
     first: firstName(row.name),
     season,
-    membership: `MG-${inquiryTierShort(row.membership_id)}`,
+    membership: texts.itemTitle,
     amount: chfAmount(mailAmountChf(row)),
     invoiceNumber,
     purpose: invoicePurpose({ ...row, invoice_number: row.invoice_number }),
@@ -209,14 +220,15 @@ export async function buildGoennerInvoiceHtmlEml(
       cityLine: `${bank.creditorPostalCode} ${bank.creditorCity}`,
       iban: formatIban(bank.iban),
     },
-    intro: "Es bedeutet mir wirklich sehr viel, dass du mich als Gönner auf meinem Weg auf die DP World Tour begleitest. Menschen wie dich machen diesen Weg möglich.",
+    intro: texts.intro,
+    body: texts.body,
   };
 
   const html = renderHtml(data).replace(/\r?\n/g, "\r\n");
   const text = renderText(data).replace(/\r?\n/g, "\r\n");
   const logo = readFileSync(path.join(process.cwd(), "public", "brand-assets", "logos", "mg-mail-logo.png"));
   const pdfName = `Rechnung-${invoiceNumber}-${season}.pdf`;
-  const subject = `Danke für deine Unterstützung, ${data.first}`;
+  const subject = texts.subject;
 
   const stamp = Date.now().toString(36);
   const m = `mg-${stamp}`;

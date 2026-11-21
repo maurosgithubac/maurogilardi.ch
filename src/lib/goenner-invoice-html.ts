@@ -8,6 +8,9 @@ export type InvoiceHtmlData = {
   invoiceDate: string;
   recipient: { name: string; street: string | null; cityLine: string | null; email: string | null };
   membershipLabel: string; // z. B. "MG-Eagle"
+  itemTitle: string; // z. B. "Gönner-Mitgliedschaft MG-Eagle" oder "Sponsoring · Saison 2027"
+  intro: string; // Einleitungssatz, je nach Variante
+  showGoennerNotice: boolean; // Gönner-Hinweise (Verlängerung, Rückerstattung) nur für Gönner
   seasonYear: number;
   amountLabel: string; // z. B. "CHF 1’000.00"
   bank: { creditorName: string; street: string; cityLine: string; iban: string };
@@ -141,8 +144,8 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
         ${recipientLines}
   </section>
 
-  <p class="subject">Gönner-Mitgliedschaft ${esc(d.membershipLabel)} · Saison ${d.seasonYear}</p>
-  <p class="intro">Danke für deine Unterstützung auf meinem Weg auf die DP World Tour. Es freut mich sehr, dich in meiner Gönnervereinigung aufnehmen zu dürfen.</p>
+  <p class="subject">${esc(d.itemTitle)} · Saison ${d.seasonYear}</p>
+  <p class="intro">${esc(d.intro)}</p>
 
   <table class="item">
     <thead>
@@ -151,7 +154,7 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
     <tbody>
       <tr>
         <td>
-          <div class="item-title">Gönner-Mitgliedschaft ${esc(d.membershipLabel)}</div>
+          <div class="item-title">${esc(d.itemTitle)}</div>
           <div class="item-sub">Saison ${d.seasonYear}</div>
         </td>
         <td class="num amount-total">${esc(d.amountLabel)}</td>
@@ -179,7 +182,7 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
     </div>
   </section>
 
-  <section class="notice">
+  ${d.showGoennerNotice ? `<section class="notice">
     <div class="section-label">Hinweis zu deiner Mitgliedschaft</div>
     <ul>
       <li>Für deine Mitgliedschaft gelten die Gönner-Bedingungen: https://www.maurogilardi.ch/goenner-bedingungen</li>
@@ -188,7 +191,7 @@ export function renderInvoiceHtml(d: InvoiceHtmlData, a: InvoiceHtmlAssets): str
       <li>Mit der Zahlung dieser Rechnung bestätigst du die Gönner-Bedingungen.</li>
     </ul>
     <p style="margin:2mm 0 0">Fragen an: mauro.gilardi@hotmail.com</p>
-  </section>
+  </section>` : ""}
 
 
   <footer class="foot">

@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminRechnungDialog, artLabelOf } from "@/components/admin-rechnung-dialog";
 import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
@@ -80,6 +81,7 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   const [showAdd, setShowAdd] = useState(false);
   const [busy, setBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [rechnungFor, setRechnungFor] = useState<GoennerMemberRow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [wallOverride, setWallOverride] = useState<Record<string, boolean>>({});
@@ -264,14 +266,14 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function openOutlookDraft(member: GoennerMemberRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear()) {
+  async function openOutlookDraft(member: GoennerMemberRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear(), status: "neu" | "bestand" = "neu") {
     if (type === "invoice") {
       setError(null);
       setNotice(null);
       setBusyId(member.id);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${season}`,
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${season}&status=${status}`,
         });
         setNotice(`Mail-Entwurf für ${member.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
       } catch (e) {
@@ -360,13 +362,15 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   function invoicePdfItems(m: GoennerMemberRow): RowMenuItem[] {
-    return seasonOptions().map((y) => ({
-      kind: "action" as const,
-      label: `Rechnung ${y} (Mail-Entwurf)`,
-      icon: <IconMail size={14} />,
-      disabled: busyId === m.id,
-      onSelect: () => void openOutlookDraft(m, "invoice", y),
-    }));
+    return [
+      {
+        kind: "action" as const,
+        label: "Rechnung (Mail-Entwurf)",
+        icon: <IconMail size={14} />,
+        disabled: busyId === m.id,
+        onSelect: () => setRechnungFor(m),
+      },
+    ];
   }
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {
@@ -426,6 +430,18 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
 
   return (
     <section id="liste" className="ap-section" aria-labelledby="liste-heading">
+      <AdminRechnungDialog
+        open={rechnungFor !== null}
+        name={rechnungFor?.name ?? ""}
+        artLabel={rechnungFor ? artLabelOf(rechnungFor) : ""}
+        busy={busyId !== null}
+        onClose={() => setRechnungFor(null)}
+        onConfirm={({ status, season }) => {
+          const m = rechnungFor;
+          setRechnungFor(null);
+          if (m) void openOutlookDraft(m, "invoice", season, status);
+        }}
+      />
       <div className="ap-section-head">
         <div>
           <h2 id="liste-heading" className="ap-h2">

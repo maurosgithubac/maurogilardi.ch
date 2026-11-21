@@ -1,3 +1,4 @@
+import { variantTexts, type RechnungsArt, type RechnungsStatus } from "@/lib/goenner-mail-variants";
 import fs from "fs/promises";
 import path from "path";
 import chromium from "@sparticuz/chromium";
@@ -57,12 +58,20 @@ async function loadAssets(row: InvoicePdfRow): Promise<InvoiceHtmlAssets> {
 export async function buildGoennerInvoicePdf(
   row: InvoicePdfRow,
   seasonYear: number = GOENNER_INVOICE_YEAR,
+  variant: { art: RechnungsArt; status: RechnungsStatus } = { art: "goenner", status: "neu" },
 ): Promise<{ buffer: Buffer; filename: string }> {
   const bank = readInvoiceBankConfig();
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
   if (!row.invoice_number) throw new Error("Keine Rechnungsnummer vorhanden.");
 
   const amount = mailAmountChf(row);
+  const texts = variantTexts({
+    art: variant.art,
+    status: variant.status,
+    season: seasonYear,
+    first: row.name.trim().split(/s+/)[0] || "",
+    tier: inquiryTierShort(row.membership_id),
+  });
   const html = renderInvoiceHtml(
     {
       invoiceNumber: row.invoice_number,
@@ -74,6 +83,9 @@ export async function buildGoennerInvoicePdf(
         email: row.email,
       },
       membershipLabel: `MG-${inquiryTierShort(row.membership_id)}`,
+      itemTitle: texts.itemTitle,
+      intro: texts.intro,
+      showGoennerNotice: texts.showGoennerNotice,
       seasonYear,
       amountLabel: chfAmount(amount),
       bank: {

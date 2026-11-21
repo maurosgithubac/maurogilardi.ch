@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminRechnungDialog, artLabelOf } from "@/components/admin-rechnung-dialog";
 import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -92,6 +93,7 @@ export function AdminGoennerInquiriesClient({
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [rechnungFor, setRechnungFor] = useState<GoennerInquiryRow | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formWarning, setFormWarning] = useState<string | null>(null);
   const [formOk, setFormOk] = useState<string | null>(null);
@@ -314,7 +316,7 @@ export function AdminGoennerInquiriesClient({
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function openOutlookDraft(row: GoennerInquiryRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear()) {
+  async function openOutlookDraft(row: GoennerInquiryRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear(), status: "neu" | "bestand" = "neu") {
     if (type === "invoice") {
       setFormError(null);
       setFormWarning(null);
@@ -322,7 +324,7 @@ export function AdminGoennerInquiriesClient({
       setBusyId(row.id);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-inquiries/${row.id}/invoice-eml?year=${season}`,
+          mailUrl: `/api/admin/goenner-inquiries/${row.id}/invoice-eml?year=${season}&status=${status}`,
         });
         setFormOk(`Mail-Entwurf für ${row.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
       } catch (e) {
@@ -421,6 +423,18 @@ export function AdminGoennerInquiriesClient({
 
   return (
     <>
+    <AdminRechnungDialog
+      open={rechnungFor !== null}
+      name={rechnungFor?.name ?? ""}
+      artLabel={rechnungFor ? artLabelOf(rechnungFor) : ""}
+      busy={busyId !== null}
+      onClose={() => setRechnungFor(null)}
+      onConfirm={({ status, season }) => {
+        const q = rechnungFor;
+        setRechnungFor(null);
+        if (q) void openOutlookDraft(q, "invoice", season, status);
+      }}
+    />
       <dl className="ap-statline" aria-label="Eingänge in Zahlen">
         <div className={newRows.length > 0 ? "is-new" : undefined}>
           <dt>Neu</dt>
@@ -729,13 +743,15 @@ export function AdminGoennerInquiriesClient({
                                 }))
                               : []),
                             ...(row.payment_method === "rechnung" && row.invoice_number
-                              ? seasonOptions().map((y) => ({
-                                  kind: "action" as const,
-                                  label: `Rechnung ${y} (Mail-Entwurf)`,
-                                  icon: <IconMail size={14} />,
-                                  disabled: busy,
-                                  onSelect: () => void openOutlookDraft(row, "invoice", y),
-                                }))
+                              ? [
+                                  {
+                                    kind: "action" as const,
+                                    label: "Rechnung (Mail-Entwurf)",
+                                    icon: <IconMail size={14} />,
+                                    disabled: busy,
+                                    onSelect: () => setRechnungFor(row),
+                                  },
+                                ]
                               : []),
                             {
                               kind: "action",

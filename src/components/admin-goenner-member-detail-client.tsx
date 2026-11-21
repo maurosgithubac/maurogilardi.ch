@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminRechnungDialog, artLabelOf } from "@/components/admin-rechnung-dialog";
 import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [busy, setBusy] = useState(false);
-  const [draftYear, setDraftYear] = useState<number>(new Date().getFullYear());
+  const [rechnungOpen, setRechnungOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState(member);
   const [invoiceBusy, setInvoiceBusy] = useState(false);
@@ -150,13 +151,13 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function downloadOutlookDraft(type: "invoice" | "twint" = "invoice") {
+  async function downloadOutlookDraft(type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear(), status: "neu" | "bestand" = "neu") {
     if (type === "invoice") {
       setInvoiceBusy(true);
       setError(null);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${draftYear}`,
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${season}&status=${status}`,
         });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Mail-Entwurf konnte nicht erstellt werden.");
@@ -242,6 +243,17 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
 
   return (
     <div className="ap-page">
+      <AdminRechnungDialog
+        open={rechnungOpen}
+        name={member.name}
+        artLabel={artLabelOf(member)}
+        busy={invoiceBusy}
+        onClose={() => setRechnungOpen(false)}
+        onConfirm={({ status, season }) => {
+          setRechnungOpen(false);
+          void downloadOutlookDraft("invoice", season, status);
+        }}
+      />
       <nav aria-label="Brotkrumen" className="ap-crumbs">
         <Link href="/admin#liste" className="ap-back">
           <IconArrowLeft size={14} />
@@ -290,21 +302,11 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             <IconMail />
             TWINT-Entwurf
           </button>
-          <label className="ap-field-inline">
-            <span className="sr-only">Saison</span>
-            <select className="ap-select" value={draftYear} onChange={(e) => setDraftYear(Number(e.target.value))}>
-              {seasonOptions().map((y) => (
-                <option key={y} value={y}>
-                  Saison {y}
-                </option>
-              ))}
-            </select>
-          </label>
           <button
             type="button"
             className="ap-btn ap-btn--primary"
             disabled={invoiceBusy}
-            onClick={() => void downloadOutlookDraft()}
+            onClick={() => setRechnungOpen(true)}
             title="Mail-Entwurf mit Rechnung als PDF im Anhang"
           >
             <IconFile />

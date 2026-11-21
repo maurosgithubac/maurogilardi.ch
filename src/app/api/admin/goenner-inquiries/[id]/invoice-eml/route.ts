@@ -1,3 +1,4 @@
+import { artFor } from "@/lib/goenner-mail-variants";
 import { NextResponse } from "next/server";
 import { isAdminSession } from "@/lib/admin-auth";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
@@ -47,8 +48,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   }
 
   try {
-    const twint = new URL(request.url).searchParams.get("type") === "twint";
-    const { buffer, filename } = twint ? buildGoennerTwintEml(row) : await buildGoennerInvoiceHtmlEml(row, parseSeason(request.url));
+    const u = new URL(request.url);
+    const variant = {
+      art: (u.searchParams.get("art") as "goenner" | "sponsor" | "partner" | null) ?? artFor(row.membership_id, (row as { category?: string | null }).category),
+      status: u.searchParams.get("status") === "bestand" ? ("bestand" as const) : ("neu" as const),
+    };
+    const twint = u.searchParams.get("type") === "twint";
+    const { buffer, filename } = twint ? buildGoennerTwintEml(row) : await buildGoennerInvoiceHtmlEml(row, parseSeason(request.url), variant);
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
