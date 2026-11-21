@@ -4126,3 +4126,18 @@ a.ap-row-title:hover {
     grid-template-columns: 72px 90px minmax(0, 1fr) 96px 30px;
   }
 }
+
+/* Einheit schmal, Einheitspreis breit genug für die Zahl */
+.ar-item {
+  grid-template-columns: 64px 64px minmax(140px, 1fr) 110px 32px;
+}
+
+.ar-unit {
+  padding-inline: 6px;
+}
+
+@media (max-width: 560px) {
+  .ar-item {
+    grid-template-columns: 56px 56px minmax(110px, 1fr) 96px 30px;
+  }
+}
