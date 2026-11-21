@@ -8,6 +8,7 @@ import { AdminLogoutButton } from "@/components/admin-logout-button";
 import {
   IconAccount,
   IconCalendar,
+  IconCopy,
   IconClose,
   IconExternal,
   IconFlag,
@@ -126,6 +127,12 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
       label: "Kalender",
       icon: <IconCalendar />,
       match: (p) => p.startsWith("/admin/kalender"),
+    },
+    {
+      href: "/admin/rechnungen",
+      label: "Rechnungen",
+      icon: <IconCopy />,
+      match: (p) => p.startsWith("/admin/rechnungen"),
     },
   ];
 
