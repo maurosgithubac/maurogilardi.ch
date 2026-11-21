@@ -51,14 +51,20 @@ export function flexAssets(): { logo: string; fontRegular: string; fontBold: str
   };
 }
 
+/** Betrag ohne Währungszeichen, z. B. 1’000.00 (für Spalten, in denen CHF schon steht). */
+function num(amount: number): string {
+  const [int, dec] = (Number.isFinite(amount) ? amount : 0).toFixed(2).split(".");
+  return `${int.replace(/\B(?=(\d{3})+(?!\d))/g, "’")}.${dec}`;
+}
+
 export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string> {
   const bank = readInvoiceBankConfig();
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
   const assets = flexAssets();
 
+  // Nur die tatsächlich erfassten Positionen werden angezeigt
   const items = d.items.slice(0, MAX_ITEMS);
   const total = items.reduce((s, it) => s + lineTotal(it), 0);
-  const slots = Array.from({ length: MAX_ITEMS }, (_, i) => items[i] ?? null);
 
   const payload = buildSwissQrPayload({
     bank,
@@ -77,14 +83,14 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
     .map((x) => `<div>${esc(x)}</div>`)
     .join("");
 
-  const rows = slots
-    .map((it) =>
-      `<tr class="${it ? "" : "is-empty"}">
-        <td class="desc">${it ? esc(it.description) : "&nbsp;"}</td>
-        <td class="num">${it ? it.quantity : "&nbsp;"}</td>
-        <td>${it ? esc(it.unit) : "&nbsp;"}</td>
-        <td class="num">${it ? esc(chf(it.unitPriceChf)) : "&nbsp;"}</td>
-        <td class="num">${it ? esc(chf(lineTotal(it))) : "&nbsp;"}</td>
+  const rows = items
+    .map(
+      (it) => `<tr>
+        <td class="desc">${esc(it.description)}</td>
+        <td class="cur">CHF</td>
+        <td class="num">${it.quantity}</td>
+        <td class="num">${num(it.unitPriceChf)}</td>
+        <td class="num strong">${num(lineTotal(it))}</td>
       </tr>`,
     )
     .join("");
@@ -102,31 +108,46 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; }
   body { color: ${C.ink}; font-family: Helvetica, Arial, "Liberation Sans", sans-serif; font-size: 10pt; line-height: 1.5; }
-  .page { width: 210mm; height: 297mm; margin: 0 auto; padding: 16mm 20mm 14mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+  .page { width: 210mm; height: 297mm; margin: 0 auto; padding: 16mm 20mm 12mm; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
   @media print { .page { margin: 0; } }
+
   .head { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 8mm; }
   .logo { height: 14mm; width: auto; }
   .doc { text-align: right; }
   .doc-title { font-family: "Playfair Display", Georgia, serif; font-size: 22pt; font-weight: 700; line-height: 1; margin: 0 0 3mm; }
   .doc-meta { font-size: 9.5pt; color: ${C.muted}; }
   .doc-meta div { margin-top: 0.6mm; }
-  .recipient { margin-bottom: 8mm; min-height: 22mm; }
+
+  .recipient { margin-bottom: 9mm; }
   .recipient .name { font-weight: 700; font-size: 11pt; margin-bottom: 1mm; }
   .recipient div { color: ${C.ink2}; }
   .section { font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; margin: 0 0 2mm; }
-  table.items { width: 100%; border-collapse: collapse; }
-  table.items th { text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; padding: 0 0 2mm; border-bottom: 1px solid ${C.ink}; }
+
+  table.items { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table.items col.c-desc { width: 34%; }
+  table.items col.c-cur { width: 12%; }
+  table.items col.c-qty { width: 12%; }
+  table.items col.c-price { width: 20%; }
+  table.items col.c-total { width: 22%; }
+  table.items th { text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; padding: 0 0 2.5mm; border-bottom: 1px solid ${C.ink}; }
   table.items th.num, table.items td.num { text-align: right; white-space: nowrap; }
-  .unit { font-size: 9pt; color: ${C.muted}; margin-top: 0.5mm; }
-  table.items td { height: 11mm; padding: 2mm 0; border-bottom: 1px solid ${C.hair}; vertical-align: middle; }
-  table.items tr.is-empty td { border-bottom-color: ${C.hair}; }
-  table.items td.num { font-weight: 700; }
-  .total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 3mm; padding-top: 3mm; }
+  table.items td { padding: 3mm 0; border-bottom: 1px solid ${C.hair}; vertical-align: top; font-size: 10pt; }
+  table.items td.desc { padding-right: 4mm; overflow-wrap: anywhere; }
+  table.items td.cur { color: ${C.muted}; font-size: 9pt; }
+  table.items td.strong { font-weight: 700; }
+
+  .total { display: flex; justify-content: flex-end; align-items: baseline; gap: 6mm; margin-top: 3mm; }
   .total .label { font-size: 9pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; }
-  .total .amount { font-family: "Playfair Display", Georgia, serif; font-size: 16pt; font-weight: 700; }
-  .pay { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; margin-top: 10mm; }
+  .total .amount { font-family: "Playfair Display", Georgia, serif; font-size: 16pt; font-weight: 700; white-space: nowrap; }
+
+  .spacer { flex: 1 1 auto; min-height: 6mm; }
+
+  .note { margin: 0 0 7mm; padding-top: 3mm; border-top: 1px solid ${C.hair}; color: ${C.ink2}; white-space: pre-line; }
+  .note .section { margin-bottom: 1.5mm; }
+
+  .pay { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; padding-top: 5mm; border-top: 1px solid ${C.ink}; }
   .pay-info { flex: 1; min-width: 0; }
-  dl { display: grid; grid-template-columns: 30mm minmax(0, 1fr); gap: 2mm 4mm; margin: 0; }
+  dl { display: grid; grid-template-columns: 32mm minmax(0, 1fr); gap: 1.8mm 4mm; margin: 0; }
   dt { color: ${C.muted}; font-size: 9.5pt; }
   dd { margin: 0; color: ${C.ink}; overflow-wrap: anywhere; }
   dd.iban { font-weight: 700; }
@@ -134,8 +155,8 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   .qr { width: 40mm; text-align: center; flex: none; }
   .qr img { width: 40mm; height: 40mm; display: block; }
   .qr-cap { margin-top: 2mm; font-size: 8.5pt; color: ${C.muted}; line-height: 1.35; }
-  .note { margin-top: 8mm; color: ${C.ink2}; white-space: pre-line; min-height: 8mm; }
-  .foot { margin-top: auto; padding-top: 3mm; border-top: 1px solid ${C.hair}; font-size: 8.5pt; color: ${C.muted}; display: flex; justify-content: space-between; gap: 6mm; }
+
+  .foot { margin-top: 7mm; padding-top: 3mm; border-top: 1px solid ${C.hair}; font-size: 8.5pt; color: ${C.muted}; display: flex; justify-content: space-between; gap: 6mm; }
 </style>
 </head>
 <body>
@@ -159,7 +180,8 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   </section>
 
   <table class="items">
-    <thead><tr><th>Leistung</th><th class="num">Anzahl</th><th>Einheit</th><th class="num">Einheitspreis</th><th class="num">Betrag</th></tr></thead>
+    <colgroup><col class="c-desc"><col class="c-cur"><col class="c-qty"><col class="c-price"><col class="c-total"></colgroup>
+    <thead><tr><th>Beschreibung</th><th>Währung</th><th class="num">Anzahl</th><th class="num">Stückpreis</th><th class="num">Betrag</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
 
@@ -167,6 +189,10 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
     <span class="label">Total</span>
     <span class="amount">${esc(chf(total))}</span>
   </div>
+
+  <div class="spacer"></div>
+
+  ${d.note.trim() ? `<section class="note"><div class="section">Notizen</div>${esc(d.note)}</section>` : ""}
 
   <section class="pay">
     <div class="pay-info">
@@ -187,8 +213,6 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
       <div class="qr-cap">Mit der Banking-App scannen.<br>Betrag und Zweck sind eingetragen.</div>
     </div>
   </section>
-
-  <div class="note">${esc(d.note)}</div>
 
   <footer class="foot">
     <span>${esc(bank.creditorName)} · ${esc(bank.creditorStreet)} · ${esc(bank.creditorPostalCode)} ${esc(bank.creditorCity)}</span>
