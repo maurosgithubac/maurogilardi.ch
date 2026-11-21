@@ -254,15 +254,24 @@ export function AdminRechnungenClient({
 
           <div className="ar-items">
             <span className="ap-field-label">Positionen (max. {MAX_ITEMS})</span>
-            {items.map((it, i) => (
-              <div className="ar-item" key={i}>
-                <input className="ap-input" placeholder="Beschreibung" value={it.description} onChange={(e) => setItem(i, "description", e.target.value)} />
-                <input className="ap-input ar-qty" inputMode="numeric" aria-label="Anzahl" value={it.qty} onChange={(e) => setItem(i, "qty", e.target.value)} />
-                <input className="ap-input ar-unit" aria-label="Einheit" placeholder="Stk." value={it.unit} onChange={(e) => setItem(i, "unit", e.target.value)} />
-                <input className="ap-input ar-amount" inputMode="decimal" placeholder="Einheitspreis" aria-label="Einheitspreis in CHF" value={it.price} onChange={(e) => setItem(i, "price", e.target.value)} />
-                <button type="button" className="ap-icon-btn" aria-label={`Position ${i + 1} entfernen`} onClick={() => removeItem(i)}>×</button>
-              </div>
-            ))}
+            {items.map((it, i) => {
+              const line = (Number(it.qty) || 0) * (Number(String(it.price).replace(/[’'\s]/g, "").replace(",", ".")) || 0);
+              return (
+                <div className="ar-item" key={i}>
+                  <input className="ap-input ar-desc" placeholder="Beschreibung der Leistung" aria-label={`Beschreibung Position ${i + 1}`} value={it.description} onChange={(e) => setItem(i, "description", e.target.value)} />
+                  <div className="ar-cap">Anzahl</div>
+                  <div className="ar-cap">Einheit</div>
+                  <div className="ar-cap">Einheitspreis</div>
+                  <div className="ar-cap ar-cap--right">Betrag</div>
+                  <span className="ar-x-spacer" aria-hidden="true" />
+                  <input className="ap-input ar-qty" inputMode="numeric" aria-label={`Anzahl Position ${i + 1}`} value={it.qty} onChange={(e) => setItem(i, "qty", e.target.value)} />
+                  <input className="ap-input ar-unit" aria-label={`Einheit Position ${i + 1}`} placeholder="Stk." value={it.unit} onChange={(e) => setItem(i, "unit", e.target.value)} />
+                  <input className="ap-input ar-amount" inputMode="decimal" placeholder="0.00" aria-label={`Einheitspreis Position ${i + 1} in CHF`} value={it.price} onChange={(e) => setItem(i, "price", e.target.value)} />
+                  <span className="ar-line">{line ? `CHF ${line.toLocaleString("de-CH", { minimumFractionDigits: 2 })}` : "—"}</span>
+                  <button type="button" className="ar-remove" aria-label={`Position ${i + 1} entfernen`} onClick={() => removeItem(i)}>×</button>
+                </div>
+              );
+            })}
             {items.length < MAX_ITEMS ? (
               <button type="button" className="ap-btn ap-btn--ghost ap-btn--sm" onClick={addItem}>+ Position</button>
             ) : null}
