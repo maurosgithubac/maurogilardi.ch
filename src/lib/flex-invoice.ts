@@ -11,7 +11,7 @@ import { buildSwissQrPayload, readInvoiceBankConfig } from "@/lib/invoice-config
 
 export const MAX_ITEMS = 5;
 
-export type FlexItem = { description: string; quantity: number; unitPriceChf: number };
+export type FlexItem = { description: string; quantity: number; unit: string; unitPriceChf: number };
 
 /** Betrag einer Position: Anzahl mal Preis pro Einheit. */
 export const lineTotal = (it: FlexItem) => (Number(it.quantity) || 0) * (Number(it.unitPriceChf) || 0);
@@ -80,7 +80,10 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   const rows = slots
     .map((it) =>
       `<tr class="${it ? "" : "is-empty"}">
-        <td class="desc">${it ? esc(it.description) + (it.quantity !== 1 ? `<div class="unit">${it.quantity} × ${esc(chf(it.unitPriceChf))}</div>` : "") : "&nbsp;"}</td>
+        <td class="desc">${it ? esc(it.description) : "&nbsp;"}</td>
+        <td class="num">${it ? it.quantity : "&nbsp;"}</td>
+        <td>${it ? esc(it.unit) : "&nbsp;"}</td>
+        <td class="num">${it ? esc(chf(it.unitPriceChf)) : "&nbsp;"}</td>
         <td class="num">${it ? esc(chf(lineTotal(it))) : "&nbsp;"}</td>
       </tr>`,
     )
@@ -156,7 +159,7 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   </section>
 
   <table class="items">
-    <thead><tr><th>Leistung</th><th class="num">Betrag</th></tr></thead>
+    <thead><tr><th>Leistung</th><th class="num">Anzahl</th><th>Einheit</th><th class="num">Einheitspreis</th><th class="num">Betrag</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
 
@@ -218,6 +221,7 @@ export function parseFlexInput(body: Record<string, unknown>, lenient = false): 
     .slice(0, MAX_ITEMS)
     .map((it) => ({
       description: str(it.description, 200),
+      unit: str(it.unit, 20) || "Stk.",
       quantity: Math.min(Math.max(Math.round(Number(it.quantity) || 1), 1), 999),
       unitPriceChf: Number(it.unitPriceChf) || 0,
     }))

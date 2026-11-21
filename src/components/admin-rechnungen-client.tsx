@@ -42,7 +42,7 @@ export function AdminRechnungenClient({
   const [invoiceNumber, setInvoiceNumber] = useState(`RG-${new Date().getFullYear()}-001`);
   const [invoiceDate, setInvoiceDate] = useState(todayCh());
   const [dueDate, setDueDate] = useState("");
-  const [items, setItems] = useState<{ description: string; qty: string; unit: string }[]>([{ description: "", qty: "1", unit: "" }]);
+  const [items, setItems] = useState<{ description: string; qty: string; unit: string; price: string }[]>([{ description: "", qty: "1", unit: "Stk.", price: "" }]);
   const [note, setNote] = useState("");
   const [device, setDevice] = useState<Device>("desktop");
   const [html, setHtml] = useState<string>("");
@@ -84,7 +84,7 @@ export function AdminRechnungenClient({
         : { name: "", organization: "", street: "", postalCode: "", city: "", email: "" },
       items: items
         .slice(0, MAX_ITEMS)
-        .map((it) => ({ description: it.description, quantity: Math.max(1, Math.round(Number(it.qty) || 1)), unitPriceChf: Number(String(it.unit).replace(/[’'\s]/g, "").replace(",", ".")) || 0 })),
+        .map((it) => ({ description: it.description, unit: it.unit || "Stk.", quantity: Math.max(1, Math.round(Number(it.qty) || 1)), unitPriceChf: Number(String(it.price).replace(/[’'\s]/g, "").replace(",", ".")) || 0 })),
     }),
     [title, invoiceNumber, invoiceDate, dueDate, note, recipient, items],
   );
@@ -112,12 +112,12 @@ export function AdminRechnungenClient({
     return () => clearTimeout(t);
   }, [payload, recipient]);
 
-  function setItem(i: number, key: "description" | "qty" | "unit", value: string) {
+  function setItem(i: number, key: "description" | "qty" | "unit" | "price", value: string) {
     setItems((prev) => prev.map((it, idx) => (idx === i ? { ...it, [key]: value } : it)));
   }
 
   function addItem() {
-    setItems((prev) => (prev.length < MAX_ITEMS ? [...prev, { description: "", qty: "1", unit: "" }] : prev));
+    setItems((prev) => (prev.length < MAX_ITEMS ? [...prev, { description: "", qty: "1", unit: "Stk.", price: "" }] : prev));
   }
 
   function removeItem(i: number) {
@@ -258,7 +258,8 @@ export function AdminRechnungenClient({
               <div className="ar-item" key={i}>
                 <input className="ap-input" placeholder="Beschreibung" value={it.description} onChange={(e) => setItem(i, "description", e.target.value)} />
                 <input className="ap-input ar-qty" inputMode="numeric" aria-label="Anzahl" value={it.qty} onChange={(e) => setItem(i, "qty", e.target.value)} />
-                <input className="ap-input ar-amount" inputMode="decimal" placeholder="Preis pro Einheit" aria-label="Preis pro Einheit in CHF" value={it.unit} onChange={(e) => setItem(i, "unit", e.target.value)} />
+                <input className="ap-input ar-unit" aria-label="Einheit" placeholder="Stk." value={it.unit} onChange={(e) => setItem(i, "unit", e.target.value)} />
+                <input className="ap-input ar-amount" inputMode="decimal" placeholder="Einheitspreis" aria-label="Einheitspreis in CHF" value={it.price} onChange={(e) => setItem(i, "price", e.target.value)} />
                 <button type="button" className="ap-icon-btn" aria-label={`Position ${i + 1} entfernen`} onClick={() => removeItem(i)}>×</button>
               </div>
             ))}
