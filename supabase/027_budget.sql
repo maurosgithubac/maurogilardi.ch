@@ -14,6 +14,10 @@ create table if not exists public.budget_entries (
   created_at timestamptz not null default now()
 );
 
+-- Falls die Tabelle schon ohne Häufigkeit existiert (frühere Version):
+alter table public.budget_entries add column if not exists frequency text not null default 'einmalig';
+alter table public.budget_entries add column if not exists ends_on date;
+
 create index if not exists budget_entries_date_idx on public.budget_entries (entry_date);
 
 alter table public.budget_entries enable row level security;
