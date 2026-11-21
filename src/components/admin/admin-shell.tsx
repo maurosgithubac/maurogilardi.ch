@@ -7,6 +7,7 @@ import { MgLogo } from "@/components/brand/mg-logo";
 import { AdminLogoutButton } from "@/components/admin-logout-button";
 import {
   IconAccount,
+  IconCalendar,
   IconClose,
   IconExternal,
   IconFlag,
@@ -119,6 +120,12 @@ export function AdminShell({ children, inbox, currentPath }: Props) {
       label: "Turnier",
       icon: <IconFlag />,
       match: (p) => p.startsWith("/admin/turnier"),
+    },
+    {
+      href: "/admin/kalender",
+      label: "Kalender",
+      icon: <IconCalendar />,
+      match: (p) => p.startsWith("/admin/kalender"),
     },
   ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { openInvoiceMail } from "@/lib/admin-invoice-mail";
+import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
@@ -46,6 +46,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [busy, setBusy] = useState(false);
+  const [draftYear, setDraftYear] = useState<number>(new Date().getFullYear());
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState(member);
   const [invoiceBusy, setInvoiceBusy] = useState(false);
@@ -155,7 +156,7 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
       setError(null);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml`,
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${draftYear}`,
         });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Mail-Entwurf konnte nicht erstellt werden.");
@@ -289,6 +290,16 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             <IconMail />
             TWINT-Entwurf
           </button>
+          <label className="ap-field-inline">
+            <span className="sr-only">Saison</span>
+            <select className="ap-select" value={draftYear} onChange={(e) => setDraftYear(Number(e.target.value))}>
+              {seasonOptions().map((y) => (
+                <option key={y} value={y}>
+                  Saison {y}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             className="ap-btn ap-btn--primary"

@@ -54,7 +54,10 @@ async function loadAssets(row: InvoicePdfRow): Promise<InvoiceHtmlAssets> {
   };
 }
 
-export async function buildGoennerInvoicePdf(row: InvoicePdfRow): Promise<{ buffer: Buffer; filename: string }> {
+export async function buildGoennerInvoicePdf(
+  row: InvoicePdfRow,
+  seasonYear: number = GOENNER_INVOICE_YEAR,
+): Promise<{ buffer: Buffer; filename: string }> {
   const bank = readInvoiceBankConfig();
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
   if (!row.invoice_number) throw new Error("Keine Rechnungsnummer vorhanden.");
@@ -71,7 +74,7 @@ export async function buildGoennerInvoicePdf(row: InvoicePdfRow): Promise<{ buff
         email: row.email,
       },
       membershipLabel: `MG-${inquiryTierShort(row.membership_id)}`,
-      seasonYear: GOENNER_INVOICE_YEAR,
+      seasonYear,
       amountLabel: chfAmount(amount),
       bank: {
         creditorName: bank.creditorName,

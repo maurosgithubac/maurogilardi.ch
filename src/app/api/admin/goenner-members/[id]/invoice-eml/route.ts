@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { isAdminSession } from "@/lib/admin-auth";
 import { nextInvoiceNumber } from "@/lib/goenner-mails";
 import { buildGoennerInvoiceEml, buildGoennerTwintEml } from "@/lib/goenner-eml";
-import { buildGoennerInvoiceMailText } from "@/lib/goenner-invoice-mail";
+import { buildGoennerInvoiceMailText, parseSeason } from "@/lib/goenner-invoice-mail";
 import { buildGoennerInvoiceHtmlEml } from "@/lib/goenner-invoice-html-mail";
 import type { InvoicePdfRow } from "@/lib/goenner-invoice-pdf";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
@@ -69,13 +69,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   };
 
   if (new URL(request.url).searchParams.get("format") === "json") {
-    const mail = buildGoennerInvoiceMailText(row);
+    const mail = buildGoennerInvoiceMailText(parseSeason(request.url), row);
     return NextResponse.json(mail);
   }
 
   try {
     const twint = new URL(request.url).searchParams.get("type") === "twint";
-    const { buffer, filename } = twint ? buildGoennerTwintEml(row) : await buildGoennerInvoiceHtmlEml(row);
+    const { buffer, filename } = twint ? buildGoennerTwintEml(row) : await buildGoennerInvoiceHtmlEml(row, parseSeason(request.url));
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {

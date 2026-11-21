@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { KalenderView, type KalenderEvent, type KalenderTotals } from "@/components/kalender/kalender-view";
+import { KalenderView } from "@/components/kalender/kalender-view";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { formatPgtEventDateRange } from "@/content/pgtSeasonEvents";
-import { HOTELPLANNER_2027_SEASON_LABEL, hotelplanner2027Events } from "@/content/hotelplanner2027";
-import { HOME_BASE, distanceKm, pgtVenueCoordinates, type VenueCoordinate } from "@/content/pgtVenueCoordinates";
+import { HOTELPLANNER_2027_SEASON_LABEL } from "@/content/hotelplanner2027";
+import { HOME_BASE } from "@/content/pgtVenueCoordinates";
+import { buildSeason, fallbackRows, type KalenderEventRow } from "@/lib/kalender-events";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { seoImageAlts, seoImages } from "@/lib/seo/constants";
 import "@/styles/pages/kalender.css";
 
@@ -14,75 +15,27 @@ export const metadata: Metadata = {
   description: `Alle Turniere der HotelPlanner Tour 2027 auf einem Globus und im Kalender. Die Reise startet in ${HOME_BASE.name}.`,
 };
 
-/**
- * Saison als Kette: Wattwil -> Turnier 1 -> Turnier 2 -> ... -> Rückreise nach Wattwil.
- * Jede Etappe ist die Luftlinie vom vorherigen Ort zum nächsten Turnier.
- */
-function buildSeason(): { events: KalenderEvent[]; totals: KalenderTotals } {
-  const sorted = [...hotelplanner2027Events].sort((a, b) => a.start.localeCompare(b.start));
-  let prevPoint: VenueCoordinate | typeof HOME_BASE = HOME_BASE;
-  let prevLabel: string = HOME_BASE.name;
-  let chainKm = 0;
-  let longest: { km: number; name: string; from: string; to: string } | null = null;
-  const countries = new Set<string>();
+/** Wird nach jeder Änderung im Admin sofort neu erzeugt (revalidatePath). Zusätzlich alle 5 Minuten. */
+export const revalidate = 300;
 
-  const events: KalenderEvent[] = sorted.map((ev) => {
-    const venue = pgtVenueCoordinates[ev.id];
-    if (!venue) {
-      return {
-        id: ev.id,
-        name: ev.name,
-        start: ev.start,
-        end: ev.end,
-        dates: formatPgtEventDateRange(ev),
-        place: ev.where,
-        country: "",
-        lat: null,
-        lon: null,
-        legKm: null,
-        fromPlace: prevLabel,
-        kind: ev.kind ?? "turnier",
-        url: ev.tourPageUrl,
-      };
-    }
-    const leg = distanceKm(prevPoint, venue);
-    chainKm += leg;
-    countries.add(venue.country);
-    if (!longest || leg > longest.km) longest = { km: leg, name: ev.name, from: prevLabel, to: venue.place };
-    const row: KalenderEvent = {
-      id: ev.id,
-      name: ev.name,
-      start: ev.start,
-      end: ev.end,
-      dates: formatPgtEventDateRange(ev),
-      place: venue.place,
-      country: venue.country,
-      lat: venue.lat,
-      lon: venue.lon,
-      legKm: leg,
-      fromPlace: prevLabel,
-      kind: ev.kind ?? "turnier",
-      url: ev.tourPageUrl,
-    };
-    prevPoint = venue;
-    prevLabel = venue.place;
-    return row;
-  });
-
-  const returnKm = prevPoint === HOME_BASE ? 0 : distanceKm(prevPoint, HOME_BASE);
-  const totals: KalenderTotals = {
-    tournaments: events.filter((e) => e.kind === "turnier").length,
-    countries: countries.size,
-    chainKm,
-    returnKm,
-    totalKm: chainKm + returnKm,
-    longest,
-  };
-  return { events, totals };
+/** Termine aus der Datenbank. Ist die Tabelle nicht erreichbar, bleibt die Seite mit dem bisherigen Stand sichtbar. */
+async function loadRows(): Promise<KalenderEventRow[]> {
+  try {
+    const supabase = createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("kalender_events")
+      .select("id,name,start_date,end_date,location,country,lat,lon,kind,info_url")
+      .order("start_date", { ascending: true });
+    if (error || !data) return fallbackRows();
+    return data as KalenderEventRow[];
+  } catch {
+    return fallbackRows();
+  }
 }
 
-export default function KalenderPage() {
-  const { events, totals } = buildSeason();
+export default async function KalenderPage() {
+  const rows = await loadRows();
+  const { events, totals } = buildSeason(rows);
 
   return (
     <div className="mg-page site-page kalender-page">

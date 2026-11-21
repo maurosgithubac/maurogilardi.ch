@@ -1,6 +1,6 @@
 "use client";
 
-import { openInvoiceMail } from "@/lib/admin-invoice-mail";
+import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import Link from "next/link";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -264,14 +264,14 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function openOutlookDraft(member: GoennerMemberRow, type: "invoice" | "twint" = "invoice") {
+  async function openOutlookDraft(member: GoennerMemberRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear()) {
     if (type === "invoice") {
       setError(null);
       setNotice(null);
       setBusyId(member.id);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml`,
+          mailUrl: `/api/admin/goenner-members/${member.id}/invoice-eml?year=${season}`,
         });
         setNotice(`Mail-Entwurf für ${member.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
       } catch (e) {
@@ -360,15 +360,13 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
   }
 
   function invoicePdfItems(m: GoennerMemberRow): RowMenuItem[] {
-    return [
-      {
-        kind: "action" as const,
-        label: "Rechnung (Mail-Entwurf)",
-        icon: <IconMail size={14} />,
-        disabled: busyId === m.id,
-        onSelect: () => void openOutlookDraft(m),
-      },
-    ];
+    return seasonOptions().map((y) => ({
+      kind: "action" as const,
+      label: `Rechnung ${y} (Mail-Entwurf)`,
+      icon: <IconMail size={14} />,
+      disabled: busyId === m.id,
+      onSelect: () => void openOutlookDraft(m, "invoice", y),
+    }));
   }
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {

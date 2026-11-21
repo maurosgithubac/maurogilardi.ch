@@ -7,18 +7,21 @@ import { readInvoiceBankConfig } from "@/lib/invoice-config";
 /**
  * Gestaltete Rechnungs-Mail als HTML (mit Text-Alternative) und PDF im Anhang.
  * Entsteht als .eml-Entwurf: Ein Doppelklick öffnet sie in Outlook, Thunderbird oder Apple Mail.
- * Versendet wird nichts.
+ * Versendet wird nichts. Schlicht, linksbündig, mit feinen Linien statt Boxen.
  */
 
-const COLOR = {
+const C = {
   ink: "#111111",
-  ink2: "#3a3a3a",
-  muted: "#6b6b6b",
-  hair: "#e4e1da",
-  paper: "#f6f5f2",
+  ink2: "#3d3d3d",
+  muted: "#8a8a85",
+  hair: "#ebeae6",
   red: "#d71920",
   white: "#ffffff",
 };
+
+const SERIF = `Georgia, 'Times New Roman', serif`;
+const SANS = `Helvetica, Arial, 'Liberation Sans', sans-serif`;
+const MONO = `Consolas, 'Courier New', monospace`;
 
 function esc(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -37,18 +40,25 @@ function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] || "";
 }
 
-const SERIF = `Georgia, 'Times New Roman', serif`;
-const SANS = `Helvetica, Arial, 'Liberation Sans', sans-serif`;
-
-function renderHtml(d: {
+type MailData = {
   first: string;
+  season: number;
   membership: string;
   amount: string;
   invoiceNumber: string;
   purpose: string;
   bank: { creditorName: string; street: string; cityLine: string; iban: string };
   intro: string;
-}): string {
+};
+
+function line(label: string, value: string): string {
+  return `<tr>
+  <td valign="top" width="128" style="padding:11px 16px 11px 0;border-top:1px solid ${C.hair};font-family:${SANS};font-size:13px;color:${C.muted};">${label}</td>
+  <td valign="top" style="padding:11px 0;border-top:1px solid ${C.hair};font-family:${SANS};font-size:14px;line-height:1.55;color:${C.ink};">${value}</td>
+</tr>`;
+}
+
+function renderHtml(d: MailData): string {
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -56,81 +66,63 @@ function renderHtml(d: {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Danke für deine Unterstützung, ${esc(d.first)}</title>
 </head>
-<body style="margin:0;padding:0;background:${COLOR.paper};">
-<span style="display:none;max-height:0;overflow:hidden;opacity:0;">Deine Rechnung als PDF ist angehängt, die Zahlungsdaten stehen darin.</span>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLOR.paper};">
-<tr><td align="center" style="padding:32px 12px;">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${COLOR.white};border-radius:16px;">
+<body style="margin:0;padding:0;background:${C.white};">
+<span style="display:none;max-height:0;overflow:hidden;opacity:0;">Die Rechnung als PDF ist angehängt.</span>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.white};">
+<tr><td style="padding:36px 28px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
 
-<tr><td style="padding:28px 32px 0 32px;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-  <tr>
-    <td valign="middle"><img src="cid:mg-logo" alt="Mauro Gilardi Golf" height="44" style="display:block;height:44px;width:auto;border:0;"></td>
-    <td align="right" valign="middle" style="font-family:${SANS};font-size:12px;color:${COLOR.muted};line-height:1.4;">
-      Rechnung ${esc(d.invoiceNumber)}
-    </td>
-  </tr>
-  </table>
-  <div style="height:3px;background:${COLOR.red};border-radius:2px;margin-top:22px;"></div>
+<tr><td style="padding:0 0 22px 0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td valign="middle" align="left"><img src="cid:mg-logo" alt="Mauro Gilardi Golf" height="40" style="display:block;height:40px;width:auto;border:0;"></td>
+    <td valign="middle" align="right" style="font-family:${SANS};font-size:12px;color:${C.muted};">Rechnung ${esc(d.invoiceNumber)}</td>
+  </tr></table>
+  <div style="height:2px;width:48px;background:${C.red};margin-top:24px;"></div>
 </td></tr>
 
-<tr><td style="padding:28px 32px 0 32px;">
-  <h1 style="margin:0 0 14px 0;font-family:${SERIF};font-size:26px;line-height:1.25;font-weight:700;color:${COLOR.ink};">
-    Danke für deine Unterstützung, ${esc(d.first)}.
-  </h1>
-  <p style="margin:0;font-family:${SANS};font-size:15px;line-height:1.65;color:${COLOR.ink2};">${esc(d.intro)}</p>
+<tr><td align="left" style="padding:0 0 12px 0;">
+  <h1 style="margin:0;font-family:${SERIF};font-size:30px;line-height:1.2;font-weight:700;color:${C.ink};">Danke, ${esc(d.first)}.</h1>
 </td></tr>
 
-<tr><td style="padding:24px 32px 0 32px;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${COLOR.paper};border-radius:14px;">
-  <tr><td style="padding:22px 22px 6px 22px;">
-    <div style="font-family:${SANS};font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:${COLOR.muted};">Gönner-Mitgliedschaft · ${esc(d.membership)}</div>
-    <div style="margin-top:8px;font-family:${SERIF};font-size:32px;font-weight:700;color:${COLOR.ink};letter-spacing:-0.01em;">${esc(d.amount)}</div>
-    <div style="font-family:${SANS};font-size:13px;color:${COLOR.muted};margin-top:2px;">Saison 2027 · zahlbar per Banküberweisung</div>
-  </td></tr>
-  <tr><td style="padding:14px 22px 22px 22px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${COLOR.hair};">
-      ${row("Zahlbar an", `${esc(d.bank.creditorName)}<br>${esc(d.bank.street)}<br>${esc(d.bank.cityLine)}`)}
-      ${row("IBAN", `<span style="font-family:Consolas,'Courier New',monospace;font-size:15px;font-weight:700;color:${COLOR.ink};letter-spacing:0.02em;">${esc(d.bank.iban)}</span>`)}
-      ${row("Zahlungszweck", `<span style="color:${COLOR.red};font-weight:700;">${esc(d.purpose)}</span>`)}
-    </table>
-  </td></tr>
+<tr><td align="left" style="padding:0 0 30px 0;font-family:${SANS};font-size:15px;line-height:1.65;color:${C.ink2};">
+  ${esc(d.intro)}
+</td></tr>
+
+<tr><td align="left" style="padding:0;">
+  <div style="font-family:${SANS};font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:${C.muted};margin-bottom:6px;">Zahlung · Saison ${d.season}</div>
+  <div style="font-family:${SERIF};font-size:34px;font-weight:700;letter-spacing:-0.01em;color:${C.ink};">${esc(d.amount)}</div>
+  <div style="font-family:${SANS};font-size:13px;color:${C.muted};margin-top:4px;">${esc(d.membership)} · Banküberweisung</div>
+</td></tr>
+
+<tr><td style="padding:22px 0 0 0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-bottom:1px solid ${C.hair};">
+    ${line("Zahlbar an", `${esc(d.bank.creditorName)}<br>${esc(d.bank.street)}<br>${esc(d.bank.cityLine)}`)}
+    ${line("IBAN", `<span style="font-family:${MONO};font-size:14px;font-weight:700;letter-spacing:0.02em;">${esc(d.bank.iban)}</span>`)}
+    ${line("Zahlungszweck", `<span style="color:${C.red};font-weight:700;">${esc(d.purpose)}</span>`)}
   </table>
 </td></tr>
 
-<tr><td style="padding:24px 32px 0 32px;font-family:${SANS};font-size:15px;line-height:1.65;color:${COLOR.ink2};">
-  Die Rechnung als PDF hängt dieser Mail an. Ich freue mich sehr, dich bald mal auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems wiederzusehen.
+<tr><td align="left" style="padding:28px 0 0 0;font-family:${SANS};font-size:15px;line-height:1.65;color:${C.ink2};">
+  Die Rechnung als PDF ist dieser Mail angehängt. Ich freue mich, dich bald auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems zu sehen.
 </td></tr>
 
-<tr><td style="padding:22px 32px 0 32px;font-family:${SANS};font-size:15px;line-height:1.65;color:${COLOR.ink2};">
-  Nochmals ganz herzlichen Dank für deinen Support.<br><br>
-  Liebe Grüsse<br>
-  <span style="color:${COLOR.ink};font-weight:700;">Mauro</span>
+<tr><td align="left" style="padding:22px 0 0 0;font-family:${SANS};font-size:15px;line-height:1.65;color:${C.ink2};">
+  Herzlichen Dank für deinen Support.<br>
+  <span style="color:${C.ink};">Mauro</span>
 </td></tr>
 
-<tr><td style="padding:26px 32px 0 32px;">
-  <div style="height:1px;background:${COLOR.hair};"></div>
-</td></tr>
-
-<tr><td style="padding:18px 32px 30px 32px;">
-  <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-    <td valign="top" style="padding-right:16px;"><img src="cid:mg-logo" alt="" width="54" style="display:block;width:54px;height:auto;border:0;"></td>
-    <td valign="top" style="font-family:${SANS};font-size:13px;line-height:1.55;color:${COLOR.muted};">
-      <div style="font-size:14px;font-weight:700;color:${COLOR.ink};">Mauro Gilardi</div>
-      SwissPGA Professional<br>
+<tr><td style="padding:40px 0 0 0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${C.hair};"><tr>
+    <td valign="top" style="padding:18px 0 0 0;font-family:${SANS};font-size:12px;line-height:1.6;color:${C.muted};">
+      <span style="font-size:13px;font-weight:700;color:${C.ink};">Mauro Gilardi</span> · SwissPGA Professional<br>
       Bleikenstrasse 6d · 9630 Wattwil<br>
-      <a href="tel:+41766751199" style="color:${COLOR.muted};text-decoration:none;">+41 76 675 11 99</a> ·
-      <a href="mailto:mauro.gilardi@hotmail.com" style="color:${COLOR.muted};text-decoration:none;">mauro.gilardi@hotmail.com</a><br>
-      <a href="https://www.maurogilardi.ch" style="color:${COLOR.red};text-decoration:none;font-weight:700;">maurogilardi.ch</a>
+      <a href="tel:+41766751199" style="color:${C.muted};text-decoration:none;">+41 76 675 11 99</a> ·
+      <a href="mailto:mauro.gilardi@hotmail.com" style="color:${C.muted};text-decoration:none;">mauro.gilardi@hotmail.com</a> ·
+      <a href="https://www.maurogilardi.ch" style="color:${C.red};text-decoration:none;">maurogilardi.ch</a>
     </td>
   </tr></table>
 </td></tr>
 
-</table>
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
-<tr><td align="center" style="padding:14px 12px 0 12px;font-family:${SANS};font-size:11px;line-height:1.5;color:${COLOR.muted};">
-  Gönner-Bedingungen: <a href="https://www.maurogilardi.ch/goenner-bedingungen" style="color:${COLOR.muted};">maurogilardi.ch/goenner-bedingungen</a>
-</td></tr>
 </table>
 </td></tr>
 </table>
@@ -138,40 +130,24 @@ function renderHtml(d: {
 </html>`;
 }
 
-function row(label: string, value: string): string {
-  return `<tr>
-  <td valign="top" width="130" style="padding:12px 12px 0 0;font-family:${SANS};font-size:13px;color:${COLOR.muted};">${label}</td>
-  <td valign="top" style="padding:12px 0 0 0;font-family:${SANS};font-size:14px;line-height:1.5;color:${COLOR.ink};">${value}</td>
-</tr>`;
-}
-
-function renderText(d: {
-  first: string;
-  membership: string;
-  amount: string;
-  purpose: string;
-  bank: { creditorName: string; street: string; cityLine: string; iban: string };
-  intro: string;
-}): string {
+function renderText(d: MailData): string {
   return [
-    `Danke für deine Unterstützung, ${d.first}.`,
+    `Danke, ${d.first}.`,
     "",
     d.intro,
     "",
-    `Gönner-Mitgliedschaft: ${d.membership}, Saison 2027`,
+    `Zahlung · Saison ${d.season}`,
     `Betrag: ${d.amount}`,
     `Zahlbar an: ${d.bank.creditorName}, ${d.bank.street}, ${d.bank.cityLine}`,
     `IBAN: ${d.bank.iban}`,
     `Zahlungszweck: ${d.purpose}`,
     "",
-    "Die Rechnung als PDF hängt dieser Mail an. Ich freue mich sehr, dich bald mal auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems wiederzusehen.",
+    "Die Rechnung als PDF ist dieser Mail angehängt. Ich freue mich, dich bald auf dem Golfplatz oder an meinem Gönnerturnier in Domat/Ems zu sehen.",
     "",
-    "Nochmals ganz herzlichen Dank für deinen Support.",
-    "",
-    "Liebe Grüsse",
+    "Herzlichen Dank für deinen Support.",
     "Mauro",
     "",
-    "Mauro Gilardi | SwissPGA Professional",
+    "Mauro Gilardi · SwissPGA Professional",
     "Bleikenstrasse 6d · 9630 Wattwil",
     "+41 76 675 11 99 · mauro.gilardi@hotmail.com",
     "maurogilardi.ch",
@@ -182,40 +158,47 @@ const wrap76 = (b64: string) => b64.match(/.{1,76}/g)?.join("\r\n") ?? "";
 const encodeHeader = (v: string) =>
   /^[\x20-\x7e]*$/.test(v) ? v : `=?UTF-8?B?${Buffer.from(v, "utf8").toString("base64")}?=`;
 
-/** .eml mit HTML + Text-Alternative, eingebettetem Logo und PDF-Anhang. */
-export async function buildGoennerInvoiceHtmlEml(row: {
-  id: string;
-  name: string;
-  email: string;
-  membership_id: string;
-  invoice_number: string | null;
-  amount_chf?: number | null;
-  street?: string | null;
-  postal_code?: string | null;
-  city?: string | null;
-}): Promise<{ buffer: Buffer; filename: string }> {
+/** .eml mit HTML + Text-Alternative, eingebettetem Logo und PDF-Anhang für die gewählte Saison. */
+export async function buildGoennerInvoiceHtmlEml(
+  row: {
+    id: string;
+    name: string;
+    email: string;
+    membership_id: string;
+    invoice_number: string | null;
+    amount_chf?: number | null;
+    street?: string | null;
+    postal_code?: string | null;
+    city?: string | null;
+  },
+  season: number,
+): Promise<{ buffer: Buffer; filename: string }> {
   const bank = readInvoiceBankConfig();
   if (!bank) throw new Error("INVOICE_QR_IBAN ist nicht gesetzt.");
 
   // Chromium nur laden, wenn die PDF wirklich gebraucht wird
   const { buildGoennerInvoicePdf } = await import("@/lib/goenner-invoice-pdf");
-  const { buffer: pdf } = await buildGoennerInvoicePdf({
-    id: row.id,
-    membership_id: row.membership_id,
-    name: row.name,
-    email: row.email,
-    street: row.street ?? null,
-    postal_code: row.postal_code ?? null,
-    city: row.city ?? null,
-    payment_method: "rechnung",
-    invoice_number: row.invoice_number,
-    amount_chf: row.amount_chf ?? null,
-    created_at: new Date().toISOString(),
-  });
+  const { buffer: pdf } = await buildGoennerInvoicePdf(
+    {
+      id: row.id,
+      membership_id: row.membership_id,
+      name: row.name,
+      email: row.email,
+      street: row.street ?? null,
+      postal_code: row.postal_code ?? null,
+      city: row.city ?? null,
+      payment_method: "rechnung",
+      invoice_number: row.invoice_number,
+      amount_chf: row.amount_chf ?? null,
+      created_at: new Date().toISOString(),
+    },
+    season,
+  );
 
   const invoiceNumber = row.invoice_number ?? row.id;
-  const d = {
+  const data: MailData = {
     first: firstName(row.name),
+    season,
     membership: `MG-${inquiryTierShort(row.membership_id)}`,
     amount: chfAmount(mailAmountChf(row)),
     invoiceNumber,
@@ -229,15 +212,16 @@ export async function buildGoennerInvoiceHtmlEml(row: {
     intro: "Es bedeutet mir wirklich sehr viel, dass du mich als Gönner auf meinem Weg auf die DP World Tour begleitest. Menschen wie dich machen diesen Weg möglich.",
   };
 
-  const html = renderHtml(d).replace(/\r?\n/g, "\r\n");
-  const text = renderText(d).replace(/\r?\n/g, "\r\n");
+  const html = renderHtml(data).replace(/\r?\n/g, "\r\n");
+  const text = renderText(data).replace(/\r?\n/g, "\r\n");
   const logo = readFileSync(path.join(process.cwd(), "public", "brand-assets", "logos", "mg-mail-logo.png"));
-  const pdfName = `Rechnung-${invoiceNumber}.pdf`;
-  const subject = `Danke für deine Unterstützung, ${d.first}`;
+  const pdfName = `Rechnung-${invoiceNumber}-${season}.pdf`;
+  const subject = `Danke für deine Unterstützung, ${data.first}`;
 
-  const m = `mg-${Date.now().toString(36)}`;
-  const alt = `mg-alt-${Date.now().toString(36)}`;
-  const rel = `mg-rel-${Date.now().toString(36)}`;
+  const stamp = Date.now().toString(36);
+  const m = `mg-${stamp}`;
+  const alt = `mg-alt-${stamp}`;
+  const rel = `mg-rel-${stamp}`;
   const lines = [
     "MIME-Version: 1.0",
     "X-Unsent: 1",
@@ -262,10 +246,10 @@ export async function buildGoennerInvoiceHtmlEml(row: {
     "",
     wrap76(Buffer.from(html, "utf8").toString("base64")),
     `--${rel}`,
-    "Content-Type: image/png; name=\"mg-logo.png\"",
+    'Content-Type: image/png; name="mg-logo.png"',
     "Content-Transfer-Encoding: base64",
     "Content-ID: <mg-logo>",
-    "Content-Disposition: inline; filename=\"mg-logo.png\"",
+    'Content-Disposition: inline; filename="mg-logo.png"',
     "",
     wrap76(logo.toString("base64")),
     `--${rel}--`,
@@ -281,6 +265,6 @@ export async function buildGoennerInvoiceHtmlEml(row: {
   ];
   return {
     buffer: Buffer.from(lines.join("\r\n"), "utf8"),
-    filename: `Entwurf-${invoiceNumber}.eml`,
+    filename: `Entwurf-${invoiceNumber}-${season}.eml`,
   };
 }

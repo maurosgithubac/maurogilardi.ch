@@ -1,6 +1,6 @@
 "use client";
 
-import { openInvoiceMail } from "@/lib/admin-invoice-mail";
+import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
@@ -314,7 +314,7 @@ export function AdminGoennerInquiriesClient({
   }
 
   /** Lädt eine .eml mit Dankesnachricht und Rechnung; Outlook öffnet sie als Entwurf. */
-  async function openOutlookDraft(row: GoennerInquiryRow, type: "invoice" | "twint" = "invoice") {
+  async function openOutlookDraft(row: GoennerInquiryRow, type: "invoice" | "twint" = "invoice", season: number = new Date().getFullYear()) {
     if (type === "invoice") {
       setFormError(null);
       setFormWarning(null);
@@ -322,7 +322,7 @@ export function AdminGoennerInquiriesClient({
       setBusyId(row.id);
       try {
         await openInvoiceMail({
-          mailUrl: `/api/admin/goenner-inquiries/${row.id}/invoice-eml`,
+          mailUrl: `/api/admin/goenner-inquiries/${row.id}/invoice-eml?year=${season}`,
         });
         setFormOk(`Mail-Entwurf für ${row.name} heruntergeladen. Mit Doppelklick öffnen, prüfen, senden.`);
       } catch (e) {
@@ -729,15 +729,13 @@ export function AdminGoennerInquiriesClient({
                                 }))
                               : []),
                             ...(row.payment_method === "rechnung" && row.invoice_number
-                              ? [
-                                  {
-                                    kind: "action" as const,
-                                    label: "Rechnung (Mail-Entwurf)",
-                                    icon: <IconMail size={14} />,
-                                    disabled: busy,
-                                    onSelect: () => void openOutlookDraft(row),
-                                  },
-                                ]
+                              ? seasonOptions().map((y) => ({
+                                  kind: "action" as const,
+                                  label: `Rechnung ${y} (Mail-Entwurf)`,
+                                  icon: <IconMail size={14} />,
+                                  disabled: busy,
+                                  onSelect: () => void openOutlookDraft(row, "invoice", y),
+                                }))
                               : []),
                             {
                               kind: "action",

@@ -20,7 +20,7 @@ function firstName(name: string): string {
  * Text für den Mail-Entwurf zur Rechnung: Dank, Zahlungsdaten als Übersicht, Verabschiedung.
  * Die PDF wird separat heruntergeladen und vom Admin an die Mail angehängt.
  */
-export function buildGoennerInvoiceMailText(row: {
+export function buildGoennerInvoiceMailText(season: number, row: {
   membership_id: string;
   name: string;
   email: string;
@@ -42,7 +42,7 @@ export function buildGoennerInvoiceMailText(row: {
     "",
     "Die Rechnung als PDF hängt dieser Mail an. Hier die Zahlungsdaten im Überblick:",
     "",
-    `Gönner-Mitgliedschaft: ${membership}, Saison 2027`,
+    `Gönner-Mitgliedschaft: ${membership}, Saison ${season}`,
     `Betrag: ${amount}`,
     `Zahlbar an: ${bank.creditorName}, ${bank.creditorStreet}, ${bank.creditorPostalCode} ${bank.creditorCity}`,
     `IBAN: ${formatIban(bank.iban)}`,
@@ -64,4 +64,17 @@ export function buildGoennerInvoiceMailText(row: {
     subject: `Danke für deine Unterstützung, ${first}`,
     body,
   };
+}
+
+/** Saison aus ?year=… lesen. Erlaubt: vorjähriges, laufendes und kommendes Jahr. Standard: laufendes Jahr. */
+export function parseSeason(url: string): number {
+  const current = new Date().getFullYear();
+  const raw = Number(new URL(url).searchParams.get("year"));
+  return raw >= current - 1 && raw <= current + 1 ? raw : current;
+}
+
+/** Jahre für die Auswahl: vorjähriges, laufendes und kommendes Jahr. */
+export function seasonOptions(): number[] {
+  const current = new Date().getFullYear();
+  return [current - 1, current, current + 1];
 }

@@ -23,3 +23,9 @@ export async function openInvoiceMail(params: { mailUrl: string }): Promise<void
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/** Auswählbare Saisons: vorjähriges, laufendes und kommendes Jahr. */
+export function seasonOptions(): number[] {
+  const current = new Date().getFullYear();
+  return [current - 1, current, current + 1];
+}
