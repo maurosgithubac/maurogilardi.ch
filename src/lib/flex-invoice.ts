@@ -124,11 +124,11 @@ export async function renderFlexInvoiceHtml(d: FlexInvoiceInput): Promise<string
   .section { font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; margin: 0 0 2mm; }
 
   table.items { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  table.items col.c-desc { width: 34%; }
-  table.items col.c-cur { width: 12%; }
-  table.items col.c-qty { width: 12%; }
-  table.items col.c-price { width: 20%; }
-  table.items col.c-total { width: 22%; }
+  table.items col.c-desc { width: 56%; }
+  table.items col.c-cur { width: 8%; }
+  table.items col.c-qty { width: 9%; }
+  table.items col.c-price { width: 13%; }
+  table.items col.c-total { width: 14%; }
   table.items th { text-align: left; font-size: 8.5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: ${C.muted}; padding: 0 0 2.5mm; border-bottom: 1px solid ${C.ink}; }
   table.items th.num, table.items td.num { text-align: right; white-space: nowrap; }
   table.items td { padding: 3mm 0; border-bottom: 1px solid ${C.hair}; vertical-align: top; font-size: 10pt; }
