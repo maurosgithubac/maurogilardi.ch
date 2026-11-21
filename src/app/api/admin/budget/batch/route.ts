@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     if (!categoriesFor(scope as BudgetScope).some((c) => c.id === category)) return [];
     if (!Number.isFinite(amount) || amount <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return [];
     const frequency = r.frequency === "monatlich" || r.frequency === "jaehrlich" ? r.frequency : "einmalig";
-    return [{ scope, category, amount_chf: amount, entry_date: date, label: String(r.label ?? "").slice(0, 200), frequency }];
+    const subcategory = String(r.subcategory ?? "").trim().slice(0, 80);
+    return [{ scope, category, amount_chf: amount, entry_date: date, label: String(r.label ?? "").slice(0, 200), frequency, ...(subcategory ? { subcategory } : {}) }];
   });
   if (rows.length === 0) return NextResponse.json({ error: "Keine gültigen Zeilen." }, { status: 400 });
   const supabase = await createSupabaseUserServerClient();

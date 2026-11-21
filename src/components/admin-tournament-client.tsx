@@ -3,8 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { inquiryTierShort, memberCategoryLabel } from "@/content/goennerMemberships";
-import { AdminPageHeader, categoryOf, StatusBadge, type PayState } from "@/components/admin/admin-ui";
-import { IconCopy, IconMail } from "@/components/admin/admin-icons";
+import { categoryOf, StatusBadge, type PayState } from "@/components/admin/admin-ui";
+import { AdminPageHeader } from "@/components/admin/ui/admin-page-header";
+import { CountUp } from "@/components/admin/ui/count-up";
+import { Ring } from "@/components/admin/dash-charts";
+import { IconCheck, IconCopy, IconMail } from "@/components/admin/admin-icons";
 import type { GoennerMemberRow } from "@/lib/goenner-finance";
 import { eventDateLabel, inviteLink, zurichStamp, type InviteKind, type TournamentInviteRow, type TournamentRow } from "@/lib/tournament";
 
@@ -45,6 +48,8 @@ export function AdminTournamentClient({
   const [clinicPicked, setClinicPicked] = useState<string[]>([]);
   const [roundPicked, setRoundPicked] = useState<string[]>([]);
   const [reminding, setReminding] = useState<string | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   function load(next: TournamentRow | null) {
     setCurrentId(next?.id ?? "");
@@ -79,6 +84,7 @@ export function AdminTournamentClient({
       }
       setNotice("Turnier gespeichert.");
       setCurrentId(data.tournament.id);
+      setEditOpen(false);
       router.refresh();
     } finally {
       setBusy(false);
@@ -146,6 +152,8 @@ export function AdminTournamentClient({
       await navigator.clipboard.writeText(inviteLink(invite.token));
       setNotice(`Link von ${invite.name} kopiert.`);
       setError(null);
+      setCopiedId(invite.id);
+      window.setTimeout(() => setCopiedId((id) => (id === invite.id ? null : id)), 2000);
     } catch {
       setError("Link konnte nicht kopiert werden.");
     }
@@ -182,7 +190,7 @@ export function AdminTournamentClient({
   }
 
   return (
-    <div className="ap-page">
+    <div className="ap-page tn-page">
       <AdminPageHeader
         eyebrow="Gönnerturnier"
         title={tournament ? tournament.title : "Turnier"}
@@ -223,19 +231,115 @@ export function AdminTournamentClient({
         </p>
       ) : null}
 
-      <form className="ap-card ap-form" onSubmit={save}>
+      {tournament ? (
+        <section className="tn-overview ap-stagger" aria-label="Übersicht">
+          <article className="tn-card tn-hero" style={{ "--i": 0 } as React.CSSProperties}>
+            <div className="tn-hero-top">
+              <span className={`tn-status ${tournament.status === "open" ? "is-open" : "is-closed"}`}>
+                {tournament.status === "open" ? "Anmeldung offen" : "Anmeldung geschlossen"}
+              </span>
+            </div>
+            <p className="tn-hero-date">{eventDateLabel(tournament.event_date)}</p>
+            <p className="tn-hero-place">{tournament.place}</p>
+            <dl className="tn-times">
+              <div>
+                <dt>Klinik</dt>
+                <dd>{tournament.clinic_time || "—"}</dd>
+              </div>
+              <div>
+                <dt>Erstes Flight</dt>
+                <dd>{tournament.first_flight_time || "—"}</dd>
+              </div>
+              <div>
+                <dt>Abendessen</dt>
+                <dd>{tournament.dinner_time || "—"}</dd>
+              </div>
+            </dl>
+            <div className="tn-hero-actions">
+              <button
+                type="button"
+                className="tn-hero-btn"
+                disabled={busy}
+                onClick={() => void setStatus(tournament.status === "open" ? "closed" : "open")}
+              >
+                {tournament.status === "open" ? "Anmeldung schliessen" : "Anmeldung öffnen"}
+              </button>
+              <button
+                type="button"
+                className="tn-hero-btn tn-hero-btn--ghost"
+                aria-expanded={editOpen}
+                aria-controls="tn-form"
+                onClick={() => setEditOpen((v) => !v)}
+              >
+                {editOpen ? "Angaben ausblenden" : "Angaben bearbeiten"}
+              </button>
+            </div>
+          </article>
+
+          <article className="tn-card tn-ring" style={{ "--i": 1 } as React.CSSProperties}>
+            <p className="tn-label">Antworten</p>
+            <Ring
+              size={132}
+              stroke={15}
+              segments={
+                counts.invited > 0
+                  ? [
+                      { value: counts.responded, className: "is-red" },
+                      { value: Math.max(0, counts.invited - counts.responded), className: "is-soft" },
+                    ]
+                  : [{ value: 0, className: "is-grey" }]
+              }
+            >
+              <span className="tn-ring-num">
+                <CountUp value={counts.responded} />
+                <span className="tn-ring-of">/{counts.invited}</span>
+              </span>
+            </Ring>
+            <p className="tn-sub">
+              {counts.invited === 0
+                ? "Noch keine Einladung gesendet"
+                : openInvites.length === 0
+                  ? "Alle haben geantwortet"
+                  : `${openInvites.length} ohne Antwort`}
+            </p>
+          </article>
+
+          <article className="tn-card tn-counts" style={{ "--i": 2 } as React.CSSProperties}>
+            <p className="tn-label">Zusagen</p>
+            <dl className="tn-count-grid">
+              <div>
+                <dd>
+                  <CountUp value={counts.clinic} />
+                </dd>
+                <dt>Klinik</dt>
+              </div>
+              <div>
+                <dd>
+                  <CountUp value={counts.round} />
+                </dd>
+                <dt>Golfrunde</dt>
+              </div>
+              <div>
+                <dd>
+                  <CountUp value={counts.dinner} />
+                </dd>
+                <dt>Abendessen</dt>
+              </div>
+              <div className="is-muted">
+                <dd>
+                  <CountUp value={counts.declined} />
+                </dd>
+                <dt>Absagen</dt>
+              </div>
+            </dl>
+          </article>
+        </section>
+      ) : null}
+
+      {!tournament || editOpen ? (
+      <form id="tn-form" className="ap-card ap-form tn-form" onSubmit={save}>
         <div className="ap-card-head">
           <h2 className="ap-h2">{tournament ? "Angaben" : "Neues Turnier"}</h2>
-          {tournament ? (
-            <button
-              type="button"
-              className="ap-btn ap-btn--secondary ap-btn--sm"
-              disabled={busy}
-              onClick={() => void setStatus(tournament.status === "open" ? "closed" : "open")}
-            >
-              {tournament.status === "open" ? "Anmeldung schliessen" : "Anmeldung öffnen"}
-            </button>
-          ) : null}
         </div>
         <div className="ap-form-grid ap-form-grid--3">
           <label className="ap-field">
@@ -271,13 +375,9 @@ export function AdminTournamentClient({
           <button type="submit" className="ap-btn ap-btn--primary" disabled={busy || missing}>
             {busy ? "Speichern…" : tournament ? "Angaben speichern" : "Turnier anlegen"}
           </button>
-          {tournament ? (
-            <span className="ap-muted-sm">
-              {eventDateLabel(tournament.event_date)} · {tournament.status === "open" ? "Anmeldung offen" : "Anmeldung geschlossen"}
-            </span>
-          ) : null}
         </div>
       </form>
+      ) : null}
 
       {tournament ? (
         <>
@@ -328,12 +428,10 @@ export function AdminTournamentClient({
             />
           </div>
 
-          <section className="ap-card ap-card--flush">
+          <section className="ap-card ap-card--flush tn-sent">
             <div className="ap-card-head">
               <h2 className="ap-h2">Gesendete Einladungen</h2>
-              <span className="ap-muted-sm">
-                {counts.invited} eingeladen · {counts.responded} geantwortet · Klinik {counts.clinic} · Runde {counts.round} · Essen {counts.dinner} · Absage {counts.declined}
-              </span>
+              <span className="ap-count">{counts.invited}</span>
               <button
                 type="button"
                 className="ap-btn ap-btn--secondary ap-btn--sm"
@@ -358,7 +456,7 @@ export function AdminTournamentClient({
                 <tbody>
                   {mine.length === 0 ? (
                     <tr className="ap-empty-row">
-                      <td colSpan={6}>Noch keine Einladung versendet.</td>
+                      <td colSpan={6}>Noch keine Einladung gesendet. Wähle oben, wer eingeladen wird.</td>
                     </tr>
                   ) : (
                     mine.map((invite) => {
@@ -383,11 +481,12 @@ export function AdminTournamentClient({
                           <div className="ap-btn-row">
                             <button
                               type="button"
-                              className="ap-icon-btn"
+                              className={`ap-icon-btn${copiedId === invite.id ? " tn-copied" : ""}`}
                               aria-label={`Link von ${invite.name} kopieren`}
+                              title={copiedId === invite.id ? "Kopiert" : "Link kopieren"}
                               onClick={() => void copyLink(invite)}
                             >
-                              <IconCopy />
+                              {copiedId === invite.id ? <IconCheck /> : <IconCopy />}
                             </button>
                             <button
                               type="button"
@@ -427,13 +526,13 @@ function inviteStand(invite: TournamentInviteRow): { state: PayState; label: str
 }
 
 function mark(invite: TournamentInviteRow) {
-  if (invite.kind !== "clinic") return "—";
+  if (invite.kind !== "clinic") return <span className="ap-dim">—</span>;
   return part(invite, invite.clinic);
 }
 
 function part(invite: TournamentInviteRow, value: boolean | null) {
-  if (!invite.responded_at) return "—";
-  return value ? "Ja" : "Nein";
+  if (!invite.responded_at) return <span className="ap-dim">—</span>;
+  return value ? <span className="ap-pill ap-pill--ok">Ja</span> : <span className="ap-pill ap-pill--muted">Nein</span>;
 }
 
 function sendNotice(result: SendResult) {

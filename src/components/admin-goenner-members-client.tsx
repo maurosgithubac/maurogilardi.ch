@@ -442,16 +442,22 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
           if (m) void openOutlookDraft(m, "invoice", season, status);
         }}
       />
-      <div className="ap-section-head">
-        <div>
-          <h2 id="liste-heading" className="ap-h2">
+      <div className="mb-head">
+        <div className="mb-head-text">
+          <h2 id="liste-heading" className="mb-title">
             Alle Gönner, Sponsoren &amp; Partner
           </h2>
-          <p className="ap-muted-sm">
-            {allActive} aktiv
-            {wallReady ? ` · ${members.filter((m) => wallOn(m)).length} auf der Website` : ""}
-            {" · "}Status und Beträge für {year}
-          </p>
+          <ul className="mb-facts" aria-label="Kennzahlen zur Liste">
+            <li>
+              <strong>{allActive}</strong> aktiv
+            </li>
+            {wallReady ? (
+              <li>
+                <strong>{members.filter((m) => wallOn(m)).length}</strong> auf der Website
+              </li>
+            ) : null}
+            <li>Status und Beträge für {year}</li>
+          </ul>
         </div>
         <button
           type="button"
@@ -572,7 +578,7 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
         </p>
       ) : null}
 
-      <div className="ap-toolbar" role="search">
+      <div className="ap-toolbar mb-toolbar" role="search">
         <div className="ap-segment" role="group" aria-label="Status filtern">
           {(
             [
@@ -642,8 +648,8 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
         </div>
       </div>
 
-      <div className="ap-table-wrap">
-        <table className="ap-table ap-table--members">
+      <div className="ap-table-wrap mb-table-wrap">
+        <table className="ap-table ap-table--members mb-table">
           <caption className="sr-only">
             Gönner, Sponsoren und Partner {year}, {visible.length} Einträge
           </caption>
@@ -655,6 +661,7 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
               {sortHeader("amount", "Jahresbetrag", "end")}
               {sortHeader("status", `Status ${year}`)}
               {sortHeader("total", "Total", "end")}
+              {wallReady ? <th scope="col">Website</th> : null}
               <th scope="col" className="ap-col-actions">
                 <span className="sr-only">Aktionen</span>
               </th>
@@ -663,10 +670,23 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
           <tbody>
             {visible.length === 0 ? (
               <tr className="ap-empty-row">
-                <td colSpan={7}>
+                <td colSpan={wallReady ? 8 : 7}>
                   <div className="ap-empty">
                     <p className="ap-empty-title">Keine Einträge für diese Auswahl</p>
-                    <p className="ap-muted-sm">Filter anpassen oder Suche leeren.</p>
+                    <p className="ap-empty-text">Passe die Filter an oder leere die Suche.</p>
+                    <button
+                      type="button"
+                      className="ap-btn ap-btn--secondary ap-btn--sm"
+                      onClick={() => {
+                        setQuery("");
+                        setStatus("all");
+                        setTier("all");
+                        setCategory("all");
+                        setOnlyActive(true);
+                      }}
+                    >
+                      Filter zurücksetzen
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -681,25 +701,17 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
                       <span className={`ap-cat ap-cat--${m.cat}`}>{memberCategoryLabel(m.cat)}</span>
                     ) : null}
                     {!m.active ? <span className="ap-tag-muted">inaktiv</span> : null}
-                    {m.organization ? <span className="ap-row-org">{m.organization}</span> : null}
-                    {m.member_since ? <span className="ap-row-org">seit {m.member_since.slice(0, 4)}</span> : null}
-                    <span className="ap-row-sub">
+                    {m.organization || m.member_since ? (
+                      <span className="mb-sub">
+                        {m.organization ? <span>{m.organization}</span> : null}
+                        {m.member_since ? <span>seit {m.member_since.slice(0, 4)}</span> : null}
+                      </span>
+                    ) : null}
+                    <span className="mb-contact">
                       {m.email ? <a href={`mailto:${m.email}`}>{m.email}</a> : null}
-                      {m.email && m.phone ? <span aria-hidden="true"> · </span> : null}
                       {m.phone ? <a href={`tel:${m.phone.replace(/\s/g, "")}`}>{m.phone}</a> : null}
                       {!m.email && !m.phone ? <span>Kein Kontakt</span> : null}
                     </span>
-                    {wallReady ? (
-                      <button
-                        type="button"
-                        className={`ap-wall${wallOn(m) ? " is-on" : ""}`}
-                        aria-pressed={wallOn(m)}
-                        disabled={busyId === m.id}
-                        onClick={() => void toggleWall(m)}
-                      >
-                        {wallOn(m) ? "Auf Website" : "Nicht auf Website"}
-                      </button>
-                    ) : null}
                   </td>
                   <td data-label="Stufe">
                     <TierTag id={m.membership_id}>{inquiryTierShort(m.membership_id)}</TierTag>
@@ -731,6 +743,21 @@ export function AdminGoennerMembersClient({ members, payments, year, initialStat
                   <td className="ap-num ap-num--strong" data-label={`Total seit ${GOENNER_FINANCE_START_YEAR}`}>
                     {m.total_chf > 0 || m.billable ? chf(m.total_chf) : <span className="ap-dim">—</span>}
                   </td>
+                  {wallReady ? (
+                    <td data-label="Website">
+                      <button
+                        type="button"
+                        className={`mb-wall${wallOn(m) ? " is-on" : ""}`}
+                        aria-pressed={wallOn(m)}
+                        aria-label={`${m.name}: ${wallOn(m) ? "auf der Website gezeigt" : "auf der Website ausgeblendet"}`}
+                        disabled={busyId === m.id}
+                        onClick={() => void toggleWall(m)}
+                      >
+                        <span className="mb-wall-track" aria-hidden="true" />
+                        {wallOn(m) ? "Sichtbar" : "Ausgeblendet"}
+                      </button>
+                    </td>
+                  ) : null}
                   <td className="ap-col-actions">
                     <div className="ap-row-actions">
                       {!m.isPaid && m.active && m.billable ? (

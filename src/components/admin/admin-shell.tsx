@@ -15,6 +15,7 @@ import {
   IconInbox,
   IconOverview,
   IconTrophy,
+  IconPlus,
   IconUsers,
 } from "@/components/admin/admin-icons";
 import type { InboxCounts } from "@/lib/admin-inbox";
@@ -144,6 +145,16 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
     { label: "Turnier und Termine", hrefs: ["/admin/turnier", "/admin/kalender"] },
   ];
 
+  /** Die wichtigsten Aktionen, immer in Reichweite. */
+  const quick: { href: string; label: string; icon: React.ReactNode; primary?: boolean }[] = [
+    { href: "/admin/rechnungen", label: "Rechnung", icon: <IconCopy size={16} />, primary: true },
+    { href: "/admin/budget", label: "Ausgabe", icon: <IconPlus size={16} />, primary: true },
+    { href: "/admin/kalender", label: "Termin", icon: <IconCalendar size={16} /> },
+    { href: "/admin/preisgelder", label: "Preisgeld", icon: <IconTrophy size={16} /> },
+    { href: "/admin/goenner/inbox", label: "Eingänge", icon: <IconInbox size={16} /> },
+    { href: "/admin/turnier", label: "Turnier", icon: <IconUsers size={16} /> },
+  ];
+
   const dockItems = items.filter((i) => DOCK_HREFS.includes(i.href));
   const moreItems = [...items.filter((i) => !DOCK_HREFS.includes(i.href)), ...accountItems];
   const moreActive = moreItems.some((i) => i.match(path));
@@ -209,33 +220,30 @@ export function AdminShell({ children, inbox, next, currentPath }: Props) {
           ))}
         </nav>
 
-        {next ? (
-          <Link href="/admin/kalender" className="ap-side-next">
-            <span className="ap-side-next-top">
-              <span className="ap-side-next-title">
-                Nächstes
-                <br />
-                Turnier
+        <section className="ap-side-card ap-side-quick" aria-label="Kurzbefehle">
+          <p className="ap-side-quick-title">Kurzbefehle</p>
+          <ul className="ap-side-quick-grid">
+            {quick.map((q) => (
+              <li key={q.href}>
+                <Link href={q.href} className={`ap-side-quick-btn${q.primary ? " is-primary" : ""}`}>
+                  <span className="ap-side-quick-icon" aria-hidden="true">
+                    {q.icon}
+                  </span>
+                  <span>{q.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {next ? (
+            <Link href="/admin/kalender" className="ap-side-quick-next">
+              <span className="ap-side-quick-next-label">Nächstes Turnier</span>
+              <strong>{next.name}</strong>
+              <span>
+                {shortDate(next.start_date)} · {next.days === 0 ? "läuft jetzt" : `in ${next.days} Tagen`}
               </span>
-              <span className="ap-side-next-date">{shortDate(next.start_date)}</span>
-            </span>
-            <span className="ap-side-next-pills">
-              <span className="is-on">{next.days === 0 ? "läuft jetzt" : `in ${next.days} Tagen`}</span>
-              <span>{next.country || next.location}</span>
-            </span>
-            <span className="ap-side-next-foot">
-              <strong>{next.location}</strong>
-              <span>{next.name}</span>
-            </span>
-          </Link>
-        ) : null}
-
-        <Link href="/admin/rechnungen" className="ap-side-new">
-          <span className="ap-side-new-plus" aria-hidden="true">
-            +
-          </span>
-          <span>Neue Rechnung</span>
-        </Link>
+            </Link>
+          ) : null}
+        </section>
 
         <div className="ap-side-foot">
           <a href="/" target="_blank" rel="noopener noreferrer" className="ap-nav-item ap-nav-item--quiet">

@@ -11,7 +11,10 @@ import {
   type PrizeMoneyRow,
 } from "@/lib/prize-money";
 import { IconPlus, IconSort, IconTrash, IconTrophy } from "@/components/admin/admin-icons";
-import { AdminPageHeader, chf, chfCompact, dateCh } from "@/components/admin/admin-ui";
+import { chf, chfCompact, dateCh } from "@/components/admin/admin-ui";
+import { AdminPageHeader } from "@/components/admin/ui/admin-page-header";
+import { CountUp } from "@/components/admin/ui/count-up";
+import { Ring } from "@/components/admin/dash-charts";
 
 type Props = {
   rows: PrizeMoneyRow[];
@@ -168,7 +171,7 @@ export function AdminPrizeMoneyClient({ rows, tableMissing, loadError }: Props) 
   const yearLabel = year === "all" ? "alle Jahre" : String(year);
 
   return (
-    <div className="ap-page">
+    <div className="ap-page pz-page">
       <AdminPageHeader
         eyebrow="Einnahmen"
         title="Preisgelder"
@@ -217,7 +220,7 @@ export function AdminPrizeMoneyClient({ rows, tableMissing, loadError }: Props) 
       ) : null}
 
       {editing ? (
-        <form id="ap-prize-form" key={editing} className="ap-card ap-form" onSubmit={onSubmit}>
+        <form id="ap-prize-form" key={editing} className="ap-card ap-form pz-form" onSubmit={onSubmit}>
           <div className="ap-card-head">
             <h2 className="ap-h2">{editRow ? `«${displayTournament(editRow)}» bearbeiten` : "Neuer Eintrag"}</h2>
           </div>
@@ -323,34 +326,65 @@ export function AdminPrizeMoneyClient({ rows, tableMissing, loadError }: Props) 
         </p>
       ) : null}
 
-      <dl className="ap-statline" aria-label={`Preisgelder ${yearLabel}`}>
-        <div>
-          <dt>Total {yearLabel}</dt>
-          <dd>{chfCompact(total)}</dd>
-        </div>
-        <div>
-          <dt>Preisgelder</dt>
-          <dd>
-            {chfCompact(byKind.prize.sum)} <span className="ap-dim">· {byKind.prize.count}×</span>
-          </dd>
-        </div>
-        <div>
-          <dt>ProAms</dt>
-          <dd>
-            {chfCompact(byKind.proam.sum)} <span className="ap-dim">· {byKind.proam.count}×</span>
-          </dd>
-        </div>
-        <div>
-          <dt>Höchstes Preisgeld</dt>
-          <dd>{best ? `${chfCompact(Number(best.amount_chf))} · ${dateCh(best.event_date)}` : "—"}</dd>
-        </div>
-        {year !== "all" ? (
-          <div>
-            <dt>Total alle Jahre</dt>
-            <dd>{chfCompact(allTime)}</dd>
-          </div>
-        ) : null}
-      </dl>
+      <section className="pz-stats ap-stagger" aria-label={`Preisgelder ${yearLabel}`}>
+        <article className="pz-card pz-hero" style={{ "--i": 0 } as React.CSSProperties}>
+          <p className="pz-label">Total {yearLabel}</p>
+          <p className="pz-hero-num">
+            <CountUp value={total} format={chfCompact} />
+          </p>
+          <p className="pz-sub">
+            {inYear.length} {inYear.length === 1 ? "Eintrag" : "Einträge"}
+            {year !== "all" ? ` · alle Jahre ${chfCompact(allTime)}` : ""}
+          </p>
+        </article>
+
+        <article className="pz-card pz-split" style={{ "--i": 1 } as React.CSSProperties}>
+          <Ring
+            size={112}
+            stroke={14}
+            segments={
+              total > 0
+                ? [
+                    { value: byKind.prize.sum, className: "is-red" },
+                    { value: byKind.proam.sum, className: "is-ink" },
+                  ]
+                : [{ value: 0, className: "is-grey" }]
+            }
+          >
+            <span className="pz-ring-num">{inYear.length}</span>
+          </Ring>
+          <ul className="pz-legend">
+            <li>
+              <span className="pz-dot pz-dot--prize" aria-hidden="true" />
+              <span className="pz-legend-label">Preisgelder</span>
+              <span className="pz-legend-val">{chfCompact(byKind.prize.sum)}</span>
+              <span className="pz-legend-sub">{byKind.prize.count}×</span>
+            </li>
+            <li>
+              <span className="pz-dot pz-dot--proam" aria-hidden="true" />
+              <span className="pz-legend-label">ProAms</span>
+              <span className="pz-legend-val">{chfCompact(byKind.proam.sum)}</span>
+              <span className="pz-legend-sub">{byKind.proam.count}×</span>
+            </li>
+          </ul>
+        </article>
+
+        <article className="pz-card pz-best" style={{ "--i": 2 } as React.CSSProperties}>
+          <p className="pz-label">Höchstes Preisgeld</p>
+          {best ? (
+            <>
+              <p className="pz-best-num">{chfCompact(Number(best.amount_chf))}</p>
+              <p className="pz-sub pz-best-name">{displayTournament(best)}</p>
+              <p className="pz-sub">
+                {dateCh(best.event_date)}
+                {best.placement ? ` · Rang ${best.placement}` : ""}
+              </p>
+            </>
+          ) : (
+            <p className="pz-sub">Noch kein Preisgeld in {yearLabel}.</p>
+          )}
+        </article>
+      </section>
 
       <div className="ap-toolbar">
         <div className="ap-segment" role="group" aria-label="Art filtern">
@@ -392,10 +426,15 @@ export function AdminPrizeMoneyClient({ rows, tableMissing, loadError }: Props) 
       </div>
 
       {visible.length === 0 ? (
-        <div className="ap-card ap-empty">
+        <div className="ap-card ap-empty pz-empty">
           <IconTrophy size={20} />
           <p className="ap-empty-title">Noch keine Preisgelder für {yearLabel}</p>
-          <p className="ap-muted-sm">Mit «Preisgeld erfassen» das erste Turnier eintragen.</p>
+          <p className="ap-empty-text">Trage das erste Turnier ein. Es zählt danach zu den Einnahmen der Saison.</p>
+          {!tableMissing && editing !== "new" ? (
+            <button type="button" className="ap-btn ap-btn--primary ap-btn--sm" onClick={() => setEditing("new")}>
+              <IconPlus /> Preisgeld erfassen
+            </button>
+          ) : null}
         </div>
       ) : (
         <div className="ap-table-wrap">
@@ -429,7 +468,15 @@ export function AdminPrizeMoneyClient({ rows, tableMissing, loadError }: Props) 
                   <td data-label="Art">
                     <span className={`ap-prize-kind ap-prize-kind--${prizeKindOf(r)}`}>{kindLabel(prizeKindOf(r))}</span>
                   </td>
-                  <td data-label="Rang">{r.placement || <span className="ap-dim">—</span>}</td>
+                  <td data-label="Rang">
+                    {r.placement ? (
+                      <span className={`ap-pill ${placementRank(r.placement) === 1 ? "ap-pill--red" : placementRank(r.placement) <= 3 ? "ap-pill--ink" : "ap-pill--muted"}`}>
+                        {r.placement}
+                      </span>
+                    ) : (
+                      <span className="ap-dim">—</span>
+                    )}
+                  </td>
                   <td className="ap-num ap-num--strong" data-label="Betrag">
                     {chf(Number(r.amount_chf))}
                   </td>

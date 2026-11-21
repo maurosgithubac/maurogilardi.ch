@@ -15,7 +15,10 @@ function parseEntry(b: Record<string, unknown>) {
   const frequency = b.frequency === "monatlich" || b.frequency === "jaehrlich" ? b.frequency : "einmalig";
   const ends = String(b.ends_on ?? "");
   const ends_on = frequency !== "einmalig" && /^d{4}-d{2}-d{2}$/.test(ends) ? ends : null;
-  return { value: { scope, amount_chf: amount, entry_date: date, category, label: String(b.label ?? "").trim().slice(0, 200), frequency, ends_on } } as const;
+  const subcategory = String(b.subcategory ?? "").trim().slice(0, 80);
+  // Die Spalte kommt mit Migration 029; ohne Unterkategorie wird sie gar nicht erst mitgeschickt.
+  const value = { scope, amount_chf: amount, entry_date: date, category, label: String(b.label ?? "").trim().slice(0, 200), frequency, ends_on, ...(subcategory ? { subcategory } : {}) };
+  return { value } as const;
 }
 
 /** Eine Ausgabe anlegen. */

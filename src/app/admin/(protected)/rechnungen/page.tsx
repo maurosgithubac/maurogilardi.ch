@@ -1,5 +1,5 @@
 import { AdminRechnungenClient, type RecipientOption } from "@/components/admin-rechnungen-client";
-import { AdminPageHeader } from "@/components/admin/admin-ui";
+import { AdminPageHeader } from "@/components/admin/ui/admin-page-header";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 
 export const dynamic = "force-dynamic";

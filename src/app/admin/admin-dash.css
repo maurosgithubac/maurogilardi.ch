@@ -937,3 +937,537 @@
 .dash-turnier-body {
   align-self: center;
 }
+
+/* ═══════════════ Feinschliff (Design-Pass) ═══════════════ */
+
+/* Kopf: Titel und Aktionen sauber auf einer Grundlinie, Jahres-Chips wie Segmente */
+.dash-head {
+  align-items: flex-end;
+  gap: 16px 24px;
+}
+
+.dash-chips {
+  padding: 4px;
+  box-shadow: var(--ap-sh-1);
+}
+
+.dash-chips button {
+  min-height: 32px;
+  padding: 0 14px;
+  font-size: var(--ap-fs-label);
+  transition: background-color var(--ap-dur-fast) var(--ap-ease), color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dash-chips button:not(.is-on):hover {
+  background: var(--ap-hover);
+}
+
+.dash-btn {
+  font-size: var(--ap-fs-body);
+}
+
+/* Karten: einheitliches Innenmass, Kopfzeile mit fester Mindesthöhe */
+.dash-card {
+  gap: 16px;
+  padding: 24px;
+}
+
+.dash-card-head {
+  min-height: 28px;
+  align-items: flex-start;
+}
+
+.dash-link,
+.dash-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  font-size: var(--ap-fs-label);
+}
+
+.dash-more {
+  margin-top: auto;
+}
+
+.dash-todo {
+  grid-template-rows: auto 1fr auto;
+}
+
+.dash-badge {
+  min-width: 28px;
+  height: 28px;
+}
+
+/* Listenzeilen */
+.dash-row {
+  min-height: 56px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: var(--ap-hover);
+}
+
+.dash-row:hover {
+  background: #efede8;
+  transform: none;
+}
+
+.dash-row:hover .dash-chevron {
+  transform: translateX(2px);
+  color: var(--ap-ink);
+}
+
+.dash-chevron {
+  transition: transform var(--ap-dur-fast) var(--ap-ease), color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dash-row-main strong {
+  font-size: 0.9rem;
+}
+
+.dash-row-main span {
+  font-size: var(--ap-fs-caption);
+}
+
+.dash-tag {
+  padding: 4px 10px;
+  font-size: 0.72rem;
+}
+
+.dash-pill {
+  padding: 4px 10px;
+}
+
+.dash-date span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.7rem;
+}
+
+.dash-sc {
+  min-height: 64px;
+  border-radius: 20px;
+  background: var(--ap-hover);
+}
+
+.dash-sc:hover {
+  transform: none;
+  background: rgb(215 25 32 / 7%);
+}
+
+.dash-sc:hover .dash-sc-icon {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.dash-sc-icon {
+  transition: background-color var(--ap-dur-fast) var(--ap-ease), color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dash-meter {
+  height: 8px;
+}
+
+/* Kennzahlen: Schrift skaliert mit der Kartenbreite, Zahlen springen nie in die nächste Zeile */
+.dash-kpis {
+  container-type: inline-size;
+  align-content: stretch;
+}
+
+.dash-kpi {
+  padding: 24px clamp(20px, 3cqi, 32px);
+}
+
+.dash-kpi-value {
+  font-size: clamp(1.5rem, 3.7cqi, 3rem);
+  white-space: nowrap;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.dash-kpi-label {
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+}
+
+.dash-delta {
+  font-size: var(--ap-fs-label);
+}
+
+.dash-mini-value,
+.dc-ring-center strong,
+.dc-gauge-center strong {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.dash-dark {
+  gap: 12px;
+}
+
+.dash-dark .dash-btn {
+  margin-top: 4px;
+}
+
+/* Ring- und Tacho-Karten: Inhalt vertikal mittig */
+.dash-ringcard {
+  align-content: space-between;
+}
+
+.dash-ringcard .dash-card-head {
+  justify-content: center;
+}
+
+.dash-stack {
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Diagramme */
+.dc-wrap {
+  position: relative;
+  outline: none;
+  border-radius: 16px;
+}
+
+.dc-wrap:focus-visible {
+  box-shadow: var(--ap-focus);
+}
+
+.dc-grid text,
+.dc-xlabel {
+  fill: var(--ap-axis);
+}
+
+.dc-grid line,
+.dc-grid-line {
+  stroke: #edece7;
+}
+
+.dc-cursor line {
+  stroke: var(--ap-ink);
+  stroke-opacity: 0.25;
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.dc-cursor-dot {
+  fill: #fff;
+  stroke: var(--ap-red);
+  stroke-width: 3;
+}
+
+.dc-cursor-dot--prev {
+  stroke: #9a968c;
+  stroke-width: 2;
+}
+
+.dc-wrap.is-hover .dc-end {
+  opacity: 0.25;
+  transition: opacity var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dc-bar {
+  transition: fill var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dc-bar.is-hover {
+  fill: var(--ap-red);
+}
+
+.dc-tip {
+  position: absolute;
+  top: 8px;
+  z-index: 3;
+  display: grid;
+  gap: 6px;
+  min-width: 150px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--ap-ink);
+  color: #fff;
+  font-size: var(--ap-fs-caption);
+  line-height: 1.2;
+  box-shadow: 0 12px 28px -8px rgb(18 19 20 / 45%);
+  transform: translateX(14px);
+  pointer-events: none;
+  animation: ap-fade 120ms var(--ap-ease) both;
+}
+
+.dc-tip.is-left {
+  transform: translateX(calc(-100% - 14px));
+}
+
+.dc-tip-title {
+  font-weight: 700;
+  font-size: var(--ap-fs-label);
+}
+
+.dc-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgb(255 255 255 / 78%);
+}
+
+.dc-tip-row b {
+  margin-left: auto;
+  padding-left: 12px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.dc-tip .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+}
+
+.dc-tip .dot.is-ink {
+  background: #fff;
+}
+
+.dc-tip .dot.is-dash {
+  border-color: rgb(255 255 255 / 70%);
+}
+
+/* Sehr schmal: Tooltip nicht über den Rand */
+@media (max-width: 520px) {
+  .dc-tip {
+    min-width: 128px;
+  }
+}
+
+/* ——— Raster: Laptop (1100–1439), Standard (1440–1759), gross (ab 1760) ——— */
+@media (min-width: 1100px) and (max-width: 1439.98px) {
+  .dash-hero {
+    grid-column: span 7;
+  }
+
+  .dash-todo {
+    grid-column: span 5;
+  }
+
+  .dash-ringcard {
+    grid-column: span 4;
+  }
+
+  .dash-kpis {
+    grid-column: span 8;
+  }
+
+  .dash-third {
+    grid-column: span 6;
+  }
+
+  .dash-third + .dash-third + .dash-third {
+    grid-column: span 12;
+  }
+
+  .dash-turnier {
+    grid-column: span 7;
+  }
+
+  .dash-ringcard + .dash-stack,
+  .dash-stack {
+    grid-column: span 12;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
+  .dash-bars {
+    grid-column: span 12;
+  }
+
+  .dash-shortcuts {
+    grid-column: span 12;
+  }
+
+  .dash-sc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dash-bars-wrap {
+    grid-template-columns: minmax(0, 1fr) 220px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ov {
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1760px) {
+  .dash-third {
+    grid-column: span 4;
+  }
+
+  .dash-card {
+    padding: 28px;
+  }
+}
+
+/* Handy: kompaktere Karten, Kopf-Aktionen füllen die Breite */
+@media (max-width: 760px) {
+  .dash {
+    gap: 14px;
+  }
+
+  .dash-card {
+    padding: 20px;
+  }
+
+  .dash-head-actions {
+    width: 100%;
+  }
+
+  .dash-head-actions .dash-chips {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dash-chips button {
+    flex: 1;
+    min-height: 40px;
+  }
+
+  .dash-kpi-value {
+    font-size: 2.25rem;
+  }
+
+  .dash-row {
+    min-height: 60px;
+  }
+}
+
+.dash-todo .dash-rows,
+.dash-third .dash-rows {
+  align-content: start;
+}
+
+/* ——— Kurzbefehle in der Seitenleiste ——— */
+.ap-side-quick {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.ap-side-quick-title {
+  margin: 0;
+  padding: 0 2px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-subtle);
+}
+
+.ap-side-quick-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ap-side-quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: #f3f2ee;
+  color: var(--ap-ink);
+  font-size: 0.84rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.ap-side-quick-btn:hover {
+  background: rgb(215 25 32 / 10%);
+  transform: translateY(-1px);
+}
+
+.ap-side-quick-btn.is-primary {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ap-side-quick-btn.is-primary:hover {
+  background: var(--ap-red-hover);
+}
+
+.ap-side-quick-icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.ap-side-quick-next {
+  display: grid;
+  gap: 1px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgb(215 25 32 / 8%);
+  color: var(--ap-ink);
+  text-decoration: none;
+}
+
+.ap-side-quick-next-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ap-red-text);
+}
+
+.ap-side-quick-next strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.ap-side-quick-next span:last-child {
+  font-size: 0.74rem;
+  color: var(--ap-muted);
+}
+
+/* ——— Newsletter-Kachel (Beehiiv) und Kategorie-Punkt ——— */
+.dash-news-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.dash-news-stats dt {
+  font-size: 0.68rem;
+  color: var(--ap-muted);
+}
+
+.dash-news-stats dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 999px;
+  background: #c7c4bc;
+}
+
+/* Kurzbefehle sind am Desktop in der Seitenleiste; die Kachel bleibt nur für Handy und Tablet */
+@media (min-width: 1100px) {
+  .dash-shortcuts {
+    display: none;
+  }
+
+  .dash-bars {
+    grid-column: 1 / -1;
+  }
+}

@@ -24,7 +24,9 @@ import {
   IconUsers,
 } from "@/components/admin/admin-icons";
 import { AreaChart, Bars, Gauge, Ring } from "@/components/admin/dash-charts";
-import { categoriesFor, monthlyAmounts, type BudgetEntryRow } from "@/lib/budget";
+import { CountUp } from "@/components/admin/ui/count-up";
+import { categoriesFor, categoryColor, monthlyAmounts, type BudgetEntryRow } from "@/lib/budget";
+import type { NewsletterStats } from "@/lib/beehiiv-stats";
 import { chf, chfCompact, dateCh, categoryOf, type CategoryFilter } from "@/components/admin/admin-ui";
 import type { UpcomingEvent } from "@/lib/kalender-upcoming";
 
@@ -39,7 +41,7 @@ type Props = {
   /** Golf-Ausgaben aus dem Budget (für Verlauf und Ergebnis) */
   budget?: BudgetEntryRow[];
   /** Anzahl Newsletter-Abonnenten */
-  newsletter?: number | null;
+  newsletter?: NewsletterStats | null;
   /** Zusammenfassung des neuesten Gönnerturniers */
   tournament?: TournamentSummary | null;
   ledgerMissing?: boolean;
@@ -292,7 +294,7 @@ export function AdminOverview({
       ) : null}
 
       {/* Verlauf */}
-      <section className="dash-card dash-hero" aria-labelledby="dash-hero-h">
+      <section className="dash-card dash-hero" style={{ "--i": 1 } as React.CSSProperties} aria-labelledby="dash-hero-h">
         <div className="dash-card-head">
           <div>
             <h2 id="dash-hero-h" className="dash-h2">Einnahmen und Ausgaben</h2>
@@ -308,7 +310,7 @@ export function AdminOverview({
       </section>
 
       {/* Heute zu tun */}
-      <section className="dash-card dash-todo" aria-labelledby="today-heading">
+      <section className="dash-card dash-todo" style={{ "--i": 2 } as React.CSSProperties} aria-labelledby="today-heading">
         <div className="dash-card-head">
           <h2 id="today-heading" className="dash-h2">Heute zu tun</h2>
           <span className="dash-badge">{todayCount}</span>
@@ -356,7 +358,7 @@ export function AdminOverview({
       </section>
 
       {/* Zahlungsquote */}
-      <section className="dash-card dash-ringcard" aria-labelledby="dash-pay-h">
+      <section className="dash-card dash-ringcard" style={{ "--i": 3 } as React.CSSProperties} aria-labelledby="dash-pay-h">
         <h2 id="dash-pay-h" className="dash-h2">Beiträge bezahlt</h2>
         <Ring
           segments={[
@@ -371,10 +373,10 @@ export function AdminOverview({
       </section>
 
       {/* Drei grosse Kennzahlen */}
-      <section className="dash-card dash-kpis" aria-label="Kennzahlen">
+      <section className="dash-card dash-kpis" style={{ "--i": 4 } as React.CSSProperties} aria-label="Kennzahlen">
         <div className="dash-kpi">
           <span className="dash-kpi-label">Einnahmen {year}</span>
-          <strong className="dash-kpi-value">{chfCompact(income.total)}</strong>
+          <strong className="dash-kpi-value"><CountUp value={income.total} format={chfCompact} /></strong>
           <span className={`dash-delta ${diff >= 0 ? "is-up" : "is-down"}`}>
             {income.prev > 0
               ? `${diff >= 0 ? "+" : "−"}${chfCompact(Math.abs(diff))}${diffPct !== null ? ` (${Math.abs(diffPct)} %)` : ""} zu ${year - 1}`
@@ -383,18 +385,18 @@ export function AdminOverview({
         </div>
         <div className="dash-kpi">
           <span className="dash-kpi-label">Ausgaben {year}</span>
-          <strong className="dash-kpi-value">{chfCompact(series.expTotal)}</strong>
+          <strong className="dash-kpi-value"><CountUp value={series.expTotal} format={chfCompact} /></strong>
           <span className="dash-delta">{series.topCats[0] ? `Grösster Posten: ${series.topCats[0].label}` : "Noch nichts erfasst"}</span>
         </div>
         <div className="dash-kpi">
           <span className="dash-kpi-label">Ergebnis</span>
-          <strong className={`dash-kpi-value ${result >= 0 ? "is-good" : "is-bad"}`}>{chfCompact(result)}</strong>
+          <strong className={`dash-kpi-value ${result >= 0 ? "is-good" : "is-bad"}`}><CountUp value={result} format={chfCompact} /></strong>
           <span className="dash-delta">Einnahmen minus Golf-Ausgaben</span>
         </div>
       </section>
 
       {/* Einnahmen nach Quelle */}
-      <section className="dash-card dash-third" aria-labelledby="dash-src-h">
+      <section className="dash-card dash-third" style={{ "--i": 5 } as React.CSSProperties} aria-labelledby="dash-src-h">
         <div className="dash-card-head">
           <h2 id="dash-src-h" className="dash-h2">Einnahmen nach Quelle</h2>
           <span className="dash-card-sub">{year}</span>
@@ -417,7 +419,7 @@ export function AdminOverview({
       </section>
 
       {/* Nächste Turniere */}
-      <section className="dash-card dash-third" aria-labelledby="dash-ev-h">
+      <section className="dash-card dash-third" style={{ "--i": 6 } as React.CSSProperties} aria-labelledby="dash-ev-h">
         <div className="dash-card-head">
           <h2 id="dash-ev-h" className="dash-h2">Nächste Turniere</h2>
           <Link href="/admin/kalender" className="dash-link">Kalender ›</Link>
@@ -446,7 +448,7 @@ export function AdminOverview({
       </section>
 
       {/* Letzte Preisgelder */}
-      <section className="dash-card dash-third" aria-labelledby="dash-pr-h">
+      <section className="dash-card dash-third" style={{ "--i": 7 } as React.CSSProperties} aria-labelledby="dash-pr-h">
         <div className="dash-card-head">
           <h2 id="dash-pr-h" className="dash-h2">Letzte Preisgelder</h2>
           <Link href="/admin/preisgelder" className="dash-link">Alle ›</Link>
@@ -472,7 +474,7 @@ export function AdminOverview({
       </section>
 
       {/* Gönnerturnier */}
-      <section className="dash-card dash-turnier" aria-labelledby="dash-tn-h">
+      <section className="dash-card dash-turnier" style={{ "--i": 8 } as React.CSSProperties} aria-labelledby="dash-tn-h">
         <div className="dash-card-head">
           <h2 id="dash-tn-h" className="dash-h2">Gönnerturnier</h2>
           <Link href="/admin/turnier" className="dash-link">Öffnen ›</Link>
@@ -498,7 +500,7 @@ export function AdminOverview({
       </section>
 
       {/* Mitglieder */}
-      <section className="dash-card dash-ringcard" aria-labelledby="dash-mem-h">
+      <section className="dash-card dash-ringcard" style={{ "--i": 9 } as React.CSSProperties} aria-labelledby="dash-mem-h">
         <div className="dash-card-head">
           <h2 id="dash-mem-h" className="dash-h2">Mitglieder</h2>
         </div>
@@ -523,21 +525,31 @@ export function AdminOverview({
 
       {/* Newsletter und offener Betrag */}
       <div className="dash-stack">
-        <section className="dash-card dash-mini" aria-labelledby="dash-nl-h">
-          <h2 id="dash-nl-h" className="dash-h2">Newsletter</h2>
-          <strong className="dash-mini-value">{newsletter ?? "–"}</strong>
-          <span className="dash-card-sub">Abonnenten auf der Website</span>
+        <section className="dash-card dash-mini dash-news" style={{ "--i": 11 } as React.CSSProperties} aria-labelledby="dash-nl-h">
+          <div className="dash-card-head">
+            <h2 id="dash-nl-h" className="dash-h2">Newsletter</h2>
+            {newsletter ? <span className="dash-tag">{newsletter.source === "beehiiv" ? "Beehiiv" : "Website-Liste"}</span> : null}
+          </div>
+          <strong className="dash-mini-value">{newsletter ? <CountUp value={newsletter.subscribers} /> : "–"}</strong>
+          <span className="dash-card-sub">{newsletter ? "aktive Abonnenten" : "Newsletter-Zahlen sind gerade nicht erreichbar."}</span>
+          {newsletter && newsletter.openRate !== null ? (
+            <dl className="dash-news-stats">
+              <div><dt>Öffnungen</dt><dd>{newsletter.openRate.toFixed(1).replace(".", ",")} %</dd></div>
+              <div><dt>Klicks</dt><dd>{(newsletter.clickRate ?? 0).toFixed(1).replace(".", ",")} %</dd></div>
+              <div><dt>Versendet</dt><dd>{(newsletter.sent ?? 0).toLocaleString("de-CH")}</dd></div>
+            </dl>
+          ) : null}
         </section>
-        <section className="dash-card dash-dark" aria-labelledby="dash-open-h">
+        <section className="dash-card dash-dark" style={{ "--i": 12 } as React.CSSProperties} aria-labelledby="dash-open-h">
           <h2 id="dash-open-h" className="dash-h2">Noch offen</h2>
-          <strong className="dash-mini-value">{chfCompact(dues.openSum)}</strong>
+          <strong className="dash-mini-value"><CountUp value={dues.openSum} format={chfCompact} /></strong>
           <span className="dash-dark-sub">{dues.unpaid.length} Beiträge ausstehend</span>
           <Link href="/admin/rechnungen" className="dash-btn is-light">Rechnung erstellen</Link>
         </section>
       </div>
 
       {/* Ausgaben pro Monat */}
-      <section className="dash-card dash-bars" aria-labelledby="dash-exp-h">
+      <section className="dash-card dash-bars" style={{ "--i": 13 } as React.CSSProperties} aria-labelledby="dash-exp-h">
         <div className="dash-card-head">
           <div>
             <h2 id="dash-exp-h" className="dash-h2">Ausgaben pro Monat</h2>
@@ -551,7 +563,7 @@ export function AdminOverview({
             {series.topCats.length === 0 ? <li className="dash-empty">Noch keine Ausgaben.</li> : null}
             {series.topCats.map((c) => (
               <li key={c.id}>
-                <span aria-hidden="true">{c.icon}</span>
+                <span className="dash-dot" style={{ background: categoryColor(c.id) }} aria-hidden="true" />
                 <span className="dash-topcats-name">{c.label}</span>
                 <strong>{chfCompact(c.v)}</strong>
               </li>
@@ -561,7 +573,7 @@ export function AdminOverview({
       </section>
 
       {/* Kurzbefehle */}
-      <section className="dash-card dash-shortcuts" aria-labelledby="dash-sc-h">
+      <section className="dash-card dash-shortcuts" style={{ "--i": 14 } as React.CSSProperties} aria-labelledby="dash-sc-h">
         <h2 id="dash-sc-h" className="dash-h2">Kurzbefehle</h2>
         <ul className="dash-sc-grid">
           {shortcuts.map((s) => (

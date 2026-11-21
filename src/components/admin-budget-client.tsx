@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CountUp } from "@/components/admin/ui/count-up";
 import {
+  SUBCATEGORY_SUGGESTIONS,
   categoriesFor,
+  categoryColor,
   fmt,
   monthlyAmounts,
   parseBankCsv,
@@ -13,13 +16,14 @@ import {
   type BudgetFrequency,
   type BudgetScope,
 } from "@/lib/budget";
+import { squarify } from "@/lib/treemap";
 
 const MONTHS = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
-const FREQS: { id: BudgetFrequency; label: string; icon: string }[] = [
-  { id: "einmalig", label: "Einmal", icon: "1×" },
-  { id: "monatlich", label: "Jeden Monat", icon: "🔁" },
-  { id: "jaehrlich", label: "Jedes Jahr", icon: "📅" },
+const FREQS: { id: BudgetFrequency; label: string }[] = [
+  { id: "einmalig", label: "Einmal" },
+  { id: "monatlich", label: "Jeden Monat" },
+  { id: "jaehrlich", label: "Jedes Jahr" },
 ];
 
 type Props = {
@@ -34,23 +38,24 @@ type ImportRow = { date: string; label: string; amount: number; include: boolean
 const todayIso = () => new Date().toISOString().slice(0, 10);
 const parseAmount = (s: string) => Number(String(s).replace(/[’'\s]/g, "").replace(",", "."));
 const dmy = (iso: string) => iso.split("-").reverse().join(".");
+const chfCount = (n: number) => `CHF ${fmt(n)}`;
 
 export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }: Props) {
   const router = useRouter();
   const [year, setYear] = useState(defaultYear);
   const [scope, setScope] = useState<BudgetScope>("golf");
   const [month, setMonth] = useState<number | null>(null);
-  const [catFilter, setCatFilter] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
+
+  // Auswahl: Hauptkategorie und Unterkategorie ("" = ohne Unterkategorie, null = keine Auswahl)
+  const [catId, setCatId] = useState<string | null>(null);
+  const [sub, setSub] = useState<string | null>(null);
+  const [newSubOpen, setNewSubOpen] = useState(false);
+  const [newSubText, setNewSubText] = useState("");
 
   // Formular
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-  const [category, setCategory] = useState<string>("");
-  const [catTouched, setCatTouched] = useState(false);
+  const [desc, setDesc] = useState("");
   const [frequency, setFrequency] = useState<BudgetFrequency>("einmalig");
-  const [freqTouched, setFreqTouched] = useState(false);
   const [date, setDate] = useState(todayIso());
   const [endsOn, setEndsOn] = useState("");
   const [busy, setBusy] = useState(false);
@@ -61,37 +66,93 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
   const [importRows, setImportRows] = useState<ImportRow[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Treemap-Grösse
+  const mapRef = useRef<HTMLDivElement>(null);
+  const detailRef = useRef<HTMLElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const [mapW, setMapW] = useState(0);
+
+  useEffect(() => {
+    const el = mapRef.current;
+    if (!el) return;
+    const read = () => setMapW(el.clientWidth);
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const cats = categoriesFor(scope);
   const scopeEntries = useMemo(() => entries.filter((e) => e.scope === scope), [entries, scope]);
   const expanded = useMemo(() => monthlyAmounts(scopeEntries, year), [scopeEntries, year]);
 
-  // Wert eines Eintrags: ganzes Jahr oder ausgewählter Monat
   const valueOf = (months: number[]) => (month === null ? months.reduce((s, v) => s + v, 0) : months[month]);
 
   const monthTotals = useMemo(() => Array.from({ length: 12 }, (_, m) => expanded.reduce((s, x) => s + x.months[m], 0)), [expanded]);
-  const yearSpent = monthTotals.reduce((s, v) => s + v, 0);
-  const shownSpent = month === null ? yearSpent : monthTotals[month];
-  const maxMonth = Math.max(1, ...monthTotals);
+  const yearTotal = monthTotals.reduce((s, v) => s + v, 0);
+  const shownTotal = month === null ? yearTotal : monthTotals[month];
 
-  const catSums = useMemo(() => {
-    const map: Record<string, number> = {};
+  const catStats = useMemo(() => {
+    const map: Record<string, { total: number; count: number }> = {};
     for (const x of expanded) {
       const v = month === null ? x.months.reduce((s, n) => s + n, 0) : x.months[month];
-      if (v > 0) map[x.entry.category] = (map[x.entry.category] ?? 0) + v;
+      if (v <= 0) continue;
+      const c = (map[x.entry.category] ??= { total: 0, count: 0 });
+      c.total += v;
+      c.count += 1;
     }
     return map;
   }, [expanded, month]);
-  const maxCat = Math.max(1, ...Object.values(catSums));
+
+  const filled = cats.filter((c) => (catStats[c.id]?.total ?? 0) > 0);
+  const empty = cats.filter((c) => (catStats[c.id]?.total ?? 0) <= 0);
+  const grand = filled.reduce((s, c) => s + catStats[c.id].total, 0);
+
+  const mapH = mapW < 640 ? Math.round(mapW * 1.05) : Math.round(Math.min(520, Math.max(340, mapW * 0.4)));
+  const rects = useMemo(
+    () =>
+      mapW > 0 && grand > 0
+        ? squarify(
+            filled.map((c) => ({ id: c.id, value: Math.max(catStats[c.id].total, grand * 0.035), data: c })),
+            mapW,
+            mapH,
+          )
+        : [],
+    // filled hängt von cats und catStats ab
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mapW, mapH, grand, catStats, cats],
+  );
 
   const recurring = expanded.filter((x) => x.entry.frequency !== "einmalig" && x.months.some((v) => v > 0));
   const fixedPerMonth = recurring.reduce((s, x) => s + x.months.reduce((a, b) => a + b, 0) / 12, 0);
-
   const income = scope === "golf" ? incomeByYear[String(year)] ?? 0 : 0;
+  const biggest = filled.length ? [...filled].sort((a, b) => catStats[b.id].total - catStats[a.id].total)[0] : null;
+  const flow = [...filled].sort((a, b) => catStats[b.id].total - catStats[a.id].total);
 
-  const listItems = expanded
-    .filter((x) => valueOf(x.months) > 0 && (catFilter === null || x.entry.category === catFilter))
+  // Auswahl-Details
+  const selCat = cats.find((c) => c.id === catId) ?? null;
+  const catItems = useMemo(
+    () => (catId ? expanded.filter((x) => x.entry.category === catId && valueOf(x.months) > 0) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [expanded, catId, month],
+  );
+  const subGroups = useMemo(() => {
+    const map = new Map<string, { name: string; total: number; count: number }>();
+    for (const x of catItems) {
+      const name = (x.entry.subcategory ?? "").trim();
+      const g = map.get(name.toLowerCase()) ?? { name, total: 0, count: 0 };
+      g.total += valueOf(x.months);
+      g.count += 1;
+      map.set(name.toLowerCase(), g);
+    }
+    return [...map.values()].sort((a, b) => b.total - a.total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catItems, month]);
+  const suggestions = (catId ? SUBCATEGORY_SUGGESTIONS[catId] ?? [] : []).filter((s) => !subGroups.some((g) => g.name.toLowerCase() === s.toLowerCase()));
+  const customSub = sub && sub !== "" && !subGroups.some((g) => g.name.toLowerCase() === sub.toLowerCase()) && !suggestions.some((s) => s.toLowerCase() === sub.toLowerCase());
+  const listItems = catItems
+    .filter((x) => (sub === null ? true : (x.entry.subcategory ?? "").trim().toLowerCase() === sub.toLowerCase()))
     .sort((a, b) => b.entry.entry_date.localeCompare(a.entry.entry_date));
-  const visibleItems = showAll ? listItems : listItems.slice(0, 12);
 
   const isRecurring = frequency !== "einmalig";
   const amountNumber = parseAmount(amount);
@@ -99,44 +160,55 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
 
   function changeScope(s: BudgetScope) {
     setScope(s);
-    setCatFilter(null);
-    setCategory("");
-    setCatTouched(false);
+    setCatId(null);
+    setSub(null);
+    setNewSubOpen(false);
   }
 
-  function closeSheet() {
-    setSheetOpen(false);
+  function pickCategory(id: string) {
+    if (catId === id) {
+      setCatId(null);
+      setSub(null);
+      return;
+    }
+    setCatId(id);
+    setSub(null);
+    setNewSubOpen(false);
     setError(null);
   }
 
-  function onNoteChange(text: string) {
-    setNote(text);
-    if (!catTouched) {
-      const lower = text.toLowerCase();
-      const hit = cats.find((c) => c.keywords.some((k) => lower.includes(k)));
-      if (hit) setCategory(hit.id);
-    }
-    if (!freqTouched) {
-      const f = suggestFrequency(text);
-      if (f !== "einmalig") setFrequency(f);
-    }
+  // Beim Wählen einer Kategorie ins Detail scrollen (Handy) und das Betragsfeld bereitmachen
+  useEffect(() => {
+    if (!catId) return;
+    if (window.innerWidth < 1100) detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const t = window.setTimeout(() => amountRef.current?.focus({ preventScroll: true }), 220);
+    return () => window.clearTimeout(t);
+  }, [catId]);
+
+  function pickSub(name: string) {
+    setSub(sub === name ? null : name);
+    setNewSubOpen(false);
+    window.setTimeout(() => amountRef.current?.focus({ preventScroll: true }), 30);
   }
 
-  function resetForm() {
-    setAmount("");
-    setNote("");
-    setCategory("");
-    setCatTouched(false);
-    setFrequency("einmalig");
-    setFreqTouched(false);
-    setDate(todayIso());
-    setEndsOn("");
+  function confirmNewSub() {
+    const name = newSubText.trim().slice(0, 80);
+    if (!name) return;
+    setSub(name);
+    setNewSubText("");
+    setNewSubOpen(false);
+    window.setTimeout(() => amountRef.current?.focus({ preventScroll: true }), 30);
+  }
+
+  function showToast(text: string) {
+    setToast(text);
+    window.setTimeout(() => setToast(null), 2600);
   }
 
   async function save() {
     setError(null);
+    if (!catId) return setError("Bitte zuerst eine Kategorie wählen.");
     if (!(amountNumber > 0)) return setError("Bitte einen Betrag eingeben.");
-    if (!category) return setError("Bitte eine Kategorie wählen.");
     setBusy(true);
     try {
       const res = await fetch("/api/admin/budget", {
@@ -144,21 +216,26 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           scope,
-          category,
+          category: catId,
+          subcategory: sub ?? "",
           amount_chf: amountNumber,
           entry_date: date,
-          label: note,
+          label: desc,
           frequency,
           ends_on: isRecurring ? endsOn : "",
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Speichern fehlgeschlagen.");
-      resetForm();
-      setSheetOpen(false);
-      setToast(isRecurring ? "Gespeichert. Läuft ab jetzt in jedem Monat mit." : "Gespeichert.");
-      setTimeout(() => setToast(null), 2600);
+      if (!res.ok) {
+        const msg = data.error ?? "Speichern fehlgeschlagen.";
+        throw new Error(/subcategory/i.test(msg) ? "Unterkategorien brauchen noch die Datenbank-Erweiterung: supabase/029_budget_subcategories.sql ausführen." : msg);
+      }
+      setAmount("");
+      setDesc("");
+      setEndsOn("");
+      showToast(isRecurring ? "Gespeichert. Läuft jetzt in jedem Monat mit." : "Gespeichert.");
       router.refresh();
+      window.setTimeout(() => amountRef.current?.focus({ preventScroll: true }), 50);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Fehler beim Speichern.");
     } finally {
@@ -174,7 +251,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
 
   async function onFile(file: File) {
     const rows = parseBankCsv(await file.text());
-    if (rows.length === 0) return setToast("Keine Buchungen in der Datei gefunden.");
+    if (rows.length === 0) return showToast("Keine Buchungen in der Datei gefunden.");
     setImportRows(
       rows.map((r) => ({
         ...r,
@@ -211,201 +288,316 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       if (!res.ok) throw new Error(data.error ?? "Import fehlgeschlagen.");
       setImportRows([]);
       if (fileRef.current) fileRef.current.value = "";
-      setToast(`${data.saved} Buchungen gespeichert.`);
-      setTimeout(() => setToast(null), 2600);
+      showToast(`${data.saved} Buchungen gespeichert.`);
       router.refresh();
     } catch (e) {
-      setToast(e instanceof Error ? e.message : "Fehler beim Import.");
+      showToast(e instanceof Error ? e.message : "Fehler beim Import.");
     } finally {
       setBusy(false);
     }
   }
 
-  const headLabel = month === null ? `Ausgaben ${year}` : `Ausgaben ${MONTHS[month]} ${year}`;
+  const periodLabel = month === null ? `${year}` : `${MONTHS[month]} ${year}`;
 
   return (
-    <div className="bx">
-      {/* Kopf: Jahr und Bereich */}
-      <div className="bx-top">
-        <div className="bx-seg" role="group" aria-label="Jahr">
+    <div className="bt">
+      {/* Steuerung: Jahr, Monat, Bereich */}
+      <div className="bt-controls">
+        <div className="bt-years" role="group" aria-label="Jahr">
           {years.map((y) => (
-            <button key={y} type="button" className={y === year ? "is-on" : ""} aria-pressed={y === year} onClick={() => { setYear(y); setMonth(null); }}>
-              {y}
+            <button key={y} type="button" className={`bt-year${y === year ? " is-on" : ""}`} aria-pressed={y === year} onClick={() => { setYear(y); setMonth(null); }}>
+              <strong>{y}</strong>
+              <span>{y === defaultYear ? "dieses Jahr" : y > defaultYear ? "Planung" : "Vorjahr"}</span>
             </button>
           ))}
         </div>
-        <div className="bx-seg" role="tablist" aria-label="Bereich">
-          <button type="button" role="tab" aria-selected={scope === "golf"} className={scope === "golf" ? "is-on" : ""} onClick={() => changeScope("golf")}>
-            ⛳ Golf
-          </button>
-          <button type="button" role="tab" aria-selected={scope === "privat"} className={scope === "privat" ? "is-on" : ""} onClick={() => changeScope("privat")}>
-            🏠 Privat
-          </button>
+        <div className="bt-seg" role="tablist" aria-label="Bereich">
+          <button type="button" role="tab" aria-selected={scope === "golf"} className={scope === "golf" ? "is-on" : ""} onClick={() => changeScope("golf")}>Golf</button>
+          <button type="button" role="tab" aria-selected={scope === "privat"} className={scope === "privat" ? "is-on" : ""} onClick={() => changeScope("privat")}>Privat</button>
         </div>
       </div>
 
-      {/* Hero: Summen und Monatsbalken */}
-      <section className="bx-hero bx-span-7" aria-label="Übersicht">
-        <div className="bx-hero-main">
-          <span className="bx-label">{headLabel}</span>
-          <strong className="bx-big">CHF {fmt(shownSpent)}</strong>
-          {scope === "golf" ? (
-            <span className="bx-sub">
-              Einnahmen CHF {fmt(income)} · <span className={income - yearSpent >= 0 ? "is-good" : "is-bad"}>Ergebnis CHF {fmt(income - yearSpent)}</span>
-            </span>
-          ) : (
-            <span className="bx-sub">Fixkosten ca. CHF {fmt(fixedPerMonth)} pro Monat</span>
-          )}
-        </div>
+      <div className="bt-months" role="group" aria-label="Monat">
+        <button type="button" className={month === null ? "is-on" : ""} aria-pressed={month === null} onClick={() => setMonth(null)}>Ganzes Jahr</button>
+        {MONTHS.map((m, i) => (
+          <button key={m} type="button" className={month === i ? "is-on" : ""} aria-pressed={month === i} onClick={() => setMonth(month === i ? null : i)} title={`CHF ${fmt(monthTotals[i])}`}>
+            {m}
+          </button>
+        ))}
+      </div>
 
-        <div className="bx-bars" role="group" aria-label="Monate wählen">
-          {monthTotals.map((v, m) => (
-            <button
-              key={m}
-              type="button"
-              className={`bx-bar${month === m ? " is-on" : ""}`}
-              aria-pressed={month === m}
-              aria-label={`${MONTHS[m]}: CHF ${fmt(v)}`}
-              onClick={() => setMonth(month === m ? null : m)}
-            >
-              <span className="bx-bar-fill" style={{ height: `${Math.max(4, (v / maxMonth) * 100)}%` }} />
-              <span className="bx-bar-label">{MONTHS[m].slice(0, 1)}</span>
-            </button>
-          ))}
-        </div>
-        <p className="bx-hint">{month === null ? "Tippe auf einen Monat, um nur diesen zu sehen." : `${MONTHS[month]} ausgewählt. Nochmals tippen zeigt wieder das ganze Jahr.`}</p>
-      </section>
-
-      {/* Kategorien */}
-      <section className="bx-card bx-span-5" aria-labelledby="bx-cat-h">
-        <div className="bx-card-head">
-          <h2 id="bx-cat-h">Kategorien</h2>
-          {catFilter ? <button type="button" className="bx-link" onClick={() => setCatFilter(null)}>Alle zeigen</button> : null}
-        </div>
-        <ul className="bx-cats">
-          {cats
-            .filter((c) => (catSums[c.id] ?? 0) > 0)
-            .sort((a, b) => (catSums[b.id] ?? 0) - (catSums[a.id] ?? 0))
-            .map((c) => {
-              const v = catSums[c.id] ?? 0;
-              return (
-                <li key={c.id}>
-                  <button type="button" className={`bx-cat${catFilter === c.id ? " is-on" : ""}`} aria-pressed={catFilter === c.id} onClick={() => setCatFilter(catFilter === c.id ? null : c.id)}>
-                    <span className="bx-cat-icon" aria-hidden="true">{c.icon}</span>
-                    <span className="bx-cat-main">
-                      <span className="bx-cat-row"><strong>{c.label}</strong><span>CHF {fmt(v)}</span></span>
-                      <span className="bx-meter"><span style={{ width: `${(v / maxCat) * 100}%` }} /></span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-        </ul>
-        {Object.keys(catSums).length === 0 ? <p className="bx-empty">Noch keine Ausgaben in dieser Auswahl.</p> : null}
-      </section>
-
-      {/* Abos */}
-      {recurring.length > 0 ? (
-        <section className="bx-card bx-span-6" aria-labelledby="bx-rec-h">
-          <div className="bx-card-head">
-            <h2 id="bx-rec-h">Abos & Fixkosten</h2>
-            <span className="bx-pill">ca. CHF {fmt(fixedPerMonth)} / Monat</span>
+      <div className="bt-grid">
+        {/* Heatmap */}
+        <section className="bt-card bt-map-card" aria-labelledby="bt-map-h">
+          <div className="bt-card-head">
+            <div>
+              <h2 id="bt-map-h" className="bt-h2">Wohin das Geld geht</h2>
+              <p className="bt-sub">Je grösser die Kachel, desto mehr Ausgaben. Kachel antippen, um Unterkategorien und Beträge zu erfassen.</p>
+            </div>
+            <span className="bt-pill">{periodLabel}</span>
           </div>
-          <ul className="bx-list">
-            {recurring.map(({ entry: e }) => {
-              const c = cats.find((x) => x.id === e.category);
-              const monthly = e.frequency === "monatlich" ? Number(e.amount_chf) : Number(e.amount_chf) / 12;
+
+          <div ref={mapRef} className="bt-map" style={{ height: grand > 0 ? mapH : undefined }}>
+            {rects.map((r, i) => {
+              const c = r.item.data;
+              const st = catStats[c.id];
+              const share = Math.round((st.total / grand) * 100);
+              const small = r.w < 150 || r.h < 96;
+              const tiny = r.w < 92 || r.h < 62;
               return (
-                <li key={e.id} className="bx-item">
-                  <span className="bx-item-icon" aria-hidden="true">{c?.icon ?? "📦"}</span>
-                  <span className="bx-item-main">
-                    <strong>{e.label || c?.label || e.category}</strong>
-                    <span>
-                      {e.frequency === "monatlich" ? "jeden Monat" : "jährlich, auf 12 Monate verteilt"}
-                      {e.ends_on ? ` · bis ${dmy(e.ends_on)}` : ""}
-                    </span>
-                  </span>
-                  <span className="bx-item-amount">
-                    CHF {fmt(Number(e.amount_chf))}
-                    <small>{e.frequency === "jaehrlich" ? `≈ ${fmt(monthly)} / Mt.` : "/ Monat"}</small>
-                  </span>
-                  <button type="button" className="bx-del" aria-label="Löschen" onClick={() => void remove(e.id)}>×</button>
-                </li>
+                <button
+                  key={c.id}
+                  type="button"
+                  className={`bt-tile${catId === c.id ? " is-on" : ""}${small ? " is-small" : ""}${tiny ? " is-tiny" : ""}`}
+                  style={{ left: r.x, top: r.y, width: r.w, height: r.h, "--c": categoryColor(c.id), "--i": i } as React.CSSProperties}
+                  aria-pressed={catId === c.id}
+                  aria-label={`${c.label}: CHF ${fmt(st.total)}, ${share} Prozent`}
+                  title={`${c.label}: CHF ${fmt(st.total)}`}
+                  onClick={() => pickCategory(c.id)}
+                >
+                  <span className="bt-tile-name">{c.label}</span>
+                  <span className="bt-tile-amount">CHF {fmt(st.total)}</span>
+                  <span className="bt-tile-meta">{share} % · {st.count} {st.count === 1 ? "Posten" : "Posten"}</span>
+                </button>
               );
             })}
-          </ul>
-        </section>
-      ) : null}
-
-      {/* Buchungen */}
-      <section className="bx-card bx-span-6" aria-labelledby="bx-list-h">
-        <div className="bx-card-head">
-          <h2 id="bx-list-h">Buchungen</h2>
-          <span className="bx-pill">{listItems.length}</span>
-        </div>
-        {listItems.length === 0 ? (
-          <p className="bx-empty">Noch nichts erfasst. Tippe unten auf „+ Ausgabe“.</p>
-        ) : (
-          <>
-            <ul className="bx-list">
-              {visibleItems.map(({ entry: e, months }) => {
-                const c = cats.find((x) => x.id === e.category);
-                const v = valueOf(months);
-                return (
-                  <li key={e.id} className="bx-item">
-                    <span className="bx-item-icon" aria-hidden="true">{c?.icon ?? "📦"}</span>
-                    <span className="bx-item-main">
-                      <strong>{e.label || c?.label || e.category}</strong>
-                      <span>
-                        {dmy(e.entry_date)} · {c?.label ?? e.category}
-                        {e.frequency !== "einmalig" ? ` · ${e.frequency === "monatlich" ? "monatlich" : "jährlich"}` : ""}
-                      </span>
-                    </span>
-                    <span className="bx-item-amount">CHF {fmt(v)}</span>
-                    <button type="button" className="bx-del" aria-label="Löschen" onClick={() => void remove(e.id)}>×</button>
-                  </li>
-                );
-              })}
-            </ul>
-            {listItems.length > 12 ? (
-              <button type="button" className="bx-more" onClick={() => setShowAll(!showAll)}>
-                {showAll ? "Weniger anzeigen" : `Alle ${listItems.length} anzeigen`}
-              </button>
+            {grand <= 0 ? (
+              <div className="bt-map-empty">
+                <strong>Noch keine Ausgaben in dieser Auswahl.</strong>
+                <span>Wähle unten eine Kategorie und erfasse die erste Ausgabe.</span>
+              </div>
             ) : null}
-          </>
-        )}
-      </section>
+          </div>
 
-      {/* Bank-Import, versteckt */}
-      <details className="bx-card bx-import">
+          {empty.length > 0 ? (
+            <div className="bt-empty-row">
+              <span className="bt-empty-label">{grand > 0 ? "Noch leer" : "Kategorie wählen"}</span>
+              <div className="bt-chips">
+                {empty.map((c) => (
+                  <button key={c.id} type="button" className={`bt-chip bt-chip--ghost${catId === c.id ? " is-on" : ""}`} style={{ "--c": categoryColor(c.id) } as React.CSSProperties} aria-pressed={catId === c.id} onClick={() => pickCategory(c.id)}>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </section>
+
+        {/* Auswertungen */}
+        <aside className="bt-side" aria-label="Auswertung">
+          <section className="bt-card bt-kpi-main">
+            <span className="bt-label">Ausgaben {periodLabel}</span>
+            <strong className="bt-big"><CountUp value={shownTotal} format={chfCount} /></strong>
+            {scope === "golf" ? (
+              <span className={`bt-sub ${income - yearTotal >= 0 ? "is-good" : "is-bad"}`}>Ergebnis {year}: CHF {fmt(income - yearTotal)} bei Einnahmen von CHF {fmt(income)}</span>
+            ) : (
+              <span className="bt-sub">Ø pro Monat: CHF {fmt(yearTotal / 12)}</span>
+            )}
+          </section>
+
+          <div className="bt-kpi-row">
+            <section className="bt-card bt-kpi">
+              <span className="bt-label">Fixkosten pro Monat</span>
+              <strong className="bt-num"><CountUp value={fixedPerMonth} format={chfCount} /></strong>
+              <span className="bt-sub">{recurring.length} Abos und Jahreskosten</span>
+            </section>
+            <section className="bt-card bt-kpi">
+              <span className="bt-label">Grösster Posten</span>
+              <strong className="bt-num bt-num--text">{biggest ? biggest.label : "–"}</strong>
+              <span className="bt-sub">{biggest && grand > 0 ? `${Math.round((catStats[biggest.id].total / grand) * 100)} % der Ausgaben` : "Noch nichts erfasst"}</span>
+            </section>
+          </div>
+
+          <section className="bt-card bt-flow" aria-labelledby="bt-flow-h">
+            <h2 id="bt-flow-h" className="bt-h2">Verteilung</h2>
+            {flow.length === 0 ? (
+              <p className="bt-sub">Sobald Ausgaben erfasst sind, siehst du hier die Anteile.</p>
+            ) : (
+              <>
+                <div className="bt-stack" role="img" aria-label="Anteile der Kategorien">
+                  {flow.map((c) => (
+                    <span key={c.id} style={{ flexGrow: catStats[c.id].total, background: categoryColor(c.id) }} title={`${c.label}: CHF ${fmt(catStats[c.id].total)}`} />
+                  ))}
+                </div>
+                <ul className="bt-legend">
+                  {flow.slice(0, 6).map((c) => (
+                    <li key={c.id}>
+                      <span className="bt-dot" style={{ background: categoryColor(c.id) }} />
+                      <span className="bt-legend-name">{c.label}</span>
+                      <span className="bt-legend-val">CHF {fmt(catStats[c.id].total)} · {Math.round((catStats[c.id].total / grand) * 100)} %</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </section>
+        </aside>
+
+        {/* Detail der gewählten Kategorie */}
+        <section ref={detailRef} className={`bt-card bt-detail${selCat ? " is-open" : ""}`} style={{ "--c": selCat ? categoryColor(selCat.id) : "#6b7077" } as React.CSSProperties} aria-labelledby="bt-detail-h">
+          {!selCat ? (
+            <div className="bt-detail-empty">
+              <h2 id="bt-detail-h" className="bt-h2">Ausgabe erfassen</h2>
+              <p className="bt-sub">Tippe oben auf eine Kachel. Dann wählst du eine Unterkategorie oder legst eine neue an, gibst Betrag und Beschreibung ein und speicherst mit Enter.</p>
+            </div>
+          ) : (
+            <>
+              <div className="bt-detail-head">
+                <span className="bt-detail-dot" aria-hidden="true" />
+                <div className="bt-detail-title">
+                  <h2 id="bt-detail-h" className="bt-h2">{selCat.label}</h2>
+                  <span className="bt-sub">CHF {fmt(catStats[selCat.id]?.total ?? 0)} in {periodLabel} · {catStats[selCat.id]?.count ?? 0} Posten</span>
+                </div>
+                <button type="button" className="bt-close" aria-label="Kategorie schliessen" onClick={() => pickCategory(selCat.id)}>×</button>
+              </div>
+
+              <div className="bt-field">
+                <span className="bt-field-label">Unterkategorie</span>
+                <div className="bt-chips">
+                  {subGroups.map((g) => (
+                    <button key={g.name || "_"} type="button" className={`bt-chip${sub !== null && sub.toLowerCase() === g.name.toLowerCase() ? " is-on" : ""}`} aria-pressed={sub !== null && sub.toLowerCase() === g.name.toLowerCase()} onClick={() => pickSub(g.name)}>
+                      {g.name || "Allgemein"} <b>CHF {fmt(g.total)}</b>
+                    </button>
+                  ))}
+                  {suggestions.map((s) => (
+                    <button key={s} type="button" className={`bt-chip bt-chip--ghost${sub === s ? " is-on" : ""}`} aria-pressed={sub === s} onClick={() => pickSub(s)}>
+                      + {s}
+                    </button>
+                  ))}
+                  {customSub ? (
+                    <button type="button" className="bt-chip is-on" aria-pressed="true" onClick={() => setSub(null)}>
+                      {sub} <b>neu</b>
+                    </button>
+                  ) : null}
+                  {newSubOpen ? (
+                    <span className="bt-newsub">
+                      <input
+                        autoFocus
+                        className="bt-input"
+                        placeholder="Name der Unterkategorie"
+                        value={newSubText}
+                        onChange={(e) => setNewSubText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") { e.preventDefault(); confirmNewSub(); }
+                          if (e.key === "Escape") setNewSubOpen(false);
+                        }}
+                        aria-label="Neue Unterkategorie"
+                      />
+                      <button type="button" className="bt-mini" onClick={confirmNewSub}>OK</button>
+                    </span>
+                  ) : (
+                    <button type="button" className="bt-chip bt-chip--ghost" onClick={() => setNewSubOpen(true)}>+ eigene</button>
+                  )}
+                </div>
+              </div>
+
+              <div className="bt-form">
+                <label className="bt-amount">
+                  <span>CHF</span>
+                  <input
+                    ref={amountRef}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void save(); } }}
+                    aria-label="Betrag in CHF"
+                  />
+                </label>
+                <label className="bt-field bt-field--grow">
+                  <span className="bt-field-label">Beschreibung (optional)</span>
+                  <input
+                    className="bt-input"
+                    placeholder={sub ? `z. B. ${sub}` : "z. B. Salt Abo, Flug nach Durban"}
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void save(); } }}
+                  />
+                </label>
+                <button type="button" className="bt-save" disabled={busy} onClick={() => void save()}>
+                  {busy ? "Speichere…" : "Speichern"}
+                </button>
+              </div>
+
+              <div className="bt-form-row">
+                <div className="bt-freq" role="group" aria-label="Häufigkeit">
+                  {FREQS.map((f) => (
+                    <button key={f.id} type="button" className={frequency === f.id ? "is-on" : ""} aria-pressed={frequency === f.id} onClick={() => setFrequency(f.id)}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+                <label className="bt-date">
+                  <span>{isRecurring ? "Ab" : "Datum"}</span>
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                </label>
+                {isRecurring ? (
+                  <label className="bt-date">
+                    <span>Endet (optional)</span>
+                    <input type="date" value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
+                  </label>
+                ) : null}
+              </div>
+              {monthlyShare > 0 ? <p className="bt-sub">Wird auf alle 12 Monate verteilt: CHF {fmt(monthlyShare)} pro Monat.</p> : null}
+              {error ? <p className="bt-error" role="alert">{error}</p> : null}
+
+              <div className="bt-list-head">
+                <h3 className="bt-h3">Einträge{sub !== null ? ` · ${sub || "Allgemein"}` : ""}</h3>
+                <span className="bt-pill">{listItems.length}</span>
+              </div>
+              {listItems.length === 0 ? (
+                <p className="bt-sub">Noch nichts in dieser Auswahl.</p>
+              ) : (
+                <ul className="bt-list">
+                  {listItems.map(({ entry: e, months }) => (
+                    <li key={e.id} className="bt-item">
+                      <span className="bt-item-main">
+                        <strong>{e.label || (e.subcategory ? e.subcategory : selCat.label)}</strong>
+                        <span>
+                          {dmy(e.entry_date)}
+                          {e.subcategory ? ` · ${e.subcategory}` : ""}
+                          {e.frequency !== "einmalig" ? ` · ${e.frequency === "monatlich" ? "monatlich" : "jährlich, auf 12 Monate verteilt"}` : ""}
+                          {e.ends_on ? ` · bis ${dmy(e.ends_on)}` : ""}
+                        </span>
+                      </span>
+                      <span className="bt-item-amount">CHF {fmt(valueOf(months))}</span>
+                      <button type="button" className="bt-close" aria-label="Löschen" onClick={() => void remove(e.id)}>×</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+        </section>
+      </div>
+
+      {/* Bank-Import */}
+      <details className="bt-card bt-import">
         <summary>Bank-Export importieren (CSV)</summary>
-        <div className="bx-import-body">
-          <p className="bx-hint">Lade den CSV-Export deiner Bank hoch. Du prüfst die Zeilen und speicherst sie gesammelt.</p>
-          <input ref={fileRef} type="file" accept=".csv,text/csv" className="bx-file" onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFile(f); }} />
+        <div className="bt-import-body">
+          <p className="bt-sub">Lade den CSV-Export deiner Bank hoch. Du prüfst Bereich, Kategorie und Häufigkeit und speicherst alles gesammelt.</p>
+          <input ref={fileRef} type="file" accept=".csv,text/csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFile(f); }} />
           {importRows.length > 0 ? (
             <>
-              <ul className="bx-imp">
+              <ul className="bt-imp">
                 {importRows.map((r, i) => (
-                  <li key={i} className={`bx-imp-row${r.include ? "" : " is-off"}`}>
+                  <li key={i} className={`bt-imp-row${r.include ? "" : " is-off"}`}>
                     <input type="checkbox" checked={r.include} onChange={(e) => updateImport(i, { include: e.target.checked })} aria-label="Übernehmen" />
-                    <span className="bx-imp-main">
-                      <strong>{r.label || "Buchung"}</strong>
-                      <span>{dmy(r.date)} · CHF {fmt(r.amount)}</span>
-                    </span>
-                    <select className="ap-select" value={r.scope} aria-label="Bereich" onChange={(e) => updateImport(i, { scope: e.target.value as BudgetScope })}>
+                    <span className="bt-imp-main"><strong>{r.label || "Buchung"}</strong><span>{dmy(r.date)} · CHF {fmt(r.amount)}</span></span>
+                    <select className="bt-select" value={r.scope} aria-label="Bereich" onChange={(e) => updateImport(i, { scope: e.target.value as BudgetScope })}>
                       <option value="golf">Golf</option>
                       <option value="privat">Privat</option>
                     </select>
-                    <select className="ap-select" value={r.category} aria-label="Kategorie" onChange={(e) => updateImport(i, { category: e.target.value })}>
-                      {categoriesFor(r.scope).map((c) => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+                    <select className="bt-select" value={r.category} aria-label="Kategorie" onChange={(e) => updateImport(i, { category: e.target.value })}>
+                      {categoriesFor(r.scope).map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
                     </select>
-                    <select className="ap-select" value={r.frequency} aria-label="Häufigkeit" onChange={(e) => updateImport(i, { frequency: e.target.value as BudgetFrequency })}>
+                    <select className="bt-select" value={r.frequency} aria-label="Häufigkeit" onChange={(e) => updateImport(i, { frequency: e.target.value as BudgetFrequency })}>
                       {FREQS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
                     </select>
                   </li>
                 ))}
               </ul>
-              <button type="button" className="ap-btn ap-btn--primary" disabled={busy} onClick={() => void saveImport()}>
+              <button type="button" className="bt-save" disabled={busy} onClick={() => void saveImport()}>
                 {busy ? "Speichere…" : `${importRows.filter((r) => r.include).length} Buchungen speichern`}
               </button>
             </>
@@ -413,92 +605,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
         </div>
       </details>
 
-      {/* Schwebende Aktion */}
-      <button type="button" className="bx-fab" onClick={() => { setError(null); setSheetOpen(true); }}>
-        <span aria-hidden="true">+</span> Ausgabe
-      </button>
-
-      {toast ? <div className="bx-toast" role="status">{toast}</div> : null}
-
-      {/* Erfassen als Sheet */}
-      {sheetOpen ? (
-        <div className="bx-overlay" onClick={closeSheet}>
-          <div className="bx-sheet" role="dialog" aria-modal="true" aria-label="Ausgabe erfassen" onClick={(e) => e.stopPropagation()}>
-            <div className="bx-sheet-head">
-              <span className="bx-label">Neue Ausgabe · {scope === "golf" ? "⛳ Golf" : "🏠 Privat"}</span>
-              <button type="button" className="bx-del" aria-label="Schliessen" onClick={closeSheet}>×</button>
-            </div>
-
-            <label className="bx-amount">
-              <span>CHF</span>
-              <input inputMode="decimal" placeholder="0.00" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Betrag in CHF" />
-            </label>
-            {monthlyShare > 0 ? (
-              <p className="bx-hint">Wird auf alle 12 Monate verteilt: CHF {fmt(monthlyShare)} pro Monat.</p>
-            ) : null}
-
-            <div className="bx-field">
-              <span className="bx-field-label">Wie oft?</span>
-              <div className="bx-freq" role="group" aria-label="Häufigkeit">
-                {FREQS.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    className={frequency === f.id ? "is-on" : ""}
-                    aria-pressed={frequency === f.id}
-                    onClick={() => { setFrequency(f.id); setFreqTouched(true); }}
-                  >
-                    <span aria-hidden="true">{f.icon}</span>
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="bx-field">
-              <span className="bx-field-label">Kategorie</span>
-              <div className="bx-tiles" role="group" aria-label="Kategorie">
-                {cats.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    className={`bx-tile${category === c.id ? " is-on" : ""}`}
-                    aria-pressed={category === c.id}
-                    onClick={() => { setCategory(c.id); setCatTouched(true); }}
-                  >
-                    <span aria-hidden="true">{c.icon}</span>
-                    <span>{c.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <label className="bx-field">
-              <span className="bx-field-label">Notiz (optional)</span>
-              <input className="ap-input" placeholder="z. B. Salt Abo, Turnier, Flug" value={note} onChange={(e) => onNoteChange(e.target.value)} />
-            </label>
-
-            <div className="bx-form-row">
-              <label className="bx-field">
-                <span className="bx-field-label">{isRecurring ? "Ab" : "Datum"}</span>
-                <input className="ap-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </label>
-              {isRecurring ? (
-                <label className="bx-field">
-                  <span className="bx-field-label">Endet (optional)</span>
-                  <input className="ap-input" type="date" value={endsOn} onChange={(e) => setEndsOn(e.target.value)} />
-                </label>
-              ) : null}
-            </div>
-
-            {error ? <p className="ap-banner ap-banner--warn" role="alert">{error}</p> : null}
-
-            <button type="button" className="bx-save" disabled={busy} onClick={() => void save()}>
-              {busy ? "Speichere…" : "Speichern"}
-            </button>
-          </div>
-        </div>
-      ) : null}
+      {toast ? <div className="bt-toast" role="status">{toast}</div> : null}
     </div>
   );
 }

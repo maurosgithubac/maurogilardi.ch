@@ -6,6 +6,17 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 const MIN_LEN = 8;
 
+function strengthOf(pw: string): { score: number; label: string } {
+  if (!pw) return { score: 0, label: "" };
+  let score = 0;
+  if (pw.length >= MIN_LEN) score++;
+  if (pw.length >= 12) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+  const labels = ["Zu kurz", "Schwach", "Ok", "Gut", "Stark"];
+  return { score, label: pw.length < MIN_LEN ? labels[0] : labels[Math.max(1, score)] };
+}
+
 export function AdminChangePasswordForm() {
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -14,6 +25,9 @@ export function AdminChangePasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [show, setShow] = useState(false);
+  const strength = strengthOf(nextPassword);
+  const mismatch = confirmPassword.length > 0 && confirmPassword !== nextPassword;
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -81,12 +95,12 @@ export function AdminChangePasswordForm() {
   }
 
   return (
-    <form className="ap-form ap-password-form" onSubmit={(e) => void onSubmit(e)}>
+    <form className="ap-form ac-form" onSubmit={(e) => void onSubmit(e)}>
       <label className="ap-field">
         <span className="ap-label">Aktuelles Passwort</span>
         <input
           className="ap-input"
-          type="password"
+          type={show ? "text" : "password"}
           autoComplete="current-password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
@@ -98,7 +112,7 @@ export function AdminChangePasswordForm() {
         <span className="ap-label">Neues Passwort</span>
         <input
           className="ap-input"
-          type="password"
+          type={show ? "text" : "password"}
           autoComplete="new-password"
           value={nextPassword}
           onChange={(e) => setNextPassword(e.target.value)}
@@ -110,19 +124,30 @@ export function AdminChangePasswordForm() {
         <span id="ap-pw-hint" className="ap-hint">
           Mindestens {MIN_LEN} Zeichen.
         </span>
+        {nextPassword ? (
+          <span className="ac-strength" data-score={strength.score} aria-live="polite">
+            <span className="ac-strength-bar" aria-hidden="true"><i /><i /><i /><i /></span>
+            <span className="ac-strength-label">{strength.label}</span>
+          </span>
+        ) : null}
       </label>
       <label className="ap-field">
         <span className="ap-label">Neues Passwort bestätigen</span>
         <input
           className="ap-input"
-          type="password"
+          type={show ? "text" : "password"}
           autoComplete="new-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          aria-invalid={mismatch ? "true" : undefined}
           disabled={busy}
           minLength={MIN_LEN}
           required
         />
+        {mismatch ? <span className="ac-mismatch" role="status">Die Passwörter stimmen noch nicht überein.</span> : null}
+      </label>
+      <label className="ac-show">
+        <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} /> Passwörter anzeigen
       </label>
 
       {error ? (
@@ -137,7 +162,7 @@ export function AdminChangePasswordForm() {
       ) : null}
 
       <div className="ap-form-actions">
-        <button type="submit" className="ap-btn ap-btn--primary" disabled={busy}>
+        <button type="submit" className={`ap-btn ap-btn--primary${busy ? " is-loading" : ""}`} disabled={busy}>
           {busy ? "Speichern…" : "Passwort ändern"}
         </button>
       </div>

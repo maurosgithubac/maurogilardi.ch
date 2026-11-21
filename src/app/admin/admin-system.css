@@ -1,0 +1,1037 @@
+/*
+ * Admin-Design-System (gemeinsame Schicht, wird NACH admin.css / shell / bento / dash geladen).
+ *
+ * Inhalt:
+ *  1. Tokens (Abstand 4/8-Raster, Typo, Radien, Schatten, Fokus, Bewegung)
+ *  2. Seite, Seitenkopf (AdminPageHeader), Breite
+ *  3. Karten, Banner, Leerzustände, Skeleton
+ *  4. Buttons, Icon-Buttons
+ *  5. Formulare (Input, Select, Checkbox, Segment, Tabs)
+ *  6. Pills / Status / Badges
+ *  7. Tabellen
+ *  8. Menüs, Dialoge
+ *  9. Bewegung (Stagger über --i, Seitenwechsel), Reduced Motion
+ *
+ * Neue Klassen: ap-back, ap-pill (+ --ok/--warn/--err/--muted/--red/--ink), ap-badge (Alias),
+ * ap-skel, ap-dialog, ap-btn--dark, ap-btn.is-loading, ap-empty-text, ap-card-title, ap-num-lg.
+ * Bestehende ap-* Klassen behalten ihre Namen.
+ */
+
+/* ——— 1. Tokens ——— */
+.admin-app {
+  /* Abstand (4/8-Raster) */
+  --ap-s-1: 4px;
+  --ap-s-2: 8px;
+  --ap-s-3: 12px;
+  --ap-s-4: 16px;
+  --ap-s-5: 24px;
+  --ap-s-6: 32px;
+  --ap-s-7: 48px;
+  --ap-s-8: 64px;
+
+  /* Typo */
+  --ap-fs-caption: 0.75rem;
+  --ap-fs-label: 0.8125rem;
+  --ap-fs-body: 0.875rem;
+  --ap-fs-lead: 0.9375rem;
+  --ap-fs-section: 1.0625rem;
+  --ap-fs-title: clamp(1.875rem, 1.2rem + 1.4vw, 2.5rem);
+  --ap-fs-num: clamp(1.75rem, 1.2rem + 1.2vw, 2.75rem);
+  --ap-lh-body: 1.5;
+
+  /* Flächen und Linien (warm) */
+  --ap-bg: #efeeea;
+  --ap-head: #f7f6f2;
+  --ap-hover: #f6f5f1;
+  --ap-sunken: #f3f2ee;
+  --ap-hair: #e6e4df;
+  --ap-hair-strong: #d6d3cb;
+  --ap-muted: #5c5a55;
+  --ap-axis: #6f6c66;
+
+  /* Radien */
+  --ap-r-xs: 6px;
+  --ap-r-sm: 8px;
+  --ap-r: 12px;
+  --ap-r-lg: 18px;
+  --ap-radius-card: 26px;
+  --ap-r-pill: 999px;
+
+  /* Schatten (sehr dezent) */
+  --ap-sh-1: 0 1px 2px rgb(18 19 20 / 4%);
+  --ap-sh-2: 0 1px 2px rgb(18 19 20 / 4%), 0 10px 28px -8px rgb(18 19 20 / 10%);
+
+  /* Fokus */
+  --ap-focus: 0 0 0 3px rgb(215 25 32 / 28%);
+
+  /* Bewegung */
+  --ap-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ap-ease-in-out: cubic-bezier(0.4, 0.1, 0.2, 1);
+  --ap-dur-fast: 140ms;
+  --ap-dur-med: 260ms;
+  --ap-dur-slow: 520ms;
+  --ap-dur: var(--ap-dur-fast);
+  --ap-stagger: 55ms;
+
+  line-height: var(--ap-lh-body);
+  text-rendering: optimizeLegibility;
+}
+
+.admin-app :focus-visible {
+  outline: 2px solid var(--ap-red);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+.admin-app ::selection {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.admin-app input[type="checkbox"],
+.admin-app input[type="radio"] {
+  accent-color: var(--ap-red);
+}
+
+.admin-app .ap-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+/* ——— 2. Seite und Seitenkopf ——— */
+.ap-content {
+  width: 100%;
+  max-width: 1760px;
+  margin-inline: auto;
+}
+
+.ap-page {
+  gap: var(--ap-s-5);
+}
+
+.ap-page-head {
+  align-items: flex-end;
+  gap: var(--ap-s-4) var(--ap-s-5);
+  padding-bottom: var(--ap-s-1);
+}
+
+.ap-page-head-text {
+  gap: var(--ap-s-1);
+  flex: 1 1 24rem;
+}
+
+.ap-page-actions {
+  gap: var(--ap-s-2);
+}
+
+.ap-eyebrow,
+.ov-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ap-s-2);
+  margin: 0;
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ap-muted);
+}
+
+.ap-eyebrow::before,
+.ov-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ap-red);
+  flex: none;
+}
+
+.ap-page-head h1,
+.ap-h1,
+.ov-title {
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-title);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ap-ink);
+  text-wrap: balance;
+}
+
+.ap-page-desc,
+.dash-sub {
+  max-width: 64ch;
+  margin-top: var(--ap-s-1);
+  font-size: var(--ap-fs-lead);
+  line-height: 1.5;
+  color: var(--ap-muted);
+  text-wrap: pretty;
+}
+
+.ap-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ap-s-1);
+  align-self: start;
+  min-height: 32px;
+  margin-bottom: var(--ap-s-1);
+  padding-right: var(--ap-s-2);
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  color: var(--ap-muted);
+  text-decoration: none;
+  transition: color var(--ap-dur-fast) var(--ap-ease), transform var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-back:hover {
+  color: var(--ap-ink);
+  transform: translateX(-2px);
+}
+
+.ap-h2,
+.ap-card-title,
+.dash-h2 {
+  font-size: var(--ap-fs-section);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.ap-num-lg {
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-num);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.ap-countup {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ——— 3. Karten, Banner, Leerzustände, Skeleton ——— */
+.ap-card,
+.dash-card {
+  box-shadow: var(--ap-sh-1);
+}
+
+.ap-card {
+  padding: var(--ap-s-5);
+}
+
+.ap-card-head {
+  gap: var(--ap-s-3);
+  margin-bottom: var(--ap-s-4);
+}
+
+.ap-card--flush {
+  padding: 0;
+}
+
+.ap-card--flush > .ap-card-head {
+  padding: var(--ap-s-4) var(--ap-s-5);
+}
+
+.ap-card-sub,
+.dash-card-sub {
+  font-size: var(--ap-fs-label);
+  color: var(--ap-muted);
+}
+
+.ap-card-foot {
+  margin-top: var(--ap-s-5);
+  padding-top: var(--ap-s-4);
+}
+
+.ap-banner {
+  padding: var(--ap-s-3) var(--ap-s-4);
+  border-radius: var(--ap-r-lg);
+  font-size: var(--ap-fs-body);
+  line-height: 1.45;
+}
+
+.ap-banner code {
+  padding: 1px 6px;
+  border-radius: var(--ap-r-xs);
+  background: rgb(18 19 20 / 6%);
+}
+
+.ap-empty {
+  gap: var(--ap-s-2);
+  padding: var(--ap-s-7) var(--ap-s-5);
+}
+
+.ap-empty > svg {
+  box-sizing: content-box;
+  padding: var(--ap-s-3);
+  margin-bottom: var(--ap-s-1);
+  border-radius: 50%;
+  background: var(--ap-sunken);
+  color: var(--ap-muted);
+}
+
+.ap-empty-title {
+  font-size: var(--ap-fs-section);
+  font-weight: 650;
+  color: var(--ap-ink);
+}
+
+.ap-empty-text {
+  max-width: 44ch;
+  font-size: var(--ap-fs-body);
+  color: var(--ap-muted);
+  text-wrap: pretty;
+}
+
+.ap-empty .ap-btn,
+.ap-empty .ap-btn-row {
+  margin-top: var(--ap-s-3);
+}
+
+/* Skeleton */
+@keyframes ap-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.ap-skel {
+  display: block;
+  border-radius: var(--ap-r);
+  background: linear-gradient(100deg, #efede8 30%, #f8f7f4 50%, #efede8 70%) 0 0 / 200% 100%;
+  animation: ap-shimmer 1.6s linear infinite;
+}
+
+.ap-skel-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ap-s-4);
+}
+
+.ap-skel-card {
+  display: grid;
+  align-content: start;
+  gap: var(--ap-s-4);
+  grid-column: span 12;
+  min-height: 160px;
+}
+
+.ap-skel-card--wide {
+  min-height: 280px;
+}
+
+@media (min-width: 1100px) {
+  .ap-skel-card {
+    grid-column: span 4;
+  }
+
+  .ap-skel-card--wide {
+    grid-column: span 8;
+  }
+}
+
+/* ——— 4. Buttons ——— */
+.ap-btn {
+  height: 40px;
+  padding: 0 var(--ap-s-4);
+  gap: var(--ap-s-2);
+  border-radius: var(--ap-r-pill);
+  font-size: var(--ap-fs-body);
+  font-weight: 650;
+  letter-spacing: -0.005em;
+  transition:
+    background-color var(--ap-dur-fast) var(--ap-ease),
+    border-color var(--ap-dur-fast) var(--ap-ease),
+    color var(--ap-dur-fast) var(--ap-ease),
+    box-shadow var(--ap-dur-fast) var(--ap-ease),
+    transform var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ap-btn:focus-visible,
+.ap-icon-btn:focus-visible,
+.dash-btn:focus-visible {
+  outline: 2px solid var(--ap-red);
+  outline-offset: 2px;
+  border-radius: var(--ap-r-pill);
+}
+
+/* Primär = Rot. Dunkel als Alternative. */
+.ap-btn--primary,
+.ap-btn--accent {
+  background: var(--ap-red);
+  border-color: var(--ap-red);
+  color: #fff;
+}
+
+.ap-btn--primary:hover:not(:disabled),
+.ap-btn--accent:hover:not(:disabled) {
+  background: var(--ap-red-hover);
+  border-color: var(--ap-red-hover);
+}
+
+.ap-btn--dark {
+  background: var(--ap-ink);
+  border-color: var(--ap-ink);
+  color: #fff;
+}
+
+.ap-btn--dark:hover:not(:disabled) {
+  background: #2c2e31;
+}
+
+.ap-btn--secondary {
+  background: var(--ap-surface);
+  border-color: var(--ap-hair-strong);
+  color: var(--ap-ink);
+}
+
+.ap-btn--secondary:hover:not(:disabled) {
+  background: var(--ap-hover);
+  border-color: #bdb9b0;
+}
+
+.ap-btn--ghost:hover:not(:disabled) {
+  background: rgb(18 19 20 / 6%);
+}
+
+.ap-btn--danger,
+.ap-btn--danger-ghost {
+  color: var(--ap-red-text);
+}
+
+.ap-btn--danger {
+  background: var(--ap-surface);
+  border-color: rgb(215 25 32 / 40%);
+}
+
+.ap-btn--danger:hover:not(:disabled),
+.ap-btn--danger-ghost:hover:not(:disabled) {
+  background: var(--ap-red-soft);
+}
+
+.ap-btn:disabled {
+  opacity: 0.5;
+}
+
+.ap-btn--primary:disabled,
+.ap-btn--accent:disabled,
+.ap-btn--dark:disabled {
+  opacity: 1;
+  background: var(--ap-sunken);
+  border-color: var(--ap-hair);
+  color: #7a766e;
+}
+
+.ap-btn--sm {
+  height: 34px;
+  padding: 0 var(--ap-s-3);
+  font-size: var(--ap-fs-label);
+}
+
+.ap-btn--block {
+  height: 46px;
+}
+
+/* Ladezustand: Klasse is-loading oder aria-busy="true" */
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ap-btn.is-loading,
+.ap-btn[aria-busy="true"] {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.ap-btn.is-loading::after,
+.ap-btn[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgb(255 255 255 / 45%);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ap-spin 700ms linear infinite;
+}
+
+.ap-btn--secondary.is-loading::after,
+.ap-btn--ghost.is-loading::after,
+.ap-btn--secondary[aria-busy="true"]::after,
+.ap-btn--ghost[aria-busy="true"]::after {
+  border-color: var(--ap-hair-strong);
+  border-top-color: var(--ap-ink);
+}
+
+.ap-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition:
+    background-color var(--ap-dur-fast) var(--ap-ease),
+    color var(--ap-dur-fast) var(--ap-ease),
+    transform var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-icon-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.ap-btn-row {
+  gap: var(--ap-s-2);
+}
+
+/* Dashboard-Buttons an dieselbe Höhe und Bewegung binden */
+.dash-btn {
+  min-height: 40px;
+  transition:
+    background-color var(--ap-dur-fast) var(--ap-ease),
+    border-color var(--ap-dur-fast) var(--ap-ease),
+    transform var(--ap-dur-fast) var(--ap-ease);
+}
+
+.dash-btn:hover {
+  transform: none;
+}
+
+.dash-btn:active {
+  transform: scale(0.98);
+}
+
+.dash-btn--icon {
+  width: 40px;
+}
+
+@media (pointer: coarse) {
+  .ap-btn,
+  .ap-btn--sm {
+    height: 44px;
+  }
+
+  .ap-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ap-segment-btn,
+  .dash-chips button {
+    min-height: 40px;
+  }
+}
+
+/* ——— 5. Formulare, Segmente, Tabs ——— */
+.ap-field {
+  gap: var(--ap-s-2);
+}
+
+.ap-label {
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+}
+
+.ap-hint {
+  font-size: var(--ap-fs-caption);
+  line-height: 1.4;
+}
+
+.ap-input,
+.ap-select,
+.ap-field :where(input:not([type="checkbox"]):not([type="file"]), textarea) {
+  height: 42px;
+  padding: 0 var(--ap-s-3);
+  border-radius: var(--ap-r);
+  border-color: var(--ap-hair-strong);
+  font-size: var(--ap-fs-body);
+  transition:
+    border-color var(--ap-dur-fast) var(--ap-ease),
+    box-shadow var(--ap-dur-fast) var(--ap-ease),
+    background-color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-input::placeholder,
+.ap-field textarea::placeholder {
+  color: #76726a;
+}
+
+.ap-input:hover,
+.ap-select:hover {
+  border-color: #b9b5ab;
+}
+
+.ap-input:focus-visible,
+.ap-select:focus-visible,
+.ap-field :where(input, textarea):focus-visible {
+  outline: none;
+  border-color: var(--ap-red);
+  box-shadow: var(--ap-focus);
+}
+
+.ap-input[aria-invalid="true"],
+.ap-select[aria-invalid="true"] {
+  border-color: var(--ap-red);
+  background: var(--ap-err-bg);
+}
+
+.ap-textarea,
+.ap-field textarea {
+  padding: var(--ap-s-3);
+  min-height: 96px;
+}
+
+.ap-select {
+  padding-right: 2.25rem;
+}
+
+.ap-segment {
+  padding: 4px;
+  gap: 2px;
+  border-radius: var(--ap-r-pill);
+  background: var(--ap-surface);
+  border-color: var(--ap-hair);
+}
+
+.ap-segment-btn {
+  height: 32px;
+  padding: 0 var(--ap-s-4);
+  border-radius: var(--ap-r-pill);
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  transition:
+    background-color var(--ap-dur-fast) var(--ap-ease),
+    color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-segment-btn:hover {
+  background: var(--ap-hover);
+}
+
+.ap-segment-btn[aria-pressed="true"] {
+  background: var(--ap-ink);
+  color: #fff;
+  font-weight: 650;
+  box-shadow: none;
+}
+
+.ap-segment-btn[aria-pressed="true"] .ap-segment-count {
+  color: rgb(255 255 255 / 75%);
+}
+
+.ap-tabs {
+  gap: var(--ap-s-1);
+}
+
+.ap-tab {
+  height: 44px;
+  padding: 0 var(--ap-s-3);
+  font-size: var(--ap-fs-body);
+  transition: color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-tab[aria-pressed="true"]::after {
+  height: 3px;
+  animation: ap-fade var(--ap-dur-med) var(--ap-ease) both;
+}
+
+/* ——— 6. Pills, Status, Badges ——— */
+.ap-pill,
+.ap-badge,
+.ap-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 var(--ap-s-3);
+  border: 1px solid transparent;
+  border-radius: var(--ap-r-pill);
+  background: var(--ap-sunken);
+  font-size: var(--ap-fs-caption);
+  font-weight: 650;
+  line-height: 1;
+  color: var(--ap-ink-2);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-pill--ok,
+.ap-badge--ok {
+  background: var(--ap-ok-bg);
+  border-color: var(--ap-ok-line);
+  color: var(--ap-ok);
+}
+
+.ap-pill--warn,
+.ap-badge--warn {
+  background: var(--ap-warn-bg);
+  border-color: var(--ap-warn-line);
+  color: var(--ap-warn);
+}
+
+.ap-pill--err,
+.ap-badge--err {
+  background: var(--ap-err-bg);
+  border-color: var(--ap-err-line);
+  color: var(--ap-err);
+}
+
+.ap-pill--red,
+.ap-badge--red {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.ap-pill--ink,
+.ap-badge--ink {
+  background: var(--ap-ink);
+  color: #fff;
+}
+
+.ap-pill--muted,
+.ap-badge--muted {
+  background: var(--ap-sunken);
+  border-color: var(--ap-hair);
+  color: var(--ap-muted);
+}
+
+.ap-status--paid {
+  background: var(--ap-ok-bg);
+  border-color: var(--ap-ok-line);
+  color: var(--ap-ok);
+}
+
+.ap-status--open {
+  background: var(--ap-warn-bg);
+  border-color: var(--ap-warn-line);
+  color: var(--ap-warn);
+}
+
+.ap-status--none {
+  background: var(--ap-sunken);
+  border-color: var(--ap-hair);
+  color: var(--ap-muted);
+}
+
+.ap-count {
+  border-radius: var(--ap-r-pill);
+}
+
+/* ——— 7. Tabellen ——— */
+.ap-table-wrap {
+  border: 0;
+  border-radius: var(--ap-radius-card);
+  box-shadow: var(--ap-sh-1);
+}
+
+.ap-card--flush .ap-table-wrap {
+  box-shadow: none;
+}
+
+.ap-table {
+  font-size: var(--ap-fs-body);
+}
+
+.ap-table thead th {
+  height: 44px;
+  padding: 0 var(--ap-s-4);
+  background: var(--ap-head);
+  font-size: var(--ap-fs-caption);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--ap-muted);
+  border-bottom: 1px solid var(--ap-hair);
+}
+
+.ap-table thead th:first-child {
+  padding-left: var(--ap-s-5);
+  border-top-left-radius: var(--ap-radius-card);
+}
+
+.ap-table thead th:last-child {
+  padding-right: var(--ap-s-5);
+  border-top-right-radius: var(--ap-radius-card);
+}
+
+.ap-card--flush .ap-table thead th:first-child,
+.ap-card--flush .ap-table thead th:last-child {
+  border-radius: 0;
+}
+
+.ap-table tbody td {
+  padding: var(--ap-s-3) var(--ap-s-4);
+  border-bottom: 1px solid var(--ap-hair);
+  transition: background-color var(--ap-dur-fast) var(--ap-ease);
+}
+
+.ap-table tbody td:first-child {
+  padding-left: var(--ap-s-5);
+}
+
+.ap-table tbody td:last-child {
+  padding-right: var(--ap-s-5);
+}
+
+.ap-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--ap-radius-card);
+}
+
+.ap-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--ap-radius-card);
+}
+
+.ap-table tbody tr:not(.ap-empty-row):hover td {
+  background: var(--ap-hover);
+}
+
+.ap-table .ap-num,
+.ap-table td.ap-num,
+.ap-table th.ap-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ap-row-title {
+  font-weight: 650;
+}
+
+.ap-row-sub {
+  font-size: var(--ap-fs-caption);
+}
+
+/* Kennzahlen-Leiste */
+.ap-kpis {
+  border: 0;
+  border-radius: var(--ap-radius-card);
+  box-shadow: var(--ap-sh-1);
+}
+
+.ap-kpi {
+  padding: var(--ap-s-5);
+}
+
+.ap-kpi-value {
+  font-family: var(--ap-display);
+  font-size: clamp(1.5rem, 1.1rem + 0.9vw, 2.125rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.ap-kpi-label {
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+}
+
+/* ——— 8. Menüs und Dialoge ——— */
+@keyframes ap-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.ap-menu-pop,
+.ap-popover {
+  padding: var(--ap-s-1);
+  border-radius: var(--ap-r-lg);
+  border-color: var(--ap-hair);
+  box-shadow: var(--ap-sh-2);
+  transform-origin: top right;
+  animation: ap-pop-in var(--ap-dur-fast) var(--ap-ease) both;
+}
+
+.ap-menu-item {
+  height: 40px;
+  padding: 0 var(--ap-s-3);
+  border-radius: var(--ap-r);
+  font-size: var(--ap-fs-body);
+}
+
+/*
+ * Dialog / Sheet:
+ *   <div className="ap-dialog-backdrop"><div className="ap-dialog" role="dialog" aria-modal="true" aria-labelledby="...">
+ *     <div className="ap-dialog-head"><h2 className="ap-h2">Titel</h2></div>
+ *     <div className="ap-dialog-body">…</div>
+ *     <div className="ap-dialog-foot"><button className="ap-btn ap-btn--secondary">Abbrechen</button><button className="ap-btn ap-btn--primary">Speichern</button></div>
+ *   </div></div>
+ * Auf dem Handy wird der Dialog zum Blatt am unteren Rand.
+ */
+@keyframes ap-backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ap-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+}
+
+@keyframes ap-sheet-in {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+.ap-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: var(--ap-s-4);
+  background: rgb(18 19 20 / 45%);
+  backdrop-filter: blur(3px);
+  animation: ap-backdrop-in var(--ap-dur-med) var(--ap-ease) both;
+}
+
+.ap-dialog {
+  display: grid;
+  gap: var(--ap-s-4);
+  width: min(560px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: var(--ap-s-5);
+  border-radius: var(--ap-radius-card);
+  background: var(--ap-surface);
+  box-shadow: 0 24px 60px -12px rgb(18 19 20 / 35%);
+  animation: ap-dialog-in var(--ap-dur-med) var(--ap-ease) both;
+}
+
+.ap-dialog-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ap-s-2);
+  padding-top: var(--ap-s-2);
+}
+
+@media (max-width: 640px) {
+  .ap-dialog-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .ap-dialog {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--ap-radius-card) var(--ap-radius-card) 0 0;
+    padding-bottom: calc(var(--ap-s-5) + env(safe-area-inset-bottom, 0px));
+    animation-name: ap-sheet-in;
+  }
+
+  .ap-dialog-foot > .ap-btn {
+    flex: 1 1 auto;
+  }
+}
+
+/* ——— 9. Bewegung ——— */
+@keyframes ap-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Seitenwechsel: nur Deckkraft, kein Layout-Sprung */
+.ap-content > * {
+  animation: ap-fade var(--ap-dur-med) var(--ap-ease) both;
+}
+
+/* Karten: sanft einblenden; gestaffelt, wenn style={{"--i": n}} gesetzt ist */
+.ap-card,
+.dash-card,
+.ap-table-wrap,
+.ap-kpis {
+  animation: ap-fade var(--ap-dur-med) var(--ap-ease) both;
+}
+
+.ap-card[style*="--i"],
+.dash-card[style*="--i"],
+.dash-stack[style*="--i"],
+.ap-table-wrap[style*="--i"],
+.ap-kpis[style*="--i"],
+.ap-stagger > * {
+  animation: ap-rise var(--ap-dur-slow) var(--ap-ease) both;
+  animation-delay: calc(min(var(--i, 0), 10) * var(--ap-stagger));
+}
+
+/* .ap-stagger: Kinder bekommen --i automatisch über nth-child, wenn kein Inline-Wert gesetzt ist */
+.ap-stagger > :nth-child(1) { --i: 0; }
+.ap-stagger > :nth-child(2) { --i: 1; }
+.ap-stagger > :nth-child(3) { --i: 2; }
+.ap-stagger > :nth-child(4) { --i: 3; }
+.ap-stagger > :nth-child(5) { --i: 4; }
+.ap-stagger > :nth-child(6) { --i: 5; }
+.ap-stagger > :nth-child(7) { --i: 6; }
+.ap-stagger > :nth-child(8) { --i: 7; }
+.ap-stagger > :nth-child(n + 9) { --i: 8; }
+
+/* Hover-Lift nur für klickbare Kacheln */
+.ap-card--link,
+a.ap-card {
+  transition:
+    transform var(--ap-dur-med) var(--ap-ease),
+    box-shadow var(--ap-dur-med) var(--ap-ease);
+}
+
+.ap-card--link:hover,
+a.ap-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ap-sh-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-content > *,
+  .ap-card,
+  .dash-card,
+  .dash-stack,
+  .ap-table-wrap,
+  .ap-kpis,
+  .ap-stagger > *,
+  .ap-menu-pop,
+  .ap-popover,
+  .ap-dialog,
+  .ap-dialog-backdrop,
+  .ap-tab[aria-pressed="true"]::after {
+    animation: none !important;
+  }
+
+  .ap-skel {
+    animation: none;
+  }
+
+  .ap-btn,
+  .ap-icon-btn,
+  .ap-back,
+  .ap-card--link,
+  a.ap-card,
+  .dash-btn {
+    transition: none;
+  }
+
+  .ap-btn:active:not(:disabled),
+  .ap-icon-btn:active:not(:disabled),
+  .dash-btn:active {
+    transform: none;
+  }
+
+  .ap-btn.is-loading::after,
+  .ap-btn[aria-busy="true"]::after {
+    animation-duration: 1.6s;
+  }
+}

@@ -1,5 +1,5 @@
 import { AdminGoennerInquiriesClient, type InboxFilter } from "@/components/admin-goenner-inquiries-client";
-import { AdminPageHeader } from "@/components/admin/admin-ui";
+import { AdminPageHeader } from "@/components/admin/ui/admin-page-header";
 import { createSupabaseUserServerClient } from "@/lib/supabase/user-server";
 import type { GoennerInquiryRow } from "@/types/content";
 
@@ -22,16 +22,16 @@ export default async function AdminGoennerInboxPage({ searchParams }: { searchPa
   return (
     <div className="ap-page">
       <AdminPageHeader
-        eyebrow="Formular-Anfragen"
+        eyebrow="Gönner"
         title="Eingänge"
-        description="Neue Anfragen sind rot markiert, bis du sie öffnest oder bearbeitest. E-Mail, Telefon, Betrag, Status und Datum direkt in der Zeile ändern und speichern. Status «Bezahlt» legt Gönner und Zahlung an."
+        description="Anfragen aus dem Gönner-Formular. Neue sind rot markiert, bis du sie öffnest oder bearbeitest. Änderungen speicherst du pro Zeile; Status «Bezahlt» legt Gönner und Zahlung an."
       />
       {error ? (
         <p className="ap-banner ap-banner--warn">Anfragen konnten nicht geladen werden.</p>
       ) : rows.length === 0 ? (
         <div className="ap-card ap-empty">
           <p className="ap-empty-title">Noch keine Eingänge</p>
-          <p className="ap-muted-sm">Neue Anfragen aus dem Gönner-Formular erscheinen hier.</p>
+          <p className="ap-empty-text">Neue Anfragen aus dem Gönner-Formular erscheinen hier.</p>
         </div>
       ) : (
         <AdminGoennerInquiriesClient key={initialFilter ?? "default"} rows={rows} initialFilter={initialFilter} />

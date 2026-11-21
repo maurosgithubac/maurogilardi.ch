@@ -14,7 +14,8 @@ import type { GoennerInquiryRow, GoennerInquiryStatus } from "@/types/content";
 import { isNewInquiry } from "@/lib/admin-inbox";
 import { IconCheck, IconDownload, IconMail, IconNote, IconSearch, IconSort, IconTrash } from "@/components/admin/admin-icons";
 import { AdminRowMenu } from "@/components/admin/admin-row-menu";
-import { TierTag } from "@/components/admin/admin-ui";
+import { TierTag, chfCompact } from "@/components/admin/admin-ui";
+import { CountUp } from "@/components/admin/ui/count-up";
 import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
 
 function chfFmt(n: number) {
@@ -184,16 +185,17 @@ export function AdminGoennerInquiriesClient({
   function sortHeader(key: SortKey, label: string, align?: "end") {
     const active = sort?.key === key;
     return (
-      <th
-        scope="col"
-        className={align === "end" ? "ap-num" : undefined}
-        aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
-      >
-        <button type="button" className={`ap-sort${active ? " is-active" : ""}`} onClick={() => toggleSort(key)}>
+      <div className={`ib-hc${align === "end" ? " is-end" : ""}`}>
+        <button
+          type="button"
+          className={`ap-sort${active ? " is-active" : ""}`}
+          aria-pressed={active}
+          onClick={() => toggleSort(key)}
+        >
           {label}
           <IconSort dir={active ? sort.dir : null} />
         </button>
-      </th>
+      </div>
     );
   }
 
@@ -421,48 +423,71 @@ export function AdminGoennerInquiriesClient({
     all: rows.length,
   };
 
-  return (
-    <>
-    <AdminRechnungDialog
-      open={rechnungFor !== null}
-      name={rechnungFor?.name ?? ""}
-      artLabel={rechnungFor ? artLabelOf(rechnungFor) : ""}
-      busy={busyId !== null}
-      onClose={() => setRechnungFor(null)}
-      onConfirm={({ status, season }) => {
-        const q = rechnungFor;
-        setRechnungFor(null);
-        if (q) void openOutlookDraft(q, "invoice", season, status);
-      }}
-    />
-      <dl className="ap-statline" aria-label="Eingänge in Zahlen">
-        <div className={newRows.length > 0 ? "is-new" : undefined}>
-          <dt>Neu</dt>
-          <dd>{newRows.length}</dd>
-        </div>
-        <div className={openRows.length > 0 ? "is-alert" : undefined}>
-          <dt>Offen</dt>
-          <dd>{openRows.length}</dd>
-        </div>
-        <div>
-          <dt>100er offen</dt>
-          <dd>{hundertOpen}</dd>
-        </div>
-        <div>
-          <dt>Bezahlt</dt>
-          <dd>{paidRows.length}</dd>
-        </div>
-        <div>
-          <dt>Ausgetreten</dt>
-          <dd>{exitedRows.length}</dd>
-        </div>
-        <div>
-          <dt>Summe bezahlt</dt>
-          <dd>{chfFmt(totalChf)}</dd>
-        </div>
-      </dl>
+  const kpiFilters: { id: Filter; label: string; value: number; tone?: string }[] = [
+    { id: "new", label: "Neu", value: newRows.length, tone: newRows.length > 0 ? "red" : undefined },
+    { id: "open", label: "Offen", value: openRows.length, tone: openRows.length > 0 ? "warn" : undefined },
+    { id: "paid", label: "Bezahlt", value: paidRows.length },
+    { id: "exited", label: "Ausgetreten", value: exitedRows.length },
+  ];
 
-      <div className="ap-toolbar" role="search">
+  const emptyCopy = query.trim()
+    ? { title: "Nichts gefunden", text: `Keine Anfrage passt zu «${query.trim()}» in diesem Filter.` }
+    : filter === "new"
+      ? { title: "Alles gelesen", text: "Es gibt keine neuen Anfragen. Neue Formular-Anfragen erscheinen hier." }
+      : filter === "open"
+        ? { title: "Keine offenen Anfragen", text: "Alle Anfragen sind bezahlt oder ausgetreten." }
+        : { title: "Keine Einträge in diesem Filter", text: "Wähle einen anderen Filter oder leere die Suche." };
+
+  return (
+    <div className="ib-wrap">
+      <AdminRechnungDialog
+        open={rechnungFor !== null}
+        name={rechnungFor?.name ?? ""}
+        artLabel={rechnungFor ? artLabelOf(rechnungFor) : ""}
+        busy={busyId !== null}
+        onClose={() => setRechnungFor(null)}
+        onConfirm={({ status, season }) => {
+          const q = rechnungFor;
+          setRechnungFor(null);
+          if (q) void openOutlookDraft(q, "invoice", season, status);
+        }}
+      />
+
+      <div className="ib-kpis ap-stagger" role="group" aria-label="Eingänge in Zahlen">
+        <div className="ib-kpi ib-kpi--hero">
+          <span className="ib-kpi-label">Summe bezahlt</span>
+          <strong className="ib-kpi-num">
+            <CountUp value={totalChf} format={(n) => chfCompact(n === totalChf ? n : Math.round(n))} />
+          </strong>
+          <span className="ib-kpi-sub">
+            aus {paidRows.length} {paidRows.length === 1 ? "Anfrage" : "Anfragen"}
+          </span>
+        </div>
+        {kpiFilters.map((k) => (
+          <button
+            key={k.id}
+            type="button"
+            className={`ib-kpi ib-kpi--btn${k.tone ? ` is-${k.tone}` : ""}`}
+            aria-pressed={filter === k.id}
+            onClick={() => setFilter(k.id)}
+          >
+            <span className="ib-kpi-label">{k.label}</span>
+            <strong className="ib-kpi-num">
+              <CountUp value={k.value} />
+            </strong>
+            <span className="ib-kpi-sub">Liste zeigen</span>
+          </button>
+        ))}
+        <div className="ib-kpi">
+          <span className="ib-kpi-label">100er offen</span>
+          <strong className="ib-kpi-num">
+            <CountUp value={hundertOpen} />
+          </strong>
+          <span className="ib-kpi-sub">nur Kontakt</span>
+        </div>
+      </div>
+
+      <div className="ib-toolbar" role="search">
         <div className="ap-segment" role="group" aria-label="Liste filtern">
           {(
             [
@@ -486,7 +511,7 @@ export function AdminGoennerInquiriesClient({
             </button>
           ))}
         </div>
-        <label className="ap-search">
+        <label className="ap-search ib-search">
           <IconSearch />
           <span className="sr-only">Eingänge suchen</span>
           <input
@@ -497,7 +522,7 @@ export function AdminGoennerInquiriesClient({
             placeholder="Name, E-Mail, Telefon…"
           />
         </label>
-        <label className="ap-field-inline ap-sort-select">
+        <label className="ap-field-inline ap-sort-select ib-sort">
           <span>Sortieren</span>
           <select
             className="ap-select"
@@ -514,17 +539,18 @@ export function AdminGoennerInquiriesClient({
             <option value="name:asc">Name A–Z</option>
             <option value="amount:desc">Betrag hoch → tief</option>
             <option value="tier:asc">Stufe</option>
+            <option value="status:asc">Status</option>
           </select>
         </label>
         {newRows.length > 0 ? (
           <button
             type="button"
-            className="ap-btn ap-btn--secondary ap-btn--sm"
+            className={`ap-btn ap-btn--secondary ap-btn--sm${markingAll ? " is-loading" : ""}`}
             disabled={markingAll}
             onClick={() => void markAllSeen()}
           >
             <IconCheck size={14} />
-            {markingAll ? "…" : "Alle als gelesen markieren"}
+            Alle als gelesen markieren
           </button>
         ) : null}
       </div>
@@ -547,56 +573,58 @@ export function AdminGoennerInquiriesClient({
 
       {visible.length === 0 ? (
         <div className="ap-card ap-empty">
-          <p className="ap-empty-title">Keine Einträge in diesem Filter</p>
-          <p className="ap-muted-sm">Anderen Filter wählen oder Suche leeren.</p>
+          <p className="ap-empty-title">{emptyCopy.title}</p>
+          <p className="ap-empty-text">{emptyCopy.text}</p>
+          {filter !== "all" || query ? (
+            <button
+              type="button"
+              className="ap-btn ap-btn--secondary ap-btn--sm"
+              onClick={() => {
+                setFilter("all");
+                setQuery("");
+              }}
+            >
+              Alle {rows.length} anzeigen
+            </button>
+          ) : null}
         </div>
       ) : (
-        <div className="ap-table-wrap">
-          <table className="ap-table ap-table--inbox">
-            <caption className="sr-only">Eingänge, {visible.length} Einträge</caption>
-            <thead>
-              <tr>
-                {sortHeader("name", "Name")}
-                {sortHeader("tier", "Stufe")}
-                <th scope="col">E-Mail</th>
-                <th scope="col">Telefon</th>
-                {sortHeader("amount", "Betrag CHF", "end")}
-                {sortHeader("status", "Status")}
-                {sortHeader("created", "Eingang")}
-                <th scope="col" className="ap-col-actions">
-                  <span className="sr-only">Aktionen</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((row) => {
-                const busy = busyId === row.id;
-                const d = drafts[row.id] ?? draftFrom(row);
-                const st = d.status;
-                const isHundert = isLiteContactMembership(row.membership_id);
-                const dirty = isDirty(row);
-                const tip = commentPreview(row);
-                const hasComment = Boolean(row.message?.trim() || row.admin_note?.trim());
-                const fresh = isNewInquiry(row);
+        <div className="ib-board">
+          <div className="ib-head" aria-hidden={false}>
+            {sortHeader("name", "Name")}
+            <span>E-Mail</span>
+            <span>Telefon</span>
+            {sortHeader("amount", "Betrag CHF", "end")}
+            {sortHeader("status", "Status")}
+            {sortHeader("created", "Eingang")}
+            <span className="ib-head-act">
+              <span className="sr-only">Aktionen</span>
+            </span>
+          </div>
+          <ul className="ib-list ap-stagger" aria-label={`Eingänge, ${visible.length} Einträge`}>
+            {visible.map((row) => {
+              const busy = busyId === row.id;
+              const d = drafts[row.id] ?? draftFrom(row);
+              const st = d.status;
+              const isHundert = isLiteContactMembership(row.membership_id);
+              const dirty = isDirty(row);
+              const tip = commentPreview(row);
+              const hasComment = Boolean(row.message?.trim() || row.admin_note?.trim());
+              const fresh = isNewInquiry(row);
 
-                return (
-                  <tr
-                    key={row.id}
-                    className={[
-                      "ap-inbox-row",
-                      `is-${st}`,
-                      fresh ? "is-new" : "",
-                      isHundert ? "is-hundert" : "",
-                      dirty ? "is-dirty" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <td className="ap-cell-name">
+              return (
+                <li
+                  key={row.id}
+                  className={["ib-row", `is-${st}`, fresh ? "is-new" : "", isHundert ? "is-hundert" : "", dirty ? "is-dirty" : "", busy ? "is-busy" : ""]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  <div className="ib-id">
+                    <div className="ib-id-line">
                       {fresh ? (
                         <button
                           type="button"
-                          className="ap-tag-new"
+                          className="ib-new"
                           disabled={busy}
                           onClick={() => markSeen(row)}
                           title="Als gelesen markieren"
@@ -606,172 +634,169 @@ export function AdminGoennerInquiriesClient({
                       ) : null}
                       <button
                         type="button"
-                        className="ap-inbox-name"
+                        className="ib-name"
                         title={`${row.name}\n\n${tip}`}
                         aria-label={`${row.name} – Kommentar ${hasComment ? "anzeigen" : "hinzufügen"}`}
                         aria-expanded={noteOpenId === row.id}
                         onClick={() => openNote(row)}
                       >
                         <span>{displayName(row.name, 26)}</span>
-                        {hasComment ? (
-                          <span className="ap-note-flag" aria-hidden="true">
-                            <IconNote size={13} />
-                          </span>
-                        ) : null}
+                        <span className={`ib-note-flag${hasComment ? " has" : ""}`} aria-hidden="true">
+                          <IconNote size={13} />
+                        </span>
                       </button>
-                      {dirty ? <span className="ap-dirty-hint">Ungespeichert</span> : null}
-                      {noteOpenId === row.id ? (
-                        <div className="ap-popover" ref={notePanelRef} role="dialog" aria-label={`Kommentar ${row.name}`}>
-                          {row.message?.trim() ? (
-                            <div className="ap-popover-block">
-                              <span className="ap-label">Formular</span>
-                              <p>{row.message.trim()}</p>
-                            </div>
-                          ) : (
-                            <p className="ap-muted-sm">Kein Formular-Kommentar.</p>
-                          )}
-                          <label className="ap-field">
-                            <span className="ap-label">Dein Kommentar</span>
-                            <textarea
-                              className="ap-input ap-textarea"
-                              value={noteDraft}
-                              onChange={(e) => setNoteDraft(e.target.value)}
-                              rows={3}
-                              disabled={busy}
-                              placeholder="Interner Vermerk…"
-                            />
-                          </label>
-                          <div className="ap-form-actions">
-                            <button
-                              type="button"
-                              className="ap-btn ap-btn--ghost ap-btn--sm"
-                              disabled={busy}
-                              onClick={() => setNoteOpenId(null)}
-                            >
-                              Schliessen
-                            </button>
-                            <button
-                              type="button"
-                              className="ap-btn ap-btn--primary ap-btn--sm"
-                              disabled={busy}
-                              onClick={() => void saveNote(row)}
-                            >
-                              Speichern
-                            </button>
-                          </div>
-                        </div>
-                      ) : null}
-                    </td>
-                    <td data-label="Stufe">
+                    </div>
+                    <div className="ib-id-meta">
                       <TierTag id={row.membership_id}>{inquiryTierShort(row.membership_id)}</TierTag>
-                    </td>
-                    <td data-label="E-Mail">
-                      <input
-                        className="ap-cell-input"
-                        type="email"
-                        value={d.email}
-                        disabled={busy}
-                        onChange={(e) => setDraft(row.id, { email: e.target.value })}
-                        aria-label={`E-Mail ${row.name}`}
-                      />
-                    </td>
-                    <td data-label="Telefon">
-                      <input
-                        className="ap-cell-input"
-                        type="tel"
-                        value={d.phone}
-                        disabled={busy}
-                        onChange={(e) => setDraft(row.id, { phone: e.target.value })}
-                        aria-label={`Telefon ${row.name}`}
-                        placeholder="—"
-                      />
-                    </td>
-                    <td data-label="Betrag CHF">
-                      <input
-                        className="ap-cell-input ap-cell-input--num"
-                        type="text"
-                        inputMode="decimal"
-                        value={d.amount}
-                        disabled={busy}
-                        onChange={(e) => setDraft(row.id, { amount: e.target.value })}
-                        aria-label={`Betrag ${row.name}`}
-                      />
-                    </td>
-                    <td data-label="Status">
-                      <select
-                        className={`ap-status-select is-${st}`}
-                        value={st}
-                        disabled={busy}
-                        onChange={(e) => setDraft(row.id, { status: e.target.value as GoennerInquiryStatus })}
-                        aria-label={`Status ${row.name}`}
-                      >
-                        <option value="open">○ Offen</option>
-                        <option value="completed">✓ Bezahlt</option>
-                        <option value="exited">– Ausgetreten</option>
-                      </select>
-                    </td>
-                    <td data-label="Eingang">
-                      <input
-                        className="ap-cell-input ap-cell-input--date"
-                        type="date"
-                        value={d.created}
-                        disabled={busy}
-                        onChange={(e) => setDraft(row.id, { created: e.target.value })}
-                        aria-label={`Eingang ${row.name}`}
-                      />
-                    </td>
-                    <td className="ap-col-actions">
-                      <div className="ap-row-actions">
-                        <button
-                          type="button"
-                          className="ap-btn ap-btn--primary ap-btn--sm"
-                          disabled={busy || !dirty}
-                          onClick={() => void saveRow(row)}
-                        >
-                          {busy ? "…" : "Speichern"}
-                        </button>
-                        <AdminRowMenu
-                          label={`Aktionen für ${row.name}`}
-                          items={[
-                            ...(row.membership_id !== "sponsoring"
-                              ? (["twint"] as const).map((type) => ({
-                                  kind: "action" as const,
-                                  label: "TWINT-Entwurf",
-                                  icon: <IconMail size={14} />,
-                                  disabled: busy,
-                                  onSelect: () => void openOutlookDraft(row, type),
-                                }))
-                              : []),
-                            ...(row.payment_method === "rechnung" && row.invoice_number
-                              ? [
-                                  {
-                                    kind: "action" as const,
-                                    label: "Rechnung (Mail-Entwurf)",
-                                    icon: <IconMail size={14} />,
-                                    disabled: busy,
-                                    onSelect: () => setRechnungFor(row),
-                                  },
-                                ]
-                              : []),
-                            {
-                              kind: "action",
-                              label: "Löschen…",
-                              danger: true,
-                              disabled: busy,
-                              icon: <IconTrash size={14} />,
-                              onSelect: () => void deleteRow(row),
-                            },
-                          ]}
-                        />
+                      {dirty ? <span className="ib-dirty">Ungespeichert</span> : null}
+                    </div>
+                    {noteOpenId === row.id ? (
+                      <div className="ib-pop" ref={notePanelRef} role="dialog" aria-label={`Kommentar ${row.name}`}>
+                        {row.message?.trim() ? (
+                          <div className="ib-pop-block">
+                            <span className="ap-label">Formular</span>
+                            <p>{row.message.trim()}</p>
+                          </div>
+                        ) : (
+                          <p className="ib-pop-empty">Kein Formular-Kommentar.</p>
+                        )}
+                        <label className="ap-field">
+                          <span className="ap-label">Dein Kommentar</span>
+                          <textarea
+                            className="ap-input ap-textarea"
+                            value={noteDraft}
+                            onChange={(e) => setNoteDraft(e.target.value)}
+                            rows={3}
+                            disabled={busy}
+                            placeholder="Interner Vermerk…"
+                            autoFocus
+                          />
+                        </label>
+                        <div className="ib-pop-actions">
+                          <button
+                            type="button"
+                            className="ap-btn ap-btn--ghost ap-btn--sm"
+                            disabled={busy}
+                            onClick={() => setNoteOpenId(null)}
+                          >
+                            Schliessen
+                          </button>
+                          <button
+                            type="button"
+                            className="ap-btn ap-btn--primary ap-btn--sm"
+                            disabled={busy}
+                            onClick={() => void saveNote(row)}
+                          >
+                            Speichern
+                          </button>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    ) : null}
+                  </div>
+                  <div className="ib-f ib-f--email" data-label="E-Mail">
+                    <input
+                      className="ap-cell-input"
+                      type="email"
+                      value={d.email}
+                      disabled={busy}
+                      onChange={(e) => setDraft(row.id, { email: e.target.value })}
+                      aria-label={`E-Mail ${row.name}`}
+                    />
+                  </div>
+                  <div className="ib-f ib-f--phone" data-label="Telefon">
+                    <input
+                      className="ap-cell-input"
+                      type="tel"
+                      value={d.phone}
+                      disabled={busy}
+                      onChange={(e) => setDraft(row.id, { phone: e.target.value })}
+                      aria-label={`Telefon ${row.name}`}
+                      placeholder="—"
+                    />
+                  </div>
+                  <div className="ib-f ib-f--amount" data-label="Betrag CHF">
+                    <input
+                      className="ap-cell-input ap-cell-input--num"
+                      type="text"
+                      inputMode="decimal"
+                      value={d.amount}
+                      disabled={busy}
+                      onChange={(e) => setDraft(row.id, { amount: e.target.value })}
+                      aria-label={`Betrag ${row.name}`}
+                    />
+                  </div>
+                  <div className="ib-f ib-f--status" data-label="Status">
+                    <select
+                      className={`ap-status-select is-${st}`}
+                      value={st}
+                      disabled={busy}
+                      onChange={(e) => setDraft(row.id, { status: e.target.value as GoennerInquiryStatus })}
+                      aria-label={`Status ${row.name}`}
+                    >
+                      <option value="open">○ Offen</option>
+                      <option value="completed">✓ Bezahlt</option>
+                      <option value="exited">– Ausgetreten</option>
+                    </select>
+                  </div>
+                  <div className="ib-f ib-f--date" data-label="Eingang">
+                    <input
+                      className="ap-cell-input ap-cell-input--date"
+                      type="date"
+                      value={d.created}
+                      disabled={busy}
+                      onChange={(e) => setDraft(row.id, { created: e.target.value })}
+                      aria-label={`Eingang ${row.name}`}
+                    />
+                  </div>
+                  <div className="ib-act">
+                    <button
+                      type="button"
+                      className={`ap-btn ap-btn--primary ap-btn--sm${busy ? " is-loading" : ""}`}
+                      disabled={busy || !dirty}
+                      onClick={() => void saveRow(row)}
+                    >
+                      Speichern
+                    </button>
+                    <AdminRowMenu
+                      label={`Aktionen für ${row.name}`}
+                      items={[
+                        ...(row.membership_id !== "sponsoring"
+                          ? (["twint"] as const).map((type) => ({
+                              kind: "action" as const,
+                              label: "TWINT-Entwurf",
+                              icon: <IconMail size={14} />,
+                              disabled: busy,
+                              onSelect: () => void openOutlookDraft(row, type),
+                            }))
+                          : []),
+                        ...(row.payment_method === "rechnung" && row.invoice_number
+                          ? [
+                              {
+                                kind: "action" as const,
+                                label: "Rechnung (Mail-Entwurf)",
+                                icon: <IconMail size={14} />,
+                                disabled: busy,
+                                onSelect: () => setRechnungFor(row),
+                              },
+                            ]
+                          : []),
+                        {
+                          kind: "action",
+                          label: "Löschen…",
+                          danger: true,
+                          disabled: busy,
+                          icon: <IconTrash size={14} />,
+                          onSelect: () => void deleteRow(row),
+                        },
+                      ]}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
-    </>
+    </div>
   );
 }

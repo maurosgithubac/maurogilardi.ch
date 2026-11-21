@@ -75,6 +75,8 @@ export type BudgetEntryRow = {
   scope: BudgetScope;
   category: string;
   label: string;
+  /** Unterkategorie, z. B. EPDT oder Salt. Leer = ohne Unterkategorie (vor Migration 029 immer leer). */
+  subcategory?: string;
   frequency: BudgetFrequency;
   ends_on: string | null; // YYYY-MM-DD, nur bei wiederkehrenden Kosten
 };
@@ -144,3 +146,61 @@ function toIso(d: string): string {
   const year = yy.length === 2 ? `20${yy}` : yy;
   return `${year}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
 }
+
+/** Farbe je Hauptkategorie (weisse Schrift darauf gut lesbar). */
+export const CATEGORY_COLORS: Record<string, string> = {
+  turniere: "#d71920",
+  flug: "#2f6fe4",
+  unterkunft: "#128a76",
+  transport: "#5a8f0c",
+  training: "#b8740a",
+  ausruestung: "#a21fb8",
+  ernaehrung: "#e0561a",
+  verbaende: "#5b4fcf",
+  events: "#d0437a",
+  spesen: "#8a6d3b",
+  fahrzeug: "#475569",
+  buero: "#0b7fb5",
+  abos: "#1b1d21",
+  sonst_golf: "#6b7077",
+  miete: "#2f6fe4",
+  verpflegung: "#128a76",
+  strom: "#b8740a",
+  heizung: "#e0561a",
+  internet: "#5b4fcf",
+  kreditkarte: "#d0437a",
+  moebel: "#5a8f0c",
+  versicherung_privat: "#a21fb8",
+  sonst_privat: "#6b7077",
+};
+
+export function categoryColor(id: string): string {
+  return CATEGORY_COLORS[id] ?? "#6b7077";
+}
+
+/** Vorschläge für Unterkategorien, damit meist ein Klick genügt. Eigene Namen sind jederzeit möglich. */
+export const SUBCATEGORY_SUGGESTIONS: Record<string, string[]> = {
+  turniere: ["ProGolf Tour", "EPDT", "Challenge Tour", "Range & Greenfee", "Tour-Pakete"],
+  flug: ["Swiss", "easyJet", "Turkish", "Pegasus und SunExpress"],
+  unterkunft: ["Airbnb", "Booking", "Agoda", "Hotel"],
+  transport: ["SBB", "Taxi", "Mietauto", "Parken"],
+  training: ["Putting Coach", "Mentalcoaching", "Physio und Kraft", "Sportmedizin"],
+  ausruestung: ["Schuhe", "Bälle und Tees", "Handschuhe", "Yardage Books", "Uhr und Tech"],
+  ernaehrung: ["Sponser", "Riegel und Drinks"],
+  verbaende: ["SwissPGA", "SwissGolf"],
+  events: ["Gönnerturnier", "Fotograf", "Apéro"],
+  spesen: ["Verpflegung unterwegs", "Trinkgeld"],
+  fahrzeug: ["Versicherung", "Kilometer", "Garage", "Benzin"],
+  buero: ["Handy", "Laptop", "Büromaterial"],
+  abos: ["Salt", "ChatGPT", "Domain", "Cloud", "VPN und E-Sim", "Fiverr"],
+  sonst_golf: ["Ausgleichskasse", "Steuern"],
+  miete: ["Miete", "Nebenkosten", "Parkplatz"],
+  verpflegung: ["Migros", "Coop", "Restaurant", "Take-away"],
+  strom: ["Strom"],
+  heizung: ["Heizung"],
+  internet: ["Internet", "Handy"],
+  kreditkarte: ["Gemeinsame Kreditkarte"],
+  moebel: ["Möbel", "Haushalt", "Garten"],
+  versicherung_privat: ["Krankenkasse", "Hausrat", "Haftpflicht"],
+  sonst_privat: ["Freizeit", "Geschenke", "Kleider"],
+};

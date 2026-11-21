@@ -2,7 +2,6 @@
 
 import { AdminRechnungDialog, artLabelOf } from "@/components/admin-rechnung-dialog";
 import { openInvoiceMail, seasonOptions } from "@/lib/admin-invoice-mail";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import {
@@ -25,7 +24,9 @@ import {
   type GoennerPaymentMethod,
   type GoennerPaymentRow,
 } from "@/lib/goenner-finance";
-import { IconArrowLeft, IconFile, IconMail, IconTrash } from "@/components/admin/admin-icons";
+import { IconFile, IconMail, IconTrash } from "@/components/admin/admin-icons";
+import { AdminPageHeader } from "@/components/admin/ui/admin-page-header";
+import { CountUp } from "@/components/admin/ui/count-up";
 import { sendStandardMail, type StandardMailType } from "@/lib/admin-send-mail";
 import { ContributionTag, StatusBadge, TierTag, categoryOf, chf, chfCompact, dateCh } from "@/components/admin/admin-ui";
 
@@ -241,8 +242,10 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
   const set = <K extends keyof GoennerMemberRow>(key: K, value: GoennerMemberRow[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
 
+  const dirty = JSON.stringify(draft) !== JSON.stringify(member);
+
   return (
-    <div className="ap-page">
+    <div className="ap-page mb-d">
       <AdminRechnungDialog
         open={rechnungOpen}
         name={member.name}
@@ -254,91 +257,56 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
           void downloadOutlookDraft("invoice", season, status);
         }}
       />
-      <nav aria-label="Brotkrumen" className="ap-crumbs">
-        <Link href="/admin#liste" className="ap-back">
-          <IconArrowLeft size={14} />
-          Übersicht
-        </Link>
-      </nav>
 
-      <header className="ap-detail-head">
-        <div className="ap-detail-id">
-          <span className="ap-avatar" aria-hidden="true">
-            {member.name
-              .split(/\s+/)
-              .filter(Boolean)
-              .slice(0, 2)
-              .map((s) => s[0]?.toUpperCase())
-              .join("")}
-          </span>
-          <div>
-            <h1 className="ap-h1">{member.name}</h1>
-            {member.organization ? <p className="ap-detail-org">{member.organization}</p> : null}
-            <div className="ap-detail-meta">
-              <span className={`ap-cat ap-cat--${cat} ap-cat--inline`}>{memberCategoryLabel(cat)}</span>
-              <TierTag id={member.membership_id}>{inquiryTierShort(member.membership_id)}</TierTag>
-              <ContributionTag id={member.contribution_type}>{contributionTypeLabel(member.contribution_type)}</ContributionTag>
-              {billable ? <span className="ap-num">{chf(expected)} / Jahr</span> : null}
-              {paidThisYear ? (
-                <StatusBadge state="paid">Bezahlt {year}</StatusBadge>
-              ) : !billable ? (
-                <StatusBadge state="none">{member.contribution_type === "material" ? "Sachleistung" : "Ohne fixen Betrag"}</StatusBadge>
-              ) : member.active ? (
-                <StatusBadge state="open">Offen {year}</StatusBadge>
-              ) : null}
-              {!member.active ? <span className="ap-tag-muted">inaktiv</span> : null}
-              {member.member_since ? <span className="ap-tag-muted">Mitglied seit {formatDateCh(member.member_since)}</span> : null}
-            </div>
-          </div>
+      <AdminPageHeader
+        back={{ href: "/admin#liste", label: "Übersicht" }}
+        eyebrow={member.organization ? `${memberCategoryLabel(cat)}, ${member.organization}` : memberCategoryLabel(cat)}
+        title={member.name}
+        description={
+          lastPayment
+            ? `Die Rechnung basiert auf der letzten Einzahlung vom ${dateCh(lastPayment.paid_on)} (${chf(Number(lastPayment.amount_chf))}).`
+            : "Für die Rechnung brauchst du mindestens eine erfasste Zahlung."
+        }
+        actions={
+          <>
+            <button
+              type="button"
+              className="ap-btn ap-btn--secondary"
+              disabled={!canMail || mailBusy !== null}
+              onClick={() => void downloadOutlookDraft("twint")}
+              title={mailTitle ?? `TWINT-Mail mit Paylink über ${chf(expected)} an ${member.email}`}
+            >
+              <IconMail />
+              TWINT-Entwurf
+            </button>
+            <button
+              type="button"
+              className="ap-btn ap-btn--primary"
+              disabled={invoiceBusy}
+              onClick={() => setRechnungOpen(true)}
+              title="Mail-Entwurf mit Rechnung als PDF im Anhang"
+            >
+              <IconFile />
+              Rechnung (Mail-Entwurf)
+            </button>
+          </>
+        }
+      >
+        <div className="mb-chips">
+          <TierTag id={member.membership_id}>{inquiryTierShort(member.membership_id)}</TierTag>
+          <ContributionTag id={member.contribution_type}>{contributionTypeLabel(member.contribution_type)}</ContributionTag>
+          {billable ? <span className="mb-chip-amount">{chf(expected)} / Jahr</span> : null}
+          {paidThisYear ? (
+            <StatusBadge state="paid">Bezahlt {year}</StatusBadge>
+          ) : !billable ? (
+            <StatusBadge state="none">{member.contribution_type === "material" ? "Sachleistung" : "Ohne fixen Betrag"}</StatusBadge>
+          ) : member.active ? (
+            <StatusBadge state="open">Offen {year}</StatusBadge>
+          ) : null}
+          {!member.active ? <span className="ap-tag-muted">inaktiv</span> : null}
+          {member.member_since ? <span className="mb-chip-since">Mitglied seit {formatDateCh(member.member_since)}</span> : null}
         </div>
-        <div className="ap-page-actions">
-          <button
-            type="button"
-            className="ap-btn ap-btn--secondary"
-            disabled={!canMail || mailBusy !== null}
-            onClick={() => void downloadOutlookDraft("twint")}
-            title={mailTitle ?? `TWINT-Mail mit Paylink über ${chf(expected)} an ${member.email}`}
-          >
-            <IconMail />
-            TWINT-Entwurf
-          </button>
-          <button
-            type="button"
-            className="ap-btn ap-btn--primary"
-            disabled={invoiceBusy}
-            onClick={() => setRechnungOpen(true)}
-            title="Mail-Entwurf mit Rechnung als PDF im Anhang"
-          >
-            <IconFile />
-            Rechnung (Mail-Entwurf)
-          </button>
-        </div>
-      </header>
-
-      <p className="ap-muted-sm ap-detail-note">
-        {lastPayment
-          ? `Rechnung basiert auf der letzten Einzahlung vom ${dateCh(lastPayment.paid_on)} (${chf(Number(lastPayment.amount_chf))}).`
-          : "Für die Rechnung brauchst du mindestens eine erfasste Zahlung."}
-      </p>
-
-      <dl className="ap-facts">
-        <div>
-          <dt>{year}</dt>
-          <dd>{chfCompact(yearTotal)}</dd>
-        </div>
-        <div>
-          <dt>Vorjahr ({lastYear})</dt>
-          <dd>{chfCompact(lastYearTotal)}</dd>
-        </div>
-        <div>
-          <dt>Total seit {GOENNER_FINANCE_START_YEAR}</dt>
-          <dd>{chfCompact(total)}</dd>
-        </div>
-        <div>
-          <dt>Letzte Zahlung</dt>
-          <dd>{lastPayment ? dateCh(lastPayment.paid_on) : "—"}</dd>
-        </div>
-      </dl>
+      </AdminPageHeader>
 
       {error ? (
         <p className="ap-banner ap-banner--error" role="alert">
@@ -351,7 +319,32 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
         </p>
       ) : null}
 
-      <section className="ap-card" aria-labelledby="history-heading">
+      <dl className="mb-kpis ap-stagger">
+        <div className="mb-kpi mb-kpi--hero">
+          <dt>Bezahlt {year}</dt>
+          <dd>
+            <CountUp value={yearTotal} format={(n) => chfCompact(n === yearTotal ? n : Math.round(n))} />
+          </dd>
+        </div>
+        <div className="mb-kpi">
+          <dt>Vorjahr ({lastYear})</dt>
+          <dd>
+            <CountUp value={lastYearTotal} format={(n) => chfCompact(n === lastYearTotal ? n : Math.round(n))} />
+          </dd>
+        </div>
+        <div className="mb-kpi">
+          <dt>Total seit {GOENNER_FINANCE_START_YEAR}</dt>
+          <dd>
+            <CountUp value={total} format={(n) => chfCompact(n === total ? n : Math.round(n))} />
+          </dd>
+        </div>
+        <div className="mb-kpi">
+          <dt>Letzte Zahlung</dt>
+          <dd className="mb-kpi-date">{lastPayment ? dateCh(lastPayment.paid_on) : "—"}</dd>
+        </div>
+      </dl>
+
+      <section className="ap-card mb-history" aria-labelledby="history-heading" style={{ "--i": 4 } as React.CSSProperties}>
         <div className="ap-card-head">
           <h2 id="history-heading" className="ap-h2">
             Zahlungshistorie
@@ -360,25 +353,25 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             {paidYears} von {timeline.length} Jahren bezahlt
           </span>
         </div>
-        <ol className="ap-timeline">
+        <ol className="mb-years">
           {timeline.map((t) => {
             const state = t.count > 0 ? "paid" : t.year === year && member.active && billable ? "open" : "none";
             return (
-              <li key={t.year} className={`ap-timeline-item is-${state}`}>
-                <span className="ap-timeline-year">{t.year}</span>
-                <span className="ap-timeline-dot" aria-hidden="true" />
+              <li key={t.year} className={`mb-year is-${state}`}>
+                <span className="mb-year-label">{t.year}</span>
                 <StatusBadge state={state}>
                   {state === "paid" ? "Bezahlt" : state === "open" ? "Offen" : "Keine Zahlung"}
                 </StatusBadge>
-                <span className="ap-timeline-amount">{t.count > 0 ? chf(t.sum) : "—"}</span>
+                <span className="mb-year-amount">{t.count > 0 ? chf(t.sum) : "—"}</span>
               </li>
             );
           })}
         </ol>
       </section>
 
-      <div className="ap-detail-grid">
-        <form className="ap-card ap-form" onSubmit={saveMember} aria-labelledby="master-heading">
+      <div className="mb-grid">
+        <div className="mb-col mb-col--main">
+        <form className="ap-card ap-form mb-card" onSubmit={saveMember} aria-labelledby="master-heading">
           <div className="ap-card-head">
             <h2 id="master-heading" className="ap-h2">
               Stammdaten
@@ -554,14 +547,16 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             </label>
           </fieldset>
 
-          <div className="ap-form-actions">
+          <div className="ap-form-actions mb-save">
+            {dirty ? <span className="mb-dirty">Ungespeicherte Änderungen</span> : null}
             <button type="submit" className="ap-btn ap-btn--primary" disabled={busy}>
               {busy ? "Speichern…" : "Stammdaten speichern"}
             </button>
           </div>
         </form>
-
-        <form className="ap-card ap-form ap-card--sticky" onSubmit={addPayment} aria-labelledby="pay-heading">
+        </div>
+        <div className="mb-col mb-col--side">
+        <form className="ap-card ap-form mb-card" onSubmit={addPayment} aria-labelledby="pay-heading">
           <div className="ap-card-head">
             <h2 id="pay-heading" className="ap-h2">
               Zahlung erfassen
@@ -619,82 +614,52 @@ export function AdminGoennerMemberDetailClient({ member, payments }: Props) {
             </button>
           </div>
         </form>
-      </div>
-
-      <section className="ap-card ap-card--flush" aria-labelledby="payments-heading">
-        <div className="ap-card-head">
-          <h2 id="payments-heading" className="ap-h2">
-            Zahlungen
-          </h2>
-          <span className="ap-count">{payments.length}</span>
-        </div>
-        <div className="ap-table-wrap">
-          <table className="ap-table ap-table--payments">
-            <thead>
-              <tr>
-                <th scope="col">Datum</th>
-                <th scope="col" className="ap-num">
-                  Betrag
-                </th>
-                <th scope="col">Methode</th>
-                <th scope="col">Stufe</th>
-                <th scope="col">Notiz</th>
-                <th scope="col" className="ap-col-actions">
-                  <span className="sr-only">Aktionen</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {payments.length === 0 ? (
-                <tr className="ap-empty-row">
-                  <td colSpan={6}>
-                    <div className="ap-empty">
-                      <p className="ap-empty-title">Noch keine Zahlungen</p>
-                      <p className="ap-muted-sm">
-                        Historische Beträge ab {GOENNER_FINANCE_START_YEAR} über «Zahlung erfassen» nachtragen.
-                      </p>
+          <section className="ap-card mb-payments" aria-labelledby="payments-heading">
+            <div className="ap-card-head">
+              <h2 id="payments-heading" className="ap-h2">
+                Zahlungen
+              </h2>
+              <span className="ap-count">{payments.length}</span>
+            </div>
+            {payments.length === 0 ? (
+              <div className="ap-empty mb-empty">
+                <p className="ap-empty-title">Noch keine Zahlungen</p>
+                <p className="ap-empty-text">
+                  Trage Beträge ab {GOENNER_FINANCE_START_YEAR} über «Zahlung erfassen» nach.
+                </p>
+              </div>
+            ) : (
+              <ul className="mb-pay-list">
+                {payments.map((p) => (
+                  <li key={p.id} className="mb-pay">
+                    <div className="mb-pay-main">
+                      <span className="mb-pay-date">{dateCh(p.paid_on)}</span>
+                      <span className="mb-pay-amount">{chf(Number(p.amount_chf))}</span>
                     </div>
-                  </td>
-                </tr>
-              ) : (
-                payments.map((p) => (
-                  <tr key={p.id}>
-                    <td className="ap-cell-name">
-                      <span className="ap-row-title ap-num">{dateCh(p.paid_on)}</span>
-                    </td>
-                    <td className="ap-num ap-num--strong" data-label="Betrag">
-                      {chf(Number(p.amount_chf))}
-                    </td>
-                    <td data-label="Methode">{methodLabel(p.method)}</td>
-                    <td data-label="Stufe">
+                    <div className="mb-pay-meta">
+                      <span>{methodLabel(p.method)}</span>
                       {p.membership_id ? (
                         <TierTag id={p.membership_id}>{inquiryTierShort(p.membership_id)}</TierTag>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td data-label="Notiz" className="ap-cell-note">
-                      {p.note || "—"}
-                    </td>
-                    <td className="ap-col-actions">
-                      <button
-                        type="button"
-                        className="ap-icon-btn ap-icon-btn--danger"
-                        disabled={busy}
-                        onClick={() => void deletePayment(p.id)}
-                        aria-label={`Zahlung vom ${dateCh(p.paid_on)} löschen`}
-                        title="Zahlung löschen"
-                      >
-                        <IconTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      ) : null}
+                      {p.note ? <span className="mb-pay-note">{p.note}</span> : null}
+                    </div>
+                    <button
+                      type="button"
+                      className="ap-icon-btn ap-icon-btn--danger mb-pay-del"
+                      disabled={busy}
+                      onClick={() => void deletePayment(p.id)}
+                      aria-label={`Zahlung vom ${dateCh(p.paid_on)} löschen`}
+                      title="Zahlung löschen"
+                    >
+                      <IconTrash />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

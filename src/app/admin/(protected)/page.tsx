@@ -3,6 +3,7 @@ import type { StatusFilter } from "@/components/admin-goenner-members-client";
 import type { CategoryFilter } from "@/components/admin/admin-ui";
 import type { BudgetEntryRow } from "@/lib/budget";
 import { GOENNER_FINANCE_START_YEAR, type GoennerMemberRow, type GoennerPaymentRow } from "@/lib/goenner-finance";
+import { loadBeehiivStats, type NewsletterStats } from "@/lib/beehiiv-stats";
 import { loadUpcomingEvents } from "@/lib/kalender-upcoming";
 import { isMissingTableError, type PrizeMoneyRow } from "@/lib/prize-money";
 import type { TournamentInviteRow, TournamentRow } from "@/lib/tournament";
@@ -23,7 +24,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
     sp.bereich === "goenner" || sp.bereich === "sponsor" || sp.bereich === "partner" ? sp.bereich : undefined;
 
   const supabase = await createSupabaseUserServerClient();
-  const [events, membersRes, paymentsRes, inquiriesRes, prizeRes, budgetRes, newsletterRes, tournamentRes] = await Promise.all([
+  const [events, membersRes, paymentsRes, inquiriesRes, prizeRes, budgetRes, newsletterRes, tournamentRes, beehiiv] = await Promise.all([
     loadUpcomingEvents(6),
     supabase.from("goenner_members").select("*").order("name", { ascending: true }),
     supabase.from("goenner_payments").select("*"),
@@ -39,6 +40,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       .eq("scope", "golf"),
     supabase.from("newsletter_subscribers").select("id", { count: "exact", head: true }),
     supabase.from("tournaments").select("*").order("event_date", { ascending: false }).limit(1),
+    loadBeehiivStats(),
   ]);
 
   // Fehlt seen_at (Migration 020), schlägt der Filter fehl → nur offene laden
@@ -46,6 +48,10 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
     ? ((await supabase.from("goenner_inquiries").select("*").eq("status", "open").order("created_at", { ascending: false }))
         .data as GoennerInquiryRow[] | null)
     : (inquiriesRes.data as GoennerInquiryRow[] | null);
+
+  // Newsletter: Beehiiv ist die Quelle. Nur wenn Beehiiv nicht erreichbar ist, die Zahl der Website-Liste (Supabase) zeigen.
+  const newsletter: NewsletterStats | null =
+    beehiiv ?? (newsletterRes.error ? null : { subscribers: newsletterRes.count ?? 0, openRate: null, clickRate: null, sent: null, source: "supabase" });
 
   // Gönnerturnier: neuester Anlass mit Antworten
   let tournament: TournamentSummary | null = null;
@@ -74,7 +80,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       prizes={(prizeRes.data as PrizeMoneyRow[]) ?? []}
       events={events}
       budget={(budgetRes.error ? [] : (budgetRes.data ?? [])) as BudgetEntryRow[]}
-      newsletter={newsletterRes.error ? null : (newsletterRes.count ?? 0)}
+      newsletter={newsletter}
       tournament={tournament}
       ledgerMissing={isMissingTableError(membersRes.error?.message) || isMissingTableError(paymentsRes.error?.message)}
       migration020Missing={isMissingTableError(prizeRes.error?.message) || Boolean(inquiriesRes.error)}

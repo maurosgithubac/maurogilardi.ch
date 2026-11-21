@@ -3,6 +3,12 @@ import "./admin.css";
 import "./admin-shell.css";
 import "./admin-bento.css";
 import "./admin-dash.css";
+import "./admin-system.css";
+import "./admin-page-inbox.css";
+import "./admin-page-invoices.css";
+import "./admin-page-events.css";
+import "./admin-page-misc.css";
+import "./admin-budget.css";
 
 export const metadata: Metadata = {
   robots: {

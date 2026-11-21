@@ -39,14 +39,17 @@ export function AdminPostsListClient({ initialPosts }: Props) {
     <>
       {error ? <p className="ap-banner ap-banner--error">{error}</p> : null}
       {posts.length === 0 ? (
-        <p className="ap-muted-sm">Noch keine Beiträge.</p>
+        <div className="ap-empty">
+          <p className="ap-empty-title">Noch keine Beiträge</p>
+          <p className="ap-empty-text">Beiträge werden im Repo gepflegt.</p>
+        </div>
       ) : (
         <ul className="ap-list">
           {posts.map((post) => (
             <li key={post.id} className="ap-list-item">
               <div>
                 <strong>{post.title}</strong>
-                <span className={`ap-status ${post.published ? "ap-status--paid" : "ap-status--none"}`}>
+                <span className={`ap-status ${post.published ? "ap-status--ok" : "ap-status--muted"}`}>
                   {post.published ? "Live" : "Entwurf"}
                 </span>
               </div>

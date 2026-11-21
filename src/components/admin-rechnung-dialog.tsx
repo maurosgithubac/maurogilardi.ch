@@ -13,6 +13,11 @@ type Props = {
   onConfirm: (wahl: RechnungWahl) => void;
 };
 
+const STATUS_OPTIONS = [
+  { id: "neu", title: "Neu", sub: "Neues Mitglied" },
+  { id: "bestand", title: "Bestehend", sub: "Bereits Mitglied" },
+] as const;
+
 /**
  * Auswahl vor dem Rechnungs-Entwurf: neuer oder bestehender Mitglied, laufendes oder kommendes Jahr.
  * Die Art (Gönner, Sponsor, Partner) kommt aus dem Profil und wird nur angezeigt.
@@ -44,68 +49,56 @@ export function AdminRechnungDialog({ open, name, artLabel, busy, onClose, onCon
   return (
     <div className="ap-dialog-backdrop" role="presentation" onClick={onClose}>
       <div
-        className="ap-dialog"
+        className="ap-dialog iv-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="rechnung-dialog-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="ap-eyebrow">{artLabel}</p>
-        <h2 id="rechnung-dialog-title" className="ap-h2">
-          Rechnung für {name}
-        </h2>
-
-        <div className="ap-dialog-group">
-          <span className="ap-dialog-label">Mitglied</span>
-          <div className="ap-segment" role="group" aria-label="Neues oder bestehendes Mitglied">
-            <button
-              type="button"
-              className={`ap-segment-btn${status === "neu" ? " is-active" : ""}`}
-              aria-pressed={status === "neu"}
-              onClick={() => setStatus("neu")}
-            >
-              Neu
-            </button>
-            <button
-              type="button"
-              className={`ap-segment-btn${status === "bestand" ? " is-active" : ""}`}
-              aria-pressed={status === "bestand"}
-              onClick={() => setStatus("bestand")}
-            >
-              Bestehend
-            </button>
-          </div>
+        <div className="iv-dialog-head">
+          <p className="ap-eyebrow">{artLabel}</p>
+          <h2 id="rechnung-dialog-title" className="ap-h2">
+            Rechnung für {name}
+          </h2>
         </div>
 
-        <div className="ap-dialog-group">
-          <span className="ap-dialog-label">Saison</span>
-          <div className="ap-segment" role="group" aria-label="Saison">
-            {seasons.map((y) => (
-              <button
-                key={y}
-                type="button"
-                className={`ap-segment-btn${season === y ? " is-active" : ""}`}
-                aria-pressed={season === y}
-                onClick={() => setSeason(y)}
-              >
-                {y}
-                {y === current ? " · laufend" : " · kommend"}
+        <fieldset className="iv-group">
+          <legend className="ap-label iv-group-label">Mitglied</legend>
+          <div className="iv-choices">
+            {STATUS_OPTIONS.map((o) => (
+              <button key={o.id} type="button" className="iv-choice" aria-pressed={status === o.id} onClick={() => setStatus(o.id)}>
+                <span className="iv-choice-check" aria-hidden="true" />
+                <span className="iv-choice-title">{o.title}</span>
+                <span className="iv-choice-sub">{o.sub}</span>
               </button>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <p className="ap-dialog-hint">
+        <fieldset className="iv-group">
+          <legend className="ap-label iv-group-label">Saison</legend>
+          <div className="iv-choices">
+            {seasons.map((y) => (
+              <button key={y} type="button" className="iv-choice" aria-pressed={season === y} onClick={() => setSeason(y)}>
+                <span className="iv-choice-check" aria-hidden="true" />
+                <span className="iv-choice-title">{y}</span>
+                <span className="iv-choice-sub">{y === current ? "Laufende Saison" : "Kommende Saison"}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <p className="iv-dialog-note">
           Die Datei öffnet sich als Entwurf in deinem Mailprogramm, mit der PDF im Anhang. Versendet wird nichts.
         </p>
 
-        <div className="ap-dialog-actions">
+        <div className="ap-dialog-foot">
           <button type="button" className="ap-btn ap-btn--ghost" onClick={onClose}>
             Abbrechen
           </button>
           <button
             type="button"
-            className="ap-btn ap-btn--primary"
+            className={`ap-btn ap-btn--primary${busy ? " is-loading" : ""}`}
             disabled={busy}
             onClick={() => onConfirm({ status, season })}
           >

@@ -1,0 +1,751 @@
+/* admin-page-events.css: Kalender (ev-), Gönnerturnier (tn-), Preisgelder (pz-). Wird nach den gemeinsamen Stilen geladen. */
+
+/* ——— Gemeinsame Kachel ——— */
+.admin-app .ev-card,
+.admin-app .tn-card,
+.admin-app .pz-card {
+  display: grid;
+  align-content: start;
+  gap: var(--ap-s-2);
+  min-width: 0;
+  padding: var(--ap-s-5);
+  border-radius: var(--ap-radius-card);
+  background: #fff;
+  box-shadow: var(--ap-sh-1);
+  animation: ap-rise 520ms var(--ap-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+  animation-delay: calc(var(--i, 0) * var(--ap-stagger, 60ms));
+}
+
+.admin-app .ev-card-label,
+.admin-app .tn-label,
+.admin-app .pz-label {
+  margin: 0;
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-big,
+.admin-app .pz-hero-num,
+.admin-app .pz-best-num {
+  margin: 0;
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-num);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-app .ev-stat-sub,
+.admin-app .tn-sub,
+.admin-app .pz-sub {
+  margin: 0;
+  font-size: var(--ap-fs-label);
+  color: var(--ap-muted);
+}
+
+/* ——— Kalender ——— */
+.admin-app .ev-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ap-s-4);
+}
+
+.admin-app .ev-next {
+  grid-column: 1 / -1;
+  background: var(--ap-red);
+  color: #fff;
+  align-content: space-between;
+}
+
+.admin-app .ev-next .ev-card-label {
+  color: rgb(255 255 255 / 78%);
+}
+
+.admin-app .ev-next-name {
+  margin: var(--ap-s-1) 0 0;
+  font-family: var(--ap-display);
+  font-size: clamp(1.5rem, 1.1rem + 1vw, 2rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.admin-app .ev-next-meta {
+  margin: 0;
+  font-size: var(--ap-fs-body);
+  line-height: 1.5;
+  color: rgb(255 255 255 / 88%);
+}
+
+.admin-app .ev-next-pill {
+  justify-self: start;
+  margin-top: var(--ap-s-2);
+  padding: 4px 12px;
+  border-radius: var(--ap-r-pill);
+  background: #fff;
+  color: var(--ap-red);
+  font-size: var(--ap-fs-label);
+  font-weight: 650;
+}
+
+.admin-app .ev-big-sep {
+  margin: 0 0.18em;
+  color: var(--ap-hair-strong);
+  font-weight: 400;
+}
+
+.admin-app .ev-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ap-s-4);
+  align-items: start;
+}
+
+.admin-app .ev-main {
+  display: grid;
+  gap: var(--ap-s-5);
+  min-width: 0;
+}
+
+.admin-app .ev-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ap-s-3);
+}
+
+.admin-app .ev-month {
+  display: grid;
+  gap: var(--ap-s-2);
+  animation: ap-rise 480ms var(--ap-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+.admin-app .ev-month-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ap-s-2);
+  margin: 0 var(--ap-s-1);
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-section);
+  font-weight: 600;
+}
+
+.admin-app .ev-month-count {
+  padding: 1px 8px;
+  border-radius: var(--ap-r-pill);
+  background: #fff;
+  font-family: inherit;
+  font-size: var(--ap-fs-caption);
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--ap-radius-card);
+  background: #fff;
+  box-shadow: var(--ap-sh-1);
+  overflow: hidden;
+}
+
+.admin-app .ev-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: var(--ap-s-3) var(--ap-s-4);
+  align-items: center;
+  padding: var(--ap-s-4) var(--ap-s-5);
+  border-top: 1px solid var(--ap-hair);
+  transition: background var(--ap-dur-fast, 150ms) ease;
+}
+
+.admin-app .ev-row:first-child {
+  border-top: 0;
+}
+
+.admin-app .ev-row:hover {
+  background: var(--ap-hover);
+}
+
+.admin-app .ev-row.is-editing {
+  background: #fdf2f2;
+  box-shadow: inset 3px 0 0 var(--ap-red);
+}
+
+.admin-app .ev-row.is-past .ev-date,
+.admin-app .ev-row.is-past .ev-name {
+  opacity: 0.6;
+}
+
+.admin-app .ev-row.is-live .ev-date {
+  background: var(--ap-red);
+  color: #fff;
+}
+
+.admin-app .ev-row.is-live .ev-date-small {
+  color: rgb(255 255 255 / 80%);
+}
+
+.admin-app .ev-date {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: 64px;
+  padding: var(--ap-s-2);
+  border-radius: var(--ap-r-lg);
+  background: var(--ap-sunken);
+  text-align: center;
+}
+
+.admin-app .ev-date-big {
+  font-family: var(--ap-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-app .ev-date-small {
+  font-size: var(--ap-fs-caption);
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-app .ev-title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ap-s-2);
+}
+
+.admin-app .ev-name {
+  font-size: var(--ap-fs-lead);
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.admin-app .ev-kind {
+  padding: 2px 9px;
+  border-radius: var(--ap-r-pill);
+  background: var(--ap-sunken);
+  font-size: var(--ap-fs-caption);
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-kind--camp {
+  background: #f2d2d4;
+  color: #8f1217;
+}
+
+.admin-app .ev-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--ap-s-3);
+  margin: 0;
+  font-size: var(--ap-fs-body);
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-meta-date {
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-ink);
+}
+
+.admin-app .ev-warn {
+  margin: 0;
+  font-size: var(--ap-fs-label);
+  color: #8a5a00;
+}
+
+.admin-app .ev-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ap-s-2);
+  grid-column: 2;
+}
+
+.admin-app .ev-form {
+  gap: var(--ap-s-4);
+  scroll-margin-top: var(--ap-s-4);
+}
+
+.admin-app .ev-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ap-s-3);
+}
+
+.admin-app .ev-form-title {
+  margin: 0;
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-section);
+  font-weight: 600;
+}
+
+.admin-app .ev-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ap-s-3);
+}
+
+.admin-app .ev-span-2 {
+  grid-column: 1 / -1;
+}
+
+.admin-app .ev-coords summary {
+  cursor: pointer;
+  padding: var(--ap-s-1) 0 var(--ap-s-2);
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  color: var(--ap-muted);
+}
+
+.admin-app .ev-coords[open] .ap-hint {
+  margin-top: var(--ap-s-2);
+}
+
+.admin-app .ev-form-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-app .ev-page .ap-empty {
+  justify-items: center;
+}
+
+@media (min-width: 700px) {
+  .admin-app .ev-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-app .ev-row {
+    grid-template-columns: 76px minmax(0, 1fr) auto;
+  }
+
+  .admin-app .ev-actions {
+    grid-column: 3;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1100px) {
+  .admin-app .ev-stats {
+    grid-template-columns: 1.7fr repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-app .ev-next {
+    grid-column: auto;
+  }
+
+  .admin-app .ev-layout.has-form {
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+
+  .admin-app .ev-layout.has-form .ev-form {
+    position: sticky;
+    top: var(--ap-s-4);
+  }
+
+  .admin-app .ev-layout.has-form .ev-row {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .admin-app .ev-layout.has-form .ev-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 1099px) {
+  .admin-app .ev-layout.has-form .ev-form {
+    order: -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-app .ev-row {
+    grid-template-columns: 60px minmax(0, 1fr);
+    padding: var(--ap-s-4);
+  }
+
+  .admin-app .ev-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-app .ev-date-big {
+    font-size: 1.05rem;
+  }
+
+  .admin-app .ev-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ——— Gönnerturnier ——— */
+.admin-app .tn-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ap-s-4);
+}
+
+.admin-app .tn-hero {
+  background: var(--ap-red);
+  color: #fff;
+  gap: var(--ap-s-1);
+}
+
+.admin-app .tn-hero-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--ap-s-2);
+}
+
+.admin-app .tn-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 10px;
+  border-radius: var(--ap-r-pill);
+  background: rgb(255 255 255 / 16%);
+  font-size: var(--ap-fs-label);
+  font-weight: 650;
+}
+
+.admin-app .tn-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.admin-app .tn-status.is-closed::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.admin-app .tn-hero-date {
+  margin: 0;
+  font-family: var(--ap-display);
+  font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.admin-app .tn-hero-place {
+  margin: 0;
+  font-size: var(--ap-fs-lead);
+  color: rgb(255 255 255 / 88%);
+}
+
+.admin-app .tn-times {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ap-s-3);
+  margin: var(--ap-s-4) 0 var(--ap-s-3);
+  padding-top: var(--ap-s-3);
+  border-top: 1px solid rgb(255 255 255 / 28%);
+}
+
+.admin-app .tn-times dt {
+  font-size: var(--ap-fs-caption);
+  color: rgb(255 255 255 / 75%);
+}
+
+.admin-app .tn-times dd {
+  margin: 2px 0 0;
+  font-size: var(--ap-fs-lead);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.admin-app .tn-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ap-s-2);
+}
+
+.admin-app .tn-hero-btn {
+  min-height: 36px;
+  padding: 0 var(--ap-s-4);
+  border: 0;
+  border-radius: var(--ap-r-pill);
+  background: #fff;
+  color: var(--ap-red);
+  font: inherit;
+  font-size: var(--ap-fs-label);
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform var(--ap-dur-fast, 150ms) ease, opacity var(--ap-dur-fast, 150ms) ease;
+}
+
+.admin-app .tn-hero-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.admin-app .tn-hero-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.admin-app .tn-hero-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.admin-app .tn-hero-btn--ghost {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 70%);
+}
+
+.admin-app .tn-ring {
+  justify-items: center;
+  text-align: center;
+  gap: var(--ap-s-3);
+}
+
+.admin-app .tn-ring .tn-label {
+  justify-self: start;
+}
+
+.admin-app .tn-ring-num {
+  font-family: var(--ap-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.admin-app .tn-ring-of {
+  font-size: 1rem;
+  color: var(--ap-muted);
+}
+
+.admin-app .tn-count-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ap-s-4) var(--ap-s-3);
+  margin: var(--ap-s-2) 0 0;
+}
+
+.admin-app .tn-count-grid > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.admin-app .tn-count-grid dd {
+  margin: 0;
+  font-family: var(--ap-display);
+  font-size: var(--ap-fs-num);
+  font-weight: 600;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-app .tn-count-grid dt {
+  font-size: var(--ap-fs-label);
+  color: var(--ap-muted);
+}
+
+.admin-app .tn-count-grid .is-muted dd {
+  color: var(--ap-axis);
+}
+
+.admin-app .tn-copied {
+  color: #137a3a;
+  background: #e5f4ea;
+}
+
+.admin-app .tn-sent .ap-card-head {
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .admin-app .tn-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-app .tn-hero {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .admin-app .tn-overview {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr) minmax(0, 1fr);
+  }
+
+  .admin-app .tn-hero {
+    grid-column: auto;
+  }
+}
+
+/* ——— Preisgelder ——— */
+.admin-app .pz-stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ap-s-4);
+}
+
+.admin-app .pz-hero {
+  background: var(--ap-red);
+  color: #fff;
+  align-content: space-between;
+  min-height: 168px;
+}
+
+.admin-app .pz-hero .pz-label,
+.admin-app .pz-hero .pz-sub {
+  color: rgb(255 255 255 / 82%);
+}
+
+.admin-app .pz-hero-num {
+  font-size: clamp(2.5rem, 1.8rem + 2.2vw, 3.75rem);
+}
+
+.admin-app .pz-split {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ap-s-5);
+}
+
+.admin-app .pz-ring-num {
+  font-family: var(--ap-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.admin-app .pz-legend {
+  display: grid;
+  gap: var(--ap-s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-app .pz-legend li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  grid-template-areas: "dot label val" "dot sub val";
+  align-items: center;
+  column-gap: var(--ap-s-2);
+}
+
+.admin-app .pz-dot {
+  grid-area: dot;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.admin-app .pz-dot--prize {
+  background: var(--ap-red);
+}
+
+.admin-app .pz-dot--proam {
+  background: var(--ap-ink);
+}
+
+.admin-app .pz-legend-label {
+  grid-area: label;
+  font-size: var(--ap-fs-body);
+  font-weight: 600;
+}
+
+.admin-app .pz-legend-sub {
+  grid-area: sub;
+  font-size: var(--ap-fs-caption);
+  color: var(--ap-muted);
+}
+
+.admin-app .pz-legend-val {
+  grid-area: val;
+  font-family: var(--ap-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-app .pz-best-num {
+  font-size: clamp(1.75rem, 1.3rem + 1.2vw, 2.5rem);
+}
+
+.admin-app .pz-best-name {
+  font-weight: 600;
+  color: var(--ap-ink);
+}
+
+.admin-app .pz-empty {
+  justify-items: center;
+  text-align: center;
+}
+
+.admin-app .pz-page .ap-table-wrap {
+  animation: ap-rise 520ms var(--ap-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+  animation-delay: 180ms;
+}
+
+.admin-app .pz-page .ap-table tbody tr:hover {
+  background: var(--ap-hover);
+}
+
+.admin-app .pz-form {
+  animation: ap-rise 360ms var(--ap-ease, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+@media (min-width: 900px) {
+  .admin-app .pz-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-app .pz-hero {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .admin-app .pz-stats {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+  }
+
+  .admin-app .pz-hero {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-app .pz-split {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .admin-app .pz-legend {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-app .ev-card,
+  .admin-app .tn-card,
+  .admin-app .pz-card,
+  .admin-app .ev-month,
+  .admin-app .pz-form,
+  .admin-app .pz-page .ap-table-wrap {
+    animation: none;
+  }
+}

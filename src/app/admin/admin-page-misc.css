@@ -1,0 +1,112 @@
+/* admin-page-misc.css: Konto (ac-), Login (lg-), Beiträge. Wird nach admin-dash.css geladen. */
+
+/* ——— Konto ——— */
+.ac-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ap-s-4);
+  align-items: start;
+}
+.ac-card { grid-column: span 7; }
+.ac-tips { grid-column: span 5; }
+.ac-card,
+.ac-tips { animation-delay: calc(var(--i, 0) * var(--ap-stagger, 70ms)); }
+.ac-tips ul {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  display: grid;
+  gap: var(--ap-s-2);
+  font-size: var(--ap-fs-body);
+  color: var(--ap-muted);
+  line-height: 1.5;
+}
+.ac-form { display: grid; gap: var(--ap-s-4); max-width: 30rem; }
+.ac-form .ap-form-actions { justify-content: flex-start; }
+.ac-show {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ap-s-2);
+  width: fit-content;
+  font-size: var(--ap-fs-label);
+  color: var(--ap-muted);
+  cursor: pointer;
+}
+.ac-show input { accent-color: var(--ap-red); width: 16px; height: 16px; }
+.ac-mismatch { font-size: var(--ap-fs-label); color: var(--ap-red); }
+.ac-strength { display: flex; align-items: center; gap: var(--ap-s-2); margin-top: var(--ap-s-1); }
+.ac-strength-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 1; max-width: 12rem; }
+.ac-strength-bar i {
+  height: 5px;
+  border-radius: 3px;
+  background: #e6e3dc;
+  transition: background-color var(--ap-dur-med, 240ms) var(--ap-ease, ease);
+}
+.ac-strength[data-score="1"] i:nth-child(-n + 1) { background: var(--ap-red); }
+.ac-strength[data-score="2"] i:nth-child(-n + 2) { background: #d98a1f; }
+.ac-strength[data-score="3"] i:nth-child(-n + 3) { background: #5d9c59; }
+.ac-strength[data-score="4"] i { background: #2f7d3c; }
+.ac-strength-label { font-size: var(--ap-fs-label); font-weight: 600; color: var(--ap-muted); min-width: 4.5rem; }
+
+/* ——— Login ——— */
+.lg {
+  background: var(--ap-bg);
+  gap: var(--ap-s-4);
+}
+.lg-card {
+  width: min(26rem, calc(100vw - 2rem));
+  gap: var(--ap-s-2);
+  padding: var(--ap-s-6) var(--ap-s-6) var(--ap-s-5);
+  border: 0;
+  border-radius: var(--ap-radius-card, 26px);
+  box-shadow: 0 1px 2px rgb(18 19 20 / 5%), 0 24px 56px rgb(18 19 20 / 8%);
+  animation: ap-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.lg-brand { margin-bottom: var(--ap-s-4); }
+.lg-title {
+  margin: 0;
+  font-family: var(--ap-display, serif);
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.lg-desc { margin: 0; color: var(--ap-muted); font-size: var(--ap-fs-body); line-height: 1.5; }
+.lg-form { margin-top: var(--ap-s-4); gap: var(--ap-s-4); }
+.lg-input { height: 48px; font-size: 1rem; }
+.lg-pw { position: relative; display: block; }
+.lg-pw .lg-input { width: 100%; padding-right: 5.5rem; }
+.lg-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  height: 36px;
+  padding: 0 var(--ap-s-3);
+  border: 0;
+  border-radius: var(--ap-r-pill, 999px);
+  background: transparent;
+  font: inherit;
+  font-size: var(--ap-fs-label);
+  font-weight: 600;
+  color: var(--ap-muted);
+  cursor: pointer;
+}
+.lg-toggle:hover { background: var(--ap-hover); color: var(--ap-ink); }
+.lg-toggle:focus-visible { outline: 2px solid var(--ap-red); outline-offset: 1px; }
+.lg-submit { height: 48px; font-size: 1rem; }
+.lg-back { transition: color var(--ap-dur-fast, 140ms) var(--ap-ease, ease); }
+
+/* ——— Breakpoints ——— */
+@media (max-width: 1099px) {
+  .ac-card,
+  .ac-tips { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .lg-card { padding: var(--ap-s-5) var(--ap-s-4); }
+  .lg-title { font-size: 1.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lg-card,
+  .ac-card,
+  .ac-tips { animation: none; }
+}
