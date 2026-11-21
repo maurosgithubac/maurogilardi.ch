@@ -249,6 +249,161 @@ function EntryForm({
 }
 
 /* ———————————————————————————————————————————————
+ * Fixkosten ins neue Jahr übernehmen: Beträge prüfen und anpassen
+ * ——————————————————————————————————————————————— */
+type CarryRow = { entry: BudgetEntryRow; ended: boolean };
+
+function CarryDialog({
+  rows,
+  year,
+  catLabel,
+  onClose,
+  onDone,
+}: {
+  rows: CarryRow[];
+  year: number;
+  catLabel: (id: string) => string;
+  onClose: () => void;
+  onDone: (message: string) => void;
+}) {
+  const [vals, setVals] = useState<Record<string, { include: boolean; amount: string }>>(() =>
+    Object.fromEntries(rows.map((r) => [r.entry.id, { include: r.ended, amount: String(Number(r.entry.amount_chf)) }])),
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const ended = rows.filter((r) => r.ended);
+  const running = rows.filter((r) => !r.ended);
+
+  // Was passiert: beendete Fixkosten neu anlegen, laufende mit geändertem Betrag ab Januar ersetzen
+  const changes = rows.filter((r) => {
+    const v = vals[r.entry.id];
+    const a = parseAmount(v.amount);
+    return r.ended ? v.include && a > 0 : a > 0 && Math.abs(a - Number(r.entry.amount_chf)) > 0.004;
+  });
+
+  async function apply() {
+    setBusy(true);
+    setError(null);
+    try {
+      for (const r of changes.filter((c) => !c.ended)) {
+        const res = await fetch(`/api/admin/budget/${r.entry.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ends_on: `${year - 1}-12-31` }),
+        });
+        if (!res.ok) throw new Error(((await res.json().catch(() => ({}))) as { error?: string }).error ?? "Beenden des alten Betrags fehlgeschlagen.");
+      }
+      const payload = changes.map((r) => ({
+        scope: r.entry.scope,
+        category: r.entry.category,
+        subcategory: r.entry.subcategory ?? "",
+        amount_chf: parseAmount(vals[r.entry.id].amount),
+        entry_date: `${year}-01-01`,
+        label: r.entry.label,
+        frequency: r.entry.frequency,
+      }));
+      if (payload.length > 0) {
+        const res = await fetch("/api/admin/budget/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rows: payload }),
+        });
+        if (!res.ok) throw new Error(((await res.json().catch(() => ({}))) as { error?: string }).error ?? "Übernehmen fehlgeschlagen.");
+      }
+      onDone(`${payload.length} Fixkosten für ${year} übernommen.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Fehler beim Übernehmen.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function row(r: CarryRow) {
+    const v = vals[r.entry.id];
+    const e = r.entry;
+    const unit = e.frequency === "monatlich" ? "pro Monat" : "pro Jahr";
+    return (
+      <li key={e.id} className="bt-carry-row">
+        {r.ended ? (
+          <input
+            type="checkbox"
+            checked={v.include}
+            onChange={(ev) => setVals((prev) => ({ ...prev, [e.id]: { ...prev[e.id], include: ev.target.checked } }))}
+            aria-label={`${e.label || catLabel(e.category)} übernehmen`}
+          />
+        ) : (
+          <span aria-hidden="true" />
+        )}
+        <span className="bt-carry-main">
+          <strong>{e.label || e.subcategory || catLabel(e.category)}</strong>
+          <span>
+            {catLabel(e.category)}
+            {e.subcategory ? ` › ${e.subcategory}` : ""} · {unit}
+            {r.ended && e.ends_on ? ` · endete ${dmy(e.ends_on)}` : ""}
+          </span>
+        </span>
+        <label className="bt-carry-amount">
+          <span>CHF</span>
+          <input
+            inputMode="decimal"
+            value={v.amount}
+            onChange={(ev) => setVals((prev) => ({ ...prev, [e.id]: { ...prev[e.id], amount: ev.target.value, include: r.ended ? true : prev[e.id].include } }))}
+            aria-label={`Betrag ${unit}`}
+          />
+        </label>
+      </li>
+    );
+  }
+
+  return (
+    <div className="bt-overlay" onClick={onClose}>
+      <div className="bt-modal bt-carry-modal" role="dialog" aria-modal="true" aria-label={`Fixkosten für ${year} übernehmen`} onClick={(e) => e.stopPropagation()}>
+        <div className="bt-modal-head">
+          <div>
+            <h2 className="bt-h2">Fixkosten für {year} übernehmen</h2>
+            <p className="bt-sub">Die Zahlen von {year - 1} bleiben unverändert. Beträge kannst du hier anpassen, sie gelten ab 1. Januar {year}.</p>
+          </div>
+          <button type="button" className="bt-close" aria-label="Schliessen" onClick={onClose}>×</button>
+        </div>
+
+        {ended.length > 0 ? (
+          <section className="bt-carry-section">
+            <h3 className="bt-h3">Laufen {year} nicht weiter</h3>
+            <ul className="bt-carry-list">{ended.map(row)}</ul>
+          </section>
+        ) : null}
+
+        {running.length > 0 ? (
+          <section className="bt-carry-section">
+            <h3 className="bt-h3">Laufen weiter</h3>
+            <p className="bt-sub">Nur ändern, wenn sich der Betrag ab Januar ändert. Der alte Betrag endet dann am 31.12. {year - 1}.</p>
+            <ul className="bt-carry-list">{running.map(row)}</ul>
+          </section>
+        ) : null}
+
+        {error ? <p className="bt-error" role="alert">{error}</p> : null}
+
+        <div className="bt-carry-foot">
+          <button type="button" className="bt-done" onClick={onClose}>Abbrechen</button>
+          <button type="button" className="bt-save" disabled={busy || changes.length === 0} onClick={() => void apply()}>
+            {busy ? "Übernehme…" : changes.length === 0 ? "Nichts zu übernehmen" : `${changes.length} ${changes.length === 1 ? "Fixkosten" : "Fixkosten"} übernehmen`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ———————————————————————————————————————————————
  * Seite
  * ——————————————————————————————————————————————— */
 export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }: Props) {
@@ -267,6 +422,7 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
   const [modalOpen, setModalOpen] = useState(false);
   const [modalCat, setModalCat] = useState<string | null>(null);
   const [modalSub, setModalSub] = useState<string | null>(null);
+  const [carryOpen, setCarryOpen] = useState(false);
 
   const [toast, setToast] = useState<string | null>(null);
   const [importRows, setImportRows] = useState<ImportRow[]>([]);
@@ -343,6 +499,21 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
     }
     return [...map.values()].sort((a, b) => b.total - a.total);
   }
+
+  // Fixkosten des Vorjahres: laufen sie im gewählten Jahr weiter oder sind sie beendet?
+  const carryRows: CarryRow[] = useMemo(
+    () =>
+      scopeEntries
+        .filter((e) => e.frequency !== "einmalig")
+        .flatMap((e) => {
+          const inSource = monthlyAmounts([e], year - 1)[0].months.some((v) => v > 0);
+          if (!inSource) return [];
+          const inTarget = monthlyAmounts([e], year)[0].months.some((v) => v > 0);
+          return [{ entry: e, ended: !inTarget }];
+        }),
+    [scopeEntries, year],
+  );
+  const endedCount = carryRows.filter((r) => r.ended).length;
 
   const selCat = cats.find((c) => c.id === catId) ?? null;
   const subGroups = subGroupsFor(catId);
@@ -514,6 +685,19 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
           </button>
         ))}
       </div>
+
+      {carryRows.length > 0 ? (
+        <div className={`bt-carry${endedCount > 0 ? " is-alert" : ""}`}>
+          <span>
+            {endedCount > 0
+              ? `${endedCount} Fixkosten aus ${year - 1} laufen in ${year} nicht weiter.`
+              : `${carryRows.length} Fixkosten laufen in ${year} automatisch weiter.`}
+          </span>
+          <button type="button" onClick={() => setCarryOpen(true)}>
+            {endedCount > 0 ? "Übernehmen" : "Prüfen und anpassen"}
+          </button>
+        </div>
+      ) : null}
 
       {/* Bühne: Heatmap (rechts, wenn hineingezoomt) und Eingabe (links) */}
       <div className={`bt-stage${drill ? " is-drill" : ""}`}>
@@ -708,6 +892,20 @@ export function AdminBudgetClient({ entries, incomeByYear, years, defaultYear }:
       <button type="button" className="bt-fab" onClick={openModal}>
         <span aria-hidden="true">+</span> Ausgabe erfassen
       </button>
+
+      {carryOpen ? (
+        <CarryDialog
+          key={`${scope}-${year}`}
+          rows={carryRows}
+          year={year}
+          catLabel={(id) => cats.find((c) => c.id === id)?.label ?? id}
+          onClose={() => setCarryOpen(false)}
+          onDone={(message) => {
+            setCarryOpen(false);
+            onSaved(message);
+          }}
+        />
+      ) : null}
 
       {toast ? <div className="bt-toast" role="status">{toast}</div> : null}
 

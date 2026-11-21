@@ -29,7 +29,9 @@ export default async function AdminBudgetPage() {
   for (const p of paymentsRes.data ?? []) incomeByYear[String(p.year)] = (incomeByYear[String(p.year)] ?? 0) + Number(p.amount_chf || 0);
   for (const r of prizesRes.data ?? []) incomeByYear[String(r.year)] = (incomeByYear[String(r.year)] ?? 0) + Number(r.amount_chf || 0);
 
-  const years = [currentYear - 1, currentYear, currentYear + 1];
+  // Alle Jahre vom ersten erfassten Eintrag bis zum nächsten Jahr, damit ältere Jahre nach dem Jahreswechsel nicht verschwinden
+  const firstYear = Math.min(currentYear - 1, ...entries.map((e) => Number(String(e.entry_date).slice(0, 4))).filter((n) => Number.isFinite(n)));
+  const years = Array.from({ length: currentYear + 1 - firstYear + 1 }, (_, i) => firstYear + i);
 
   return (
     <div className="ap-page ap-page--wide">

@@ -1047,3 +1047,147 @@
     transition: none;
   }
 }
+
+/* ——— Fixkosten ins neue Jahr übernehmen ——— */
+.bt-carry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: #fff;
+  font-size: 0.88rem;
+  color: var(--ap-ink-2);
+}
+
+.bt-carry.is-alert {
+  background: rgb(215 25 32 / 9%);
+  color: var(--ap-ink);
+  font-weight: 600;
+}
+
+.bt-carry button {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ap-ink);
+  color: #fff;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+
+.bt-carry.is-alert button {
+  background: var(--ap-red);
+}
+
+.bt-carry button:hover {
+  transform: translateY(-1px);
+}
+
+.bt-carry-modal {
+  width: min(820px, 100%);
+}
+
+.bt-carry-section {
+  display: grid;
+  gap: 8px;
+}
+
+.bt-carry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.bt-carry-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 170px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #f6f5f1;
+}
+
+.bt-carry-main {
+  display: grid;
+  min-width: 0;
+}
+
+.bt-carry-main strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.bt-carry-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--ap-muted);
+}
+
+.bt-carry-amount {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid var(--ap-hair-strong, #d0d3d8);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.bt-carry-amount span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ap-muted);
+}
+
+.bt-carry-amount input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 650;
+  text-align: right;
+  color: var(--ap-ink);
+  outline: none;
+}
+
+.bt-carry-amount:focus-within {
+  border-color: var(--ap-red);
+  box-shadow: 0 0 0 4px rgb(215 25 32 / 14%);
+}
+
+.bt-carry-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.bt-carry-foot .bt-done {
+  padding: 0 22px;
+}
+
+@media (max-width: 560px) {
+  .bt-carry-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .bt-carry-amount {
+    grid-column: 1 / -1;
+  }
+}
