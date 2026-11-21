@@ -74,13 +74,15 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
     const projection = geoOrthographic().clipAngle(90).precision(0.4);
     const path = geoPath(projection, ctx);
 
+    let baseScale = 0;
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       sizeRef.current = { w: rect.width, h: rect.height, dpr };
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
-      projection.translate([rect.width / 2, rect.height / 2]).scale(Math.min(rect.width, rect.height) / 2 - 18);
+      baseScale = Math.min(rect.width, rect.height) / 2 - 18;
+      projection.translate([rect.width / 2, rect.height / 2]).scale(baseScale);
       draw(progress());
     };
 
@@ -105,11 +107,31 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
       const e = easeInOut(t);
       const center = interp(e);
       projection.rotate([-center[0], -center[1]]);
+      // Zoom: nah am Turnier hinein, in der Flugphase heraus
+      const zoom = 1 + 0.42 * Math.pow(Math.abs(2 * t - 1), 4);
+      projection.scale(baseScale * zoom);
+      const R = projection.scale();
+      const cx = sizeRef.current.w / 2;
+      const cy = sizeRef.current.h / 2;
+
+      // Atmosphäre: weicher Lichtrand um den Globus
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.22);
+      halo.addColorStop(0, "rgba(250,249,246,0.16)");
+      halo.addColorStop(0.45, "rgba(250,249,246,0.035)");
+      halo.addColorStop(1, "rgba(215,25,32,0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
+      ctx.fill();
 
       // Globus
       ctx.beginPath();
       path({ type: "Sphere" });
-      ctx.fillStyle = C.ocean;
+      const shade = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+      shade.addColorStop(0, "#2b2922");
+      shade.addColorStop(0.7, "#171510");
+      shade.addColorStop(1, "#070706");
+      ctx.fillStyle = shade;
       ctx.fill();
       ctx.beginPath();
       path(geoGraticule10());
@@ -121,6 +143,9 @@ export function KalenderJourney({ events, totals, homeName }: { events: Kalender
         path(landRef.current as never);
         ctx.fillStyle = C.land;
         ctx.fill();
+        ctx.strokeStyle = "rgba(250,249,246,0.10)";
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
       }
 
       // Strecken: bereits gespielt (durchgezogen), aktuelle (wächst), kommend (gestrichelt)

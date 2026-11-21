@@ -15,7 +15,7 @@ type Props = {
 export function ScrollFillText({ text, className }: Props) {
   const ref = useRef<HTMLParagraphElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 45%"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "end 5%"] });
   const words = text.split(" ");
 
   if (reduce) {
