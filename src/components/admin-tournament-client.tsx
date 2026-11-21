@@ -31,7 +31,12 @@ export function AdminTournamentClient({
   invites: TournamentInviteRow[];
 }) {
   const router = useRouter();
-  const [currentId, setCurrentId] = useState(tournaments[0]?.id ?? "");
+  // Aktuelle Turniere und Archiv (abgeschlossen)
+  const active = tournaments.filter((item) => !item.archived_at);
+  const archived = tournaments.filter((item) => item.archived_at);
+  const [currentId, setCurrentId] = useState(active[0]?.id ?? "");
+  const [tab, setTab] = useState<"aktuell" | "archiv">("aktuell");
+  const [creating, setCreating] = useState(false);
   const tournament = tournaments.find((item) => item.id === currentId) ?? null;
   const [draft, setDraft] = useState({
     title: tournament?.title ?? `Gönnerturnier ${new Date().getFullYear()}`,
@@ -66,6 +71,67 @@ export function AdminTournamentClient({
     });
   }
 
+  /** Neues Turnier, meist fürs nächste Jahr: Ort, Zeiten und Text kommen vom letzten Turnier. */
+  function startNew() {
+    const latest = [...tournaments].sort((a, b) => b.event_date.localeCompare(a.event_date))[0] ?? null;
+    const thisYear = new Date().getFullYear();
+    const latestYear = latest ? Number(latest.event_date.slice(0, 4)) : null;
+    const year = latestYear !== null && latestYear >= thisYear ? latestYear + 1 : thisYear;
+    setTab("aktuell");
+    setCurrentId("");
+    setCreating(true);
+    setEditOpen(false);
+    setClinicPicked([]);
+    setRoundPicked([]);
+    setError(null);
+    setNotice(null);
+    setDraft({
+      title: `Gönnerturnier ${year}`,
+      event_date: latest ? `${year}${latest.event_date.slice(4)}` : "",
+      place: latest?.place ?? "Domat/Ems",
+      clinic_time: latest?.clinic_time ?? "Vormittag",
+      first_flight_time: latest?.first_flight_time ?? "12:00",
+      dinner_time: latest?.dinner_time ?? "18:30",
+      intro: latest?.intro ?? "",
+    });
+  }
+
+  /** Abschliessen (ins Archiv) oder aus dem Archiv wiederherstellen. */
+  async function archive(target: TournamentRow, value: boolean) {
+    if (
+      value &&
+      !window.confirm(`«${target.title}» abschliessen und ins Archiv legen? Die Anmeldung wird geschlossen. Einladungen und Antworten bleiben erhalten.`)
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await fetch(`/api/admin/turnier/${target.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ archived: value }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setError(data.error || "Das hat nicht geklappt.");
+        return;
+      }
+      if (value) {
+        setNotice("Turnier abgeschlossen und ins Archiv gelegt. Jetzt kannst du das nächste anlegen.");
+        setCurrentId(active.find((item) => item.id !== target.id)?.id ?? "");
+      } else {
+        setNotice("Turnier wiederhergestellt.");
+        setCurrentId(target.id);
+        setTab("aktuell");
+      }
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function save(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -85,6 +151,7 @@ export function AdminTournamentClient({
       setNotice("Turnier gespeichert.");
       setCurrentId(data.tournament.id);
       setEditOpen(false);
+      setCreating(false);
       router.refresh();
     } finally {
       setBusy(false);
@@ -189,6 +256,8 @@ export function AdminTournamentClient({
     }
   }
 
+  const showForm = creating || editOpen || (!tournament && tournaments.length === 0);
+
   return (
     <div className="ap-page tn-page">
       <AdminPageHeader
@@ -196,22 +265,31 @@ export function AdminTournamentClient({
         title={tournament ? tournament.title : "Turnier"}
         description="Zuerst wählst du, wer die Einladung mit Klinik bekommt. Danach, wer nur Golfrunde und Abendessen bekommt. In der Liste sind alle aktiven Personen, auch ohne Status bezahlt. Der 100er Club ist nicht dabei. Ein Mail geht erst raus, wenn du die Einladung sendest."
         actions={
-          tournaments.length > 0 ? (
-            <label className="ap-field-inline">
-              <span>Turnier</span>
-              <select
-                className="ap-select"
-                value={currentId}
-                onChange={(event) => load(tournaments.find((item) => item.id === event.target.value) ?? null)}
-              >
-                {tournaments.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null
+          <>
+            <div className="ap-segment" role="tablist" aria-label="Ansicht">
+              <button type="button" role="tab" aria-selected={tab === "aktuell"} aria-pressed={tab === "aktuell"} className="ap-segment-btn" onClick={() => setTab("aktuell")}>
+                Aktuell
+              </button>
+              <button type="button" role="tab" aria-selected={tab === "archiv"} aria-pressed={tab === "archiv"} className="ap-segment-btn" onClick={() => setTab("archiv")}>
+                Archiv ({archived.length})
+              </button>
+            </div>
+            {tab === "aktuell" && active.length > 1 && active.some((item) => item.id === currentId) ? (
+              <label className="ap-field-inline">
+                <span>Turnier</span>
+                <select className="ap-select" value={currentId} onChange={(event) => load(active.find((item) => item.id === event.target.value) ?? null)}>
+                  {active.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+            <button type="button" className="ap-btn ap-btn--primary" onClick={startNew}>
+              + Neues Turnier
+            </button>
+          </>
         }
       />
 
@@ -228,6 +306,66 @@ export function AdminTournamentClient({
       {notice ? (
         <p className="ap-banner ap-banner--ok" role="status">
           {notice}
+        </p>
+      ) : null}
+
+      {tab === "archiv" ? (
+        <section className="tn-archive" aria-label="Archiv">
+          {archived.length === 0 ? (
+            <div className="ap-card tn-empty">
+              <h2 className="ap-h2">Noch nichts im Archiv</h2>
+              <p className="tn-sub">Abgeschlossene Turniere landen hier. Zum Abschliessen im aktuellen Turnier auf «Turnier abschliessen» tippen.</p>
+            </div>
+          ) : (
+            <ul className="tn-archive-list ap-stagger">
+              {archived.map((item, index) => {
+                const inv = invites.filter((invite) => invite.tournament_id === item.id);
+                const answered = inv.filter((invite) => invite.responded_at);
+                return (
+                  <li key={item.id} className="tn-card tn-archive-item" style={{ "--i": index } as React.CSSProperties}>
+                    <div className="tn-archive-main">
+                      <h2 className="tn-archive-title">{item.title}</h2>
+                      <p className="tn-sub">
+                        {eventDateLabel(item.event_date)} · {item.place}
+                      </p>
+                    </div>
+                    <dl className="tn-archive-stats">
+                      <div><dd>{inv.filter((invite) => invite.invited_at).length}</dd><dt>Eingeladen</dt></div>
+                      <div><dd>{answered.length}</dd><dt>Geantwortet</dt></div>
+                      <div><dd>{answered.filter((invite) => invite.clinic).length}</dd><dt>Klinik</dt></div>
+                      <div><dd>{answered.filter((invite) => invite.golf_round).length}</dd><dt>Golfrunde</dt></div>
+                      <div><dd>{answered.filter((invite) => invite.dinner).length}</dd><dt>Abendessen</dt></div>
+                    </dl>
+                    <div className="tn-archive-actions">
+                      <button
+                        type="button"
+                        className="ap-btn ap-btn--secondary ap-btn--sm"
+                        onClick={() => {
+                          load(item);
+                          setCreating(false);
+                          setTab("aktuell");
+                        }}
+                      >
+                        Ansehen
+                      </button>
+                      <button type="button" className="ap-btn ap-btn--ghost ap-btn--sm" disabled={busy} onClick={() => void archive(item, false)}>
+                        Wiederherstellen
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      ) : (
+      <>
+      {tournament && tournament.archived_at ? (
+        <p className="ap-banner ap-banner--warn tn-archived-note" role="status">
+          Dieses Turnier ist abgeschlossen und im Archiv.
+          <button type="button" className="ap-btn ap-btn--secondary ap-btn--sm" disabled={busy} onClick={() => void archive(tournament, false)}>
+            Wiederherstellen
+          </button>
         </p>
       ) : null}
 
@@ -273,6 +411,11 @@ export function AdminTournamentClient({
               >
                 {editOpen ? "Angaben ausblenden" : "Angaben bearbeiten"}
               </button>
+              {!tournament.archived_at ? (
+                <button type="button" className="tn-hero-btn tn-hero-btn--ghost" disabled={busy} onClick={() => void archive(tournament, true)}>
+                  Turnier abschliessen
+                </button>
+              ) : null}
             </div>
           </article>
 
@@ -336,7 +479,7 @@ export function AdminTournamentClient({
         </section>
       ) : null}
 
-      {!tournament || editOpen ? (
+      {showForm ? (
       <form id="tn-form" className="ap-card ap-form tn-form" onSubmit={save}>
         <div className="ap-card-head">
           <h2 className="ap-h2">{tournament ? "Angaben" : "Neues Turnier"}</h2>
@@ -375,8 +518,30 @@ export function AdminTournamentClient({
           <button type="submit" className="ap-btn ap-btn--primary" disabled={busy || missing}>
             {busy ? "Speichern…" : tournament ? "Angaben speichern" : "Turnier anlegen"}
           </button>
+          {creating && tournaments.length > 0 ? (
+            <button
+              type="button"
+              className="ap-btn ap-btn--ghost"
+              onClick={() => {
+                setCreating(false);
+                load(active[0] ?? null);
+              }}
+            >
+              Abbrechen
+            </button>
+          ) : null}
         </div>
       </form>
+      ) : null}
+
+      {!tournament && !showForm ? (
+        <div className="ap-card tn-empty">
+          <h2 className="ap-h2">Kein aktuelles Turnier</h2>
+          <p className="tn-sub">Das letzte Turnier liegt im Archiv. Lege das nächste Gönnerturnier an, Ort und Zeiten werden übernommen.</p>
+          <button type="button" className="ap-btn ap-btn--primary" onClick={startNew}>
+            + Neues Turnier
+          </button>
+        </div>
       ) : null}
 
       {tournament ? (
@@ -509,6 +674,8 @@ export function AdminTournamentClient({
           </section>
         </>
       ) : null}
+      </>
+      )}
     </div>
   );
 }

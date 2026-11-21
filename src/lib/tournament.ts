@@ -18,6 +18,8 @@ export type TournamentRow = {
   dinner_time: string;
   intro: string | null;
   status: TournamentStatus;
+  /** Gesetzt, wenn das Turnier abgeschlossen und im Archiv ist (Migration 030). */
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 };

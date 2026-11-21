@@ -749,3 +749,85 @@
     animation: none;
   }
 }
+
+/* ——— Gönnerturnier: Archiv, Leerzustand ——— */
+.admin-app .tn-empty {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  padding: 24px;
+}
+
+.admin-app .tn-archive-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-app .tn-archive-item {
+  display: grid;
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: var(--ap-radius-card, 26px);
+  background: #fff;
+}
+
+.admin-app .tn-archive-title {
+  margin: 0;
+  font-family: var(--ap-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.admin-app .tn-archive-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-app .tn-archive-stats div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-app .tn-archive-stats dd {
+  margin: 0;
+  font-family: var(--ap-display, Georgia, serif);
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.admin-app .tn-archive-stats dt {
+  font-size: 0.72rem;
+  color: var(--ap-muted);
+}
+
+.admin-app .tn-archive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-app .tn-archived-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (min-width: 1100px) {
+  .admin-app .tn-archive-item {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) auto;
+    align-items: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-app .tn-archive-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

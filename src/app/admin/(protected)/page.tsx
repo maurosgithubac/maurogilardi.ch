@@ -39,7 +39,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       .select("id,entry_date,amount_chf,scope,category,label,frequency,ends_on")
       .eq("scope", "golf"),
     supabase.from("newsletter_subscribers").select("id", { count: "exact", head: true }),
-    supabase.from("tournaments").select("*").order("event_date", { ascending: false }).limit(1),
+    supabase.from("tournaments").select("*").is("archived_at", null).order("event_date", { ascending: false }).limit(1),
     loadBeehiivStats(),
   ]);
 
@@ -55,7 +55,11 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
 
   // Gönnerturnier: neuester Anlass mit Antworten
   let tournament: TournamentSummary | null = null;
-  const latest = (tournamentRes.data?.[0] ?? null) as TournamentRow | null;
+  // Fehlt die Archiv-Spalte noch (Migration 030), das neueste Turnier ohne Filter laden
+  const tournamentRows = tournamentRes.error
+    ? (await supabase.from("tournaments").select("*").order("event_date", { ascending: false }).limit(1)).data
+    : tournamentRes.data;
+  const latest = (tournamentRows?.[0] ?? null) as TournamentRow | null;
   if (latest) {
     const invitesRes = await supabase.from("tournament_invites").select("*").eq("tournament_id", latest.id);
     const invites = ((invitesRes.data ?? []) as TournamentInviteRow[]).filter(Boolean);

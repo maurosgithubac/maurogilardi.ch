@@ -44,9 +44,27 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     patch.status = body.status;
   }
 
+  // Abschliessen: ins Archiv legen und die Anmeldung schliessen. Wiederherstellen: nur aus dem Archiv holen.
+  if ("archived" in body) {
+    if (body.archived === true) {
+      patch.archived_at = new Date().toISOString();
+      patch.status = "closed";
+    } else if (body.archived === false) {
+      patch.archived_at = null;
+    } else {
+      return NextResponse.json({ error: "Ungültiger Wert für Archiv." }, { status: 400 });
+    }
+  }
+
   const supabase = await createSupabaseUserServerClient();
   const { data, error } = await supabase.from("tournaments").update(patch).eq("id", id).select("*").maybeSingle();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    const noColumn = /archived_at/i.test(error.message);
+    return NextResponse.json(
+      { error: noColumn ? "Das Archiv braucht noch die Datenbank-Erweiterung: supabase/030_tournament_archive.sql ausführen." : error.message },
+      { status: 500 },
+    );
+  }
   if (!data) return NextResponse.json({ error: "Turnier nicht gefunden." }, { status: 404 });
   return NextResponse.json({ tournament: data });
 }
