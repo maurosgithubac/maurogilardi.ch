@@ -39,7 +39,6 @@ export const personProfileUrls = {
   instagram: socialProfiles.instagram.url,
   linkedin: socialProfiles.linkedin.url,
   proGolfTour: "https://www.progolftour.de/spieler-profil/55943",
-  swissPga: "https://swisspga.ch/spieler-detail/156?year=2025",
   owgr: "https://www.owgr.com/playerprofile/mauro-gilardi-27006",
   dataGolf: "https://datagolf.com/player-profiles?dg_id=27006",
   friendsOfSwissGolfTalents: "https://friendsofswissgolftalents.ch/talent/mauro-gilardi/",

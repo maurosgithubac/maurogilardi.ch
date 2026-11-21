@@ -66,7 +66,7 @@ export function buildPageMetadata({
 }
 
 export const HOME_PAGE_DESCRIPTION =
-  "Mauro Gilardi ist Schweizer Golfprofi und Swiss PGA Professional aus Graubünden. 2026 gelang ihm der Aufstieg von der Pro Golf Tour in die HotelPlanner Tour.";
+  "Mauro Gilardi ist Golf Professional und Swiss PGA Playing Pro aus Graubünden, Schweiz. 2026 gelang ihm der Aufstieg von der Pro Golf Tour in die HotelPlanner Tour.";
 
 export const homePageMetadata: Metadata = buildPageMetadata({
   path: "/",

@@ -272,13 +272,6 @@ export const pressItems: PressItem[] = [
   },
   {
     outletId: "swiss-pga",
-    title: "Spielerprofil Swiss PGA",
-    href: "https://swisspga.ch/spieler-detail/156?year=2025",
-    period: "2025",
-    dek: "Ranking, Turniere und Profil beim Verband.",
-  },
-  {
-    outletId: "swiss-pga",
     title: "Order of Merit Herren",
     href: "https://swisspga.ch/order-of-merit",
     dek: "Aktuelle Wertung — Platzierung im Schweizer Profifeld.",

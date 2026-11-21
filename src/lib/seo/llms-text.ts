@@ -102,7 +102,6 @@ function profilesSection(): string[] {
     instagram: "Instagram (@gilardigolf)",
     linkedin: "LinkedIn",
     proGolfTour: "Pro Golf Tour — Spielerprofil",
-    swissPga: "Swiss PGA — Spielerprofil",
     owgr: "Official World Golf Ranking — Spielerprofil",
     dataGolf: "Data Golf — Spielerprofil",
     friendsOfSwissGolfTalents: "Friends of Swiss Golf Talents — Talentprofil",
