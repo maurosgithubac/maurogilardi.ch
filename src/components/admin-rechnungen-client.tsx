@@ -297,7 +297,7 @@ export function AdminRechnungenClient({
           </div>
         </div>
         {previewError ? <p className="ar-empty">{previewError}</p> : null}
-        <div ref={frameRef} className={`ar-frame ar-frame--${device}`} style={{ height: 1123 * scale }}>
+        <div ref={frameRef} className={`ar-frame ar-frame--${device}`} style={{ height: html ? 1123 * scale : 0 }}>
           {html ? (
             <iframe
               title="Rechnungsvorschau"
